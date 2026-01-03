@@ -10,6 +10,7 @@ from ops_youtube import OperatorYoutube
 from ops_rss import OperatorRSS
 from ops_reddit import OperatorReddit
 from ops_crawl_blog_superhuman import OperatorCrawlBlogSuperhuman
+from ops_crawl_rss_natolambert import OperatorCrawlRSSNatoLambert
 import utils
 
 
@@ -199,6 +200,12 @@ def run(args):
             op = OperatorCrawlBlogSuperhuman()
             data = pull_crawl(args, op)
             save_crawl(args, op, data, source=source)
+        
+        elif source == "CrawlBlogNatoLambert":
+            op = OperatorCrawlRSSNatoLambert()
+            data = pull_rss(args, op)
+            save_rss(args, op, data)
+
 
         elif source == "APICrawler":
             from ops_api_crawler import OperatorAPICrawler

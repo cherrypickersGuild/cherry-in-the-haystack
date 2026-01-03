@@ -64,7 +64,7 @@ with DAG(
                      '--run-id={{ run_id }} '
                      '--job-id={{ ti.job_id }} '
                      '--data-folder="data/news" '
-                     '--sources=RSS,CrawlBlogSuperhuman',
+                     '--sources=RSS,CrawlBlogSuperhuman,CrawlBlogNatoLambert',
     )
 
     t4 = BashOperator(
@@ -77,7 +77,7 @@ with DAG(
                      '--data-folder="data/news" '
                      '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
                      '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
-                     '--sources=RSS,CrawlBlogSuperhuman',
+                     '--sources=RSS,CrawlBlogSuperhuman,CrawlBlogNatoLambert',
     )
 
     t5 = BashOperator(
