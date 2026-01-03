@@ -40,3 +40,7 @@ logs/
 .claude/*.txt
 dev/apps/api/venv/
 dev/apps/api/src/WORKDIR=/
+dev/apps/api/.env.template
+dev/apps/api/.env.template.k8s
+dev/run_local.sh
+dev/apps/api/api.env
