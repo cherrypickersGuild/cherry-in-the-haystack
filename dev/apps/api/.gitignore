@@ -5,3 +5,8 @@ test_*.py
 
 claude_chat_text/*
 docker/workspace/
+
+# 환경변수 파일 (민감정보 보호)
+.env
+.env.template
+.env.template.k8s
