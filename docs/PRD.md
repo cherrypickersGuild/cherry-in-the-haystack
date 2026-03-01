@@ -221,20 +221,27 @@ Cherry for AI Engineers is organized into three main content sections, each with
 
 **New Page Structure (Applied to ALL users - Free & Paid):**
 
-Each concept page follows this three-section format:
+Each concept page follows this four-section format:
 
 1. **Overview**
    - Summarizes the definition of the technique/methodology
    - Explains why this matters to engineers
    - Provides context and practical relevance
 
-2. **Child Concepts / Co-occurring Concepts**
+2. **Cherries**
+   - MECE-structured summaries of what ingested books and sources say about this concept
+   - Each entry is a distinct, non-overlapping insight from an authoritative source
+   - Organized so entries are collectively exhaustive — together they cover the concept fully
+   - Shows the ground truth: what the literature actually says, not AI invention
+   - Format: source title + structured key insight(s) from that source
+
+3. **Child Concepts / Co-occurring Concepts**
    - Shows related concepts from Graph DB ontology
    - Displays prerequisite, related, subtopic, extends, or contradicts relationships
    - Example: RAG concept shows "Reranking", "Hybrid Search", "Vector Databases" as child concepts
    - Each related concept includes brief explanation of relationship
 
-3. **Progressive References (MECE Learning Path)**
+4. **Progressive References (MECE Learning Path)**
    - Mutually Exclusive, Collectively Exhaustive reference organization
    - Starts with foundational article that broadly and easily covers the concept
    - Each subsequent reference adds value not covered in previous ones
@@ -265,7 +272,7 @@ Curated Text Sources → Evidence Layer Storage → Ontology Building → Writer
 - Custom embedding models
 - Adversarial evaluation, benchmarking
 
-**Page Structure:** Same three-section format as Basics (Overview → Child Concepts → Progressive References)
+**Page Structure:** Same four-section format as Basics (Overview → Cherries → Child Concepts → Progressive References)
 
 **Content Pipeline:** Same as Basics section (Evidence Layer → Ontology → Writer Agent with new format)
 
@@ -396,7 +403,7 @@ Content Ingestion Pipeline → Deduplication → AI Agent Scoring (1-5) → Know
 - ✅ Graph Database with two-layer architecture:
   - Ontology Layer: Concept nodes and relationships
   - Evidence Layer: Source texts and materials
-- ✅ Writer Agent for Basics/Advanced page generation with **new three-section format** (Overview → Child Concepts → Progressive References)
+- ✅ Writer Agent for Basics/Advanced page generation with **new four-section format** (Overview → Cherries → Child Concepts → Progressive References)
 - **🆕 Web Application Backend:**
   - User authentication & authorization (email/password, OAuth)
   - User database (accounts, preferences, reading history)
@@ -411,10 +418,10 @@ Content Ingestion Pipeline → Deduplication → AI Agent Scoring (1-5) → Know
 **Content at Launch:**
 - **Basics Section:**
   - Topics extracted from Curated Books and Lectures
-  - All pages use new three-section format
+  - All pages use new four-section format
 - **Advanced Section:**
   - Topics extracted from Curated Books and Lectures
-  - All pages use new three-section format
+  - All pages use new four-section format
 - **Newly Discovered:**
   - All 4 main categories established with initial content (Research & Models, Service & System Building, Industry & Business Applications, Ecosystem/Governance)
   - Minimum 10 entries per category from first month of curation
@@ -431,7 +438,7 @@ Content Ingestion Pipeline → Deduplication → AI Agent Scoring (1-5) → Know
 **Free Tier (Unpersonalized Experience):**
 - Access to all community-curated content
 - Browse Basics, Advanced, Newly Discovered sections
-- View content in new three-section format
+- View content in new four-section format
 - Built-in search
 - No account required for read-only access
 - Optional account creation for reading history
@@ -491,7 +498,7 @@ Content Ingestion Pipeline → Deduplication → AI Agent Scoring (1-5) → Know
 - Writer Agent for page generation (new format):
   - Loads concept + connected concepts + relationships from Graph DB
   - Collects mapped evidence sources
-  - Generates three-section structure: Overview → Child Concepts → Progressive References
+  - Generates four-section structure: Overview → Cherries → Child Concepts → Progressive References
   - Composes pages by citing/paraphrasing evidence
 - **🆕 Natural Language Preference Parsing:**
   - Interprets user's natural language scoring criteria into actionable weights
@@ -719,10 +726,10 @@ Knowledge Team Concept Review (2nd Saturday monthly)
   - Discuss and finalize TOC updates
   - Decide concept promotion (Advanced → Basics)
   ↓
-Writer Agent Page Generation (New Three-Section Format)
+Writer Agent Page Generation (New Four-Section Format)
   - Load concept + connected concepts + relationships
   - Collect mapped evidence sources
-  - Generate: Overview → Child Concepts → Progressive References (MECE)
+  - Generate: Overview → Cherries → Child Concepts → Progressive References (MECE)
   - Compose page (cite/paraphrase evidence)
   ↓
 Community Content Repository (Database)
@@ -765,7 +772,7 @@ Email Distribution
 
 ### Concept Page Structure (UI Design)
 
-**Design Philosophy:** Three-section progressive learning structure with MECE reference organization.
+**Design Philosophy:** Four-section progressive learning structure with MECE organization throughout.
 
 **Page Layout for Basics/Advanced Concepts (Applied to ALL users - Free & Paid):**
 
@@ -783,7 +790,16 @@ Email Distribution
 - Situational guidance
 - Use cases and anti-patterns
 
-## 2. Child Concepts / Co-occurring Concepts
+## 2. Cherries
+MECE-structured key insights from ingested books and sources on this concept:
+
+- **[Source Title A]** — [Distinct insight or framing this source provides]
+- **[Source Title B]** — [Different angle or aspect not covered by A]
+- **[Source Title C]** — [Further non-overlapping insight]
+
+*(Each cherry is a valuable piece picked from the haystack of source material — non-overlapping, collectively exhaustive)*
+
+## 3. Child Concepts / Co-occurring Concepts
 These concepts are commonly used together or build upon [Concept]:
 
 ### Prerequisite Concepts
@@ -807,7 +823,7 @@ These concepts are commonly used together or build upon [Concept]:
 - **[Advanced Concept]** — Building on this foundation
 - Links to Advanced section
 
-## 3. Progressive References (MECE Learning Path)
+## 4. Progressive References (MECE Learning Path)
 
 **Mutually Exclusive, Collectively Exhaustive reference organization:**
 
@@ -856,13 +872,19 @@ These concepts are commonly used together or build upon [Concept]:
    - Provides immediate context and value proposition
    - Accessible to all skill levels
 
-2. **Child Concepts Section:**
+2. **Cherries Section:**
+   - Shows what authoritative sources actually say — no AI invention
+   - MECE: each entry covers a distinct aspect of the concept (Mutually Exclusive)
+   - Together, entries give a complete picture of the concept across literature (Collectively Exhaustive)
+   - Source attribution on every entry enforces the no-hallucination guarantee
+
+3. **Child Concepts Section:**
    - Shows relationships from Graph DB ontology
    - Helps users navigate knowledge graph
    - Prerequisite → Related → Subtopics → Extensions hierarchy
    - Each relation type rendered only if exists (dynamic)
 
-3. **Progressive References (MECE):**
+4. **Progressive References (MECE):**
    - **Mutually Exclusive:** Each reference covers unique aspects, minimal overlap
    - **Collectively Exhaustive:** Together, references provide complete understanding
    - **Progressive Difficulty:** Start easy, increase complexity
@@ -1022,7 +1044,7 @@ Tables:
    - Academic papers and tutorials
 2. AI extracts and normalizes paragraph-level key concepts
 3. AI writes relations (links), checks the ontology on Graph DB for similar concepts, adds or merges
-4. Writer Agent writes pages in **new three-section format** (Overview → Child Concepts → Progressive References), based on TOC given by knowledge team
+4. Writer Agent writes pages in **new four-section format** (Overview → Cherries → Child Concepts → Progressive References), based on TOC given by knowledge team
 5. Human editing for clarity and structure
 6. Store in database (concepts, references, evidence tables)
 
@@ -1406,7 +1428,7 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 - **Acceptance Criteria:**
   - User clicks "Generate Page" for custom topic
   - Writer Agent loads user's custom evidence
-  - Generates page in three-section format (Overview → Child Concepts → Progressive References)
+  - Generates page in four-section format (Overview → Cherries → Child Concepts → Progressive References)
   - Page saved in user's personal knowledge base
   - Regeneration takes under 10 minutes
   - User can iterate: add more evidence → regenerate
@@ -1562,7 +1584,7 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 
 **Content:**
 - ✅ Community content pipeline operational (community-curated Basics, Advanced, Newly Discovered)
-- ✅ Content stored in database with new three-section format (Overview → Child Concepts → Progressive References)
+- ✅ Content stored in database with new four-section format (Overview → Cherries → Child Concepts → Progressive References)
 - ✅ Content freshness: at least one "Newly Discovered" update per week
 
 **Free Tier:**
@@ -1959,7 +1981,7 @@ This workflow will:
 
 🌟 **MECE Knowledge Structure** - Logical navigation without gaps or overlaps makes users say "now I understand"
 
-🌟 **Progressive Learning** - New three-section format (Overview → Child Concepts → Progressive References) guides efficient learning
+🌟 **Progressive Learning** - New four-section format (Overview → Cherries → Child Concepts → Progressive References) guides efficient learning
 
 🌟 **Living Updates** - Weekly "Newly Discovered" content keeps Cherry feeling alive and current
 

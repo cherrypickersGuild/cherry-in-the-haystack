@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-cherry-in-the-haystack builds **Cherry for AI Engineers** through a two-layer knowledge architecture: Evidence Layer (PostgreSQL for source paragraphs with `extracted_concept` linkage) + Concept Layer (GraphDB for normalized concept ontology). Three pipelines operate in parallel: (1) **Newly Discovered** — custom news ingestion pipeline scores content → Notion serves as the primary Knowledge Team review workspace → daily Postgres backup → weekly GitHub publication; (2) **Basics/Advanced** — source documents chunk into evidence paragraphs → concept extraction and graph normalization → Writer Agent synthesizes three-section handbook pages; (3) **Newsletter Studio** (future Phase 2, not in current epics). The web application and data pipeline are built in TypeScript with Next.js. AI/LLM-specific modules (concept extraction, Writer Agent synthesis) use Python. Pipeline scheduling uses cron with no external orchestration dependency. Publication is Jupyter Book on GitHub Pages for the content layer. The architecture prioritizes automation, cost tracking per LLM call, weekly update velocity, and zero-hallucination synthesis (all claims trace to evidence).
+cherry-in-the-haystack builds **Cherry for AI Engineers** through a two-layer knowledge architecture: Evidence Layer (PostgreSQL for source paragraphs with `extracted_concept` linkage) + Concept Layer (GraphDB for normalized concept ontology). Three pipelines operate in parallel: (1) **Newly Discovered** — custom news ingestion pipeline scores content → Notion serves as the primary Knowledge Team review workspace → daily Postgres backup → weekly GitHub publication; (2) **Basics/Advanced** — source documents chunk into evidence paragraphs → concept extraction and graph normalization → Writer Agent synthesizes four-section handbook pages; (3) **Newsletter Studio** (future Phase 2, not in current epics). The web application and data pipeline are built in TypeScript with Next.js. AI/LLM-specific modules (concept extraction, Writer Agent synthesis) use Python. Pipeline scheduling uses cron with no external orchestration dependency. Content is served through the Next.js web application. The architecture prioritizes automation, cost tracking per LLM call, weekly update velocity, and zero-hallucination synthesis (all claims trace to evidence).
 
 ---
 
@@ -42,14 +42,6 @@ poetry add psycopg[binary] loguru tenacity anthropic openai
 poetry add --group dev ruff mypy pytest pytest-cov
 ```
 
-### Jupyter Book Initialization
-
-```bash
-pip install jupyter-book==1.0.4
-jupyter-book create handbook-content
-# Configures _config.yml and _toc.yml
-```
-
 ### Brownfield Adaptation Note
 
 - `dev/packages/ontology/` → Adapt to `handbook/db_connection/graph_db.py`
@@ -65,8 +57,6 @@ jupyter-book create handbook-content
 | Frontend Language | TypeScript | 5.9+ |
 | Pipeline Language | TypeScript | 5.9+ |
 | AI/LLM Language | Python | 3.10+ |
-| Static Site Generator | Jupyter Book (Sphinx-based) | 1.0.4 |
-| Content Format | MyST Markdown | — |
 | Deployment Target | AWS / Oracle | — |
 
 ---
@@ -90,16 +80,15 @@ jupyter-book create handbook-content
 | PostgreSQL Driver (TS) | Prisma or postgres.js | latest | Phase 2 | Type-safe ORM / query builder for Next.js API routes |
 | Graph Database | GraphDB (RDF, self-hosted) | latest | Epics 1, 3, 4 | Free open-source; RDF standard; no production licensing cost |
 | Vector Store | pgvector (PostgreSQL extension) | latest | Epics 1, 3 | No separate infrastructure; sufficient for ~100K vectors |
-| Publication | Jupyter Book | 1.0.4 | Epics 1, 4, 5 | Professional docs site; zero frontend dev needed for content layer |
-| Content Deployment | GitHub Pages (gh-pages branch) | — | Epics 1, 4 | Free; CI/CD integrated; zero-downtime via Actions |
-| CI/CD | GitHub Actions | — | Epics 1, 5 | Existing infrastructure; integrates with GitHub Pages |
+| Content Deployment | Next.js webapp (AWS / Oracle) | — | Epics 1, 4 | Full-stack TypeScript; content served from database via API routes |
+| CI/CD | GitHub Actions | — | Epics 1, 5 | Existing infrastructure; build, test, and deploy pipeline |
 | Local Dev | Docker Compose | — | Epic 1 | PostgreSQL 16 + pgvector + GraphDB; 30-min onboarding target |
 | Review Workspace | Notion API v2 (source of truth) | v2 | Epics 1, 2 | KT already uses Notion; eliminates custom review UI |
 | LLM — Synthesis | Claude 3.5 Sonnet | claude-3-5-sonnet-latest | Epics 3, 4 | 200K context; superior concept extraction and prose quality |
 | LLM — Embeddings | OpenAI text-embedding-3-small | 1536 dims | Epics 1, 3 | $0.02/1M tokens; sufficient quality for semantic search |
 | LLM — Fallback | Gemini Flash | latest | Epics 3, 4 | When Claude unavailable after 2 retries; cost-effective |
 | Python Retry | tenacity | latest | Epics 1, 3, 4 | Exponential backoff with jitter for external API calls |
-| Content Format | MyST Markdown | — | Epics 2, 4, 5 | Jupyter Book native; supports directives, admonitions, frontmatter |
+| Content Format | Markdown | — | Epics 2, 4, 5 | Supports frontmatter metadata; rendered by Next.js webapp |
 | Notion Client (TS) | notion-client (official SDK) | latest | Epics 1, 2 | Official SDK; handles auth and pagination |
 | GitHub Automation | Octokit or GitHub API | latest | Epics 2, 4 | Bot account atomic commits; TypeScript native |
 
@@ -166,30 +155,14 @@ cherry-in-the-haystack/
 │       │   └── deduplication.py        # simhash64 + vector cosine for near-dupes
 │       └── writer_agent/
 │           ├── graph_query.py          # Two-step query: GraphDB + Postgres
-│           ├── page_synthesizer.py     # Claude 3.5 Sonnet, three-section format
+│           ├── page_synthesizer.py     # Claude 3.5 Sonnet, four-section format
 │           ├── synthesis_prompts.py    # Prompt templates per section type
 │           ├── patchnote_aggregator.py # Track all page changes in patchnote.md
 │           └── image_generation/
 │               ├── image_agent.py      # Custom Agent for diagram planning
 │               ├── mcp_client.py       # MCP Server communication
-│               └── markdown_inserter.py # Insert image refs into MyST Markdown
+│               └── markdown_inserter.py # Insert image refs into Markdown
 │
-├── handbook-content/                   # Jupyter Book content (published to GitHub Pages)
-│   ├── _config.yml                     # Brand colors, logo, theme options
-│   ├── _toc.yml                        # Table of contents
-│   ├── patchnote.md                    # Chronological changelog (newest first)
-│   ├── basics/                         # Foundational LLM concepts
-│   ├── advanced/                       # Deep technical content
-│   ├── newly-discovered/
-│   │   ├── model-updates/              # YYYY-MM-DD-{slug}.md files
-│   │   ├── frameworks/
-│   │   ├── productivity-tools/
-│   │   ├── business-cases/
-│   │   └── how-people-use-ai/
-│   └── _static/
-│       ├── logo.svg
-│       ├── favicon.ico
-│       └── custom.css
 │
 ├── dev/                                # EXISTING — prototype packages (reference only)
 │   ├── packages/
@@ -213,7 +186,7 @@ cherry-in-the-haystack/
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci.yml                      # PR: ruff, mypy, tsc, pytest, markdown-lint
-│   │   ├── deploy.yml                  # main push: jupyter-book build → gh-pages
+│   │   ├── deploy.yml                  # main push: Next.js build → deploy to AWS/Oracle
 │   │   └── link-check.yml             # Weekly: validate all external URLs
 │   ├── ISSUE_TEMPLATE/
 │   │   ├── report-error.md
@@ -243,7 +216,7 @@ cherry-in-the-haystack/
 | **Epic 1: Foundation & Core Infrastructure** | Databases, tooling, CI/CD, brownfield adaptation | `handbook/` Python setup, `scripts/setup_evidence_layer.sql`, `scripts/setup_graph_db.py`, `handbook/db_connection/`, `docker-compose.yml`, `.github/workflows/ci.yml` + `deploy.yml`, `pnpm-workspace.yaml` |
 | **Epic 2: Newly Discovered Pipeline** | News ingestion → Notion → Postgres backup → GitHub weekly | `packages/pipeline/src/jobs/news-ingestion.ts`, `packages/pipeline/src/integrations/notion-client.ts`, `packages/pipeline/src/jobs/notion-backup.ts`, `packages/pipeline/src/newly-discovered/`, `packages/pipeline/src/jobs/weekly-publish.ts`, `packages/pipeline/src/publication/` |
 | **Epic 3: Evidence Ingestion & Knowledge Graph** | Documents → Evidence Layer → Concept Layer | `handbook/pipeline/evidence_ingestion/`, `handbook/db_connection/graph_db.py`, `handbook/db_connection/vector_db.py` |
-| **Epic 4: Writer Agent & Publication** | Knowledge graph → synthesis → Jupyter Book | `handbook/pipeline/writer_agent/`, `handbook-content/`, `packages/pipeline/src/jobs/writer-agent.ts`, `.github/workflows/deploy.yml`, `handbook-content/_config.yml` styling |
+| **Epic 4: Writer Agent & Publication** | Knowledge graph → synthesis → webapp content | `handbook/pipeline/writer_agent/`, `packages/pipeline/src/jobs/writer-agent.ts`, `.github/workflows/deploy.yml` |
 | **Epic 5: Community & Quality Operations** | PR workflow, link validation, backup | `.github/` (PR template, issue templates, CODEOWNERS), `.github/workflows/link-check.yml`, `CONTRIBUTING.md`, `STYLE_GUIDE.md`, `templates/`, `scripts/backup_databases.py` |
 
 ---
@@ -375,7 +348,7 @@ News ingestion + dedup + AI scoring 1-5
   → Query Notion for status="Approved" since last publish
   → format-dispatcher.ts → category-specific markdown
   → github-committer.ts → atomic commit to main
-  → GitHub Actions → Jupyter Book build → GitHub Pages
+  → GitHub Actions → Next.js webapp deployment
 ```
 
 **Notion DB Schema (properties per page):**
@@ -396,9 +369,9 @@ PublishedDate (date — set by bot after GitHub commit)
 
 ---
 
-### Novel Pattern 3: Writer Agent Three-Section Synthesis
+### Novel Pattern 3: Writer Agent Four-Section Synthesis
 
-**Purpose:** Writer Agent generates Concept Pages with a consistent three-section format (Overview → Child Concepts → Progressive References) with MECE (Mutually Exclusive, Collectively Exhaustive) reference organization. All claims trace to evidence — no hallucinations.
+**Purpose:** Writer Agent generates Concept Pages with a consistent four-section format (Overview → Cherries → Related Concepts → Progressive References) with MECE organization throughout. All claims trace to ingested source material — no hallucinations.
 
 **Core Challenge:** AI synthesis without guardrails produces inconsistent structure and hallucinated claims. Multiple AI agents must produce structurally identical pages.
 
@@ -407,7 +380,7 @@ PublishedDate (date — set by bot after GitHub commit)
 | Component | Responsibility |
 |---|---|
 | `graph_query.py` | Load concept + all relations + evidence; return `ConceptQueryResult` dataclass |
-| `page_synthesizer.py` | Claude 3.5 Sonnet (200K context); structured output → MyST Markdown |
+| `page_synthesizer.py` | Claude 3.5 Sonnet (200K context); structured output → Markdown |
 | `synthesis_prompts.py` | Prompt templates; includes no-hallucination rule |
 | `patchnote_aggregator.py` | Prepend change entry to `patchnote.md`; categorize as New/Major/Minor/Correction |
 
@@ -418,7 +391,7 @@ For every claim, cite the source. Format: "[excerpt]" — [Source Title] ([parap
 If the evidence does not support a claim, omit it.
 ```
 
-**Output Format (MyST Markdown):**
+**Output Format (Markdown with YAML frontmatter):**
 ```markdown
 ---
 title: "Retrieval-Augmented Generation"
@@ -432,12 +405,9 @@ contributors: [github_username1, github_username2]
 # Retrieval-Augmented Generation
 
 ## 1. Overview
-## 2. Child Concepts / Co-occurring Concepts
-### Prerequisite Concepts
-### Related Concepts (Co-occurring)
-### Subtopics (Child Concepts)
-### Extensions (Advanced)
-## 3. Progressive References (MECE Learning Path)
+## 2. Cherries
+## 3. Related Concepts (Co-occurring) / Subtopics (Child Concepts) / Prerequisite Concepts
+## 4. Progressive References (MECE Learning Path)
 📚 Start Here → 📖 Next → 🎓 Deep Dive → 💡 Practical Implementation
 ```
 
@@ -574,14 +544,16 @@ postgres.update_pipeline_run(
 
 ### Evidence Layer (PostgreSQL 16)
 
+#### Newly Discovered Pipeline
+
 ```sql
 CREATE TABLE raw_html_archive (
     id              SERIAL PRIMARY KEY,
     url             TEXT NOT NULL,
     html_content    TEXT,
     content_hash    VARCHAR(64),          -- SHA256 for exact dedup
-    simhash64       BIGINT,               -- Approximate similarity
-    fetched_at      TIMESTAMP WITH TIME ZONE,
+    simhash64       BIGINT,
+    fetched_at      TIMESTAMPTZ,
     source_type     VARCHAR(50)
 );
 
@@ -598,141 +570,46 @@ CREATE TABLE notion_news_backup (
     tags                    JSONB,
     review_status           VARCHAR(50),
     reviewer                VARCHAR(100),
-    notion_created_at       TIMESTAMP WITH TIME ZONE,
-    notion_last_edited_at   TIMESTAMP WITH TIME ZONE,
-    backed_up_at            TIMESTAMP WITH TIME ZONE,
+    notion_created_at       TIMESTAMPTZ,
+    notion_last_edited_at   TIMESTAMPTZ,
+    backed_up_at            TIMESTAMPTZ,
     published_date          DATE
 );
 
-CREATE TABLE documents (
-    id                  SERIAL PRIMARY KEY,
-    title               TEXT NOT NULL,
-    source_type         VARCHAR(50),              -- pdf/html/markdown
-    source_url          TEXT,
-    handbook_section    VARCHAR(50),              -- basics/advanced
-    processing_status   VARCHAR(50),              -- pending/processing/completed/failed
-    processed_at        TIMESTAMP WITH TIME ZONE,
-    llm_tokens_used     INTEGER,
-    llm_cost_cents      NUMERIC(10,2)
-);
-
-CREATE TABLE evidence_paragraphs (
-    id                      SERIAL PRIMARY KEY,
-    document_id             INTEGER REFERENCES documents(id),
-    paragraph_text          TEXT NOT NULL,
-    paragraph_hash          VARCHAR(64),
-    simhash64               BIGINT,
-    paragraph_index         INTEGER,
-    page_number             INTEGER,
-    section_title           TEXT,
-    extracted_concept       VARCHAR(200),         -- KEY LINKAGE to GraphDB concept name
-    extraction_confidence   NUMERIC(3,2),
-    importance_score        NUMERIC(3,2),
-    sampling_weight         NUMERIC(3,2),
-    cluster_id              INTEGER,
-    is_representative       BOOLEAN DEFAULT false,
-    llm_tokens_used         INTEGER,
-    llm_cost_cents          NUMERIC(10,2),
-    llm_provider            VARCHAR(50)
-);
-
-CREATE TABLE evidence_metadata (
-    id                          SERIAL PRIMARY KEY,
-    evidence_paragraph_id       INTEGER REFERENCES evidence_paragraphs(id),
-    extract_type                VARCHAR(50),      -- core_summary/supporting_detail/counterpoint/example
-    keywords                    JSONB,
-    entities                    JSONB,
-    handbook_topic              VARCHAR(100),
-    handbook_subtopic           VARCHAR(100),
-    judge_originality           NUMERIC(3,2),
-    judge_depth                 NUMERIC(3,2),
-    judge_technical_accuracy    NUMERIC(3,2)
-);
-
-CREATE TABLE document_embeddings (
-    id                      SERIAL PRIMARY KEY,
-    evidence_paragraph_id   INTEGER REFERENCES evidence_paragraphs(id),
-    embedding               vector(1536),         -- OpenAI text-embedding-3-small
-    document_id             INTEGER,
-    paragraph_text          TEXT,                 -- Denormalized for fast retrieval
-    handbook_topic          VARCHAR(100),
-    embedding_cost_cents    NUMERIC(10,2),
-    created_at              TIMESTAMP WITH TIME ZONE
-);
-
-CREATE TABLE pipeline_runs (
-    id                  SERIAL PRIMARY KEY,
-    job_name            VARCHAR(100),             -- e.g. news-ingestion, notion-backup
-    status              VARCHAR(50),
-    items_processed     INTEGER,
-    llm_tokens_used     INTEGER,
-    llm_cost_cents      NUMERIC(10,2),
-    started_at          TIMESTAMP WITH TIME ZONE,
-    completed_at        TIMESTAMP WITH TIME ZONE,
-    error_message       TEXT
-);
-
-CREATE TABLE failed_items (
-    id              SERIAL PRIMARY KEY,
-    source_table    VARCHAR(100),
-    source_id       INTEGER,
-    failure_reason  TEXT,
-    retry_count     SMALLINT DEFAULT 0,
-    failed_at       TIMESTAMP WITH TIME ZONE
-);
-```
-
-**Indexes:**
-```sql
-CREATE INDEX idx_raw_html_content_hash ON raw_html_archive(content_hash);
-CREATE INDEX idx_notion_backup_page_id ON notion_news_backup(notion_page_id);
-CREATE INDEX idx_evidence_extracted_concept ON evidence_paragraphs(extracted_concept);  -- CRITICAL
-CREATE INDEX idx_evidence_paragraph_hash ON evidence_paragraphs(paragraph_hash);
-CREATE INDEX idx_evidence_simhash64 ON evidence_paragraphs(simhash64);
-CREATE INDEX idx_embeddings_handbook_topic ON document_embeddings(handbook_topic);
-CREATE INDEX idx_embeddings_vector ON document_embeddings
-    USING ivfflat (embedding vector_cosine_ops) WITH (lists=100);
-```
-
--- Reviewers: Knowledge Team member registry (backup of Notion Reviewers DB)
+-- Knowledge Team member registry (backup of Notion Reviewers DB)
 -- Used for topic-based assignment in the news ingestion pipeline
-```sql
 CREATE TABLE reviewers (
     id              SERIAL PRIMARY KEY,
     notion_user_id  VARCHAR(36) UNIQUE,           -- Notion person ID (UPSERT key)
     reviewer_name   TEXT NOT NULL,
-    tags            JSONB,                         -- Topic tags for assignment matching
-                                                  -- e.g. ["rag", "fine-tuning", "agents"]
+    tags            JSONB,                         -- e.g. ["rag", "fine-tuning", "agents"]
     comment         TEXT,
-    backed_up_at    TIMESTAMP WITH TIME ZONE
+    backed_up_at    TIMESTAMPTZ
 );
-```
 
-```sql
--- Data Sources: Source registry for news ingestion pipeline (backup of Notion Data Sources DB)
--- Canonical list of websites, people, and feeds that the pipeline monitors.
+-- Source registry for news ingestion pipeline (backup of Notion Data Sources DB)
 -- Notion is primary — this table is a one-way backup.
 CREATE TABLE data_sources (
     id                              SERIAL PRIMARY KEY,
-    notion_page_id                  VARCHAR(36) UNIQUE,   -- UPSERT key
-    website_name                    TEXT,                 -- title field in Notion
-    url                             TEXT UNIQUE,          -- unique page URL
+    notion_page_id                  VARCHAR(36) UNIQUE,
+    website_name                    TEXT,
+    url                             TEXT UNIQUE,
     created_time                    TEXT,                 -- ISO-8601 datetime
-    site_last_updated_start         TEXT,                 -- ISO-8601 date/datetime
-    site_last_updated_end           TEXT,                 -- ISO-8601 date/datetime (NULL for single date)
+    site_last_updated_start         TEXT,
+    site_last_updated_end           TEXT,
     site_last_updated_is_datetime   INTEGER,              -- 1=datetime 0=date
     community_engagement            TEXT,
     quality_score                   FLOAT,
     user_defined_url                TEXT,
-    follow                          TEXT,                 -- select: Not Yet | Following | Stopped
+    follow                          TEXT,                 -- Not Yet | Following | Stopped
     rss_feed                        TEXT,
     reviewer_notes                  TEXT,
-    content_type                    TEXT,                 -- select
-    created_by                      JSONB,                -- person (JSON array of Notion user IDs)
+    content_type                    TEXT,
+    created_by                      JSONB,                -- Notion user IDs
     update_frequency                FLOAT,
     credibility_check               TEXT,
-    site_status                     TEXT,                 -- select: Dead | Alive
-    cherry_category                 JSONB,                -- multi_select (JSON array of strings)
+    site_status                     TEXT,                 -- Dead | Alive
+    cherry_category                 JSONB,                -- multi_select (JSON array)
     newsletters                     TEXT,
     podcasts                        TEXT,
     notable_works                   TEXT,
@@ -746,17 +623,12 @@ CREATE TABLE data_sources (
     top_audience                    TEXT,
     comment                         TEXT,
     linkedin                        TEXT,
-    assignee                        JSONB,                -- 담당자: person (JSON array of Notion user IDs)
+    assignee                        JSONB,                -- Notion user IDs
     substack                        TEXT,
     website                         TEXT,
     youtube                         TEXT,
-    backed_up_at                    TIMESTAMP WITH TIME ZONE
+    backed_up_at                    TIMESTAMPTZ
 );
-
-CREATE INDEX idx_data_sources_url ON data_sources(url);
-CREATE INDEX idx_data_sources_follow ON data_sources(follow);
-CREATE INDEX idx_data_sources_site_status ON data_sources(site_status);
-CREATE INDEX idx_reviewers_notion_user_id ON reviewers(notion_user_id);
 ```
 
 **Usage notes:**
@@ -764,6 +636,220 @@ CREATE INDEX idx_reviewers_notion_user_id ON reviewers(notion_user_id);
 - `data_sources.assignee` / `reviewers.notion_user_id` → join on Notion user ID to find a reviewer's assigned sources
 - `data_sources.cherry_category` → JSON array, use `@>` operator for filtering: `WHERE cherry_category @> '["RAG"]'`
 - `reviewers.tags` → matched against `data_sources.cherry_category` to auto-assign reviewers by topic
+
+---
+
+#### Books / Evidence Pipeline
+
+```sql
+-- Ingested source documents (PDFs, HTML, markdown)
+-- Actual table name in DB: books
+CREATE TABLE documents (
+    id                   BIGSERIAL PRIMARY KEY,
+    title                TEXT NOT NULL,
+    author               TEXT,
+    source_path          TEXT,
+    source_type          VARCHAR(50),              -- pdf/html/markdown
+    source_url           TEXT,
+    handbook_section     VARCHAR(50),              -- basics/advanced
+    processing_status    TEXT DEFAULT 'pending'
+                         CHECK (processing_status IN ('pending','processing','completed','failed')),
+    total_paragraphs     INTEGER,
+    paragraphs_processed INTEGER DEFAULT 0,
+    llm_tokens_used      INTEGER DEFAULT 0,
+    llm_cost_cents       NUMERIC(10,4) DEFAULT 0,
+    created_at           TIMESTAMPTZ DEFAULT now()
+);
+
+-- Chapter hierarchy within a document (supports nesting via parent_chapter_id)
+CREATE TABLE chapters (
+    id                BIGSERIAL PRIMARY KEY,
+    document_id       BIGINT NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+    chapter_number    INTEGER,
+    title             TEXT,
+    start_page        INTEGER,
+    end_page          INTEGER,
+    level             INTEGER DEFAULT 1,
+    parent_chapter_id BIGINT REFERENCES chapters(id),
+    detection_method  VARCHAR(50),
+    created_at        TIMESTAMPTZ DEFAULT now()
+);
+
+-- Section hierarchy within a chapter (supports nesting via parent_section_id)
+CREATE TABLE sections (
+    id                BIGSERIAL PRIMARY KEY,
+    document_id       BIGINT NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+    chapter_id        BIGINT NOT NULL REFERENCES chapters(id) ON DELETE CASCADE,
+    section_number    INTEGER,
+    title             TEXT NOT NULL,
+    level             INTEGER DEFAULT 1,
+    parent_section_id BIGINT REFERENCES sections(id),
+    detection_method  VARCHAR(50) DEFAULT 'llm',
+    created_at        TIMESTAMPTZ DEFAULT now()
+);
+
+-- Normalized concept groupings; canonical_idea_text is the KEY LINKAGE to GraphDB concept names
+CREATE TABLE idea_groups (
+    id                  BIGSERIAL PRIMARY KEY,
+    canonical_idea_text TEXT NOT NULL,
+    created_at          TIMESTAMPTZ DEFAULT now()
+);
+
+-- Paragraph-level chunks of source documents
+-- Actual table name in DB: paragraph_chunks
+CREATE TABLE evidence_paragraphs (
+    id                      BIGSERIAL PRIMARY KEY,
+    document_id             BIGINT REFERENCES documents(id),
+    chapter_id              BIGINT REFERENCES chapters(id),
+    section_id              BIGINT REFERENCES sections(id),
+    page_number             INTEGER,
+    paragraph_index         INTEGER,
+    chapter_paragraph_index INTEGER,
+    body_text               TEXT NOT NULL,
+    paragraph_hash          TEXT,
+    simhash64               BIGINT,
+    -- Concept linkage
+    idea_group_id           BIGINT REFERENCES idea_groups(id),
+    extracted_concept       VARCHAR(200),         -- Denormalized from idea_groups.canonical_idea_text; KEY LINKAGE to GraphDB
+    extraction_confidence   NUMERIC(3,2),
+    importance_score        NUMERIC(3,2),
+    sampling_weight         NUMERIC(3,2),
+    cluster_id              INTEGER,
+    is_representative       BOOLEAN DEFAULT false,
+    -- Cost tracking
+    llm_tokens_used         INTEGER,
+    llm_cost_cents          NUMERIC(10,4),
+    llm_provider            VARCHAR(50),
+    created_at              TIMESTAMPTZ DEFAULT now()
+);
+
+-- Key ideas extracted from paragraphs, grouped by concept
+CREATE TABLE key_ideas (
+    id              BIGSERIAL PRIMARY KEY,
+    paragraph_id    BIGINT REFERENCES evidence_paragraphs(id),
+    document_id     BIGINT REFERENCES documents(id),
+    core_idea_text  TEXT NOT NULL,
+    idea_group_id   BIGINT REFERENCES idea_groups(id),
+    created_at      TIMESTAMPTZ DEFAULT now()
+);
+
+-- Per-paragraph metadata and quality scores (used to organize Cherries section)
+CREATE TABLE evidence_metadata (
+    id                          BIGSERIAL PRIMARY KEY,
+    evidence_paragraph_id       BIGINT REFERENCES evidence_paragraphs(id),
+    extract_type                VARCHAR(50),      -- core_summary/supporting_detail/counterpoint/example
+    keywords                    JSONB,
+    entities                    JSONB,
+    handbook_topic              VARCHAR(100),
+    handbook_subtopic           VARCHAR(100),
+    judge_originality           NUMERIC(3,2),
+    judge_depth                 NUMERIC(3,2),
+    judge_technical_accuracy    NUMERIC(3,2)
+);
+
+-- Vector embeddings for semantic search
+-- Actual table name in DB: paragraph_embeddings
+CREATE TABLE document_embeddings (
+    id                    BIGSERIAL PRIMARY KEY,
+    evidence_paragraph_id BIGINT REFERENCES evidence_paragraphs(id) ON DELETE CASCADE,
+    document_id           BIGINT REFERENCES documents(id),
+    embedding             vector(1536),           -- OpenAI text-embedding-3-small
+    body_text             TEXT,                   -- Denormalized for fast retrieval
+    handbook_topic        VARCHAR(100),
+    model                 TEXT DEFAULT 'text-embedding-3-small',
+    embedding_cost_cents  NUMERIC(10,4),
+    created_at            TIMESTAMPTZ DEFAULT now()
+);
+
+-- Per-page/chapter granular processing tracker (enables pipeline resumability)
+CREATE TABLE processing_progress (
+    id              SERIAL PRIMARY KEY,
+    document_id     INTEGER REFERENCES documents(id),
+    chapter_id      BIGINT REFERENCES chapters(id),
+    page_number     INTEGER,
+    processing_unit VARCHAR(50) DEFAULT 'page',   -- page/chapter
+    status          VARCHAR(50),
+    error_message   TEXT,
+    attempt_count   INTEGER,
+    last_attempt_at TIMESTAMPTZ,
+    completed_at    TIMESTAMPTZ,
+    created_at      TIMESTAMPTZ DEFAULT now(),
+    updated_at      TIMESTAMPTZ
+);
+```
+
+---
+
+#### Operations
+
+```sql
+-- Job-level pipeline run log (complements processing_progress which is per-page granularity)
+CREATE TABLE pipeline_runs (
+    id              SERIAL PRIMARY KEY,
+    job_name        VARCHAR(100),                 -- e.g. news-ingestion, notion-backup, writer-agent
+    status          VARCHAR(50),
+    items_processed INTEGER,
+    llm_tokens_used INTEGER,
+    llm_cost_cents  NUMERIC(10,2),
+    started_at      TIMESTAMPTZ,
+    completed_at    TIMESTAMPTZ,
+    error_message   TEXT
+);
+
+-- Dead-letter queue for failed items awaiting retry
+CREATE TABLE failed_items (
+    id              SERIAL PRIMARY KEY,
+    source_table    VARCHAR(100),
+    source_id       INTEGER,
+    failure_reason  TEXT,
+    retry_count     SMALLINT DEFAULT 0,
+    failed_at       TIMESTAMPTZ
+);
+
+-- Community contributors registry (used for Cherries section attribution)
+CREATE TABLE knowledge_verification_contributors (
+    id                   BIGSERIAL PRIMARY KEY,
+    name                 TEXT NOT NULL UNIQUE,
+    email                TEXT,
+    github_username      TEXT,
+    active               BOOLEAN DEFAULT true,
+    contributions_count  INTEGER DEFAULT 0,
+    joined_at            TIMESTAMPTZ DEFAULT now(),
+    last_contribution_at TIMESTAMPTZ,
+    created_at           TIMESTAMPTZ DEFAULT now(),
+    updated_at           TIMESTAMPTZ DEFAULT now()
+);
+```
+
+**Indexes:**
+```sql
+-- Newly Discovered pipeline
+CREATE INDEX idx_raw_html_content_hash ON raw_html_archive(content_hash);
+CREATE INDEX idx_notion_backup_page_id ON notion_news_backup(notion_page_id);
+CREATE INDEX idx_data_sources_url ON data_sources(url);
+CREATE INDEX idx_data_sources_follow ON data_sources(follow);
+CREATE INDEX idx_data_sources_site_status ON data_sources(site_status);
+CREATE INDEX idx_reviewers_notion_user_id ON reviewers(notion_user_id);
+
+-- Books / Evidence pipeline
+CREATE INDEX idx_documents_status ON documents(processing_status);
+CREATE INDEX idx_documents_section ON documents(handbook_section);
+CREATE INDEX idx_chapters_document ON chapters(document_id);
+CREATE INDEX idx_sections_document ON sections(document_id);
+CREATE INDEX idx_sections_chapter ON sections(chapter_id);
+CREATE INDEX idx_idea_groups_canonical ON idea_groups(canonical_idea_text);             -- GraphDB linkage key
+CREATE INDEX idx_evidence_extracted_concept ON evidence_paragraphs(extracted_concept);  -- CRITICAL: Writer Agent query
+CREATE INDEX idx_evidence_idea_group ON evidence_paragraphs(idea_group_id);
+CREATE INDEX idx_evidence_paragraph_hash ON evidence_paragraphs(paragraph_hash);
+CREATE INDEX idx_evidence_simhash64 ON evidence_paragraphs(simhash64);
+CREATE INDEX idx_embeddings_handbook_topic ON document_embeddings(handbook_topic);
+CREATE INDEX idx_embeddings_vector ON document_embeddings
+    USING ivfflat (embedding vector_cosine_ops) WITH (lists=100);
+
+-- Operations
+CREATE INDEX idx_contributors_active ON knowledge_verification_contributors(active);
+CREATE INDEX idx_contributors_contributions ON knowledge_verification_contributors(contributions_count DESC);
+```
 
 ---
 
@@ -792,7 +878,7 @@ Articles arrive here from the news ingestion pipeline. Knowledge Team members sc
 | Tags | multi_select | Topic tags |
 | Review Status | select | Pending \| Approved \| Rejected \| Published |
 | Reviewer | person | Assigned Knowledge Team member |
-| Published Date | date | Date pushed to GitHub Pages |
+| Published Date | date | Date published to the webapp |
 
 Written by: news ingestion cron deposits new articles as Notion pages.
 Read by: `notion-backup.ts` → upserts to `notion_news_backup`; weekly-publish cron reads `review_status = 'Approved'`.
@@ -834,26 +920,52 @@ Read by: `notion-backup.ts` → upserts to `reviewers`.
 
 ### Concept Layer (GraphDB — RDF)
 
-**Concept Node Properties:**
-```
-concept_id:       UUID
-concept_name:     Normalized noun phrase — matches extracted_concept in Evidence Layer
-summary:          1-3 sentence definition
-definition:       Extended definition
-contributors:     List of GitHub usernames
-confidence_score: 0.0–1.0
-evidence_count:   Integer (incremented when paragraphs linked)
-created_at:       ISO timestamp
+**Namespaces:**
+```sparql
+PREFIX llm:  <http://example.org/llm-ontology#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 ```
 
-**Relationship Types:**
+**Concept Nodes (`owl:Class`):**
 ```
-PREREQUISITE   (strength: float, contributor: str, created_at: datetime)
-RELATED        (relation_type: comparison|alternative|complementary, strength: float)
-SUBTOPIC       (handbook_path: str, order_index: int)
-EXTENDS        (extension_type: advanced_technique|variant|optimization)
-CONTRADICTS    (explanation: str, source: str)
+llm:{concept_id}       URI — concept_id is a slug (e.g. llm:RetrievalAugmentedGeneration)
+rdfs:label             Human-readable name — KEY LINKAGE to idea_groups.canonical_idea_text in Postgres
+llm:description        Text description of the concept
+rdfs:subClassOf        Parent concept URI (encodes hierarchy / subtopic structure)
 ```
+
+**Relationship Types — currently implemented:**
+```
+rdfs:subClassOf         Hierarchical parent → child (taxonomy, subtopic structure)
+
+llm:ClassRelation       Co-occurrence relationship node (reified triple):
+  llm:source              → source concept URI
+  llm:target              → target concept URI
+  llm:cooccurrenceCount   → integer (how often these concepts co-occur across evidence)
+
+llm:related             Symmetric co-occurrence shorthand (bidirectional, added in pairs)
+```
+
+**Concept Instance Nodes (`llm:ConceptInstance`) — paragraph-level:**
+```
+llm:instanceOf          → parent concept class URI
+llm:relatedInstance     → related instance URI (symmetric)
+rdfs:label              Instance label
+llm:description         Instance description
+```
+
+**Planned Relationship Types (not yet implemented):**
+```
+llm:prerequisite        Directional: understanding A requires B first
+llm:extends             A is an advanced variant or optimization of B
+llm:contradicts         A and B are in tension or conflict
+```
+
+**Postgres linkage:**
+- `rdfs:label` on a concept node = `idea_groups.canonical_idea_text` = `evidence_paragraphs.extracted_concept`
+- Evidence count is derived from Postgres: `SELECT COUNT(*) FROM key_ideas WHERE idea_group_id = ?` — not stored in GraphDB
+- Writer Agent query: GraphDB (`rdfs:label` → concept + relations) → Postgres (`WHERE extracted_concept = ?` → evidence paragraphs)
 
 ---
 
@@ -972,7 +1084,7 @@ AWS_S3_BACKUP_BUCKET=cherry-handbook-backups
 
 | Concern | Target | Approach |
 |---|---|---|
-| Jupyter Book page load | < 2 seconds | Static HTML via CDN (GitHub Pages / Cloudflare) |
+| Webapp page load | < 2 seconds | Next.js SSR/SSG via CDN (AWS CloudFront / Cloudflare) |
 | GraphDB concept query | < 500ms | Index concept_name; cache frequent queries in-process |
 | pgvector search (top-10) | < 100ms | IVFFlat index (lists=100 for ~100K vectors); denormalized text |
 | Notion API | Max 3 req/sec | Rate limiter in `notion-client.ts`; exponential backoff on 429 |
@@ -992,10 +1104,6 @@ AWS_S3_BACKUP_BUCKET=cherry-handbook-backups
 Cron job: weekly-publish.ts (Sunday 00:00 UTC)
   → Notion (fetch approved items)
   → format-dispatcher.ts (markdown generation)
-  → github-committer.ts (commit to main branch)
-  → GitHub Actions (deploy.yml triggers)
-  → jupyter-book build handbook-content/
-  → gh-pages branch → GitHub Pages
 ```
 
 ### Pipeline Scheduling (Cron)
@@ -1069,8 +1177,8 @@ cd packages/pipeline && pnpm tsc --noEmit
 # Run a cron job manually
 npx tsx packages/pipeline/src/jobs/notion-backup.ts
 
-# Preview handbook build
-jupyter-book build handbook-content/
+# Preview webapp
+cd apps/web && pnpm dev
 ```
 
 ---
@@ -1093,10 +1201,9 @@ jupyter-book build handbook-content/
 - **Rationale:** No additional infrastructure; pgvector handles ~100K vectors efficiently
 - **Re-evaluate at:** 1M+ vectors
 
-### ADR-004: Jupyter Book + GitHub Pages (content layer)
-- **Decision:** Jupyter Book 1.0.4 deployed to GitHub Pages for the knowledge content
-- **Rationale:** Phase 1 is the pipeline system. Jupyter Book provides a professional documentation site at zero frontend cost.
-- **Future:** Content served via Next.js web app in Phase 2
+### ADR-004: Next.js Webapp (content layer)
+- **Decision:** Content is served through the Next.js web application (deployed to AWS / Oracle)
+- **Rationale:** Full-stack TypeScript; content served from database via API routes; unified deployment with the rest of the application; enables dynamic features and search
 
 ### ADR-005: Cron over Airflow for pipeline scheduling
 - **Decision:** System cron / node-cron for job scheduling
