@@ -1,0 +1,140 @@
+# Auto-News Lightweight Stack
+# Replaces Airflow-based docker-compose.yaml
+# Containers: 6 (down from 14+)
+#
+# Usage:
+#   docker compose -f docker/docker-compose.autonews.yaml up -d
+#   docker compose -f docker/docker-compose.autonews.yaml logs -f autonews
+
+version: '3.8'
+
+services:
+  # ============================================================
+  # PostgreSQL - Application database (replaces Airflow metadata + MySQL)
+  # ============================================================
+  postgres:
+    image: postgres:16
+    container_name: autonews-postgres
+    networks:
+      - autonews_network
+    environment:
+      POSTGRES_USER: ${PG_USER:-autonews}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-autonews}
+      POSTGRES_DB: ${PG_DATABASE:-autonews}
+    volumes:
+      - ${PG_DATA_DIR:-./workspace/postgres}/data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "${PG_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${PG_USER:-autonews}"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: always
+
+  # ============================================================
+  # Redis - Cache (dedup, summaries, categories, embeddings TTL)
+  # ============================================================
+  redis:
+    image: redis:7-alpine
+    container_name: autonews-redis
+    networks:
+      - autonews_network
+    volumes:
+      - ${REDIS_DATA_DIR:-./workspace/redis}/data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: always
+
+  # ============================================================
+  # Milvus Stack - Vector database for similarity scoring
+  # ============================================================
+  etcd:
+    container_name: autonews-etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    networks:
+      - autonews_network
+    volumes:
+      - ${MILVUS_DATA_DIR:-./workspace/milvus}/volumes/etcd:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    restart: always
+
+  milvus-minio:
+    container_name: autonews-minio
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    networks:
+      - autonews_network
+    volumes:
+      - ${MILVUS_DATA_DIR:-./workspace/milvus}/volumes/minio:/minio_data
+    command: minio server /minio_data
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  milvus-standalone:
+    container_name: autonews-milvus
+    image: milvusdb/milvus:v2.4.0
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: milvus-minio:9000
+    networks:
+      - autonews_network
+    volumes:
+      - ${MILVUS_DATA_DIR:-./workspace/milvus}/volumes/milvus:/var/lib/milvus
+    ports:
+      - "19530:19530"
+    restart: always
+    depends_on:
+      - etcd
+      - milvus-minio
+
+  # ============================================================
+  # Auto-News Service (FastAPI + APScheduler)
+  # ============================================================
+  autonews:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.autonews
+    container_name: autonews-api
+    networks:
+      - autonews_network
+    environment:
+      - DATABASE_URL=postgresql://${PG_USER:-autonews}:${PG_PASSWORD:-autonews}@postgres:5432/${PG_DATABASE:-autonews}
+      - BOT_REDIS_URL=redis://:@redis:6379/1
+      - BOT_REDIS_KEY_EXPIRE_TIME=604800
+      - MILVUS_HOST=milvus-standalone
+      - MILVUS_PORT=19530
+      - SKIP_SCORING=${SKIP_SCORING:-false}
+      - SKIP_SUMMARIZE=${SKIP_SUMMARIZE:-false}
+    env_file:
+      - ../.env
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ../src:/app/src
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+
+networks:
+  autonews_network:

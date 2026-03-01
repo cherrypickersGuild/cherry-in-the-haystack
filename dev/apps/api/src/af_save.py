@@ -11,7 +11,7 @@ from ops_youtube import OperatorYoutube
 from ops_rss import OperatorRSS
 from ops_reddit import OperatorReddit
 from ops_crawl_blog_superhuman import OperatorCrawlBlogSuperhuman
-from ops_crawl_rss_natolambert import OperatorCrawlRSSNatoLambert
+# ops_crawl_rss_natolambert는 사용 시에만 import (litellm 의존성 회피)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--prefix", help="runtime prefix path",

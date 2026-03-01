@@ -222,9 +222,11 @@ class LLMAgentBase:
 
         elif provider == "google":
             model_name = model_name or os.getenv("GOOGLE_MODEL", "gemini-pro")
+            google_api_key = os.getenv("GOOGLE_API_KEY")
 
             llm = ChatGoogleGenerativeAI(
                 model=model_name,
+                google_api_key=google_api_key,
                 temperature=temperature)
 
         elif provider == "ollama":

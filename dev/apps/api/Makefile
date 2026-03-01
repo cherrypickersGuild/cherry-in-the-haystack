@@ -59,7 +59,7 @@ prepare-env:
 	@echo "WORKSPACE: $(WORKSPACE)"
 	mkdir -p $(build_dir)
 	mkdir -p $(WORKSPACE)
-	chmod -R 777 $(WORKSPACE)
+	# chmod -R 777 $(WORKSPACE)
 	@echo "creating environment files..."
 	if [ ! -f $(build_dir)/.env ]; then \
 		cp .env.template $(build_dir)/.env; \

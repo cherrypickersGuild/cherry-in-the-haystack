@@ -9,8 +9,8 @@ DEVTO_API = "https://dev.to/api/articles"
 
 # Keywords/Tags for filtering
 KEYWORDS_CONFIG = {
-    "HackerNews": ["AI agent", "MCP", "LLM", "Claude", "OpenAI", "Gemini"],
-    "DevTo": ["ai", "agents", "llm", "machinelearning"]
+    "HackerNews": ["AI agent", "MCP", "LLM", "Claude", "OpenAI", "Gemini", "Model Context Protocol"],
+    "DevTo": ["ai", "agents", "llm", "machinelearning", "mcp", "business", "use-case"]
 }
 
 # Category Keywords for tagging/classification (if needed)

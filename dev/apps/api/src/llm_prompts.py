@@ -112,6 +112,15 @@ Ethan Mollick의 글을 다음 중점에 맞춰 요약해 주세요:
 ```{text}```
 """
 
+LLM_PROMPT_RSS_DEV_TO = """
+Dev.to의 기술 아티클을 다음 중점에 맞춰 요약해 주세요:
+- 핵심 기술 개념 및 구현 방법
+- 개발자에게 유용한 팁과 노하우
+- 언급된 도구 및 라이브러리
+번호가 매겨진 리스트 형식으로, 반드시 한국어로 작성해 주세요:
+```{text}```
+"""
+
 LLM_PROMPT_API_SUMMARY = """
 Analyze the provided technical article/discussion and generate a structured summary in KOREAN.
 Please organize the output into the following four sections using the exact headers below:
@@ -142,7 +151,20 @@ Content:
 RSS_FEED_PROMPTS = {
     FeedNames.REDDIT_ML: LLM_PROMPT_RSS_REDDIT_ML,
     FeedNames.NEWSLETTER_ELVIS: LLM_PROMPT_RSS_NEWSLETTER,
-    FeedNames.ETHAN_MOLLICK: LLM_PROMPT_RSS_ETHAN_MOLLICK,
+    
+    # Use the structured API Summary (4 sections) for deep-dive content
+    FeedNames.ETHAN_MOLLICK: LLM_PROMPT_API_SUMMARY,
+    FeedNames.LATENT_SPACE: LLM_PROMPT_API_SUMMARY,
+    FeedNames.HBR_AI: LLM_PROMPT_API_SUMMARY,
+    FeedNames.MIT_TECH_REVIEW: LLM_PROMPT_API_SUMMARY,
+    FeedNames.OPENAI_BLOG: LLM_PROMPT_API_SUMMARY,
+    FeedNames.GOOGLE_AI_BLOG: LLM_PROMPT_API_SUMMARY,
+    FeedNames.ANTHROPIC_NEWS: LLM_PROMPT_API_SUMMARY,
+    FeedNames.THE_SEQUENCE: LLM_PROMPT_API_SUMMARY,
+    FeedNames.AHEAD_OF_AI: LLM_PROMPT_API_SUMMARY,
+    FeedNames.BENS_BITES: LLM_PROMPT_RSS_NEWSLETTER, # Keep simple for Ben's Bites as it's a digest
+    
+    FeedNames.DEV_TO: LLM_PROMPT_RSS_DEV_TO,
     # Default fallback for unmapped feeds
     "default": LLM_PROMPT_SUMMARY_COMBINE_PROMPT3,
 }

@@ -4,3 +4,4 @@ workspace/*
 test_*.py
 
 claude_chat_text/*
+docker/workspace/

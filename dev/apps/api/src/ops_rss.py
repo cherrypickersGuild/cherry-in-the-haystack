@@ -35,7 +35,19 @@ class OperatorRSS(OperatorBase):
         """
         Fetch artciles from feed url (pull last n)
         """
+        import logging
+        
+        # Configure file logging
+        log_file = os.path.join(os.getcwd(), 'rss_pull.log')
+        logging.basicConfig(
+            filename=log_file,
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s'
+        )
+        logger = logging.getLogger('RSS_MONITOR')
+
         print(f"[fetch_articles] list_name: {list_name}, feed_url: {feed_url}, count: {count}")
+        logger.info(f"START_FETCH: {list_name} - {feed_url}")
 
         # Fetch RSS feed with proper headers to avoid being blocked by Reddit
         headers = {
@@ -48,8 +60,10 @@ class OperatorRSS(OperatorBase):
             response = requests.get(feed_url, headers=headers, timeout=10)
             response.raise_for_status()
             feed = feedparser.parse(response.content)
+            logger.info(f"FETCH_SUCCESS: {list_name} - Entries: {len(feed.entries)}")
         except Exception as e:
             print(f"[ERROR] Failed to fetch RSS feed: {e}")
+            logger.error(f"FETCH_FAILED: {list_name} - Error: {str(e)}")
             feed = feedparser.parse('')  # Empty feed to avoid errors
 
         # Debug information
@@ -95,6 +109,7 @@ class OperatorRSS(OperatorBase):
             article_id = utils.hashcode_md5(hash_key)
 
             print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, list_name: {list_name}, title: {title}, published: {created_time}, article_id: {article_id}, hash_key: [{hash_key}]")
+            logger.info(f"ARTICLE_FOUND: {list_name} - {title[:50]}...")
 
             # Create a dictionary representing an article
             article = {
@@ -129,6 +144,14 @@ class OperatorRSS(OperatorBase):
         # Load RSS feeds from centralized configuration
         rss_list = get_enabled_feeds()
         print(f"Loaded {len(rss_list)} enabled RSS feeds from config")
+        
+        # Log summary of feeds to process
+        import logging
+        logger = logging.getLogger('RSS_MONITOR')
+        # Setup basic config again here just in case pull called first/separately
+        log_file = os.path.join(os.getcwd(), 'rss_pull.log')
+        logging.basicConfig(filename=log_file, level=logging.INFO)
+        logger.info(f"SESSION_START: Processing {len(rss_list)} feeds")
 
         # Fetch articles from rss list
         pages = {}
@@ -146,6 +169,7 @@ class OperatorRSS(OperatorBase):
                 page_id = article["id"]
                 pages[page_id] = article
 
+        logger.info(f"SESSION_END: Total articles collected: {len(pages)}")
         return pages
 
     def dedup(self, extractedPages, target="inbox"):
@@ -485,7 +509,7 @@ class OperatorRSS(OperatorBase):
 
                 # database_id = utils.get_notion_database_id_toread(
                 #     notion_agent, db_index_id)
-                database_id = "2a6f199edf7c809eac47c77106b34c38"
+                database_id = os.getenv("NOTION_DATABASE_ID", "2a6f199edf7c809eac47c77106b34c38")
                 
                 print(f"Latest ToRead database id: {database_id}")
 

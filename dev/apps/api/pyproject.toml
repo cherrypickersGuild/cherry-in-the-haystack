@@ -6,6 +6,13 @@ authors = [
     { name = "Yuzhang Hu", email = "hyzwowtools@gmail.com" }
 ]
 dependencies = [
+    # --- API & Scheduler (신규) ---
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.0",
+    "apscheduler>=3.10,<4",
+    "psycopg2-binary>=2.9",
+    # --- Core ---
     "SpeechRecognition",
     "arxiv",
     "bs4",
@@ -23,7 +30,6 @@ dependencies = [
     "lz4",
     "minio",
     "miniopy-async",
-    "mysql-connector-python>=8.2.0",
     "notion-client",
     "openai",
     "openai-whisper",
@@ -54,7 +60,7 @@ dependencies = [
     "scikit-learn>=1.6.1",
 ]
 readme = "README.md"
-requires-python = ">= 3.9"
+requires-python = ">= 3.10"
 
 [project.scripts]
 # hello = "airflow:hello"

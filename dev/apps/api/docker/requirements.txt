@@ -5,11 +5,13 @@ requests
 langchain==0.3.1
 langchain-community==0.3.1
 langchain-google-genai
+google-generativeai
 transformers
 sentence_transformers
 pillow
 tiktoken
 openai
+litellm
 
 # webbaseload related
 bs4

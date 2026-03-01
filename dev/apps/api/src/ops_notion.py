@@ -1,6 +1,6 @@
 import os
 from notion import NotionAgent
-from mysql_cli import MySQLClient
+from pg_cli import PGClient
 
 
 class OperatorNotion:
@@ -8,7 +8,7 @@ class OperatorNotion:
     Operator of Notion, create and maintain metadata
     """
     def init(self):
-        db_cli = MySQLClient()
+        db_cli = PGClient()
         indexes = db_cli.index_pages_table_load()
         print(f"loaded indexes: {indexes}")
 
@@ -131,7 +131,7 @@ class OperatorNotion:
             notion_api_key = os.getenv("NOTION_TOKEN")
             agent = NotionAgent(notion_api_key)
 
-        db_cli = MySQLClient()
+        db_cli = PGClient()
         indexes = db_cli.index_pages_table_load()
         print(f"loaded indexes: {indexes}")
 
@@ -174,7 +174,7 @@ class OperatorNotion:
             notion_api_key = os.getenv("NOTION_TOKEN")
             agent = NotionAgent(notion_api_key)
 
-        db_cli = MySQLClient()
+        db_cli = PGClient()
         indexes = db_cli.index_pages_table_load()
         print(f"loaded indexes: {indexes}")
 
@@ -214,7 +214,7 @@ class OperatorNotion:
         """
         Get database id of index - inbox
         """
-        db_cli = MySQLClient()
+        db_cli = PGClient()
         indexes = db_cli.index_pages_table_load()
         print(f"loaded indexes: {indexes}")
 
@@ -231,7 +231,7 @@ class OperatorNotion:
         """
         Get database id of index - toread
         """
-        db_cli = MySQLClient()
+        db_cli = PGClient()
         indexes = db_cli.index_pages_table_load()
         print(f"loaded indexes: {indexes}")
 

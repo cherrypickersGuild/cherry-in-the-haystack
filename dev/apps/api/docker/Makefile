@@ -16,7 +16,7 @@ deploy-airflow:
 	@echo "Assembling Airflow ..."
 	mkdir -p $(AIRFLOW_PROJ_DIR)
 	cd $(AIRFLOW_PROJ_DIR) && mkdir -p dags logs config plugins run data
-	cd $(AIRFLOW_PROJ_DIR) && chmod 777 run/ data/
+	# cd $(AIRFLOW_PROJ_DIR) && chmod -R 777 run/ data/
 	@echo "Copy environment file ..."
 	cp $(topdir)/build/.env $(AIRFLOW_PROJ_DIR)/config
 	@echo "Airflow deployment finished"

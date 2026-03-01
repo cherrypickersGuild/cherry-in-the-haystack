@@ -60,7 +60,7 @@ x-airflow-common:
   privileged: true
   environment:
     &airflow-common-env
-    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     # For backward compatibility, with Airflow <2.3
     AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -84,7 +84,7 @@ x-airflow-common:
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/dags:/opt/airflow/dags
+    # - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-./workspace/airflow}/run:/opt/airflow/run
     - ../src:/opt/airflow/run/auto-news/src
     - ../dags:/opt/airflow/dags
@@ -153,7 +153,7 @@ services:
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
-        condition: service_completed_successfully
+        condition: service_started
 
   airflow-scheduler:
     <<: *airflow-common
@@ -168,7 +168,7 @@ services:
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
-        condition: service_completed_successfully
+        condition: service_started
 
   airflow-worker:
     <<: *airflow-common
@@ -226,7 +226,7 @@ services:
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
-        condition: service_completed_successfully
+        condition: service_started
 
   airflow-triggerer:
     <<: *airflow-common
@@ -241,7 +241,7 @@ services:
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
-        condition: service_completed_successfully
+        condition: service_started
 
   airflow-init:
     <<: *airflow-common
@@ -364,7 +364,7 @@ services:
     user: "${AIRFLOW_UID:-50000}:0"
     depends_on:
       airflow-init:
-        condition: service_completed_successfully
+        condition: service_started
       airflow-scheduler:
         condition: service_healthy
       mysql:
@@ -390,7 +390,7 @@ services:
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
-        condition: service_completed_successfully
+        condition: service_started
 
   mysql:
     image: mysql:8.4.2
@@ -408,7 +408,7 @@ services:
     command: --mysql-native-password=ON
     restart: always
     ports:
-      - "${BOT_SVC_BIND_IP:-127.0.0.1}:3306:3306"
+      - "${BOT_SVC_BIND_IP:-127.0.0.1}:3307:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s

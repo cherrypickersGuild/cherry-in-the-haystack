@@ -1,0 +1,43 @@
+# Core API
+fastapi>=0.109
+uvicorn[standard]>=0.27
+pydantic>=2.0
+
+# Scheduler
+apscheduler>=3.10
+
+# Database
+psycopg2-binary>=2.9
+
+# Existing dependencies (from pyproject.toml, excluding Airflow)
+feedparser
+requests
+httpx
+httpcore>=1.0
+bs4
+fake_useragent
+notion-client
+redis
+pymilvus>=2.4
+openai
+langchain==0.3.1
+langchain-community==0.3.1
+langchain-google-genai
+google-generativeai>=0.8.5
+python-dotenv
+pytz
+tiktoken
+validators
+retry
+litellm>=1.80.10
+scikit-learn>=1.6.1
+transformers
+lz4
+
+# Required by import chain (utils.py -> ops_audio2text -> whisper, etc.)
+openai-whisper
+numpy
+arxiv
+duckduckgo_search
+chromadb>=0.4
+llama-index>=0.9

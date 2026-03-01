@@ -10,7 +10,7 @@ from ops_youtube import OperatorYoutube
 from ops_rss import OperatorRSS
 from ops_reddit import OperatorReddit
 from ops_crawl_blog_superhuman import OperatorCrawlBlogSuperhuman
-from ops_crawl_rss_natolambert import OperatorCrawlRSSNatoLambert
+# ops_crawl_rss_natolambert는 사용 시에만 import (litellm 의존성 회피)
 import utils
 
 
@@ -202,6 +202,7 @@ def run(args):
             save_crawl(args, op, data, source=source)
         
         elif source == "CrawlBlogNatoLambert":
+            from ops_crawl_rss_natolambert import OperatorCrawlRSSNatoLambert
             op = OperatorCrawlRSSNatoLambert()
             data = pull_rss(args, op)
             save_rss(args, op, data)
