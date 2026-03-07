@@ -854,7 +854,35 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sa
         </div>
 
         <div style="margin-bottom:30px;">
-          <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:10px;"><span>02 — RELATED CONCEPTS</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
+          <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;display:flex;align-items:center;gap:10px;"><span>02 — CHERRIES</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:12px;">Key insights from ingested sources — each covers a distinct, non-overlapping aspect of RAG</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--cherry);border-radius:7px;padding:11px 14px;">
+              <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:5px;">
+                <span style="font-size:10px;font-weight:700;color:var(--cherry);">🍒</span>
+                <span style="font-size:11px;font-weight:700;color:var(--text);">Building LLMs from Scratch — Sebastian Raschka</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);line-height:1.5;">RAG is framed as an inference-time solution: rather than encoding knowledge into weights, you supply context dynamically. Raschka walks through why this matters for knowledge cutoff and how retrieval quality dominates output quality.</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--cherry);border-radius:7px;padding:11px 14px;">
+              <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:5px;">
+                <span style="font-size:10px;font-weight:700;color:var(--cherry);">🍒</span>
+                <span style="font-size:11px;font-weight:700;color:var(--text);">Hands-On Large Language Models — Alammar & Grootendorst</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);line-height:1.5;">Focuses on chunking strategy as the primary lever: chunk size and overlap directly determine retrieval precision. Introduces the tradeoff between semantic coherence and context window constraints.</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--cherry);border-radius:7px;padding:11px 14px;">
+              <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:5px;">
+                <span style="font-size:10px;font-weight:700;color:var(--cherry);">🍒</span>
+                <span style="font-size:11px;font-weight:700;color:var(--text);">AI Engineering — Chip Huyen</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);line-height:1.5;">Treats RAG as a production systems problem — latency, re-ranking cost, index freshness, and failure modes under high load. Distinct from theory: the bottleneck in production is almost never the LLM, it's retrieval pipeline reliability.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:30px;">
+          <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:10px;"><span>03 — RELATED CONCEPTS</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
             <div class="cc"><div class="cc-rel">Subtopic →</div><div class="cc-name">Vector DBs</div><div class="cc-desc">Similarity search</div></div>
             <div class="cc"><div class="cc-rel">Extends →</div><div class="cc-name">Hybrid Search</div><div class="cc-desc">Dense + sparse</div></div>
@@ -866,7 +894,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sa
         </div>
 
         <div style="margin-bottom:30px;">
-          <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:10px;"><span>03 — PROGRESSIVE REFERENCES</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
+          <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:10px;"><span>04 — PROGRESSIVE REFERENCES</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
           <div class="ref r1"><div class="rn">Start Here</div><div class="rt">RAG from scratch — LangChain tutorial</div><div class="rw">Best hands-on introduction. Full pipeline with working code.</div><div class="ra">→ Teaches: chunking, embedding, retrieval, generation loop</div></div>
           <div class="ref"><div class="rn">Next</div><div class="rt">Lewis et al. — RAG for Knowledge-Intensive NLP (2020)</div><div class="rw">Original paper. Theoretical grounding for design choices.</div><div class="ra">→ Adds: formal definition, DPR retriever, seq2seq generator</div></div>
           <div class="ref"><div class="rn">Deeper</div><div class="rt">Contextual Retrieval — Anthropic (2024)</div><div class="rw">Current SOTA. -67% retrieval failures. Essential for production RAG.</div><div class="ra">→ Adds: BM25 hybrid, contextual chunk headers, reranking</div></div>

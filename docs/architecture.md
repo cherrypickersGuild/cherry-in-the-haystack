@@ -53,7 +53,7 @@ poetry add --group dev ruff mypy pytest pytest-cov
 
 | Component | Decision | Version |
 |---|---|---|
-| Web Framework | Next.js (App Router) | latest |
+| Web Framework | Nest.js (App Router) | latest |
 | Frontend Language | TypeScript | 5.9+ |
 | Pipeline Language | TypeScript | 5.9+ |
 | AI/LLM Language | Python | 3.10+ |
@@ -65,9 +65,9 @@ poetry add --group dev ruff mypy pytest pytest-cov
 
 | Category | Decision | Version | Affects Epics | Rationale |
 |---|---|---|---|---|
-| Web Language | TypeScript | 5.9+ | All | Type-safe; Next.js native; shared types across frontend and pipeline |
+| Web Language | TypeScript | 5.9+ | All | Type-safe; Nest.js native; shared types across frontend and pipeline |
 | AI/LLM Language | Python | 3.10+ | Epics 1, 3, 4 | Best ecosystem for LLM SDKs, embeddings, and PDF parsing |
-| Web Framework | Next.js (App Router) | latest | Phase 2 | Full-stack TypeScript; API routes + SSR; single deployment unit |
+| Web Framework | Nest.js (App Router) | latest | Phase 2 | Full-stack TypeScript; API routes + SSR; single deployment unit |
 | Package Manager | pnpm | latest | All TS | Workspace support; fast; disk-efficient |
 | Python Deps | Poetry | 1.8+ | Epics 1, 3, 4 | Lock files; dev/prod dependency separation |
 | Python Linting | Ruff | latest | Epics 1, 3, 4 | Single tool replacing flake8, black, isort |
@@ -77,10 +77,10 @@ poetry add --group dev ruff mypy pytest pytest-cov
 | Pipeline Scheduling | Cron (system cron / node-cron) | — | Epics 2, 3, 4 | No external orchestration service; simple, reliable scheduling |
 | Primary Database | PostgreSQL 16 (Amazon RDS db.t3.small) | 16 | Epics 1, 2, 3, 4 | Evidence Layer; ~$25/month; point-in-time recovery |
 | PostgreSQL Driver (Python) | psycopg3 | latest | Epics 1, 3, 4 | Modern async-capable Postgres adapter with type hints |
-| PostgreSQL Driver (TS) | Prisma or postgres.js | latest | Phase 2 | Type-safe ORM / query builder for Next.js API routes |
+| PostgreSQL Driver (TS) | Prisma or postgres.js | latest | Phase 2 | Type-safe ORM / query builder for Nest.js API routes |
 | Graph Database | GraphDB (RDF, self-hosted) | latest | Epics 1, 3, 4 | Free open-source; RDF standard; no production licensing cost |
 | Vector Store | pgvector (PostgreSQL extension) | latest | Epics 1, 3 | No separate infrastructure; sufficient for ~100K vectors |
-| Content Deployment | Next.js webapp (AWS / Oracle) | — | Epics 1, 4 | Full-stack TypeScript; content served from database via API routes |
+| Content Deployment | Nest.js webapp (AWS / Oracle) | — | Epics 1, 4 | Full-stack TypeScript; content served from database via API routes |
 | CI/CD | GitHub Actions | — | Epics 1, 5 | Existing infrastructure; build, test, and deploy pipeline |
 | Local Dev | Docker Compose | — | Epic 1 | PostgreSQL 16 + pgvector + GraphDB; 30-min onboarding target |
 | Review Workspace | Notion API v2 (source of truth) | v2 | Epics 1, 2 | KT already uses Notion; eliminates custom review UI |
@@ -100,14 +100,14 @@ poetry add --group dev ruff mypy pytest pytest-cov
 cherry-in-the-haystack/
 │
 ├── apps/
-│   └── web/                            # Next.js application (TypeScript)
+│   └── web/                            # Nest.js application (TypeScript)
 │       ├── app/
 │       │   ├── (public)/               # Public routes — no auth required
 │       │   │   ├── basics/[slug]/
 │       │   │   ├── advanced/[slug]/
 │       │   │   └── newly-discovered/
 │       │   ├── (dashboard)/            # Authenticated routes (Phase 2)
-│       │   └── api/                    # Next.js API routes
+│       │   └── api/                    # Nest.js API routes
 │       │       ├── content/
 │       │       ├── users/
 │       │       └── newsletter/
@@ -186,7 +186,7 @@ cherry-in-the-haystack/
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci.yml                      # PR: ruff, mypy, tsc, pytest, markdown-lint
-│   │   ├── deploy.yml                  # main push: Next.js build → deploy to AWS/Oracle
+│   │   ├── deploy.yml                  # main push: Nest.js build → deploy to AWS/Oracle
 │   │   └── link-check.yml             # Weekly: validate all external URLs
 │   ├── ISSUE_TEMPLATE/
 │   │   ├── report-error.md
@@ -229,7 +229,8 @@ cherry-in-the-haystack/
 |---|---|---|---|
 | Language | TypeScript | 5.9+ | Web app, API routes, data pipeline scripts |
 | Language | Python | 3.10+ | AI/LLM agent modules (concept extraction, Writer Agent) |
-| Web Framework | Next.js (App Router) | latest | Frontend + API backend |
+| Web Framework | Next.js (App Router) | latest | Frontend |
+| Web Framework | Nest.js (App Router) | latest | API backend |
 | Evidence Layer | PostgreSQL | 16 (RDS db.t3.small) | Paragraphs, backups, pipeline runs |
 | Concept Layer | GraphDB | latest | Normalized concept ontology, typed relations |
 | Vector Search | pgvector | latest | Semantic search on Basics/Advanced only |
@@ -953,6 +954,7 @@ llm:instanceOf          → parent concept class URI
 llm:relatedInstance     → related instance URI (symmetric)
 rdfs:label              Instance label
 llm:description         Instance description
+llm:fromSection         xsd:float — section position within source document (used for ordering)
 ```
 
 **Planned Relationship Types (not yet implemented):**
