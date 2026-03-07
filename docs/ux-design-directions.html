@@ -250,6 +250,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sa
     <button class="dir-btn active" onclick="show(1,this)">1 · Dashboard ✓</button>
     <button class="dir-btn" onclick="show('pn',this)">Patchnotes</button>
     <span class="sep">|</span>
+    <button class="dir-btn" onclick="show('nd-frameworks',this)">ND · Frameworks</button>
     <button class="dir-btn" onclick="show('nd-models',this)">ND · Model Updates</button>
     <button class="dir-btn" onclick="show('nd-business',this)">ND · Case Studies</button>
     <span class="sep">|</span>
@@ -1129,6 +1130,343 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sa
           <div style="font-size:10px;color:var(--muted);">Extends RAG · -67% failures · Score 5</div>
           <div style="font-size:10px;color:var(--cherry);margin-top:4px;cursor:pointer;">See in Digest →</div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     ND · FRAMEWORKS
+═══════════════════════════════════════════════════════ -->
+<div id="dir-nd-frameworks" class="direction-frame">
+  <div class="dir-meta">
+    <div class="dir-name">ND · Frameworks — Newly Discovered / Service &amp; System Building</div>
+    <div class="dir-tagline">주요 프레임워크의 벤치마크 성능과 최신 릴리즈 소식을 한눈에 확인하세요. "Frameworks" active in sidebar.</div>
+    <div class="dir-tags"><span class="dir-tag">Major Framework</span><span class="dir-tag">Rising Star</span><span class="dir-tag">Latest Updates</span></div>
+  </div>
+  <div style="background:var(--bg);display:flex;min-height:calc(100vh - 108px);">
+
+    <!-- ─── SIDEBAR ─── -->
+    <div style="width:220px;background:var(--surface);border-right:1px solid var(--border);padding:14px 0;flex-shrink:0;overflow-y:auto;">
+      <div style="padding:0 12px 14px;border-bottom:1px solid var(--border);margin-bottom:6px;">
+        <span style="font-size:15px;font-weight:800;color:var(--cherry);">cherry</span>
+        <div style="margin-top:10px;"><div class="search-bar" style="padding:5px 9px;"><span style="color:var(--muted);font-size:11px;">🔍</span><input placeholder="Search..." readonly><span class="kbd">⌘K</span></div></div>
+      </div>
+      <div style="padding:0 8px;">
+        <div class="knav-h" style="margin-top:4px;">Digest</div>
+        <div class="knav-item">⚡ This Week's Highlight</div>
+        <div class="knav-item">📋 Patchnotes</div>
+        <div class="knav-h">Basics</div>
+        <div class="knav-item">Prompting Techniques</div>
+        <div class="knav-item">RAG</div>
+        <div class="knav-item">Fine-tuning</div>
+        <div class="knav-item">Agent Architectures</div>
+        <div class="knav-item">Embeddings &amp; Vector DBs</div>
+        <div class="knav-item">Evaluation</div>
+        <div class="knav-h">Advanced</div>
+        <div class="knav-item">Chain-of-Thought</div>
+        <div class="knav-item">Multi-hop RAG</div>
+        <div class="knav-item">PEFT / LoRA / QLoRA</div>
+        <div class="knav-item">Multi-agent Systems</div>
+        <div class="knav-item">Custom Embeddings</div>
+        <div class="knav-item">Adversarial Evaluation</div>
+        <div class="knav-h">Newly Discovered</div>
+        <div class="knav-sg">Research &amp; Models</div>
+        <div class="knav-sub">Model Updates</div>
+        <div class="knav-sub">Papers &amp; Benchmarks</div>
+        <div class="knav-sg">Service &amp; System Building</div>
+        <div class="knav-sub active">Frameworks</div>
+        <div class="knav-sub">Tools</div>
+        <div class="knav-sub">Shared Resources</div>
+        <div class="knav-sg">Industry &amp; Business <span style="color:var(--cherry);">⭐</span></div>
+        <div class="knav-sub">Case Studies</div>
+        <div class="knav-sg">Ecosystem &amp; Governance</div>
+        <div class="knav-sub">Regulations</div>
+        <div class="knav-sub">Big Tech Trends</div>
+        <div class="knav-sub">This Week's Posts</div>
+        <div style="padding:0 8px;margin-top:14px;"><button style="width:100%;padding:7px;border-radius:7px;background:var(--violet-soft);border:1px solid var(--violet);color:#A987D4;font-size:11px;font-weight:600;cursor:pointer;">✦ My Feed — Paid</button></div>
+      </div>
+    </div>
+
+    <!-- ─── FRAMEWORKS CONTENT ─── -->
+    <div style="flex:1;padding:26px 30px;overflow-y:auto;">
+
+      <!-- Breadcrumb + Title -->
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px;">Newly Discovered / Service &amp; System Building /</div>
+      <h1 style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin-bottom:4px;">Framework</h1>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:28px;">주요 프레임워크의 벤치마크 성능과 최신 릴리즈 소식을 한눈에 확인하세요</p>
+
+      <!-- ─── Section 1: Major Framework ─── -->
+      <h2 style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px;">🏢 Major Framework</h2>
+      <div style="height:1px;background:var(--border);margin-bottom:16px;"></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:32px;">
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='#7B5EA7'" onmouseout="this.style.borderColor=''">
+          <div style="font-size:18px;margin-bottom:6px;">🤖</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text);margin-bottom:10px;">Agent</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:rgba(201,75,110,.13);border:1px solid rgba(201,75,110,.22);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#E94057;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:-.2px;">AG</div>
+              <span style="font-size:10px;font-weight:600;color:#F48BA0;">AutoGPT</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#4F8EF7;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">LG</div>
+              <span style="font-size:10px;color:var(--text);">LangGraph</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#F59E0B;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">CR</div>
+              <span style="font-size:10px;color:var(--text);">CrewAI</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='#7B5EA7'" onmouseout="this.style.borderColor=''">
+          <div style="font-size:18px;margin-bottom:6px;">📬</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text);margin-bottom:10px;">Serving</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:rgba(201,75,110,.13);border:1px solid rgba(201,75,110,.22);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#10B981;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">OL</div>
+              <span style="font-size:10px;font-weight:600;color:#F48BA0;">Ollama</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#8B5CF6;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">vL</div>
+              <span style="font-size:10px;color:var(--text);">vLLM</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#76B900;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">TR</div>
+              <span style="font-size:10px;color:var(--text);">TensorRT-LLM</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='#7B5EA7'" onmouseout="this.style.borderColor=''">
+          <div style="font-size:18px;margin-bottom:6px;">🗄️</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text);margin-bottom:10px;">Data / Search &amp; Storage</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:rgba(201,75,110,.13);border:1px solid rgba(201,75,110,.22);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#F97316;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">LI</div>
+              <span style="font-size:10px;font-weight:600;color:#F48BA0;">LlamaIndex</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#E91E8C;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">CB</div>
+              <span style="font-size:10px;color:var(--text);">ChromaDB</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#00C7B7;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">WV</div>
+              <span style="font-size:10px;color:var(--text);">Weaviate</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='#7B5EA7'" onmouseout="this.style.borderColor=''">
+          <div style="font-size:18px;margin-bottom:6px;">🎯</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text);margin-bottom:10px;">Fine-Tuning</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:rgba(201,75,110,.13);border:1px solid rgba(201,75,110,.22);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#3B82F6;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">LF</div>
+              <span style="font-size:10px;font-weight:600;color:#F48BA0;">LLaMA-Factory</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#EF4444;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">UN</div>
+              <span style="font-size:10px;color:var(--text);">Unsloth</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#6366F1;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">AX</div>
+              <span style="font-size:10px;color:var(--text);">Axolotl</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='#7B5EA7'" onmouseout="this.style.borderColor=''">
+          <div style="font-size:18px;margin-bottom:6px;">🔍</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text);margin-bottom:10px;">RAG</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:rgba(201,75,110,.13);border:1px solid rgba(201,75,110,.22);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">RF</div>
+              <span style="font-size:10px;font-weight:600;color:#F48BA0;">RAGFlow</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#059669;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">HS</div>
+              <span style="font-size:10px;color:var(--text);">Haystack</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#D97706;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">RG</div>
+              <span style="font-size:10px;color:var(--text);">RAGAS</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='#7B5EA7'" onmouseout="this.style.borderColor=''">
+          <div style="font-size:18px;margin-bottom:6px;">✏️</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text);margin-bottom:10px;">Prompt Engineering</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:rgba(201,75,110,.13);border:1px solid rgba(201,75,110,.22);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#DC2626;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">DS</div>
+              <span style="font-size:10px;font-weight:600;color:#F48BA0;">DSPy</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#0891B2;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">GD</div>
+              <span style="font-size:10px;color:var(--text);">Guidance</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#0284C7;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">PF</div>
+              <span style="font-size:10px;color:var(--text);">PromptFlow</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='#7B5EA7'" onmouseout="this.style.borderColor=''">
+          <div style="font-size:18px;margin-bottom:6px;">⚙️</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text);margin-bottom:10px;">LLMOps</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:rgba(201,75,110,.13);border:1px solid rgba(201,75,110,.22);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#0194E2;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">ML</div>
+              <span style="font-size:10px;font-weight:600;color:#F48BA0;">MLflow</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#FFBE00;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#1a1a1a;flex-shrink:0;">WB</div>
+              <span style="font-size:10px;color:var(--text);">W&amp;B</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#16A34A;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">LS</div>
+              <span style="font-size:10px;color:var(--text);">LangSmith</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='#7B5EA7'" onmouseout="this.style.borderColor=''">
+          <div style="font-size:18px;margin-bottom:6px;">📊</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text);margin-bottom:10px;">Observability / Evaluation</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:rgba(201,75,110,.13);border:1px solid rgba(201,75,110,.22);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#7B5EA7;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">LF</div>
+              <span style="font-size:10px;font-weight:600;color:#F48BA0;">Langfuse</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#EA580C;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">PX</div>
+              <span style="font-size:10px;color:var(--text);">Phoenix</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--elevated);border:1px solid var(--border);">
+              <div style="width:20px;height:20px;border-radius:4px;background:#0D9488;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;flex-shrink:0;">TL</div>
+              <span style="font-size:10px;color:var(--text);">TruLens</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── Section 2: Rising Star ─── -->
+      <h2 style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px;">🔥 Rising Star</h2>
+      <div style="height:1px;background:var(--border);margin-bottom:16px;"></div>
+      <div class="rising-star" style="margin-bottom:32px;display:grid;grid-template-columns:1fr 210px;gap:18px;align-items:center;">
+        <div>
+          <div class="rs-tag">🔥 Rising Star — 이번 주 주목할 프레임워크</div>
+          <div class="rs-name">AutoGPT <span style="font-size:11px;font-weight:700;background:var(--cherry);color:#fff;border-radius:4px;padding:1px 7px;margin-left:6px;">HOT</span></div>
+          <div class="rs-sub">에이전트 빌더, 워크플로 관리, 배포 제어, 즉시 사용 가능한 에이전트</div>
+          <div class="rs-body">AutoGPT는 자율 AI 에이전트 구축을 위한 오픈소스 플랫폼으로, 워크플로 자동화부터 멀티 에이전트 오케스트레이션까지 지원합니다. 이번 주 커뮤니티에서 가장 활발히 언급된 프레임워크입니다.</div>
+          <div class="rs-stats">
+            <div class="rs-stat"><strong>180k+</strong> Mentions (2 weeks)</div>
+            <div class="rs-stat"><strong>+312%</strong> Trend</div>
+            <div class="rs-stat"><strong>168.4k</strong> GitHub Stars</div>
+          </div>
+        </div>
+        <div style="background:#171423;border:1px solid #3A2D48;border-radius:10px;padding:12px;">
+          <div style="font-size:8px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">2주 언급량 추이 · Daily mentions</div>
+          <svg viewBox="0 0 210 68" width="100%" style="display:block;">
+            <defs>
+              <linearGradient id="rsBarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#C94B6E" stop-opacity="0.35"/>
+                <stop offset="50%" stop-color="#C94B6E" stop-opacity="0.7"/>
+                <stop offset="100%" stop-color="#E94057" stop-opacity="1"/>
+              </linearGradient>
+            </defs>
+            <!-- grid lines -->
+            <line x1="0" y1="16" x2="210" y2="16" stroke="#2A2535" stroke-width="0.5" stroke-dasharray="3,3"/>
+            <line x1="0" y1="33" x2="210" y2="33" stroke="#2A2535" stroke-width="0.5" stroke-dasharray="3,3"/>
+            <line x1="0" y1="50" x2="210" y2="50" stroke="#2A2535" stroke-width="0.5" stroke-dasharray="3,3"/>
+            <!-- week divider -->
+            <line x1="103" y1="8" x2="103" y2="58" stroke="#3A2D48" stroke-width="1" stroke-dasharray="2,2"/>
+            <!-- Week 1 bars (dim) -->
+            <rect x="4"  y="50" width="11" height="8"  rx="2" fill="rgba(201,75,110,.28)"/>
+            <rect x="18" y="48" width="11" height="10" rx="2" fill="rgba(201,75,110,.28)"/>
+            <rect x="32" y="49" width="11" height="9"  rx="2" fill="rgba(201,75,110,.28)"/>
+            <rect x="46" y="47" width="11" height="11" rx="2" fill="rgba(201,75,110,.32)"/>
+            <rect x="60" y="45" width="11" height="13" rx="2" fill="rgba(201,75,110,.32)"/>
+            <rect x="74" y="44" width="11" height="14" rx="2" fill="rgba(201,75,110,.36)"/>
+            <rect x="88" y="42" width="11" height="16" rx="2" fill="rgba(201,75,110,.4)"/>
+            <!-- Week 2 bars (bright, spiking) -->
+            <rect x="107" y="37" width="11" height="21" rx="2" fill="rgba(233,64,87,.55)"/>
+            <rect x="121" y="30" width="11" height="28" rx="2" fill="rgba(233,64,87,.68)"/>
+            <rect x="135" y="22" width="11" height="36" rx="2" fill="#C94B6E"/>
+            <rect x="149" y="16" width="11" height="42" rx="2" fill="#C94B6E"/>
+            <rect x="163" y="11" width="11" height="47" rx="2" fill="#E94057"/>
+            <rect x="177" y="7"  width="11" height="51" rx="2" fill="#E94057"/>
+            <rect x="191" y="9"  width="11" height="49" rx="2" fill="#E94057"/>
+            <!-- baseline -->
+            <line x1="0" y1="58" x2="210" y2="58" stroke="#2A2535" stroke-width="1"/>
+            <!-- week labels -->
+            <text x="50"  y="65" text-anchor="middle" font-size="7" fill="#8B849E">Week 1</text>
+            <text x="158" y="65" text-anchor="middle" font-size="7" fill="#F48BA0" font-weight="700">Week 2  🔥</text>
+          </svg>
+          <div style="display:flex;justify-content:space-between;margin-top:5px;">
+            <span style="font-size:8px;color:rgba(255,255,255,.22);">Feb 10</span>
+            <span style="font-size:9px;color:#F48BA0;font-weight:700;">+312%</span>
+            <span style="font-size:8px;color:rgba(255,255,255,.22);">Feb 24</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Section 3: Latest Updates ─── -->
+      <h2 style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px;">📢 Latest Updates</h2>
+      <div style="height:1px;background:var(--border);margin-bottom:16px;"></div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:32px;">
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--cherry);border-radius:8px;padding:14px;cursor:pointer;transition:transform .12s,border-color .12s;" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#3b334a'" onmouseout="this.style.transform='';this.style.borderColor=''">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);">vLLM <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:var(--cherry-soft);color:var(--cherry);margin-left:5px;">v0.8.2</span></div>
+            <div style="font-size:10px;color:var(--muted);">📅 Feb 25</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px;">Speculative decoding &amp; chunked prefill 성능 개선. 추론 처리량 최대 2.4배 향상.</div>
+          <div style="font-size:10px;color:var(--cherry);cursor:pointer;">🔗 상세 보기 →</div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--violet);border-radius:8px;padding:14px;cursor:pointer;transition:transform .12s,border-color .12s;" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#3b334a'" onmouseout="this.style.transform='';this.style.borderColor=''">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);">unsloth <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:var(--violet-soft);color:#A987D4;margin-left:5px;">v2026.2.1</span></div>
+            <div style="font-size:10px;color:var(--muted);">📅 Feb 24</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px;">2배 빠른 파인튜닝과 VRAM 사용량 60% 감소. Llama 4 Scout 지원 추가.</div>
+          <div style="font-size:10px;color:#A987D4;cursor:pointer;">🔗 상세 보기 →</div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid #5ECBA1;border-radius:8px;padding:14px;cursor:pointer;transition:transform .12s,border-color .12s;" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#3b334a'" onmouseout="this.style.transform='';this.style.borderColor=''">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);">ollama <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:#0A2A24;color:#5ECBA1;margin-left:5px;">v0.6.2</span></div>
+            <div style="font-size:10px;color:var(--muted);">📅 Feb 23</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px;">모델 컨텍스트 캐싱 추가 및 멀티모달 스트리밍 안정성 개선.</div>
+          <div style="font-size:10px;color:#5ECBA1;cursor:pointer;">🔗 상세 보기 →</div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid #D4A853;border-radius:8px;padding:14px;cursor:pointer;transition:transform .12s,border-color .12s;" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#3b334a'" onmouseout="this.style.transform='';this.style.borderColor=''">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);">Langfuse <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:#2A2010;color:#D4A853;margin-left:5px;">v3.12</span></div>
+            <div style="font-size:10px;color:var(--muted);">📅 Feb 22</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px;">LangGraph 네이티브 트레이싱 지원 및 실시간 스코어링 대시보드 추가.</div>
+          <div style="font-size:10px;color:#D4A853;cursor:pointer;">🔗 상세 보기 →</div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid #5A8DFF;border-radius:8px;padding:14px;cursor:pointer;transition:transform .12s,border-color .12s;" onmouseover="this.style.transform='translateX(2px)';this.style.borderColor='#3b334a'" onmouseout="this.style.transform='';this.style.borderColor=''">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);">llama_index <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:#1A2238;color:#8DB2FF;margin-left:5px;">v0.12.3</span></div>
+            <div style="font-size:10px;color:var(--muted);">📅 Feb 21</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px;">하이브리드 검색 파이프라인 개선 및 새로운 LLM 공급자 커넥터 추가.</div>
+          <div style="font-size:10px;color:#8DB2FF;cursor:pointer;">🔗 상세 보기 →</div>
+        </div>
+
       </div>
     </div>
   </div>
