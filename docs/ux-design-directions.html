@@ -151,6 +151,91 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sa
 .art-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; line-height:1.35; }
 .art-desc { font-size:11px; color:var(--muted); line-height:1.5; margin-bottom:6px; }
 .art-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+
+/* model updates only (scoped) */
+#dir-nd-models .mu-header { margin-bottom:18px; }
+#dir-nd-models .mu-title-row { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; }
+#dir-nd-models .mu-tabs { display:flex; gap:22px; border-bottom:1px solid var(--border); margin-top:14px; padding-top:2px; }
+#dir-nd-models .mu-tab { padding:0 0 10px; font-size:12px; letter-spacing:.2px; color:var(--muted); cursor:pointer; position:relative; }
+#dir-nd-models .mu-tab:hover { color:var(--text); }
+#dir-nd-models .mu-tab.active { color:var(--text); font-weight:700; }
+#dir-nd-models .mu-tab.active::after { content:""; position:absolute; left:0; right:0; bottom:-1px; height:3px; border-radius:3px; background:linear-gradient(90deg, #E94057 0%, #F48BA0 100%); }
+#dir-nd-models .mu-leaderboard-grid { display:grid; grid-template-columns:1.4fr 1.4fr 1fr 1fr; gap:10px; align-items:stretch; }
+#dir-nd-models .mu-leader-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px; cursor:pointer; display:flex; flex-direction:column; gap:7px; min-height:124px; transition:border-color .15s, transform .15s, box-shadow .15s; }
+#dir-nd-models .mu-leader-card:hover { border-color:var(--violet); transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.25); }
+#dir-nd-models .mu-leader-card.mu-lead { grid-column:span 2; min-height:156px; border-color:rgba(233,64,87,0.4); background:linear-gradient(140deg, #2D1F26 0%, #251b31 100%); box-shadow:0 12px 28px rgba(233,64,87,.16); }
+#dir-nd-models .mu-leader-card:not(.mu-lead) { min-height:132px; }
+#dir-nd-models .mu-rank { font-size:10px; color:var(--muted); font-weight:700; letter-spacing:.4px; text-transform:uppercase; }
+#dir-nd-models .mu-leader-card.mu-lead .mu-rank { color:#F48BA0; font-size:11px; }
+#dir-nd-models .mu-company { font-size:14px; font-weight:800; color:var(--text); }
+#dir-nd-models .mu-chip { margin-left:5px; font-size:8px; font-weight:700; padding:1px 5px; border-radius:8px; background:var(--cherry); color:#fff; }
+#dir-nd-models .mu-score { font-size:15px; color:var(--text); font-weight:800; line-height:1; }
+#dir-nd-models .mu-score-track { height:4px; border-radius:999px; background:#2A2535; overflow:hidden; margin-top:2px; }
+#dir-nd-models .mu-score-fill { height:100%; border-radius:999px; background:linear-gradient(90deg, #E94057 0%, #F48BA0 100%); }
+#dir-nd-models .mu-models { font-size:10px; color:var(--muted); line-height:1.5; }
+#dir-nd-models .mu-rising { background:linear-gradient(145deg, #2D1F26 0%, #241C2E 100%); border:1px solid rgba(233,64,87,.35); border-radius:12px; padding:18px 20px; margin-bottom:20px; display:grid; grid-template-columns:minmax(0,1fr) 240px; gap:16px; align-items:center; }
+#dir-nd-models .mu-rs-tag { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--cherry); margin-bottom:8px; }
+#dir-nd-models .mu-rs-name { font-size:18px; font-weight:800; color:var(--text); margin-bottom:4px; letter-spacing:-.2px; }
+#dir-nd-models .mu-rs-stars { font-size:13px; color:#F48BA0; letter-spacing:1px; margin-bottom:8px; }
+#dir-nd-models .mu-rs-summary { font-size:11px; color:#D7D0E3; line-height:1.5; }
+#dir-nd-models .mu-rs-metrics { display:flex; gap:22px; margin-top:12px; flex-wrap:wrap; }
+#dir-nd-models .mu-rs-metric strong { display:block; font-size:32px; font-weight:800; color:#F48BA0; line-height:.95; }
+#dir-nd-models .mu-rs-metric span { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+#dir-nd-models .mu-rs-spark { background:#171423; border:1px solid #3A2D48; border-radius:10px; padding:12px; }
+#dir-nd-models .mu-updates { display:flex; flex-direction:column; gap:10px; }
+#dir-nd-models .mu-update-item { display:grid; grid-template-columns:42px 1fr; gap:12px; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--border); border-radius:10px; padding:14px 14px; transition:transform .12s, border-color .12s; }
+#dir-nd-models .mu-update-item:hover { transform:translateX(2px); border-color:#3b334a; }
+#dir-nd-models .mu-update-item.company-an { border-left-color:#C94B6E; }
+#dir-nd-models .mu-update-item.company-oa { border-left-color:#E94057; }
+#dir-nd-models .mu-update-item.company-go { border-left-color:#A987D4; }
+#dir-nd-models .mu-update-item.company-mi { border-left-color:#D4A853; }
+#dir-nd-models .mu-update-item.company-me { border-left-color:#5A8DFF; }
+#dir-nd-models .mu-company-avatar { width:36px; height:36px; border-radius:50%; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; letter-spacing:.3px; color:var(--text); background:var(--elevated); }
+#dir-nd-models .mu-company-avatar.company-an { color:#F48BA0; border-color:#5C2233; background:#3A1828; }
+#dir-nd-models .mu-company-avatar.company-oa { color:#F48BA0; border-color:rgba(233,64,87,.45); background:#331922; }
+#dir-nd-models .mu-company-avatar.company-go { color:#C5ACEE; border-color:#4B3A72; background:#211A32; }
+#dir-nd-models .mu-company-avatar.company-mi { color:#E3BF67; border-color:#5A4720; background:#2A2010; }
+#dir-nd-models .mu-company-avatar.company-me { color:#8DB2FF; border-color:#35549A; background:#1A2238; }
+#dir-nd-models .mu-update-title { font-size:14px; font-weight:700; color:var(--text); line-height:1.35; margin-bottom:4px; letter-spacing:-.1px; }
+#dir-nd-models .mu-update-desc { font-size:11px; color:var(--muted); line-height:1.5; margin-bottom:6px; }
+#dir-nd-models .mu-update-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+
+/* model updates — resource flow layer */
+#dir-nd-models .mu-flow-section { margin-bottom:20px; }
+#dir-nd-models .mu-flow-kicker { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:8px; }
+#dir-nd-models .mu-flow-shell { background:linear-gradient(145deg, #181420 0%, #12101B 100%); border:1px solid #2F2A3B; border-radius:12px; padding:14px; box-shadow:0 10px 28px rgba(0,0,0,.24); }
+#dir-nd-models .mu-flow-head { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:10px; }
+#dir-nd-models .mu-flow-title { font-size:15px; font-weight:700; color:var(--text); letter-spacing:-.1px; }
+#dir-nd-models .mu-flow-sub { margin-top:3px; font-size:11px; color:var(--muted); line-height:1.45; }
+#dir-nd-models .mu-flow-legend { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+#dir-nd-models .mu-flow-legend-item { display:flex; align-items:center; gap:5px; font-size:10px; color:rgba(255,255,255,.42); }
+#dir-nd-models .mu-flow-dot { width:7px; height:7px; border-radius:50%; display:inline-block; flex-shrink:0; }
+#dir-nd-models .mu-flow-stage { position:relative; border-radius:10px; border:1px solid #2A2535; background:#0F0D16; overflow:hidden; }
+#dir-nd-models .mu-flow-grid { position:absolute; inset:0; opacity:.028; pointer-events:none; background-image:linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px); background-size:36px 36px; }
+#dir-nd-models .mu-flow-canvas { display:block; width:100%; height:auto; }
+#dir-nd-models .mu-flow-hint { position:absolute; left:50%; bottom:12px; transform:translateX(-50%); font-size:9px; color:rgba(255,255,255,.2); letter-spacing:.08em; text-transform:uppercase; pointer-events:none; white-space:nowrap; transition:opacity .2s; }
+#dir-nd-models .mu-flow-detail { margin-top:10px; border-radius:10px; border:1px solid #2A2535; background:#151222; padding:12px; }
+#dir-nd-models .mu-flow-default { display:flex; align-items:stretch; gap:12px; flex-wrap:wrap; }
+#dir-nd-models .mu-flow-default-card { flex:1; min-width:170px; background:#100E18; border:1px solid #2A2535; border-radius:8px; padding:10px; }
+#dir-nd-models .mu-flow-default-card strong { display:block; font-size:22px; color:#F48BA0; line-height:1; font-variant-numeric:tabular-nums; margin-bottom:4px; }
+#dir-nd-models .mu-flow-default-card span { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.55px; }
+#dir-nd-models .mu-flow-node-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px; }
+#dir-nd-models .mu-flow-meta { font-size:10px; color:var(--muted); margin-bottom:10px; }
+#dir-nd-models .mu-flow-meta .fresh { color:#E94057; font-weight:600; }
+#dir-nd-models .mu-flow-bars { display:grid; gap:8px; }
+#dir-nd-models .mu-flow-row-head { display:flex; justify-content:space-between; align-items:center; font-size:10px; color:rgba(255,255,255,.6); margin-bottom:3px; }
+#dir-nd-models .mu-flow-row-left { display:flex; align-items:center; gap:6px; }
+#dir-nd-models .mu-flow-row-track { height:3px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.07); }
+#dir-nd-models .mu-flow-row-fill { height:100%; border-radius:999px; }
+#dir-nd-models .mu-flow-chip-row { margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; }
+#dir-nd-models .mu-flow-chip { font-size:9px; padding:2px 7px; border-radius:999px; border:1px solid #3A344A; color:#CFC8DF; background:#201A2F; text-transform:uppercase; letter-spacing:.5px; }
+#dir-nd-models .mu-flow-total { margin-top:10px; padding-top:10px; border-top:1px solid #2A2535; font-size:10px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; }
+#dir-nd-models .mu-flow-total strong { font-size:20px; color:#E94057; font-variant-numeric:tabular-nums; }
+
+@media (max-width: 1200px) {
+  #dir-nd-models .mu-leaderboard-grid { grid-template-columns:1fr 1fr; }
+  #dir-nd-models .mu-leader-card.mu-lead { grid-column:span 2; }
+}
 </style>
 </head>
 <body>
@@ -455,86 +540,167 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sa
 
     <!-- ─── MODEL UPDATES CONTENT ─── -->
     <div style="flex:1;padding:26px 30px;overflow-y:auto;">
-      <div style="margin-bottom:16px;">
+      <div class="mu-header">
         <div style="font-size:10px;color:var(--muted);margin-bottom:6px;">Newly Discovered / Research & Models /</div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;">
+        <div class="mu-title-row">
           <div>
             <h1 style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.3px;">Model Updates</h1>
             <p style="font-size:12px;color:var(--muted);margin-top:3px;">9 items · 6 companies tracked · Week of Feb 24, 2026</p>
           </div>
-          <div class="cat-tabs">
-            <span class="cat-tab">All</span>
-            <span class="cat-tab ct-mod">Model Updates</span>
-            <span class="cat-tab">Papers & Benchmarks</span>
+        </div>
+        <div class="mu-tabs">
+          <span class="mu-tab">All</span>
+          <span class="mu-tab active">Model Updates</span>
+          <span class="mu-tab">Papers & Benchmarks</span>
+        </div>
+      </div>
+
+      <div class="mu-flow-section">
+        <div class="mu-flow-kicker">Resource Convergence Layer</div>
+        <div class="mu-flow-shell">
+          <div class="mu-flow-head">
+            <div>
+              <div class="mu-flow-title">Where model evidence gathers this week</div>
+              <div class="mu-flow-sub">Each particle is a resource item (book, paper, case study, digest). Node size reflects total evidence density.</div>
+            </div>
+            <div class="mu-flow-legend">
+              <span class="mu-flow-legend-item"><span class="mu-flow-dot" style="background:#4F8EF7;"></span>Books</span>
+              <span class="mu-flow-legend-item"><span class="mu-flow-dot" style="background:#A78BFA;"></span>Papers</span>
+              <span class="mu-flow-legend-item"><span class="mu-flow-dot" style="background:#34D399;"></span>Cases</span>
+              <span class="mu-flow-legend-item"><span class="mu-flow-dot" style="background:#E94057;"></span>Digest</span>
+            </div>
           </div>
+          <div class="mu-flow-stage" id="mu-flow-stage">
+            <div class="mu-flow-grid"></div>
+            <canvas id="mu-flow-canvas" class="mu-flow-canvas"></canvas>
+            <div id="mu-flow-hint" class="mu-flow-hint">Click a company node to inspect exact composition and totals</div>
+          </div>
+          <div id="mu-flow-detail" class="mu-flow-detail"></div>
         </div>
       </div>
 
       <!-- Company Leaderboard -->
       <div style="margin-bottom:20px;">
         <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Major Players — GPQA Benchmark</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-          <div class="lb-card" style="border-color:var(--cherry);background:var(--cherry-soft);">
-            <div class="lb-rank">#1</div>
-            <div class="lb-company">OpenAI <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px;background:var(--cherry);color:#fff;">LEAD</span></div>
-            <div class="lb-score">92.4% GPQA</div>
-            <div class="lb-models">GPT-5, GPT-5-Codex-Max, GPT-OSS</div>
+        <div class="mu-leaderboard-grid">
+          <div class="mu-leader-card mu-lead">
+            <div class="mu-rank">#1</div>
+            <div class="mu-company">OpenAI <span class="mu-chip">LEAD</span></div>
+            <div class="mu-score">92.4% GPQA</div>
+            <div class="mu-score-track"><div class="mu-score-fill" style="width:92.4%;"></div></div>
+            <div class="mu-models">GPT-5, GPT-5-Codex-Max, GPT-OSS</div>
           </div>
-          <div class="lb-card" style="border-color:#C94B6E;background:#2D1F26;">
-            <div class="lb-rank">#2 <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px;background:#C94B6E;color:#fff;margin-left:3px;">NEW ↑</span></div>
-            <div class="lb-company">Anthropic</div>
-            <div class="lb-score" style="color:#F48BA0;">91.0% GPQA</div>
-            <div class="lb-models">Claude 3.7 Sonnet</div>
+          <div class="mu-leader-card" style="border-color:#C94B6E;background:#2D1F26;">
+            <div class="mu-rank">#2 <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px;background:#C94B6E;color:#fff;margin-left:3px;">NEW ↑</span></div>
+            <div class="mu-company">Anthropic</div>
+            <div class="mu-score" style="color:#F48BA0;">91.0% GPQA</div>
+            <div class="mu-score-track"><div class="mu-score-fill" style="width:91%;background:#F48BA0;"></div></div>
+            <div class="mu-models">Claude 3.7 Sonnet</div>
           </div>
-          <div class="lb-card">
-            <div class="lb-rank">#3</div>
-            <div class="lb-company">Google</div>
-            <div class="lb-score" style="color:var(--muted);">89.2% GPQA</div>
-            <div class="lb-models">Gemini 2.0 Pro, Flash Thinking</div>
+          <div class="mu-leader-card">
+            <div class="mu-rank">#3</div>
+            <div class="mu-company">Google</div>
+            <div class="mu-score" style="color:var(--muted);">89.2% GPQA</div>
+            <div class="mu-score-track"><div class="mu-score-fill" style="width:89.2%;background:#A987D4;"></div></div>
+            <div class="mu-models">Gemini 2.0 Pro, Flash Thinking</div>
           </div>
-          <div class="lb-card">
-            <div class="lb-rank">#4</div>
-            <div class="lb-company">xAI</div>
-            <div class="lb-score" style="color:var(--muted);">87.5% GPQA</div>
-            <div class="lb-models">Grok 3, Grok 3-Mini</div>
+          <div class="mu-leader-card">
+            <div class="mu-rank">#4</div>
+            <div class="mu-company">xAI</div>
+            <div class="mu-score" style="color:var(--muted);">87.5% GPQA</div>
+            <div class="mu-score-track"><div class="mu-score-fill" style="width:87.5%;background:#8B849E;"></div></div>
+            <div class="mu-models">Grok 3, Grok 3-Mini</div>
           </div>
-          <div class="lb-card">
-            <div class="lb-rank">#5</div>
-            <div class="lb-company">Meta</div>
-            <div class="lb-score" style="color:var(--muted);">73.7% GPQA</div>
-            <div class="lb-models">Llama 4 Scout, Maverick</div>
+          <div class="mu-leader-card">
+            <div class="mu-rank">#5</div>
+            <div class="mu-company">Meta</div>
+            <div class="mu-score" style="color:var(--muted);">73.7% GPQA</div>
+            <div class="mu-score-track"><div class="mu-score-fill" style="width:73.7%;background:#5A8DFF;"></div></div>
+            <div class="mu-models">Llama 4 Scout, Maverick</div>
           </div>
-          <div class="lb-card">
-            <div class="lb-rank">#6</div>
-            <div class="lb-company">DeepSeek</div>
-            <div class="lb-score" style="color:var(--muted);">71.5% GPQA</div>
-            <div class="lb-models">DeepSeek R2, V3</div>
+          <div class="mu-leader-card">
+            <div class="mu-rank">#6</div>
+            <div class="mu-company">DeepSeek</div>
+            <div class="mu-score" style="color:var(--muted);">71.5% GPQA</div>
+            <div class="mu-score-track"><div class="mu-score-fill" style="width:71.5%;background:#6AA8A0;"></div></div>
+            <div class="mu-models">DeepSeek R2, V3</div>
           </div>
         </div>
       </div>
 
       <!-- Rising Star -->
-      <div class="rising-star" style="margin-bottom:20px;">
-        <div class="rs-tag">🔥 Rising Star — This Week</div>
-        <div class="rs-name">Claude 3.7 Sonnet — Extended Thinking</div>
-        <div class="rs-sub">★★★★★ · 250,000+ mentions · +189% trend this week</div>
-        <div class="rs-body">Extended thinking mode lets Claude reason step-by-step before responding — matching o1 on SWE-bench while remaining cost-comparable to Claude 3.5. Opt-in via <code style="font-family:monospace;font-size:11px;background:#1C1927;color:#A987D4;padding:1px 5px;border-radius:3px;">thinking: {type: "enabled"}</code> API parameter.</div>
-        <div class="rs-stats">
-          <div class="rs-stat"><strong>250k+</strong> mentions in 2 weeks</div>
-          <div class="rs-stat"><strong>+189%</strong> keyword trend</div>
-          <div class="rs-stat"><strong>SWE-bench</strong> SOTA (tied o1)</div>
-          <div class="rs-stat"><strong>Same cost</strong> as 3.5 Sonnet</div>
+      <div class="mu-rising">
+        <div>
+          <div class="mu-rs-tag">Rising Star — This Week</div>
+          <div class="mu-rs-name">Claude 3.7 Sonnet — Extended Thinking</div>
+          <div class="mu-rs-stars">★★★★★</div>
+          <div class="mu-rs-summary">Higher SWE-bench performance with extended thinking, while keeping cost near Claude 3.5 Sonnet.</div>
+          <div class="mu-rs-metrics">
+            <div class="mu-rs-metric"><strong>250k+</strong><span>mentions</span></div>
+            <div class="mu-rs-metric"><strong>+189%</strong><span>trend</span></div>
+            <div class="mu-rs-metric"><strong>SOTA</strong><span>SWE-bench</span></div>
+          </div>
+        </div>
+        <div class="mu-rs-spark">
+          <svg width="100%" viewBox="0 0 200 90" role="img" aria-label="Trend sparkline">
+            <defs>
+              <linearGradient id="muSparkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#C94B6E;stop-opacity:0.35"/>
+                <stop offset="100%" style="stop-color:#C94B6E;stop-opacity:0"/>
+              </linearGradient>
+            </defs>
+            <polyline points="10,72 32,66 54,61 76,55 98,43 120,38 142,27 164,20 190,14" fill="none" stroke="#F48BA0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <polygon points="10,72 32,66 54,61 76,55 98,43 120,38 142,27 164,20 190,14 190,82 10,82" fill="url(#muSparkGrad)"/>
+            <circle cx="190" cy="14" r="3.5" fill="#F48BA0"/>
+            <line x1="10" y1="82" x2="190" y2="82" stroke="#2A2535" stroke-width="1"/>
+          </svg>
+          <div style="font-size:9px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.5px;">2-week momentum</div>
         </div>
       </div>
 
       <!-- All model updates -->
       <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">All Model Updates This Week</div>
-      <div style="background:var(--surface);border-radius:10px;border:1px solid var(--border);overflow:hidden;">
-        <div class="ni"><div class="nt">Claude 3.7 Sonnet — extended thinking matches o1 on SWE-bench</div><div class="ns">Opt-in via API parameter. Cost parity with Claude 3.5. Significant uplift on multi-step reasoning.</div><div class="nm"><span class="badge bc">Models</span><span class="stars">★★★★★</span><span style="font-size:9px;color:var(--muted);">Anthropic · Feb 25</span></div></div>
-        <div class="ni"><div class="nt">GPT-5.2 multimodal reasoning — spreadsheets, slides, code, vision</div><div class="ns">Adds structured output generation across document types. 250k context. Replaces GPT-4o for complex tasks.</div><div class="nm"><span class="badge bc">Models</span><span class="stars">★★★★☆</span><span style="font-size:9px;color:var(--muted);">OpenAI · Feb 24</span></div></div>
-        <div class="ni"><div class="nt">Gemini 2.0 Flash Thinking — 1/10th cost of o1 for reasoning</div><div class="ns">Cost-efficient reasoning model. Strong on code and math. Weaker on multi-step logic chains than o1.</div><div class="nm"><span class="badge bc">Models</span><span class="stars">★★★★☆</span><span style="font-size:9px;color:var(--muted);">Google · Feb 24</span></div></div>
-        <div class="ni"><div class="nt">Mistral Small 3.1 — best open-source at 24B params</div><div class="ns">Outperforms Llama 3.3 70B on MMLU. Apache 2.0 license. Runs on a single A100.</div><div class="nm"><span class="badge bc">Models</span><span class="stars">★★★★☆</span><span style="font-size:9px;color:var(--muted);">Mistral · Feb 23</span></div></div>
-        <div class="ni"><div class="nt">Llama 4 Scout — Meta's 17B MoE with 10M context</div><div class="ns">Mixture-of-experts, 10M token context window. Beats Gemma 3 27B on most benchmarks.</div><div class="nm"><span class="badge bc">Models</span><span class="stars">★★★☆☆</span><span style="font-size:9px;color:var(--muted);">Meta · Feb 22</span></div></div>
+      <div class="mu-updates">
+        <div class="mu-update-item company-an">
+          <div class="mu-company-avatar company-an">AN</div>
+          <div>
+            <div class="mu-update-title">Claude 3.7 Sonnet — extended thinking matches o1 on SWE-bench</div>
+            <div class="mu-update-desc">Opt-in via API parameter. Cost parity with Claude 3.5. Significant uplift on multi-step reasoning.</div>
+            <div class="mu-update-meta"><span class="badge bc">Models</span><span class="stars">★★★★★</span><span style="font-size:9px;color:var(--muted);">Anthropic · Feb 25</span></div>
+          </div>
+        </div>
+        <div class="mu-update-item company-oa">
+          <div class="mu-company-avatar company-oa">OA</div>
+          <div>
+            <div class="mu-update-title">GPT-5.2 multimodal reasoning — spreadsheets, slides, code, vision</div>
+            <div class="mu-update-desc">Adds structured output generation across document types. 250k context. Replaces GPT-4o for complex tasks.</div>
+            <div class="mu-update-meta"><span class="badge bc">Models</span><span class="stars">★★★★☆</span><span style="font-size:9px;color:var(--muted);">OpenAI · Feb 24</span></div>
+          </div>
+        </div>
+        <div class="mu-update-item company-go">
+          <div class="mu-company-avatar company-go">GO</div>
+          <div>
+            <div class="mu-update-title">Gemini 2.0 Flash Thinking — 1/10th cost of o1 for reasoning</div>
+            <div class="mu-update-desc">Cost-efficient reasoning model. Strong on code and math. Weaker on multi-step logic chains than o1.</div>
+            <div class="mu-update-meta"><span class="badge bc">Models</span><span class="stars">★★★★☆</span><span style="font-size:9px;color:var(--muted);">Google · Feb 24</span></div>
+          </div>
+        </div>
+        <div class="mu-update-item company-mi">
+          <div class="mu-company-avatar company-mi">MI</div>
+          <div>
+            <div class="mu-update-title">Mistral Small 3.1 — best open-source at 24B params</div>
+            <div class="mu-update-desc">Outperforms Llama 3.3 70B on MMLU. Apache 2.0 license. Runs on a single A100.</div>
+            <div class="mu-update-meta"><span class="badge bc">Models</span><span class="stars">★★★★☆</span><span style="font-size:9px;color:var(--muted);">Mistral · Feb 23</span></div>
+          </div>
+        </div>
+        <div class="mu-update-item company-me">
+          <div class="mu-company-avatar company-me">ME</div>
+          <div>
+            <div class="mu-update-title">Llama 4 Scout — Meta's 17B MoE with 10M context</div>
+            <div class="mu-update-desc">Mixture-of-experts, 10M token context window. Beats Gemma 3 27B on most benchmarks.</div>
+            <div class="mu-update-meta"><span class="badge bc">Models</span><span class="stars">★★★☆☆</span><span style="font-size:9px;color:var(--muted);">Meta · Feb 22</span></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -943,12 +1109,372 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sa
 </div><!-- frame-wrapper -->
 
 <script>
+const MU_FLOW_NODES = [
+  { id:"openai", label:"OpenAI", x:50, y:42, resources:{books:9,papers:14,cases:8,digest:19}, updated:1, benchmark:"92.4% GPQA", focus:"GPT-5 · GPT-5-Codex-Max" },
+  { id:"anthropic", label:"Anthropic", x:29, y:28, resources:{books:8,papers:12,cases:6,digest:17}, updated:2, benchmark:"91.0% GPQA", focus:"Claude 3.7 Sonnet" },
+  { id:"google", label:"Google", x:73, y:27, resources:{books:7,papers:11,cases:7,digest:14}, updated:3, benchmark:"89.2% GPQA", focus:"Gemini 2.0 Pro" },
+  { id:"xai", label:"xAI", x:78, y:61, resources:{books:4,papers:7,cases:4,digest:10}, updated:6, benchmark:"87.5% GPQA", focus:"Grok 3" },
+  { id:"meta", label:"Meta", x:27, y:64, resources:{books:6,papers:6,cases:5,digest:9}, updated:4, benchmark:"73.7% GPQA", focus:"Llama 4 Scout" },
+  { id:"deepseek", label:"DeepSeek", x:57, y:74, resources:{books:3,papers:8,cases:4,digest:7}, updated:5, benchmark:"71.5% GPQA", focus:"DeepSeek R2" }
+];
+
+const MU_FLOW_LINKS = [
+  ["openai", "anthropic"],
+  ["openai", "google"],
+  ["openai", "meta"],
+  ["openai", "xai"],
+  ["anthropic", "google"],
+  ["anthropic", "deepseek"],
+  ["google", "xai"],
+  ["meta", "deepseek"],
+  ["xai", "deepseek"]
+];
+
+const MU_FLOW_RESOURCE_COLORS = { books:"#4F8EF7", papers:"#A78BFA", cases:"#34D399", digest:"#E94057" };
+const MU_FLOW_RESOURCE_LABELS = { books:"Books", papers:"Papers", cases:"Case Studies", digest:"Digest Items" };
+
+const muFlowState = {
+  initialized: false,
+  canvas: null,
+  ctx: null,
+  stage: null,
+  hint: null,
+  detail: null,
+  width: 0,
+  height: 0,
+  particles: [],
+  hovered: null,
+  selected: null,
+  frame: 0,
+  rafId: null,
+  resizeObserver: null
+};
+
+function muFlowTotal(node) {
+  return node.resources.books + node.resources.papers + node.resources.cases + node.resources.digest;
+}
+
+function muFlowRadius(node) {
+  return 17 + Math.sqrt(muFlowTotal(node)) * 2.8;
+}
+
+function muFlowGlow(node) {
+  return Math.max(0, 1 - node.updated / 12);
+}
+
+function muFlowNodeById(id) {
+  return MU_FLOW_NODES.find(node => node.id === id) || null;
+}
+
+function muFlowPoints(width, height) {
+  const points = {};
+  MU_FLOW_NODES.forEach(node => {
+    points[node.id] = { x: (node.x / 100) * width, y: (node.y / 100) * height };
+  });
+  return points;
+}
+
+function muFlowInitParticles(width, height) {
+  const resourceTypes = Object.keys(MU_FLOW_RESOURCE_COLORS);
+  return Array.from({ length: 120 }, (_, idx) => {
+    const target = MU_FLOW_NODES[Math.floor(Math.random() * MU_FLOW_NODES.length)];
+    const type = resourceTypes[Math.floor(Math.random() * resourceTypes.length)];
+    return {
+      id: idx,
+      targetId: target.id,
+      type,
+      x: width * (0.05 + Math.random() * 0.9),
+      y: height * (0.05 + Math.random() * 0.9),
+      size: 1.4 + Math.random() * 1.8,
+      color: MU_FLOW_RESOURCE_COLORS[type],
+      speed: 0.006 + Math.random() * 0.009,
+      progress: Math.random(),
+      opacity: 0,
+      phase: Math.random() * Math.PI * 2,
+      orbitRadius: 0,
+      orbitAngle: Math.random() * Math.PI * 2,
+      settled: false,
+      delay: Math.random() * 150
+    };
+  });
+}
+
+function muFlowResize() {
+  const rect = muFlowState.stage.getBoundingClientRect();
+  const width = Math.max(560, Math.round(rect.width));
+  const height = Math.max(280, Math.round(width * 0.42));
+
+  muFlowState.width = width;
+  muFlowState.height = height;
+  muFlowState.canvas.width = width;
+  muFlowState.canvas.height = height;
+  muFlowState.canvas.style.width = "100%";
+  muFlowState.canvas.style.height = height + "px";
+}
+
+function muFlowRenderDetail(node) {
+  if (!muFlowState.detail) return;
+
+  if (!node) {
+    const totals = { books: 0, papers: 0, cases: 0, digest: 0 };
+    let totalResources = 0;
+    MU_FLOW_NODES.forEach(item => {
+      totalResources += muFlowTotal(item);
+      Object.keys(totals).forEach(type => {
+        totals[type] += item.resources[type];
+      });
+    });
+
+    const hottest = [...MU_FLOW_NODES].sort((a, b) => a.updated - b.updated)[0];
+
+    muFlowState.detail.innerHTML = `
+      <div class="mu-flow-default">
+        <div class="mu-flow-default-card"><strong>${MU_FLOW_NODES.length}</strong><span>Tracked companies</span></div>
+        <div class="mu-flow-default-card"><strong>${totalResources}</strong><span>Total evidence items</span></div>
+        <div class="mu-flow-default-card"><strong>${hottest.label}</strong><span>Most recently updated</span></div>
+      </div>
+      <div class="mu-flow-chip-row">
+        <span class="mu-flow-chip">Books ${totals.books}</span>
+        <span class="mu-flow-chip">Papers ${totals.papers}</span>
+        <span class="mu-flow-chip">Cases ${totals.cases}</span>
+        <span class="mu-flow-chip">Digest ${totals.digest}</span>
+      </div>
+    `;
+    muFlowState.hint.style.opacity = "1";
+    return;
+  }
+
+  const total = muFlowTotal(node);
+  const bars = Object.keys(MU_FLOW_RESOURCE_COLORS).map(type => {
+    const value = node.resources[type];
+    const pct = total > 0 ? (value / total) * 100 : 0;
+    return `
+      <div>
+        <div class="mu-flow-row-head">
+          <span class="mu-flow-row-left"><span class="mu-flow-dot" style="background:${MU_FLOW_RESOURCE_COLORS[type]};"></span>${MU_FLOW_RESOURCE_LABELS[type]}</span>
+          <span>${value}</span>
+        </div>
+        <div class="mu-flow-row-track"><div class="mu-flow-row-fill" style="width:${pct}%; background:${MU_FLOW_RESOURCE_COLORS[type]};"></div></div>
+      </div>
+    `;
+  }).join("");
+
+  muFlowState.detail.innerHTML = `
+    <div class="mu-flow-node-title">${node.label}</div>
+    <div class="mu-flow-meta">${node.benchmark} · ${node.focus} · <span class="${node.updated <= 3 ? "fresh" : ""}">updated ${node.updated}d ago</span></div>
+    <div class="mu-flow-bars">${bars}</div>
+    <div class="mu-flow-total"><span>Total gathered resources</span><strong>${total}</strong></div>
+  `;
+
+  muFlowState.hint.style.opacity = "0";
+}
+
+function muFlowDraw(frame) {
+  if (!muFlowState.ctx) return;
+
+  const ctx = muFlowState.ctx;
+  const width = muFlowState.width;
+  const height = muFlowState.height;
+  const points = muFlowPoints(width, height);
+
+  ctx.clearRect(0, 0, width, height);
+
+  MU_FLOW_LINKS.forEach(([a, b]) => {
+    const from = points[a];
+    const to = points[b];
+    if (!from || !to) return;
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.strokeStyle = "rgba(255,255,255,0.05)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  muFlowState.particles.forEach(particle => {
+    if (frame < particle.delay) return;
+
+    const target = muFlowNodeById(particle.targetId);
+    if (!target) return;
+
+    const targetPoint = points[target.id];
+    const targetRadius = muFlowRadius(target);
+
+    if (!particle.settled) {
+      particle.progress += particle.speed;
+      if (particle.progress >= 1) {
+        particle.settled = true;
+        particle.orbitRadius = targetRadius + 5 + Math.random() * 10;
+        particle.orbitAngle = Math.random() * Math.PI * 2;
+      }
+      particle.x += (targetPoint.x - particle.x) * particle.speed * 2;
+      particle.y += (targetPoint.y - particle.y) * particle.speed * 2;
+      particle.opacity = Math.min(1, particle.progress * 1.8) * 0.68;
+    } else {
+      particle.orbitAngle += 0.0015 + Math.random() * 0.001;
+      if (particle.orbitRadius > targetRadius + 2) particle.orbitRadius -= 0.018;
+      particle.x = targetPoint.x + Math.cos(particle.orbitAngle) * particle.orbitRadius;
+      particle.y = targetPoint.y + Math.sin(particle.orbitAngle) * particle.orbitRadius;
+      particle.opacity = 0.42 + 0.2 * Math.sin(frame * 0.022 + particle.phase);
+    }
+
+    const alpha = Math.max(0, Math.min(1, particle.opacity));
+    const alphaHex = Math.round(alpha * 255).toString(16).padStart(2, "0");
+
+    ctx.beginPath();
+    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+    ctx.fillStyle = particle.color + alphaHex;
+    ctx.fill();
+  });
+
+  MU_FLOW_NODES.forEach(node => {
+    const p = points[node.id];
+    const radius = muFlowRadius(node);
+    const glow = muFlowGlow(node);
+    const active = muFlowState.hovered === node.id || muFlowState.selected === node.id;
+
+    if (glow > 0.06) {
+      for (let i = 3; i >= 1; i -= 1) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius + i * 6, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(233,64,87,${(glow * (active ? 0.24 : 0.12)) / i})`;
+        ctx.lineWidth = 6 / i;
+        ctx.stroke();
+      }
+    }
+
+    const grad = ctx.createRadialGradient(p.x - radius * 0.24, p.y - radius * 0.24, 0, p.x, p.y, radius);
+    grad.addColorStop(0, active ? "#3A1F28" : "#241E31");
+    grad.addColorStop(1, active ? "#1E1117" : "#13101D");
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+    if (node.id === "openai") ctx.strokeStyle = "rgba(233,64,87,0.55)";
+    else ctx.strokeStyle = active ? "rgba(233,64,87,0.65)" : "rgba(255,255,255,0.12)";
+    ctx.lineWidth = node.id === "openai" ? 1.6 : 1.1;
+    ctx.stroke();
+
+    const total = muFlowTotal(node);
+    let startAngle = -Math.PI / 2;
+    Object.keys(node.resources).forEach(type => {
+      const slice = total > 0 ? (node.resources[type] / total) * Math.PI * 2 : 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, radius + 4, startAngle, startAngle + slice);
+      ctx.strokeStyle = MU_FLOW_RESOURCE_COLORS[type];
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      startAngle += slice;
+    });
+
+    const fontSize = Math.max(10, radius * 0.32);
+    ctx.font = `600 ${fontSize}px 'Segoe UI', sans-serif`;
+    ctx.fillStyle = active ? "#fff" : "#E3DFEC";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(node.label, p.x, p.y);
+
+    ctx.font = "600 9px monospace";
+    ctx.fillStyle = active ? "#F48BA0" : "rgba(233,64,87,0.7)";
+    ctx.fillText(String(total), p.x, p.y + radius * 0.58);
+  });
+}
+
+function muFlowStart() {
+  if (muFlowState.rafId) return;
+  const loop = () => {
+    muFlowState.frame += 1;
+    muFlowDraw(muFlowState.frame);
+    muFlowState.rafId = requestAnimationFrame(loop);
+  };
+  muFlowState.rafId = requestAnimationFrame(loop);
+}
+
+function destroyModelUpdatesFlow() {
+  if (muFlowState.rafId) {
+    cancelAnimationFrame(muFlowState.rafId);
+    muFlowState.rafId = null;
+  }
+}
+
+function initModelUpdatesFlow() {
+  if (!muFlowState.initialized) {
+    muFlowState.canvas = document.getElementById("mu-flow-canvas");
+    muFlowState.stage = document.getElementById("mu-flow-stage");
+    muFlowState.hint = document.getElementById("mu-flow-hint");
+    muFlowState.detail = document.getElementById("mu-flow-detail");
+
+    if (!muFlowState.canvas || !muFlowState.stage || !muFlowState.hint || !muFlowState.detail) return;
+
+    muFlowState.ctx = muFlowState.canvas.getContext("2d");
+    muFlowResize();
+    muFlowState.particles = muFlowInitParticles(muFlowState.width, muFlowState.height);
+    muFlowRenderDetail(null);
+
+    muFlowState.canvas.addEventListener("mousemove", event => {
+      const rect = muFlowState.canvas.getBoundingClientRect();
+      const scaleX = muFlowState.width / rect.width;
+      const scaleY = muFlowState.height / rect.height;
+      const mx = (event.clientX - rect.left) * scaleX;
+      const my = (event.clientY - rect.top) * scaleY;
+      const points = muFlowPoints(muFlowState.width, muFlowState.height);
+
+      let found = null;
+      MU_FLOW_NODES.forEach(node => {
+        const p = points[node.id];
+        const r = muFlowRadius(node);
+        if ((mx - p.x) ** 2 + (my - p.y) ** 2 <= (r + 11) ** 2) found = node.id;
+      });
+
+      muFlowState.hovered = found;
+      muFlowState.canvas.style.cursor = found ? "pointer" : "default";
+
+      if (!muFlowState.selected) muFlowRenderDetail(muFlowNodeById(muFlowState.hovered));
+    });
+
+    muFlowState.canvas.addEventListener("mouseleave", () => {
+      muFlowState.hovered = null;
+      muFlowState.canvas.style.cursor = "default";
+      if (!muFlowState.selected) muFlowRenderDetail(null);
+    });
+
+    muFlowState.canvas.addEventListener("click", () => {
+      if (muFlowState.hovered) {
+        muFlowState.selected = muFlowState.selected === muFlowState.hovered ? null : muFlowState.hovered;
+      } else {
+        muFlowState.selected = null;
+      }
+      muFlowRenderDetail(muFlowNodeById(muFlowState.selected || muFlowState.hovered));
+    });
+
+    muFlowState.resizeObserver = new ResizeObserver(() => {
+      muFlowResize();
+      muFlowState.particles = muFlowInitParticles(muFlowState.width, muFlowState.height);
+    });
+    muFlowState.resizeObserver.observe(muFlowState.stage);
+
+    muFlowState.initialized = true;
+  }
+
+  muFlowStart();
+}
+
 function show(id, btn) {
-  document.querySelectorAll('.direction-frame').forEach(f => f.classList.remove('active'));
-  document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.direction-frame').forEach(frame => frame.classList.remove('active'));
+  document.querySelectorAll('.dir-btn').forEach(button => button.classList.remove('active'));
   document.getElementById('dir-' + id).classList.add('active');
   btn.classList.add('active');
+
+  if (String(id) === "nd-models") initModelUpdatesFlow();
+  else destroyModelUpdatesFlow();
 }
+
+const activeFrame = document.querySelector('.direction-frame.active');
+if (activeFrame && activeFrame.id === 'dir-nd-models') initModelUpdatesFlow();
 </script>
 </body>
 </html>
