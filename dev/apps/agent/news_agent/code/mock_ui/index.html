@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>News Agent Studio</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap");
+
+    :root {
+      --ink: #121318;
+      --muted: #5c6068;
+      --paper: #f5f2ee;
+      --accent: #ff6a2a;
+      --accent-2: #1f6feb;
+      --card: #ffffff;
+      --border: #e3ddd5;
+      --shadow: rgba(17, 18, 22, 0.08);
+      --gold: #f3c969;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Arial", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at top left, #fff3e6 0%, transparent 50%),
+        radial-gradient(circle at bottom right, #e6f0ff 0%, transparent 55%),
+        var(--paper);
+    }
+
+    header {
+      padding: 32px 24px 12px;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .panel {
+      max-width: 1160px;
+      margin: 16px auto 0;
+      padding: 0 24px 32px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .controls {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 8px 24px var(--shadow);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    select, input, textarea, button {
+      width: 100%;
+      font-family: "Space Grotesk", "Arial", sans-serif;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 120px;
+      font-family: "DM Mono", "Courier New", monospace;
+      resize: vertical;
+    }
+
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button.secondary { background: var(--accent-2); }
+    button.ghost { background: #f2f2f2; color: var(--ink); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 12px 24px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 14px 26px rgba(255, 106, 42, 0.2);
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #fff0e7;
+      color: #b64013;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .importance { font-weight: 700; font-size: 14px; }
+
+    .newsletter {
+      padding: 10px;
+      background: #f3f7ff;
+      border-radius: 12px;
+      font-size: 13px;
+      color: #1c2b52;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .tag {
+      padding: 4px 8px;
+      background: #f4f4f4;
+      border-radius: 999px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 12px;
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .section-title {
+      font-weight: 700;
+      font-size: 16px;
+      margin: 12px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      background: var(--gold);
+      color: #5a3b00;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .draft {
+      white-space: pre-wrap;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 16px;
+      padding: 16px;
+      font-family: "DM Mono", monospace;
+      font-size: 13px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 24px 16px 8px; }
+      .panel { padding: 0 16px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="title">Newsletter Studio</h1>
+    <p class="subtitle">Highly rated news this week + draft generator with custom prompts.</p>
+  </header>
+
+  <section class="panel">
+    <div class="controls">
+      <div>
+        <label>Company Filter</label>
+        <input id="companyFilter" placeholder="e.g., Anthropic" />
+      </div>
+      <div>
+        <label>Min Importance</label>
+        <select id="minScore">
+          <option value="1" selected>1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+          <option value="4">4+</option>
+          <option value="5">5</option>
+        </select>
+      </div>
+      <div>
+        <label>Newsletter Only</label>
+        <select id="newsletterOnly">
+          <option value="false" selected>All</option>
+          <option value="true">Fit Only</option>
+        </select>
+      </div>
+      <div>
+        <label>Status</label>
+        <div class="status" id="status">Idle</div>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button id="loadLatestBtn">Load Latest Output</button>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button class="secondary" id="runBtn">Run Agent</button>
+      </div>
+    </div>
+
+    <div class="section-title">Highly Rated News This Week <span class="pill">auto-recommended</span></div>
+    <div class="grid" id="highCards"></div>
+
+    <div class="section-title">Selected for This Week</div>
+    <div class="grid" id="selectedCards"></div>
+
+    <div class="controls split">
+      <div>
+        <label>Summary Prompt (NewsAnalyst)</label>
+        <textarea id="promptAnalyst"></textarea>
+        <label style="margin-top:10px;">Importance Prompt (ImportanceScorer)</label>
+        <textarea id="promptScorer"></textarea>
+        <label style="margin-top:10px;">Newsletter Edit Prompt (NewsletterEditor)</label>
+        <textarea id="promptEditor"></textarea>
+        <label style="margin-top:10px;">QA Prompt (QAReviewer)</label>
+        <textarea id="promptQA"></textarea>
+        <div class="split" style="margin-top:10px;">
+          <button class="ghost" id="loadPromptsBtn">Load Prompts</button>
+          <button class="secondary" id="savePromptsBtn">Save Prompts</button>
+        </div>
+      </div>
+      <div>
+        <label>Extra Instructions</label>
+        <textarea id="extraInstructions" placeholder="e.g., emphasize infra changes, keep tone concise"></textarea>
+        <label style="margin-top:10px;">Few-shot Examples</label>
+        <textarea id="fewShots" placeholder="Paste a short example of prior newsletter writing"></textarea>
+        <label style="margin-top:10px;">Brand Tone</label>
+        <textarea id="brandTone" placeholder="e.g., crisp, technical, minimal hype"></textarea>
+        <button id="draftBtn" style="margin-top:10px;">Generate Draft</button>
+      </div>
+    </div>
+
+    <div class="section-title">Draft Output</div>
+    <div class="draft" id="draftOutput">No draft yet.</div>
+
+    <div class="section-title">All News Items</div>
+    <div class="grid" id="cards"></div>
+  </section>
+
+  <script>
+    let currentItems = [];
+    let selectedTitles = new Set();
+
+    function setStatus(text) {
+      document.getElementById("status").textContent = text;
+    }
+
+    function itemKey(item) {
+      return item.title || "";
+    }
+
+    function render() {
+      const companyFilter = document.getElementById("companyFilter").value.trim().toLowerCase();
+      const minScore = parseInt(document.getElementById("minScore").value, 10);
+      const newsletterOnly = document.getElementById("newsletterOnly").value === "true";
+
+      const filtered = currentItems.filter(item => {
+        const companyMatch = !companyFilter || (item.company || "").toLowerCase().includes(companyFilter);
+        const scoreMatch = (item.importance_score || 0) >= minScore;
+        const newsletterMatch = !newsletterOnly || item.newsletter_fit === true;
+        return companyMatch && scoreMatch && newsletterMatch;
+      });
+
+      const cards = document.getElementById("cards");
+      const highCards = document.getElementById("highCards");
+      const selectedCards = document.getElementById("selectedCards");
+      cards.innerHTML = "";
+      highCards.innerHTML = "";
+      selectedCards.innerHTML = "";
+
+      filtered.forEach(item => {
+        const key = itemKey(item);
+        const card = document.createElement("div");
+        card.className = "card" + (selectedTitles.has(key) ? " selected" : "");
+        card.innerHTML = `
+          <div class="meta">
+            <span class="badge">${item.category || "Other"}</span>
+            <span class="importance">Score ${item.importance_score || 0}</span>
+          </div>
+          <h3>${item.title}</h3>
+          <p>${item.summary}</p>
+          <div class="newsletter">
+            <strong>Newsletter:</strong> ${item.newsletter_fit ? "Fit" : "Skip"}<br />
+            ${item.newsletter_edit}
+          </div>
+          <div class="tags">
+            ${(item.tags || []).map(tag => `<span class="tag">${tag}</span>`).join("")}
+          </div>
+          <div class="meta">
+            <label style="display:flex;align-items:center;gap:6px;">
+              <input type="checkbox" data-title="${key}" ${selectedTitles.has(key) ? "checked" : ""} />
+              Select
+            </label>
+            <span>${item.company || ""}</span>
+          </div>
+        `;
+        cards.appendChild(card);
+      });
+
+      const highValue = currentItems.filter(item => (item.importance_score || 0) >= 4 && item.newsletter_fit === true);
+      highValue.forEach(item => {
+        const key = itemKey(item);
+        const card = document.createElement("div");
+        card.className = "card" + (selectedTitles.has(key) ? " selected" : "");
+        card.innerHTML = `
+          <div class="meta">
+            <span class="badge">${item.category || "Other"}</span>
+            <span class="importance">Score ${item.importance_score || 0}</span>
+          </div>
+          <h3>${item.title}</h3>
+          <p>${item.summary}</p>
+          <div class="newsletter">
+            <strong>Newsletter:</strong> ${item.newsletter_fit ? "Fit" : "Skip"}<br />
+            ${item.newsletter_edit}
+          </div>
+          <div class="meta">
+            <label style="display:flex;align-items:center;gap:6px;">
+              <input type="checkbox" data-title="${key}" ${selectedTitles.has(key) ? "checked" : ""} />
+              Select
+            </label>
+            <span>${item.company || ""}</span>
+          </div>
+        `;
+        highCards.appendChild(card);
+      });
+
+      const selectedItems = currentItems.filter(item => selectedTitles.has(itemKey(item)));
+      selectedItems.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card selected";
+        card.innerHTML = `
+          <div class="meta">
+            <span class="badge">${item.category || "Other"}</span>
+            <span class="importance">Score ${item.importance_score || 0}</span>
+          </div>
+          <h3>${item.title}</h3>
+          <p>${item.summary}</p>
+          <div class="meta">
+            <span>${item.company || ""}</span>
+          </div>
+        `;
+        selectedCards.appendChild(card);
+      });
+
+      document.querySelectorAll('input[type="checkbox"][data-title]').forEach(cb => {
+        cb.addEventListener("change", (e) => {
+          const title = e.target.getAttribute("data-title");
+          if (e.target.checked) {
+            selectedTitles.add(title);
+          } else {
+            selectedTitles.delete(title);
+          }
+          render();
+        });
+      });
+    }
+
+    async function loadLatest() {
+      setStatus("Loading latest output...");
+      const res = await fetch("/api/latest");
+      if (!res.ok) {
+        setStatus("No output yet");
+        return;
+      }
+      const data = await res.json();
+      currentItems = data.items || [];
+      setStatus(`Loaded ${currentItems.length} items`);
+      render();
+    }
+
+    async function loadPrompts() {
+      setStatus("Loading prompts...");
+      const res = await fetch("/api/prompts");
+      const data = await res.json();
+      document.getElementById("promptAnalyst").value = data.analyst || "";
+      document.getElementById("promptScorer").value = data.scorer || "";
+      document.getElementById("promptEditor").value = data.editor || "";
+      document.getElementById("promptQA").value = data.qa || "";
+      setStatus("Prompts loaded");
+    }
+
+    async function savePrompts() {
+      setStatus("Saving prompts...");
+      const payload = {
+        analyst: document.getElementById("promptAnalyst").value,
+        scorer: document.getElementById("promptScorer").value,
+        editor: document.getElementById("promptEditor").value,
+        qa: document.getElementById("promptQA").value
+      };
+      await fetch("/api/prompts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      setStatus("Prompts saved");
+    }
+
+    async function runAgent() {
+      setStatus("Running agent...");
+      const res = await fetch("/api/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      });
+      const data = await res.json();
+      currentItems = data.items || [];
+      setStatus(`Run complete: ${currentItems.length} items`);
+      render();
+    }
+
+    async function generateDraft() {
+      const selectedItems = currentItems.filter(item => selectedTitles.has(itemKey(item)));
+      if (selectedItems.length === 0) {
+        setStatus("Select at least one item");
+        return;
+      }
+      setStatus("Generating draft...");
+      const payload = {
+        selected_items: selectedItems,
+        user_instructions: document.getElementById("extraInstructions").value,
+        few_shots: document.getElementById("fewShots").value,
+        brand_tone: document.getElementById("brandTone").value,
+      };
+      const res = await fetch("/api/newsletter_draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const draft = await res.json();
+
+      const draftText = [
+        draft.title ? `# ${draft.title}` : "",
+        draft.tldr && draft.tldr.length ? "TL;DR\n" + draft.tldr.map(t => `- ${t}`).join("\n") : "",
+        draft.sections && draft.sections.length ? draft.sections.map(section => `\n## ${section.heading}\n${section.body}`).join("\n") : "",
+        draft.closing ? `\n${draft.closing}` : ""
+      ].filter(Boolean).join("\n\n");
+
+      document.getElementById("draftOutput").textContent = draftText || JSON.stringify(draft, null, 2);
+      setStatus("Draft ready");
+    }
+
+    document.getElementById("loadLatestBtn").addEventListener("click", loadLatest);
+    document.getElementById("runBtn").addEventListener("click", runAgent);
+    document.getElementById("draftBtn").addEventListener("click", generateDraft);
+    document.getElementById("loadPromptsBtn").addEventListener("click", loadPrompts);
+    document.getElementById("savePromptsBtn").addEventListener("click", savePrompts);
+
+    ["companyFilter", "minScore", "newsletterOnly"].forEach(id => {
+      document.getElementById(id).addEventListener("input", render);
+      document.getElementById(id).addEventListener("change", render);
+    });
+
+    loadLatest().catch(() => {});
+    loadPrompts().catch(() => {});
+  </script>
+</body>
+</html>
