@@ -1,12 +1,13 @@
-<!--
-================================================================================
-SYNC IMPACT REPORT - Constitution Update
-================================================================================
+# <!--
+
+# SYNC IMPACT REPORT - Constitution Update
+
 Version Change: [none] → 1.0.0
 Type: MAJOR (Initial constitution establishment)
 Date: 2025-11-07
 
 Modified Principles:
+
 - NEW: I. Test-First Development (TDD Mandatory)
 - NEW: II. Independent Testability
 - NEW: III. Observability & Debuggability
@@ -14,12 +15,14 @@ Modified Principles:
 - NEW: V. Clear Scope & Documentation
 
 Added Sections:
+
 - Core Principles (5 principles)
 - Development Workflow
 - Quality Standards
 - Governance
 
 Removed Sections:
+
 - None (initial version)
 
 Templates Consistency Check:
@@ -31,15 +34,16 @@ Command Files Check:
 ✅ All commands reference constitution generically (no agent-specific updates needed)
 
 Follow-up TODOs:
+
 - None (all placeholders filled)
 
 Rationale for v1.0.0:
+
 - This is the initial establishment of project governance
 - Defines foundational non-negotiable principles
 - Sets baseline for all future development work
-- MAJOR version appropriate for first constitution
-================================================================================
--->
+- # MAJOR version appropriate for first constitution
+  -->
 
 # Cherry-in-the-Haystack Constitution
 
@@ -70,6 +74,7 @@ clearly marked as temporary and replaced with TDD approach before merging to mai
 Every feature, user story, and component MUST be independently testable and deliverable.
 
 Each user story must represent a complete vertical slice of functionality that:
+
 - Can be implemented without requiring other stories to be complete
 - Can be tested in isolation with clear acceptance criteria
 - Delivers tangible value to users on its own
@@ -88,6 +93,7 @@ clear checkpoints for independent validation.
 All systems MUST be observable, debuggable, and maintainable through clear instrumentation.
 
 Required observability practices:
+
 - **Structured logging**: All significant operations must emit structured logs with
   context (timestamps, identifiers, operation names, outcomes)
 - **Text I/O protocol**: CLI tools must use stdin/stdout for data, stderr for errors,
@@ -113,6 +119,7 @@ justified.
 abstraction until there is a concrete, current need.
 
 Complexity requires explicit justification:
+
 - **When adding abstraction**: Document the concrete duplication or variation driving
   the need
 - **When adding patterns**: Explain why simpler alternatives (direct implementation,
@@ -132,6 +139,7 @@ Tracking section in implementation plans must justify any deviations from simpli
 Every feature, component, and decision must have clear scope and purpose documented.
 
 Documentation requirements:
+
 - **Feature specifications**: Must define user scenarios, requirements, success criteria
 - **Implementation plans**: Must specify structure, constraints, complexity
   justifications
@@ -164,6 +172,7 @@ Specifications must be approved before implementation begins.
 ### Code Review Requirements
 
 All pull requests MUST verify:
+
 - ✅ Tests written before implementation (review git history or ask)
 - ✅ All tests passing (CI/CD gates)
 - ✅ Each user story independently testable
@@ -184,6 +193,7 @@ standards:
 - **Unit tests**: Verify isolated component behavior (when justified)
 
 Test quality criteria:
+
 - Tests must be deterministic (no flakiness)
 - Tests must be fast enough to run in development loop
 - Tests must have clear failure messages indicating what broke
@@ -192,6 +202,7 @@ Test quality criteria:
 ### Performance Standards
 
 Performance requirements are feature-specific and must be defined in specifications:
+
 - Latency requirements (e.g., p95 < 200ms)
 - Throughput requirements (e.g., 1000 req/s)
 - Resource constraints (e.g., < 100MB memory)
@@ -204,6 +215,7 @@ feature.
 ### Security Requirements
 
 All features must consider security implications:
+
 - **Input validation**: Validate and sanitize all external input
 - **OWASP Top 10**: Address applicable vulnerabilities (injection, XSS, auth, etc.)
 - **Secrets management**: Never commit credentials, API keys, or secrets
@@ -248,9 +260,9 @@ Constitution compliance is verified at multiple stages:
 When deviating from Principle IV (Simplicity First), explicit justification is required
 in the implementation plan's Complexity Tracking section:
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|--------------------------------------|
-| [Pattern/abstraction] | [Specific current need] | [Why simpler approach insufficient] |
+| Violation             | Why Needed              | Simpler Alternative Rejected Because |
+| --------------------- | ----------------------- | ------------------------------------ |
+| [Pattern/abstraction] | [Specific current need] | [Why simpler approach insufficient]  |
 
 Unjustified complexity found during review must be simplified before approval.
 

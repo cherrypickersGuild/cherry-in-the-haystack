@@ -72,6 +72,7 @@ ssh -N -L 5433:localhost:5432 cherry@13.239.18.76
 Leave this terminal open. The remote Postgres at `cherry@13.239.18.76` is the Evidence Layer with real data. Nothing works without this tunnel.
 
 Verify the tunnel is up:
+
 ```bash
 lsof -nP -iTCP:5433 -sTCP:LISTEN
 ```
@@ -83,6 +84,7 @@ cp dev/apps/agent/writer_agent/.env.example dev/apps/agent/writer_agent/.env
 ```
 
 Fill in:
+
 ```
 DATABASE_URL=postgresql://postgres:cherry251110!@localhost:5433/cherry_db
 OPENAI_API_KEY=<your key>
@@ -116,22 +118,22 @@ There is a gap between what's built and what the architecture describes. You nee
 
 ### What Exists Today
 
-| Location | What it does | Status |
-|---|---|---|
-| `dev/apps/agent/writer_agent/` | Full Writer Agent (GraphDB + Evidence DB → Claude/GPT page) | Working prototype |
-| `dev/packages/ontology/` | GraphDB setup + concept management + vector store | Working prototype |
-| `dev/packages/pdf_knowledge_extractor/` | PDF → paragraph extraction pipeline | Working prototype |
-| `dev/apps/api/` | Legacy pipeline code (reference only — not reused directly) | Reference |
+| Location                                | What it does                                                | Status            |
+| --------------------------------------- | ----------------------------------------------------------- | ----------------- |
+| `dev/apps/agent/writer_agent/`          | Full Writer Agent (GraphDB + Evidence DB → Claude/GPT page) | Working prototype |
+| `dev/packages/ontology/`                | GraphDB setup + concept management + vector store           | Working prototype |
+| `dev/packages/pdf_knowledge_extractor/` | PDF → paragraph extraction pipeline                         | Working prototype |
+| `dev/apps/api/`                         | Legacy pipeline code (reference only — not reused directly) | Reference         |
 
 ### What's Planned (your job to build)
 
-| Location | What it does | Status |
-|---|---|---|
-| `apps/web/` | Next.js web application + API backend (TypeScript) | Does not exist yet |
-| `packages/pipeline/` | TypeScript cron jobs: news ingestion, Notion backup, weekly publish | Does not exist yet |
-| `handbook/db_connection/` | psycopg3 Evidence Layer, GraphDB, pgvector connections (Python) | Does not exist yet |
-| `handbook/pipeline/` | Evidence ingestion, Writer Agent modules (Python) | Does not exist yet |
-| `handbook-content/` | Jupyter Book content (published to GitHub Pages) | Does not exist yet |
+| Location                  | What it does                                                        | Status             |
+| ------------------------- | ------------------------------------------------------------------- | ------------------ |
+| `apps/web/`               | Next.js web application + API backend (TypeScript)                  | Does not exist yet |
+| `packages/pipeline/`      | TypeScript cron jobs: news ingestion, Notion backup, weekly publish | Does not exist yet |
+| `handbook/db_connection/` | psycopg3 Evidence Layer, GraphDB, pgvector connections (Python)     | Does not exist yet |
+| `handbook/pipeline/`      | Evidence ingestion, Writer Agent modules (Python)                   | Does not exist yet |
+| `handbook-content/`       | Jupyter Book content (published to GitHub Pages)                    | Does not exist yet |
 
 **Language boundary:** `packages/pipeline/` is TypeScript (cron jobs, Notion/GitHub API calls). `handbook/` is Python (LLM calls, PDF parsing, GraphDB queries). Don't mix them.
 
@@ -160,14 +162,14 @@ Find your epic in `docs/epics.md` and pick the lowest-numbered incomplete story.
 
 ### Recommended First Tasks by Epic
 
-| Epic | Good first task |
-|---|---|
-| Epic 1 | Write `scripts/setup_evidence_layer.sql` — the full Postgres schema from `docs/architecture.md` → Data Architecture section. Run it against local Docker Postgres. |
+| Epic   | Good first task                                                                                                                                                                                     |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Epic 1 | Write `scripts/setup_evidence_layer.sql` — the full Postgres schema from `docs/architecture.md` → Data Architecture section. Run it against local Docker Postgres.                                  |
 | Epic 1 | Write `handbook/db_connection/postgres.py` — adapt connection logic from `dev/packages/pdf_knowledge_extractor/src/db/connection.py` to the psycopg3 + context manager pattern in the architecture. |
-| Epic 2 | Write `packages/pipeline/src/integrations/notion-client.ts` — TypeScript wrapper for Notion API v2 with pagination and rate limit handling. |
-| Epic 2 | Write `packages/pipeline/src/jobs/notion-backup.ts` — cron job that queries Notion and upserts into `notion_news_backup` table. |
-| Epic 3 | Adapt `dev/packages/pdf_knowledge_extractor/src/workflow/workflow.py` into `handbook/pipeline/evidence_ingestion/document_chunker.py`. |
-| Epic 4 | Read `dev/apps/agent/writer_agent/run_writer_agent.py` in full, then write `handbook/pipeline/writer_agent/graph_query.py`. |
+| Epic 2 | Write `packages/pipeline/src/integrations/notion-client.ts` — TypeScript wrapper for Notion API v2 with pagination and rate limit handling.                                                         |
+| Epic 2 | Write `packages/pipeline/src/jobs/notion-backup.ts` — cron job that queries Notion and upserts into `notion_news_backup` table.                                                                     |
+| Epic 3 | Adapt `dev/packages/pdf_knowledge_extractor/src/workflow/workflow.py` into `handbook/pipeline/evidence_ingestion/document_chunker.py`.                                                              |
+| Epic 4 | Read `dev/apps/agent/writer_agent/run_writer_agent.py` in full, then write `handbook/pipeline/writer_agent/graph_query.py`.                                                                         |
 
 ---
 

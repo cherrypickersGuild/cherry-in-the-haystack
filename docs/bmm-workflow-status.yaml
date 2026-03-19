@@ -21,12 +21,12 @@
 #   - {file-path}: File created/found (e.g., "docs/product-brief.md")
 #   - skipped: Optional/conditional workflow that was skipped
 
-generated: "2025-11-07"
-project: "cherry-in-the-haystack"
-project_type: "software"
-selected_track: "method"
-field_type: "brownfield"
-workflow_path: "method-brownfield.yaml"
+generated: '2025-11-07'
+project: 'cherry-in-the-haystack'
+project_type: 'software'
+selected_track: 'method'
+field_type: 'brownfield'
+workflow_path: 'method-brownfield.yaml'
 
 brainstorm_requested: false
 research_requested: false
@@ -41,10 +41,11 @@ workflow_status:
   create-design: docs/ux-design-specification.md
 
   # Phase 2: Solutioning
-  architecture: docs/architecture.md  # Completed 2026-02-28
+  architecture: docs/architecture.md # Completed 2026-02-28
   validate-architecture: optional
-  epic-tech-context: required  # Next: Generate technical specs from PRD+Architecture
+  epic-tech-context: docs/tech-spec-epic-1.md # JIT: also generated epic-2 and epic-3 specs
   solutioning-gate-check: required
 
   # Phase 3: Implementation
-  sprint-planning: required
+  create-epics-and-stories: required  # Returning to this step — current epics are flawed and need to be redone
+  sprint-planning: required  # Reset: must re-run after epics are finalized

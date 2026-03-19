@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: cherry-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cherry}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cherry_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-cherry_db}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-cherry} -d ${POSTGRES_DB:-cherry_db}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  graphdb:
+    image: ontotext/graphdb:10.7.4
+    container_name: cherry-graphdb
+    ports:
+      - '7200:7200'
+    volumes:
+      - graphdb_data:/opt/graphdb/home
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -sf http://localhost:7200/rest/repositories || exit 1']
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: cherry-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  graphdb_data:
+  redis_data:

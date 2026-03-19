@@ -1,0 +1,14 @@
+{
+  "name": "@cherry/web",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Cherry in the Haystack — Next.js + Nest.js web application (scaffold)",
+  "scripts": {
+    "dev": "echo \"TODO: initialize Next.js/Nest.js in a later story\"",
+    "build": "echo \"TODO: build step\"",
+    "test": "vitest run",
+    "lint": "eslint src"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

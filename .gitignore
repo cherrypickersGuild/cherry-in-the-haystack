@@ -41,3 +41,6 @@ logs/
 
 # gcp cloud key
 n8n-atmt-d7a9a05899be.json
+
+#pdf files
+.assets_pdf

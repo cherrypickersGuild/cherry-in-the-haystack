@@ -1,0 +1,10 @@
+dist/
+_build/
+node_modules/
+pnpm-lock.yaml
+bmad/
+dev/
+.claude/
+*.pdf
+AI Engineering*.md
+AI Engineering*.txt
