@@ -1,0 +1,209 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* ── Cherry for AI Engineers — Light Theme ── */
+
+  /* Core surfaces */
+  --background:        #F7F6F9;
+  --foreground:        #1A1626;
+  --card:              #FFFFFF;
+  --card-foreground:   #1A1626;
+  --popover:           #FFFFFF;
+  --popover-foreground:#1A1626;
+
+  /* Semantic roles */
+  --primary:           #C94B6E;
+  --primary-foreground:#FFFFFF;
+  --secondary:         #F2F0F7;
+  --secondary-foreground: #1A1626;
+  --muted:             #F2F0F7;
+  --muted-foreground:  #9E97B3;
+  --accent:            #FDF0F3;
+  --accent-foreground: #C94B6E;
+
+  --destructive:       #C94B6E;
+  --destructive-foreground: #FFFFFF;
+
+  --border:            #E4E1EE;
+  --input:             #E4E1EE;
+  --ring:              #C94B6E;
+
+  /* Radius */
+  --radius: 0.75rem;
+
+  /* Sidebar */
+  --sidebar:                #FFFFFF;
+  --sidebar-foreground:     #6B6480;
+  --sidebar-primary:        #C94B6E;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent:         #F2F0F7;
+  --sidebar-accent-foreground: #1A1626;
+  --sidebar-border:         #E4E1EE;
+  --sidebar-ring:           #C94B6E;
+
+  /* Cherry brand tokens */
+  --cherry:            #C94B6E;
+  --cherry-soft:       #FDF0F3;
+  --cherry-border:     #F2C4CE;
+
+  /* Violet brand tokens */
+  --violet:            #7B5EA7;
+  --violet-soft:       #F3EFFA;
+  --violet-border:     #C7B8E8;
+
+  /* Text scale */
+  --text-primary:      #1A1626;
+  --text-secondary:    #6B6480;
+  --text-body:         #3D3652;
+  --text-muted:        #9E97B3;
+
+  /* Success */
+  --success:           #2D7A5E;
+  --success-soft:      #EFF7F3;
+
+  /* Charts */
+  --chart-1: #C94B6E;
+  --chart-2: #7B5EA7;
+  --chart-3: #2D7A5E;
+  --chart-4: #D4854A;
+  --chart-5: #4A90D9;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-popover:            var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary:            var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:          var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-accent:             var(--accent);
+  --color-accent-foreground:  var(--accent-foreground);
+  --color-destructive:        var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border:             var(--border);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
+  --color-chart-1:            var(--chart-1);
+  --color-chart-2:            var(--chart-2);
+  --color-chart-3:            var(--chart-3);
+  --color-chart-4:            var(--chart-4);
+  --color-chart-5:            var(--chart-5);
+  --radius-sm:  calc(var(--radius) - 4px);
+  --radius-md:  calc(var(--radius) - 2px);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) + 4px);
+  --color-sidebar:                      var(--sidebar);
+  --color-sidebar-foreground:           var(--sidebar-foreground);
+  --color-sidebar-primary:              var(--sidebar-primary);
+  --color-sidebar-primary-foreground:   var(--sidebar-primary-foreground);
+  --color-sidebar-accent:               var(--sidebar-accent);
+  --color-sidebar-accent-foreground:    var(--sidebar-accent-foreground);
+  --color-sidebar-border:               var(--sidebar-border);
+  --color-sidebar-ring:                 var(--sidebar-ring);
+
+  /* Cherry / Violet exposed to Tailwind */
+  --color-cherry:         var(--cherry);
+  --color-cherry-soft:    var(--cherry-soft);
+  --color-cherry-border:  var(--cherry-border);
+  --color-violet:         var(--violet);
+  --color-violet-soft:    var(--violet-soft);
+  --color-violet-border:  var(--violet-border);
+  --color-success:        var(--success);
+  --color-success-soft:   var(--success-soft);
+  --color-text-primary:   var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-body:      var(--text-body);
+  --color-text-muted:     var(--text-muted);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Card shadow utilities */
+@layer utilities {
+  .shadow-card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  }
+  .shadow-card-hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 8px 24px rgba(0,0,0,0.06);
+  }
+  .cherry-active-bar {
+    border-left: 2px solid var(--cherry);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Final Polish — Transitions, Focus, Scrollbars
+───────────────────────────────────────────── */
+
+/* Smooth transitions on interactive elements */
+@layer base {
+  button, a, [role="button"] {
+    transition: all 150ms ease;
+  }
+  
+  /* Focus states for accessibility (cherry color) */
+  *:focus-visible {
+    outline: 2px solid var(--cherry);
+    outline-offset: 2px;
+  }
+  
+  /* Custom scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+  }
+
+}
+
+/* Skeleton loading animation */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.skeleton {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  background: linear-gradient(90deg, var(--secondary) 25%, var(--muted) 50%, var(--secondary) 75%);
+  background-size: 200% 100%;
+}
+
+/* Max content width constraint */
+.content-container {
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+}
