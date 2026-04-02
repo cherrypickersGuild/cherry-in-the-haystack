@@ -40,10 +40,11 @@ with DAG(
         max_active_runs=1,
         description='news pulling, config: {"sources":  "targets": "notion", '
                     '"dedup": true}',
-        schedule_interval="15 * * * *",  # At minute 15 every hour
+                    schedule_interval="0 9 * * *",  # Once a day (09:00)
         # schedule_interval=timedelta(minutes=60),
         # schedule_interval=None,
-        start_date=days_ago(0),
+        # start_date=days_ago(0),
+        start_date=datetime(2026, 4, 3),
         tags=['NewsBot'],
 ) as dag:
     t1 = BashOperator(
