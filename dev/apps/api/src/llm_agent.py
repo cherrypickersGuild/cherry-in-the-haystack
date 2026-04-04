@@ -207,18 +207,22 @@ class LLMAgentBase:
                                             "https://": proxy})
                 llm = ChatOpenAI(
                     # model_name="text-davinci-003"
-                    model_name=model_name,
+                    # model_name=model_name,
+                    model_name="glm-4.5",
                     http_client=client,
                     # temperature dictates how whacky the output should be
                     # for fixed response format task, set temperature = 0
-                    temperature=temperature)
+                    temperature=temperature,
+                    openai_api_base="https://api.z.ai/api/coding/paas/v4")
             else:
                 llm = ChatOpenAI(
                     # model_name="text-davinci-003"
-                    model_name=model_name,
+                    # model_name=model_name,
+                    model_name="glm-4.5",
                     # temperature dictates how whacky the output should be
                     # for fixed response format task, set temperature = 0
-                    temperature=temperature)
+                    temperature=temperature,
+                    openai_api_base="https://api.z.ai/api/coding/paas/v4")
 
         elif provider == "google":
             model_name = model_name or os.getenv("GOOGLE_MODEL", "gemini-pro")

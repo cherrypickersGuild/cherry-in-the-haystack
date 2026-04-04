@@ -15,16 +15,16 @@ class EmbeddingOpenAI_1x(Embedding):
     """
     For The implementation for openai < 1.*
     """
-    def __init__(self, model_name="text-embedding-ada-002"):
+    def __init__(self, model_name="embedding-2"):
         super().__init__(model_name)
 
         proxy = os.getenv('OPENAI_PROXY')
         if proxy and proxy.strip():
             client = httpx.Client(proxies={"http://": proxy,
                                            "https://": proxy})
-            self.client = OpenAI(http_client=client)
+            self.client = OpenAI(http_client=client, base_url="https://api.z.ai/api/coding/paas/v4/")
         else:
-            self.client = OpenAI()
+            self.client = OpenAI(base_url="https://api.z.ai/api/coding/paas/v4/")
 
         print(f"Initialized EmbeddingOpenAI 1x: {openai.__version__}")
 
