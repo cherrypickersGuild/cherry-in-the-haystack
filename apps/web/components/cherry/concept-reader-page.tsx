@@ -76,18 +76,18 @@ const REFERENCES = [
 ───────────────────────────────────────────── */
 export function ConceptReaderPage() {
   return (
-    <div className="flex flex-col h-full -m-8 -mx-10">
+    <div className="flex flex-col -m-4 -mx-4 lg:-m-8 lg:-mx-10">
       {/* 2-column content (left reading + right panel) */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row lg:flex-1 lg:overflow-hidden">
         {/* Center reading column */}
-        <main className="flex-1 overflow-y-auto" style={{ maxWidth: "700px", padding: "40px 48px" }}>
+        <main className="flex-1 overflow-y-auto px-5 py-6 lg:px-12 lg:py-10" style={{ maxWidth: "700px" }}>
           {/* Section badge */}
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-violet-soft text-violet mb-3">
             Basics
           </span>
 
           {/* Title */}
-          <h1 className="text-[28px] font-extrabold text-text-primary tracking-[-0.5px] leading-[1.2] mb-4">
+          <h1 className="text-[20px] lg:text-[28px] font-extrabold text-text-primary tracking-[-0.5px] leading-[1.2] mb-4">
             Retrieval-Augmented Generation
           </h1>
 
@@ -229,8 +229,7 @@ export function ConceptReaderPage() {
 
         {/* Right panel */}
         <aside
-          className="w-[280px] flex-shrink-0 overflow-y-auto border-l border-border"
-          style={{ padding: "20px 16px" }}
+          className="w-full lg:w-[280px] lg:flex-shrink-0 overflow-y-auto border-t lg:border-t-0 lg:border-l border-border px-4 py-5"
         >
           {/* Learning Path card */}
           <div className="bg-card border border-border rounded-[12px] p-4 mb-4">

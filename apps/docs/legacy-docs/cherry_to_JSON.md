@@ -483,7 +483,7 @@ Writer의 `evidence/references` 생성을 위한 근거 데이터 소스(직접 
 
 경로:
 
-`D:/intellij project/cherry-in-the-haystack/docs/ddl-v1.0.sql`
+`D:/intellij project/cherry-in-the-haystack/docs/ddl-v1.1.sql`
 
 ### 이 JSON은 무엇인가
 

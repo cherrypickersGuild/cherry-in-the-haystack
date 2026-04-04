@@ -265,7 +265,7 @@
 }
 ```
 
-- 5번 참조: `D:/intellij project/cherry-in-the-haystack/docs/ddl-v1.0.sql`
+- 5번 참조: `D:/intellij project/cherry-in-the-haystack/docs/ddl-v1.1.sql`
   - 이 JSON은 무엇인가: `cherry_platform` 스키마에서 요구하는 JSONB 컬럼 타입 계약.
   - 어디에 쓰는가: 에이전트 산출물 적재 시 최종 타깃 포맷 검증 기준.
   - 실제 데이터 형식(핵심 JSONB 컬럼 타입 제약):

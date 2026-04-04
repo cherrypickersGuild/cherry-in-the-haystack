@@ -34,8 +34,13 @@
 --   3) insert the new canonical row
 -- - do not rely on is_active = FALSE alone for replacement, because the
 --   unique index is based on revoked_at IS NULL
+-- - public concept documents are stored in content.concept_page and
+--   content.concept_changelog, not in a separate concept schema
 -- ============================================================
 
+-- IMPORTANT:
+-- - For RDS or restricted environments, this line is often removed.
+-- - If you already connected to an existing database, start from schemas.
 CREATE DATABASE cherry_platform
     WITH ENCODING 'UTF8';
 
@@ -56,7 +61,6 @@ CREATE SCHEMA IF NOT EXISTS core;
 CREATE SCHEMA IF NOT EXISTS personal;
 CREATE SCHEMA IF NOT EXISTS content;
 CREATE SCHEMA IF NOT EXISTS handbook;
-CREATE SCHEMA IF NOT EXISTS concept;
 CREATE SCHEMA IF NOT EXISTS snapshot;
 CREATE SCHEMA IF NOT EXISTS publishing;
 
@@ -130,7 +134,6 @@ CREATE TYPE core.run_kind_enum AS ENUM (
     'STAT_SNAPSHOT_BUILD',
     'NEWSLETTER_GENERATION',
     'EMAIL_SENDING',
-    'CONCEPT_PAGE_GENERATION',
     'NEWLY_DISCOVERED_BUILD',
     'BOOK_PROCESSING',
     'EMBEDDING_BUILD'
@@ -180,11 +183,10 @@ CREATE TYPE core.related_entity_type_enum AS ENUM (
     'USER_ENTITY_DAILY_STAT',
     'USER_ENTITY_WEEKLY_STAT',
     'NEWSLETTER_ISSUE',
-    'CONCEPT_PAGE',
-    'USER_CONCEPT_PAGE',
     'BOOK',
     'PARAGRAPH_CHUNK',
-    'CURATED_ARTICLE'
+    'CURATED_ARTICLE',
+    'CONCEPT_PAGE'
 );
 
 CREATE TYPE content.source_submission_status_enum AS ENUM (
@@ -193,17 +195,7 @@ CREATE TYPE content.source_submission_status_enum AS ENUM (
     'REJECTED'
 );
 
-CREATE TYPE concept.concept_gen_mode_enum AS ENUM (
-    'EXTEND',
-    'REPLACE'
-);
-
-CREATE TYPE concept.evidence_source_enum AS ENUM (
-    'PARAGRAPH_CHUNK',
-    'ARTICLE_EVIDENCE'
-);
-
-CREATE TYPE concept.page_gen_status_enum AS ENUM (
+CREATE TYPE content.content_gen_status_enum AS ENUM (
     'PENDING',
     'GENERATING',
     'DONE',
@@ -936,6 +928,58 @@ CREATE TRIGGER trg_side_category_set_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION core.set_updated_at();
 
+-- Public concept documents are platform-wide content.
+-- They are not personal data, so they belong to content schema.
+CREATE TABLE content.concept_page (
+                                      id               UUID NOT NULL,
+                                      concept_slug     TEXT NOT NULL,
+                                      concept_name     TEXT NOT NULL,
+                                      content_md       TEXT NULL,
+                                      is_published     BOOLEAN NOT NULL DEFAULT FALSE,
+                                      published_at     TIMESTAMPTZ NULL,
+                                      created_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                      updated_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+                                      PRIMARY KEY (id),
+
+                                      CONSTRAINT uq_concept_page_slug UNIQUE (concept_slug)
+);
+
+CREATE INDEX idx_concept_page_name
+    ON content.concept_page (concept_name);
+
+CREATE INDEX idx_concept_page_published
+    ON content.concept_page (is_published)
+    WHERE (is_published = TRUE);
+
+CREATE TRIGGER trg_concept_page_set_updated_at
+    BEFORE UPDATE ON content.concept_page
+    FOR EACH ROW
+    EXECUTE FUNCTION core.set_updated_at();
+
+-- Change history for public concept documents.
+CREATE TABLE content.concept_changelog (
+                                           id             BIGSERIAL PRIMARY KEY,
+                                           concept_slug   TEXT NOT NULL,
+                                           concept_name   TEXT NOT NULL,
+                                           change_type    VARCHAR(20) NOT NULL,
+                                           change_summary TEXT NOT NULL,
+                                           changed_at     TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+                                           CONSTRAINT fk_concept_changelog_concept_slug
+                                               FOREIGN KEY (concept_slug) REFERENCES content.concept_page(concept_slug)
+                                                   ON UPDATE RESTRICT ON DELETE RESTRICT,
+
+                                           CONSTRAINT chk_concept_changelog_change_type
+                                               CHECK (change_type IN ('New', 'Major', 'Minor', 'Correction'))
+);
+
+CREATE INDEX idx_concept_changelog_changed_at
+    ON content.concept_changelog (changed_at DESC);
+
+CREATE INDEX idx_concept_changelog_concept_slug
+    ON content.concept_changelog (concept_slug);
+
 -- representative_entity_id here is the final confirmed value.
 -- It may be NULL until review/confirmation is complete.
 CREATE TABLE content.user_article_state (
@@ -1522,63 +1566,6 @@ CREATE TRIGGER trg_knowledge_verification_contributor_set_updated_at
     EXECUTE FUNCTION core.set_updated_at();
 
 -- ============================================================
--- CONCEPT
--- ============================================================
-
-CREATE TABLE concept.page (
-                              id               UUID NOT NULL,
-                              concept_slug     TEXT NOT NULL,
-                              concept_name     TEXT NOT NULL,
-                              handbook_section VARCHAR(50) NOT NULL,
-                              content_md       TEXT NULL,
-                              is_published     BOOLEAN NOT NULL DEFAULT FALSE,
-                              published_at     TIMESTAMPTZ NULL,
-                              created_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                              updated_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-                              PRIMARY KEY (id),
-
-                              CONSTRAINT uq_page_slug UNIQUE (concept_slug),
-
-                              CONSTRAINT chk_page_handbook_section
-                                  CHECK (handbook_section IN ('basics', 'advanced'))
-);
-
-CREATE INDEX idx_page_section
-    ON concept.page (handbook_section);
-
-CREATE INDEX idx_page_published
-    ON concept.page (is_published)
-    WHERE (is_published = TRUE);
-
-CREATE TRIGGER trg_page_set_updated_at
-    BEFORE UPDATE ON concept.page
-    FOR EACH ROW
-    EXECUTE FUNCTION core.set_updated_at();
-
-CREATE TABLE concept.changelog (
-                                   id             BIGSERIAL PRIMARY KEY,
-                                   concept_slug   TEXT NOT NULL,
-                                   concept_name   TEXT NOT NULL,
-                                   change_type    VARCHAR(20) NOT NULL,
-                                   change_summary TEXT NOT NULL,
-                                   changed_at     TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-                                   CONSTRAINT fk_changelog_concept_slug
-                                       FOREIGN KEY (concept_slug) REFERENCES concept.page(concept_slug)
-                                           ON UPDATE RESTRICT ON DELETE RESTRICT,
-
-                                   CONSTRAINT chk_changelog_change_type
-                                       CHECK (change_type IN ('New', 'Major', 'Minor', 'Correction'))
-);
-
-CREATE INDEX idx_changelog_changed_at
-    ON concept.changelog (changed_at DESC);
-
-CREATE INDEX idx_changelog_concept_slug
-    ON concept.changelog (concept_slug);
-
--- ============================================================
 -- PERSONAL
 -- ============================================================
 
@@ -1690,143 +1677,6 @@ CREATE INDEX idx_entity_follow_entity
 
 CREATE TRIGGER trg_entity_follow_set_updated_at
     BEFORE UPDATE ON personal.entity_follow
-    FOR EACH ROW
-    EXECUTE FUNCTION core.set_updated_at();
-
-CREATE TABLE personal.concept_evidence_selection (
-                                                     id              UUID NOT NULL,
-                                                     user_id         UUID NOT NULL,
-                                                     concept_slug    TEXT NOT NULL,
-                                                     generation_mode concept.concept_gen_mode_enum NOT NULL DEFAULT 'EXTEND',
-                                                     created_at      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                     updated_at      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-                                                     PRIMARY KEY (id),
-
-                                                     CONSTRAINT uq_concept_evidence_selection UNIQUE (user_id, concept_slug),
-                                                     CONSTRAINT uq_concept_evidence_selection_user_id_id UNIQUE (user_id, id),
-
-                                                     CONSTRAINT fk_concept_evidence_selection_user
-                                                         FOREIGN KEY (user_id) REFERENCES core.app_user(id)
-                                                             ON UPDATE RESTRICT ON DELETE RESTRICT,
-
-                                                     CONSTRAINT fk_concept_evidence_selection_concept_slug
-                                                         FOREIGN KEY (concept_slug) REFERENCES concept.page(concept_slug)
-                                                             ON UPDATE RESTRICT ON DELETE RESTRICT
-);
-
-CREATE INDEX idx_concept_evidence_selection_user_concept
-    ON personal.concept_evidence_selection (user_id, concept_slug);
-
-CREATE TRIGGER trg_concept_evidence_selection_set_updated_at
-    BEFORE UPDATE ON personal.concept_evidence_selection
-    FOR EACH ROW
-    EXECUTE FUNCTION core.set_updated_at();
-
-CREATE TABLE personal.concept_evidence_item (
-                                                id                            UUID NOT NULL,
-                                                concept_evidence_selection_id UUID NOT NULL,
-                                                evidence_type                 concept.evidence_source_enum NOT NULL,
-
-                                                paragraph_chunk_id            BIGINT NULL,
-                                                user_article_state_id         UUID NULL,
-
-                                                is_included                   BOOLEAN NOT NULL DEFAULT TRUE,
-                                                sort_order                    INT NOT NULL DEFAULT 0,
-
-                                                created_at                    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                updated_at                    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-                                                PRIMARY KEY (id),
-
-                                                CONSTRAINT fk_concept_evidence_item_selection
-                                                    FOREIGN KEY (concept_evidence_selection_id) REFERENCES personal.concept_evidence_selection(id)
-                                                        ON DELETE CASCADE,
-
-                                                CONSTRAINT fk_concept_evidence_item_paragraph_chunk
-                                                    FOREIGN KEY (paragraph_chunk_id) REFERENCES handbook.paragraph_chunk(id)
-                                                        ON DELETE RESTRICT,
-
-                                                CONSTRAINT fk_concept_evidence_item_user_article_state
-                                                    FOREIGN KEY (user_article_state_id) REFERENCES content.user_article_state(id)
-                                                        ON DELETE RESTRICT,
-
-                                                CONSTRAINT chk_concept_evidence_item_ref
-                                                    CHECK (
-                                                        (evidence_type = 'PARAGRAPH_CHUNK' AND paragraph_chunk_id IS NOT NULL AND user_article_state_id IS NULL)
-                                                            OR
-                                                        (evidence_type = 'ARTICLE_EVIDENCE' AND user_article_state_id IS NOT NULL AND paragraph_chunk_id IS NULL)
-                                                        )
-);
-
-CREATE INDEX idx_concept_evidence_item_selection
-    ON personal.concept_evidence_item (concept_evidence_selection_id)
-    WHERE (is_included = TRUE);
-
-CREATE INDEX idx_concept_evidence_item_paragraph_chunk
-    ON personal.concept_evidence_item (paragraph_chunk_id)
-    WHERE (paragraph_chunk_id IS NOT NULL);
-
-CREATE INDEX idx_concept_evidence_item_user_article_state
-    ON personal.concept_evidence_item (user_article_state_id)
-    WHERE (user_article_state_id IS NOT NULL);
-
-CREATE UNIQUE INDEX uq_concept_evidence_item_selection_paragraph_chunk
-    ON personal.concept_evidence_item (concept_evidence_selection_id, paragraph_chunk_id)
-    WHERE (paragraph_chunk_id IS NOT NULL);
-
-CREATE UNIQUE INDEX uq_concept_evidence_item_selection_user_article_state
-    ON personal.concept_evidence_item (concept_evidence_selection_id, user_article_state_id)
-    WHERE (user_article_state_id IS NOT NULL);
-
-CREATE TRIGGER trg_concept_evidence_item_set_updated_at
-    BEFORE UPDATE ON personal.concept_evidence_item
-    FOR EACH ROW
-    EXECUTE FUNCTION core.set_updated_at();
-
-CREATE TABLE personal.concept_page (
-                                       id                            UUID NOT NULL,
-                                       user_id                       UUID NOT NULL,
-                                       concept_slug                  TEXT NOT NULL,
-                                       concept_evidence_selection_id UUID NOT NULL,
-                                       generation_mode               concept.concept_gen_mode_enum NOT NULL DEFAULT 'EXTEND',
-                                       content_md                    TEXT NULL,
-                                       generation_status             concept.page_gen_status_enum NOT NULL DEFAULT 'PENDING',
-                                       run_log_id                    UUID NULL,
-                                       last_generated_at             TIMESTAMPTZ NULL,
-                                       created_at                    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                       updated_at                    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-                                       PRIMARY KEY (id),
-
-                                       CONSTRAINT fk_concept_page_user
-                                           FOREIGN KEY (user_id) REFERENCES core.app_user(id)
-                                               ON UPDATE RESTRICT ON DELETE RESTRICT,
-
-                                       CONSTRAINT fk_concept_page_concept_slug
-                                           FOREIGN KEY (concept_slug) REFERENCES concept.page(concept_slug)
-                                               ON UPDATE RESTRICT ON DELETE RESTRICT,
-
-                                       CONSTRAINT fk_concept_page_selection
-                                           FOREIGN KEY (user_id, concept_evidence_selection_id)
-                                               REFERENCES personal.concept_evidence_selection(user_id, id)
-                                               ON UPDATE RESTRICT ON DELETE RESTRICT,
-
-                                       CONSTRAINT fk_concept_page_run_log
-                                           FOREIGN KEY (run_log_id) REFERENCES core.run_log(id)
-                                               ON UPDATE RESTRICT ON DELETE RESTRICT,
-
-                                       CONSTRAINT uq_concept_page UNIQUE (user_id, concept_slug)
-);
-
-CREATE INDEX idx_concept_page_user
-    ON personal.concept_page (user_id);
-
-CREATE INDEX idx_concept_page_slug
-    ON personal.concept_page (concept_slug);
-
-CREATE TRIGGER trg_concept_page_set_updated_at
-    BEFORE UPDATE ON personal.concept_page
     FOR EACH ROW
     EXECUTE FUNCTION core.set_updated_at();
 
@@ -2089,7 +1939,7 @@ CREATE TABLE snapshot.user_entity_page_weekly_list (
                                                        week_end          DATE NOT NULL,
                                                        article_count     INT NOT NULL DEFAULT 0,
                                                        articles_json     JSONB NOT NULL DEFAULT '[]'::jsonb,
-                                                       generation_status concept.page_gen_status_enum NOT NULL DEFAULT 'PENDING',
+                                                       generation_status content.content_gen_status_enum NOT NULL DEFAULT 'PENDING',
                                                        run_log_id        UUID NULL,
                                                        last_generated_at TIMESTAMPTZ NULL,
                                                        created_at        TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -17,7 +17,7 @@ import config from 'src/config';
             password: config.db.password,
             database: config.db.database,
           },
-          pool: { min: 3, max: 10 },
+          pool: { min: 3, max: 5 },
         });
       },
     },

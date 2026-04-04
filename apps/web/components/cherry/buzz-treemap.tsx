@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { useIsMobile } from "@/components/ui/use-mobile"
 
 type BuzzItem = {
   label: string
@@ -10,26 +11,30 @@ type BuzzItem = {
 }
 
 const BUZZ_DATA: BuzzItem[] = [
-  { label: "LLM Architecture",    percent: 24, color: "#7B5EA7", bgColor: "#F3EFFA" }, // largest → purple
-  { label: "RAG & Retrieval",     percent: 18, color: "#C94B6E", bgColor: "#FDF0F3" }, // second → cherry
-  { label: "Agents & Tools",      percent: 16, color: "#2D7A5E", bgColor: "#EFF7F3" },
-  { label: "Fine-tuning",         percent: 14, color: "#D4854A", bgColor: "#FDF6EE" },
-  { label: "Inference & Serving", percent: 11, color: "#4A90D9", bgColor: "#EEF4FC" },
-  { label: "Evaluation",          percent: 8,  color: "#1A1626", bgColor: "#F2F0F7" },
-  { label: "Multi-modal",         percent: 5,  color: "#9E97B3", bgColor: "#F7F6F9" },
-  { label: "Governance",          percent: 4,  color: "#6B6480", bgColor: "#F7F6F9" },
+  { label: "MODEL_UPDATES",    percent: 18, color: "#7B5EA7", bgColor: "#F3EFFA" },
+  { label: "PAPER_BENCHMARK",  percent: 15, color: "#C94B6E", bgColor: "#FDF0F3" },
+  { label: "FRAMEWORKS",       percent: 14, color: "#2D7A5E", bgColor: "#EFF7F3" },
+  { label: "TOOLS",            percent: 12, color: "#D4854A", bgColor: "#FDF6EE" },
+  { label: "SHARED_RESOURCES", percent: 11, color: "#4A90D9", bgColor: "#EEF4FC" },
+  { label: "CASE_STUDIES",     percent: 9,  color: "#1A1626", bgColor: "#F2F0F7" },
+  { label: "REGULATIONS",      percent: 8,  color: "#9E97B3", bgColor: "#F7F6F9" },
+  { label: "BIG_TECH_TRENDS",  percent: 7,  color: "#6B6480", bgColor: "#F7F6F9" },
+  { label: "THIS_WEEKS_POSTS", percent: 6,  color: "#2E5C94", bgColor: "#EEF4FC" },
 ]
 
 const TREEMAP_FONT_STACK =
   'var(--font-rounded), "Inter", "Segoe UI", system-ui, sans-serif'
 
-// Scale font size between min/max based on percent (4%→24%)
+// Scale font size between min/max based on percent (6%→18%)
 function scaleFontSize(percent: number, min: number, max: number) {
-  const lo = 4, hi = 24
+  const lo = 6, hi = 18
   return min + ((percent - lo) / (hi - lo)) * (max - min)
 }
 
 export function CategoryTreemap() {
+  const isMobile = useIsMobile()
+  const rowH = isMobile ? 96 : 72
+
   return (
     <div>
       <div className="mb-3 flex items-end justify-between">
@@ -43,7 +48,7 @@ export function CategoryTreemap() {
           className="text-[11px] text-text-muted"
           style={{ fontFamily: TREEMAP_FONT_STACK, letterSpacing: "0.02em" }}
         >
-          8 sectors
+          9 sectors
         </span>
       </div>
 
@@ -58,23 +63,24 @@ export function CategoryTreemap() {
           className="grid gap-[6px]"
           style={{
             gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
-            gridTemplateRows: "repeat(4, 72px)",
+            gridTemplateRows: `repeat(4, ${rowH}px)`,
             gridTemplateAreas: `
-              "a a a a a a b b b b c c"
-              "a a a a a a b b b b c c"
+              "a a a a a b b b b c c c"
+              "a a a a a b b b b c c c"
               "d d d d e e e f f g g g"
-              "d d d d h h h f f g g g"
+              "d d d d h h h f f i i i"
             `,
           }}
         >
-          <TreemapTile item={BUZZ_DATA[0]} gridArea="a" isLarge />
-          <TreemapTile item={BUZZ_DATA[1]} gridArea="b" isLarge />
-          <TreemapTile item={BUZZ_DATA[2]} gridArea="c" />
-          <TreemapTile item={BUZZ_DATA[3]} gridArea="d" />
-          <TreemapTile item={BUZZ_DATA[4]} gridArea="e" />
-          <TreemapTile item={BUZZ_DATA[5]} gridArea="f" />
-          <TreemapTile item={BUZZ_DATA[6]} gridArea="g" />
-          <TreemapTile item={BUZZ_DATA[7]} gridArea="h" />
+          <TreemapTile item={BUZZ_DATA[0]} gridArea="a" isLarge isMobile={isMobile} />
+          <TreemapTile item={BUZZ_DATA[1]} gridArea="b" isLarge isMobile={isMobile} />
+          <TreemapTile item={BUZZ_DATA[2]} gridArea="c" isMobile={isMobile} />
+          <TreemapTile item={BUZZ_DATA[3]} gridArea="d" isMobile={isMobile} />
+          <TreemapTile item={BUZZ_DATA[4]} gridArea="e" isMobile={isMobile} />
+          <TreemapTile item={BUZZ_DATA[5]} gridArea="f" isMobile={isMobile} />
+          <TreemapTile item={BUZZ_DATA[6]} gridArea="g" isMobile={isMobile} />
+          <TreemapTile item={BUZZ_DATA[7]} gridArea="h" isMobile={isMobile} />
+          <TreemapTile item={BUZZ_DATA[8]} gridArea="i" isMobile={isMobile} />
         </div>
       </div>
 
@@ -98,18 +104,20 @@ export function CategoryTreemap() {
   )
 }
 
-function TreemapTile({ 
-  item, 
+function TreemapTile({
+  item,
   gridArea,
   isLarge = false,
-}: { 
+  isMobile = false,
+}: {
   item: BuzzItem
   gridArea: string
   isLarge?: boolean
+  isMobile?: boolean
 }) {
-  // percent font: scale label 11px→20px, percent number 12px→22px
-  const labelSize  = scaleFontSize(item.percent, 11, 18)
-  const pctSize    = scaleFontSize(item.percent, 12, 19)
+  // percent font: scale label 11px→18px (mobile: 8px→13px)
+  const labelSize  = scaleFontSize(item.percent, isMobile ? 8 : 11, isMobile ? 13 : 18)
+  const pctSize    = scaleFontSize(item.percent, isMobile ? 9 : 12, isMobile ? 14 : 19)
   // weight: heavier as percent grows
   const fontWeight = item.percent >= 20 ? 900 : item.percent >= 14 ? 800 : item.percent >= 10 ? 700 : 600
 
@@ -139,7 +147,7 @@ function TreemapTile({
       />
 
       <p
-        className="relative max-w-[88%] leading-[1.12]"
+        className="relative max-w-[88%] leading-[1.12] break-all"
         style={{
           color: item.color,
           fontSize: labelSize,

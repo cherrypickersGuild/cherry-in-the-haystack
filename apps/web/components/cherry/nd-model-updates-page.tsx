@@ -161,8 +161,8 @@ export function NDModelUpdatesPage() {
     <div className="max-w-[900px]">
       {/* Header */}
       <h1
-        className="font-extrabold text-[#1A1626] mb-2 leading-tight"
-        style={{ fontSize: "26px", letterSpacing: "-0.3px" }}
+        className="font-extrabold text-[#1A1626] mb-2 leading-tight text-[20px] lg:text-[26px]"
+        style={{ letterSpacing: "-0.3px" }}
       >
         Model Updates
       </h1>
@@ -176,11 +176,11 @@ export function NDModelUpdatesPage() {
           Major Players — GPQA Benchmark
         </p>
 
-        <div className="grid grid-cols-3 gap-[10px]">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-[10px]">
           {LEADERBOARD.map((entry) => (
             <div
               key={entry.rank}
-              className={`rounded-[10px] border p-4 transition-shadow hover:shadow-md ${entry.isLead ? "col-span-3" : ""}`}
+              className={`rounded-[10px] border p-4 transition-shadow hover:shadow-md ${entry.isLead ? "lg:col-span-3" : ""}`}
               style={{
                 backgroundColor: entry.bgColor,
                 borderColor: entry.borderColor,
@@ -217,7 +217,7 @@ export function NDModelUpdatesPage() {
       {/* ── Section 2: Rising Star ── */}
       <div className="mb-6">
         <div
-          className="flex items-start gap-6 rounded-[10px] border p-5"
+          className="flex flex-col lg:flex-row items-start gap-6 rounded-[10px] border p-5"
           style={{ backgroundColor: "#FFF8EF", borderColor: "#F0D8B0", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
         >
           {/* Left */}
@@ -250,7 +250,7 @@ export function NDModelUpdatesPage() {
           </div>
 
           {/* Right sparkline */}
-          <div className="flex-shrink-0 w-[200px]">
+          <div className="w-full lg:w-[200px] lg:flex-shrink-0">
             <Sparkline />
           </div>
         </div>

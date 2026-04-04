@@ -174,8 +174,8 @@ export function PatchNotesPage() {
       {/* Header */}
       <div className="mb-6">
         <h1
-          className="font-extrabold text-[#1A1626] leading-none mb-2.5"
-          style={{ fontSize: "30px", letterSpacing: "-0.5px" }}
+          className="font-extrabold text-[#1A1626] leading-none mb-2.5 text-[22px] lg:text-[30px]"
+          style={{ letterSpacing: "-0.5px" }}
         >
           Patch Notes
         </h1>
@@ -184,10 +184,10 @@ export function PatchNotesPage() {
         </p>
       </div>
 
-      {/* Two-column layout */}
-      <div className="flex gap-6">
+      {/* Two-column layout — stacks on mobile */}
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* LEFT: Timeline */}
-        <div className="flex-[0_0_65%] min-w-0">
+        <div className="w-full lg:flex-[0_0_65%] min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.8px] text-text-muted mb-4">
             14 UPDATES · 4 AREAS
           </p>
@@ -247,7 +247,7 @@ export function PatchNotesPage() {
         </div>
 
         {/* RIGHT: Filter panel + Stats */}
-        <div className="flex-[0_0_35%] min-w-0 space-y-3">
+        <div className="w-full lg:flex-[0_0_35%] min-w-0 space-y-3">
           {/* Filter card */}
           <div className="bg-card border border-border rounded-[12px] p-4">
             <p className="text-[10px] font-bold uppercase tracking-[0.8px] text-text-muted mb-3">

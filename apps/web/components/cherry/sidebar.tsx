@@ -212,7 +212,7 @@ const SECTIONS: SectionDef[] = [
 /* ─────────────────────────────────────────────
    Cherry SVG Icon
 ───────────────────────────────────────────── */
-function CherryIcon({ className }: { className?: string }) {
+export function CherryIcon({ className }: { className?: string }) {
   return (
     <svg
       width="32"
@@ -278,25 +278,31 @@ function NavButton({
 export function Sidebar({
   active,
   onSelect,
+  className,
+  hideLogo = false,
 }: {
   active: string
   onSelect: (id: string) => void
+  className?: string
+  hideLogo?: boolean
 }) {
   return (
     <aside
-      className="flex flex-col w-[240px] min-h-screen bg-sidebar border-r border-sidebar-border flex-shrink-0"
+      className={cn("flex flex-col w-[240px] min-h-screen bg-sidebar border-r border-sidebar-border flex-shrink-0", className)}
       aria-label="Main navigation"
     >
-      {/* Logo */}
-      <div className="px-4 pt-5 pb-4 flex-shrink-0 border-b border-sidebar-border">
-        <div className="flex items-center gap-2.5">
-          <CherryIcon className="flex-shrink-0" />
-          <div className="leading-tight">
-            <span className="text-[17px] font-bold text-text-primary tracking-tight">Cherry</span>
-            <p className="text-[11px] text-text-muted font-medium">for AI Engineers</p>
+      {/* Logo — hidden in mobile sheet */}
+      {!hideLogo && (
+        <div className="px-4 pt-5 pb-4 flex-shrink-0 border-b border-sidebar-border">
+          <div className="flex items-center gap-2.5">
+            <CherryIcon className="flex-shrink-0" />
+            <div className="leading-tight">
+              <span className="text-[17px] font-bold text-text-primary tracking-tight">Cherry</span>
+              <p className="text-[11px] text-text-muted font-medium">for AI Engineers</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Nav sections */}
       <nav className="flex-1 overflow-y-auto px-2 py-4 pb-6 flex flex-col gap-0.5">

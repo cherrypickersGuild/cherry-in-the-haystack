@@ -1,7 +1,7 @@
 # 에이전트 JSON/DB 저장 포맷 정리 (DDL 기준)
 
 ## 목적
-- 기준 스키마: `docs/ddl-v1.0.sql` (`cherry_platform`)
+- 기준 스키마: `docs/ddl-v1.1.sql` (`cherry_platform`)
 - 목표: 현재 코드에서 **에이전트가 실제 생성/저장하는 JSON**과 **DB write 형태**를 추출하고, DDL 컬럼과 매핑
 
 ---
@@ -9,13 +9,13 @@
 ## 1) 핵심 결론 (중요)
 - 현재 저장소에는 `company_article_ai_state`, `highlight_weekly_stat_snapshot` 등 `cherry_platform` 테이블로 직접 `INSERT/UPDATE`하는 코드가 없다.
 - 현재 에이전트 결과는 주로 **파일(JSON/JSONL)** 또는 **기존 프로토타입 DB(books/paragraph_chunks/key_ideas 등)** 에 저장된다.
-- 즉, `docs/ddl-v1.0.sql`은 설계 기준이고, 실제 적재 파이프라인은 아직 연결 전 단계다.
+- 즉, `docs/ddl-v1.1.sql`은 설계 기준이고, 실제 적재 파이프라인은 아직 연결 전 단계다.
 
 ---
 
 ## 2) DDL 기준 주요 JSON 컬럼 요약
 
-`docs/ddl-v1.0.sql`에서 에이전트 결과와 직접 관련이 큰 JSON 컬럼:
+`docs/ddl-v1.1.sql`에서 에이전트 결과와 직접 관련이 큰 JSON 컬럼:
 
 - `company_article_ai_state`
   - `ai_classification_json` (object)
@@ -468,7 +468,7 @@ News Agent 결과 item 1건을 `company_article_ai_state`로 변환:
 ---
 
 ## 7) 참고 파일
-- `docs/ddl-v1.0.sql`
+- `docs/ddl-v1.1.sql`
 - `dev/apps/agent/writer_agent/run_writer_agent.py`
 - `dev/apps/agent/writer_agent/format_for_frontend.py`
 - `dev/apps/agent/writer_agent/build_front_preview.py`

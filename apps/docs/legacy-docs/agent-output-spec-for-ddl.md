@@ -1,7 +1,7 @@
 # Cherry 에이전트 출력 명세 (DDL 화면/기사 생성 기준)
 
 ## 0. 문서 목적
-- 기준: `docs/ddl-v1.0.sql` (PostgreSQL `cherry_platform`)
+- 기준: `docs/ddl-v1.1.sql` (PostgreSQL `cherry_platform`)
 - 목표:
   - 지금 이미 생산되는 JSON과 아직 미생산 JSON을 명확히 구분
   - 화면 렌더링/기사 생성에 필요한 에이전트 출력 계약(JSON Contract) 확정
@@ -12,7 +12,7 @@
 ## 1. 소스 오브 트루스(권위 체계)
 
 ## 1.1 DB 스키마 권위
-- 화면 데이터 구조의 최종 권위는 `docs/ddl-v1.0.sql`.
+- 화면 데이터 구조의 최종 권위는 `docs/ddl-v1.1.sql`.
 - 특히 화면용 JSON 필드의 구조 예시는 DDL 주석에 명시되어 있음.
 
 ## 1.2 카테고리 권위
@@ -554,7 +554,7 @@ Writer Agent 출력:
 ---
 
 ## 9. 참고
-- `docs/ddl-v1.0.sql`
+- `docs/ddl-v1.1.sql`
 - `docs/agent-json-db-mapping.md`
 - `dev/apps/agent/writer_agent/run_writer_agent.py`
 - `dev/apps/agent/news_agent/code/run_news_agent.py`

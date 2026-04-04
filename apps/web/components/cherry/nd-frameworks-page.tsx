@@ -120,8 +120,8 @@ export function NDFrameworksPage() {
     <div className="max-w-[900px]">
       {/* Header */}
       <h1
-        className="font-extrabold text-[#1A1626] mb-2 leading-tight"
-        style={{ fontSize: "26px", letterSpacing: "-0.3px" }}
+        className="font-extrabold text-[#1A1626] mb-2 leading-tight text-[20px] lg:text-[26px]"
+        style={{ letterSpacing: "-0.3px" }}
       >
         Frameworks
       </h1>
@@ -138,7 +138,7 @@ export function NDFrameworksPage() {
           <div className="flex-1 border-t border-[#E4E1EE]" />
         </div>
 
-        <div className="grid grid-cols-4 gap-[10px]">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-[10px]">
           {/* Card 1 — Agent */}
           <div className="bg-white border border-[#E4E1EE] rounded-[10px] p-3.5 hover:border-[#7B5EA7] transition-colors cursor-pointer" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
             <div className="text-[18px] mb-1">🤖</div>
@@ -239,7 +239,7 @@ export function NDFrameworksPage() {
         </div>
 
         <div
-          className="flex items-center gap-5 rounded-[10px] border p-5"
+          className="flex flex-col lg:flex-row items-start gap-5 rounded-[10px] border p-5"
           style={{ backgroundColor: "#FFFFFF", borderColor: "#E4E1EE", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
         >
           {/* Left */}
@@ -280,7 +280,7 @@ export function NDFrameworksPage() {
           </div>
 
           {/* Right — Bar Chart */}
-          <div className="flex-shrink-0 w-[210px]">
+          <div className="w-full lg:w-[210px] lg:flex-shrink-0">
             <BarChart />
           </div>
         </div>
