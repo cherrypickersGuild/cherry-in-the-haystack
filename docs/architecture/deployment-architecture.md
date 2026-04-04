@@ -1,5 +1,14 @@
 # Deployment Architecture
 
+### Infrastructure Access
+
+**Tailscale** is used for secure access to all infrastructure resources:
+
+- Database access (PostgreSQL, GraphDB) via Tailscale IP
+- Internal services communicate over Tailscale network
+- Development and production use the same Tailscale net (tailnet) with ACL separation
+- No public endpoints for databases — all access through Tailscale
+
 ### Content Publication Pipeline
 
 ```

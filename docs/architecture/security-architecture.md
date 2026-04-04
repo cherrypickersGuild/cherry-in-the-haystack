@@ -1,8 +1,9 @@
 # Security Architecture
 
+- **Infrastructure Access:** Tailscale for all secure infrastructure access (DBs, services, internal tools)
 - **All credentials:** Environment variables only. Never hardcoded. Never committed. `.env.example` shows required keys with placeholder values.
-- **Database:** RDS in private VPC subnet; connections use `sslmode=require`
-- **GraphDB:** Self-hosted; restrict network access to application server IPs only
+- **Database:** RDS in private VPC subnet; connections use `sslmode=require`; accessed via Tailscale
+- **GraphDB:** Self-hosted; restrict network access to application server IPs only; accessed via Tailscale
 - **GitHub PAT (handbook-bot):** Scoped to `repo:write` only; rotate quarterly; store in GitHub Secrets
 - **Notion API token:** Scoped to specific database IDs only
 - **No user authentication in current epics** — pipeline system only. User auth is Phase 2.

@@ -1,7 +1,7 @@
 # cherry-in-the-haystack UX Design Specification
 
-_Created on 2026-02-28 by HK_
-_Generated using BMad Method - Create UX Design Workflow v1.0_
+_Updated on 2026-04-04 by HK (based on actual web frontend implementation)_
+_Original: 2026-02-28_
 
 ---
 
@@ -21,9 +21,9 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 
 **Emotional Goals:** Oriented · Sharp · Confident · In Control · FOMO-free
 
-**Platform:** Mobile-first (commute consumption), desktop-optimized for deep work sessions (personalization config, Newsletter Studio)
+**Platform:** Mobile-first (commute consumption), desktop-optimized for deep work sessions
 
-**Design Inspiration:** Obsidian (deliberate navigation, knowledge graph feel, no endless scroll) + Morning Brew (structured sections, satisfying completeness)
+**Design Inspiration:** Clean, modern light-mode aesthetic with sophisticated component system
 
 **UX Principle:** Users should _navigate_ Cherry like a map, not _scroll_ it like a feed.
 
@@ -33,828 +33,885 @@ _Generated using BMad Method - Create UX Design Workflow v1.0_
 
 ### 1.1 Design System Choice
 
-**Selected:** shadcn/ui (v2, Tailwind CSS v4)
+**Selected:** shadcn/ui (New York style) + Tailwind CSS
 
-**Rationale:** Cherry needs visual distinctiveness (Obsidian-inspired, not generic SaaS) with strong defaults. shadcn/ui provides composable components copied directly into the project — full ownership, no black-box dependency. Radix UI primitives underneath give accessibility for free (keyboard nav, ARIA, focus management). Tailwind CSS enables mobile-first responsive design with minimal overhead.
+**Rationale:** Cherry needed a production-ready design system with full ownership. shadcn/ui provides composable components copied directly into the project — no black-box dependency. Radix UI primitives underneath give accessibility for free (keyboard nav, ARIA, focus management). Tailwind CSS enables mobile-first responsive design with minimal overhead.
 
 **What it provides:**
 
-- Full component library: buttons, forms, dialogs, cards, navigation, dropdowns, toasts, tables
+- Full component library: 50+ components including buttons, forms, dialogs, cards, navigation, dropdowns, toasts, tables
 - Accessible by default (WCAG 2.1 AA compliant primitives)
-- Dark/light mode theming with CSS variables
+- Light/dark mode theming with CSS variables
 - Responsive utilities via Tailwind
+- New York style configuration for modern aesthetic
 
-**Custom components needed:**
+**Custom components implemented:**
 
-- Concept knowledge graph visualization (no standard component covers this)
-- "Completeness signal" / FOMO-free progress indicator (novel pattern)
-- Newsletter Studio editor panel
-- Personalization scoring criteria input (natural language → weights)
-- Content card variants (concept page card vs news item card vs newsletter draft card)
+- Tree-stem sidebar navigation with curved branches
+- Interactive treemap visualization
+- News cards with star ratings
+- Mobile sheet-based navigation
+- Page header component
+- Handbook placeholder pages
+- Patch notes timeline
+- Concept pages (frameworks, model updates, case studies)
 
-**Customization approach:** Override shadcn/ui CSS variables for Cherry's brand palette; extend Tailwind config for custom spacing/typography scale.
+### 1.2 Theme System
 
----
+**Theme Provider:** Uses `next-themes` for seamless theme switching
 
-## 2. Core User Experience
+**Supported Themes:**
+- Light mode (default)
+- Dark mode (via `.dark` class)
 
-### 2.1 Defining Experience
-
-**Core loop:** Navigate structured knowledge → land on a concept or news page → feel instantly oriented and caught up.
-
-**The ONE thing users do most:** Browse and read curated LLM knowledge — consuming concept pages (Overview → Child Concepts → Progressive References) and weekly news digests.
-
-**What must be effortless:** Getting from intent to insight. Whether "what's new in LLMs this week?" or "explain RAG to me" — zero friction, immediate value.
-
-**Most critical to get right:** The concept page reading experience and the weekly news digest — these are where Cherry's core value is delivered.
-
-**UX Principle — Navigate, Don't Scroll:** Cherry should feel like a **map you navigate**, not a feed you consume infinitely. Users open sections deliberately, read with purpose, and leave satisfied — not anxious.
-
-### 2.3 Core Experience Principles
-
-| Principle       | Decision                                                                                   | Rationale                                                                         |
-| --------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| **Speed**       | Instant feel — skeleton screens, no blank states, immediate navigation                     | Commute users have 2–3 min; every ms counts                                       |
-| **Guidance**    | Light-touch — zero friction for reading; contextual prompts for personalization setup only | Engineers don't want to be babied; onboarding only where complexity warrants it   |
-| **Flexibility** | Structured content layout (Cherry controls) + flexible filtering (user controls)           | Reading UX is opinionated for clarity; personalization is the paid differentiator |
-| **Feedback**    | Subtle, satisfying micro-confirmations — not celebratory toasts                            | Engineers prefer signal over noise; rewards should feel earned, not manufactured  |
-
-### 2.2 Novel UX Patterns
-
-#### The Completeness Signal (Anti-FOMO Pattern)
-
-**Challenge:** Most content platforms make users feel like there's always more to read. Cherry needs the opposite — users should feel _done_ and _caught up_, not anxious.
-
-**Pattern Name:** The Completeness Signal
-**User Goal:** Know they haven't missed anything important since their last visit
-
-**Design Solution:** Morning Brew-style "end card" — **only in Patchnotes**
-
-- Patchnotes has a **defined, finite scope** (all changes since last visit, chronological)
-- When a user reaches the end, they see a satisfying end state: _"You're caught up — [date range] reviewed"_
-- Clear temporal boundary (last visit → today) so users know exactly what "caught up" means
-- "Newly Discovered" and concept pages are browsable, not finite — no end-card there
-
-**States:**
-
-- Default: "Last visit: [date] → Today: [date] · X days of updates"
-- In progress: Timeline items scrolled through, badge drains
-- Complete: End card with date range + 3 stats (updates reviewed, areas changed, status: Current)
-
-**Rationale:** Users chose Cherry precisely to escape FOMO. The UI must actively signal completeness in the one section designed for catch-up (Patchnotes), while leaving discovery sections (Newly Discovered, Basics, Advanced) intentionally open-ended.
-
-**Accessibility:** Keyboard navigable; screen reader announces "End of Patchnotes. You are caught up as of [date]."
+**Color Format:** OKLCH color space for better color management and perceptual uniformity
 
 ---
 
-## 3. Visual Foundation
+## 2. Visual Foundation
 
-### 3.1 Color System
+### 2.1 Color System
 
-**Selected Theme:** Obsidian Night — deep purple-slate backgrounds, cherry-red accent, violet secondary
+**Selected Theme:** Light mode default with cherry brand accents
 
-**Rationale:** Dark-mode-native for engineer users. The data visualization elements (treemap, keyword trend charts) pop on dark backgrounds. Cherry-red accent is singular and memorable — one bold signal color that cuts through the darkness, consistent with the product name. Preserves the existing site's dark mode default while dramatically upgrading visual sophistication.
+**Color Tokens (Light Mode):**
 
-**Color Tokens:**
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--background` | `#F7F6F9` | App background (light cream) |
+| `--foreground` | `#1A1626` | Primary text (deep purple) |
+| `--card` | `#FFFFFF` | Card background (white) |
+| `--card-foreground` | `#1A1626` | Card text |
+| `--popover` | `#FFFFFF` | Popover/dropdown background |
+| `--popover-foreground` | `#1A1626` | Popover text |
+| `--border` | `#E4E1EE` | All borders and dividers |
+| `--input` | `#E4E1EE` | Input field borders |
 
-| Token                 | Hex       | Usage                                           |
-| --------------------- | --------- | ----------------------------------------------- |
-| `--color-bg`          | `#13111A` | App background                                  |
-| `--color-surface`     | `#1C1927` | Cards, sidebars, panels                         |
-| `--color-elevated`    | `#241F32` | Modals, dropdowns, popovers                     |
-| `--color-border`      | `#2A2535` | All borders and dividers                        |
-| `--color-text`        | `#E8E4F0` | Primary text                                    |
-| `--color-muted`       | `#8B849E` | Secondary text, timestamps, labels              |
-| `--color-cherry`      | `#C94B6E` | Primary accent — CTAs, active states, links     |
-| `--color-cherry-soft` | `#2D1F26` | Cherry accent backgrounds (badges, highlights)  |
-| `--color-violet`      | `#7B5EA7` | Secondary — section labels, concept graph nodes |
-| `--color-violet-soft` | `#221A33` | Violet accent backgrounds                       |
-| `--color-success`     | `#3D7A5E` | Success states                                  |
-| `--color-warning`     | `#8A6A2E` | Warning states                                  |
-| `--color-error`       | `#8A2E3E` | Error states                                    |
+**Semantic Colors:**
 
-**Data Visualization Palette** (for treemap, charts, keyword trends):
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--primary` | `#C94B6E` | Primary brand color (cherry) |
+| `--primary-foreground` | `#FFFFFF` | Text on primary background |
+| `--secondary` | `#F2F0F7` | Secondary background (light purple-gray) |
+| `--secondary-foreground` | `#1A1626` | Text on secondary |
+| `--muted` | `#F2F0F7` | Muted background |
+| `--muted-foreground` | `#9E97B3` | Muted text (soft purple) |
+| `--accent` | `#FDF0F3` | Accent background (cherry soft) |
+| `--accent-foreground` | `#C94B6E` | Text on accent |
 
-- Sector 1 (Models/Research): `#C94B6E` (cherry)
-- Sector 2 (Frameworks/Tools): `#7B5EA7` (violet)
-- Sector 3 (Business/Enterprise): `#3D7A5E` (teal-green)
-- Sector 4 (Governance/Ecosystem): `#8A6A2E` (amber)
-- Trending up: `#3D7A5E` · Trending down: `#8A2E3E`
+**Functional Colors:**
 
-### 3.2 Typography
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--destructive` | `#C94B6E` | Error/danger states |
+| `--destructive-foreground` | `#FFFFFF` | Text on destructive |
+| `--success` | `#2D7A5E` | Success states (green) |
+| `--success-soft` | `#EFF7F3` | Success background |
+| `--ring` | `#C94B6E` | Focus ring (cherry) |
+
+**Brand Tokens:**
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--cherry` | `#C94B6E` | Primary cherry brand |
+| `--cherry-soft` | `#FDF0F3` | Cherry with opacity |
+| `--cherry-border` | `#F2C4CE` | Light cherry border |
+| `--violet` | `#7B5EA7` | Secondary brand color |
+| `--violet-soft` | `#F3EFFA` | Violet with opacity |
+| `--violet-border` | `#C7B8E8` | Light violet border |
+
+**Text Hierarchy:**
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--text-primary` | `#1A1626` | Main headings |
+| `--text-secondary` | `#6B6480` | Secondary headings |
+| `--text-body` | `#3D3652` | Body text |
+| `--text-muted` | `#9E97B3` | Disabled/placeholder |
+
+**Chart Colors:**
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--chart-1` | `#C94B6E` | Cherry (primary) |
+| `--chart-2` | `#7B5EA7` | Violet (secondary) |
+| `--chart-3` | `#2D7A5E` | Green (tertiary) |
+| `--chart-4` | `#D4854A` | Amber (quaternary) |
+| `--chart-5` | `#4A90D9` | Blue (quinary) |
+
+**Sidebar Specific:**
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--sidebar` | `#FFFFFF` | Sidebar background |
+| `--sidebar-foreground` | `#6B6480` | Sidebar text |
+| `--sidebar-primary` | `#C94B6E` | Sidebar active |
+| `--sidebar-primary-foreground` | `#FFFFFF` | Text on sidebar active |
+| `--sidebar-accent` | `#F2F0F7` | Sidebar hover |
+| `--sidebar-accent-foreground` | `#1A1626` | Text on sidebar hover |
+| `--sidebar-border` | `#E4E1EE` | Sidebar border |
+| `--sidebar-ring` | `#C94B6E` | Sidebar focus ring |
+
+### 2.2 Typography
 
 **Font Stack:**
 
-- **Headings:** `Inter` (or system-ui fallback) — variable weight, tight letter-spacing for sharp headers
-- **Body:** `Inter` — 16px base, 1.7 line-height for comfortable reading
-- **Code/Monospace:** `'JetBrains Mono', 'Fira Code', monospace` — for inline code snippets, concept IDs
+| Role | Font | Usage |
+|------|------|-------|
+| **Primary** | `'Geist', 'Inter', sans-serif` | UI elements, body text |
+| **Display** | `'Plus Jakarta Sans', sans-serif` | Headings, emphasis |
+| **Monospace** | `'Geist Mono', monospace` | Code, technical content |
+| **Legacy** | `'Inter', sans-serif` | Fallback support |
 
 **Type Scale:**
-| Role | Size | Weight | Letter-spacing |
-|------|------|--------|----------------|
-| h1 (Page title) | 28px | 700 | -0.5px |
-| h2 (Section) | 20px | 600 | -0.3px |
-| h3 (Subsection) | 16px | 600 | 0 |
-| Body | 14px | 400 | 0 |
-| Small / Meta | 12px | 400 | 0 |
-| Label / Caps | 11px | 600 | +0.8px uppercase |
-| Code inline | 12px | 400 | 0 (monospace) |
 
-### 3.3 Spacing & Layout
+| Role | Size | Weight | Line-height |
+|------|------|--------|-------------|
+| **h1 (Page title - mobile)** | `20px` | 800 (extrabold) | none |
+| **h1 (Page title - desktop)** | `30px` | 800 (extrabold) | none |
+| **h2 (Section)** | `17px` | 600-700 (semibol/bold) | snug |
+| **h3 (Card title)** | `16px` | 700 (bold) | snug |
+| **Body** | `14px` | 400 (regular) | relaxed (1.6) |
+| **Small** | `13px` | 400 (regular) | relaxed |
+| **Meta/Label** | `11px` | 700 (bold) | - |
+| **Badge text** | `11px` | 700 (bold) | +0.6px letter-spacing (uppercase) |
+| **Tiny label** | `10px` | 400 (regular) | - |
 
-**Base unit:** 4px grid
+**CSS Variables:**
 
-**Spacing scale:**
-`xs=4px · sm=8px · md=12px · lg=16px · xl=24px · 2xl=32px · 3xl=48px · 4xl=64px`
+```css
+--font-sans: 'Geist', 'Inter', sans-serif;
+--font-mono: 'Geist Mono', monospace;
+--font-rounded: 'Plus Jakarta Sans', sans-serif;
+--font-inter: 'Inter', sans-serif;
+```
 
-**Layout grid:**
+**Typography Classes:**
 
-- Desktop: 12-column, 1280px max container, 24px gutters
-- Tablet: 8-column, 768px, 20px gutters
-- Mobile: 4-column, full-width, 16px gutters
+```tsx
+/* Page Header */
+<h1 className="font-extrabold text-[#1A1626] leading-none mb-2.5 text-[20px] lg:text-[30px]">
 
-**Interactive Visualizations:**
+/* Subtitle */
+<p className="text-[13px] lg:text-[15px] text-text-muted leading-relaxed">
 
-- Color Theme Explorer: [ux-color-themes.html](./ux-color-themes.html)
+/* News Card Title */
+<h3 className="text-[16px] font-bold text-[#1A1626] leading-snug mb-2">
 
----
+/* News Summary */
+<p className="text-[14px] text-text-body leading-relaxed mb-3">
 
-## 4. Design Direction
+/* Badge Text */
+<span className="text-[11px] font-bold uppercase tracking-[0.6px] px-2.5 py-1 rounded-full">
+```
 
-### 4.1 Chosen Design Approach
+### 2.3 Spacing & Layout
 
-**Selected: Left Sidebar Navigator + Context-Appropriate Content Layouts**
+**Base unit:** 4px grid (Tailwind default)
 
-A hybrid of two approved directions — the persistent left sidebar from Direction 1 combined with the focused concept reading experience from Direction 6. The sidebar is the constant anchor across all screens; the main area adapts to what is being viewed.
+**Spacing Scale:**
 
-**Navigation Architecture:**
+| Token | Value | Usage |
+|-------|-------|-------|
+| `tiny` | `0.25rem` (4px) | Micro spacing |
+| `small` | `0.5rem` (8px) | Compact spacing |
+| `medium` | `1rem` (16px) | Default spacing |
+| `large` | `1.5rem` (24px) | Comfortable spacing |
+| `xl` | `2rem` (32px) | Generous spacing |
+| `xxl` | `3rem` (48px) | Section spacing |
 
-- **Left sidebar (220px, persistent desktop):** 4-section hierarchy
-  1. **Digest** — This Week's Highlight, Patchnotes
-  2. **Basics** — Prompting Techniques, RAG, Fine-tuning, Agent Architectures, Embeddings & Vector DBs, Evaluation
-  3. **Advanced** — Chain-of-Thought, Multi-hop RAG, PEFT/LoRA/QLoRA, Multi-agent Systems, Custom Embeddings, Adversarial Evaluation
-  4. **Newly Discovered** — Research & Models (Model Updates, Papers & Benchmarks) · Service & System Building (Frameworks, Tools, Shared Resources) · Industry & Business ⭐ (Case Studies) · Ecosystem & Governance (Regulations, Big Tech Trends, This Week's Posts)
-- **My Feed — Paid** pinned button at sidebar bottom
+**Border Radius:**
 
-**Content Area Layouts by Section:**
+| Token | Value | Usage |
+|-------|-------|-------|
+| Default | `0.75rem` (12px) | Cards, buttons |
+| Small | `calc(var(--radius) - 4px)` | Small elements |
+| Medium | `calc(var(--radius) - 2px)` | Medium elements |
+| Large | `var(--radius)` | Large elements |
+| XL | `calc(var(--radius) + 4px)` | Extra large elements |
 
-| Section                        | Layout                                                     | Key Elements                                            |
-| ------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------- |
-| This Week's Highlight          | 2-column (treemap / keywords+must-reads) + full-width feed | Metrics strip, treemap hero, keyword pills, ranked list |
-| Patchnotes                     | Single-column centered (max 740px)                         | Timeline, end-card (only here)                          |
-| Newly Discovered sub-pages     | Single-column + optional right aside                       | Leaderboard/articles by category                        |
-| Concept Page (Basics/Advanced) | 3-column (nav / reading / roadmap)                         | Focused reading, roadmap graph, digest callout          |
-| Mobile all sections            | Single column + bottom nav                                 | Treemap on dashboard, bottom tab navigation             |
+**Layout Grid:**
 
-**Layout Decisions:**
+| Breakpoint | Range | Container | Gutters |
+|------------|-------|-----------|---------|
+| Mobile | `0 - 1023px` | Full width | `16px` (px-4) |
+| Desktop (lg) | `≥ 1024px` | Max `1440px` | `40px` (lg:px-10) |
+| Wide | `≥ 1440px` | Max `1440px` centered | `40px` |
 
-- Navigation: Persistent left sidebar (desktop) / Bottom tab bar (mobile)
-- Visual density: Balanced — comfortable reading with generous line-height, compact metadata
-- Information hierarchy: Section label → page title → meta → content (consistent across all pages)
-- Border style: Subtle — 1px `--color-border` on all cards/panels; no drop shadows
-- Depth cues: Background color steps (`--bg` < `--surface` < `--elevated`) replace shadows
-
-**Interaction Decisions:**
-
-- Primary action: Direct navigation — click sidebar item → content loads (no confirmation)
-- Information disclosure: Progressive — overview (dashboard) → category drill-down → item detail
-- User control: Structured reading experience (Cherry decides layout); flexible filtering (user decides category)
-
-**Interactive Mockups:**
-
-- Design Direction Showcase: [ux-design-directions.html](./ux-design-directions.html)
-
----
-
-## 5. User Journey Flows
-
-### 5.1 Critical User Paths
-
-Five critical journeys cover the full product scope across all tiers.
+**Sidebar Width:** `240px` (hidden on mobile)
 
 ---
 
-#### Journey 1: Browse This Week's Highlight (Free Tier — Primary)
+## 3. Component Library
 
-**User Goal:** Stay current with what's happening in LLMs this week in 3–5 minutes.
-**Entry Point:** Cherry homepage (This Week's Highlight dashboard)
-**Approach:** Single-screen overview → category drill-down → item read
+### 3.1 Shadcn/ui Components (50+)
 
-**Flow:**
+**Navigation:**
+- `navigation-menu.tsx` - Horizontal navigation
+- `breadcrumb.tsx` - Breadcrumb trails
+- `tabs.tsx` - Tabbed content
+- `separator.tsx` - Visual dividers
 
-1. **Land on dashboard.** See week label, 4 metrics (items, topics, keywords, must-reads), treemap, trending keywords, must-reads list.
-2. **Scan treemap** → understand which sectors dominated this week (Models 38%, Frameworks 28%, etc.)
-3. **Optional: Click treemap sector or category tab** → filtered feed showing only that category's items
-4. **Scan must-reads** → read title + 1-line summary for each starred item
-5. **Click an item** → opens article source in new tab (external link) OR navigates to Cherry concept page if linked
-6. **Optional detour:** Notice a trending keyword → click to explore related concept in Basics/Advanced
+**Overlays:**
+- `dialog.tsx` - Modal dialogs
+- `sheet.tsx` - Side sheets (mobile drawer)
+- `drawer.tsx` - Drawer component
+- `popover.tsx` - Hover/popover content
+- `dropdown-menu.tsx` - Dropdown menus
+- `context-menu.tsx` - Right-click menus
+- `alert-dialog.tsx` - Alert confirmations
+- `hover-card.tsx` - Hover info cards
 
-**Decision Points:**
+**Feedback:**
+- `alert.tsx` - Alert banners
+- `toast.tsx` + `toaster.tsx` - Toast notifications
+- `sonner.tsx` - Alternative toast system
+- `skeleton.tsx` - Loading placeholders
+- `progress.tsx` - Progress bars
+- `spinner.tsx` - Loading spinners
 
-- External article → new tab, user returns to Cherry after reading
-- Cherry concept link → in-app navigation to concept page (Journey 2)
-- No time → user scans treemap + keywords alone (30 seconds of value delivered)
+**Form Elements:**
+- `button.tsx` + `button-group.tsx` - Buttons
+- `input.tsx` + `input-group.tsx` + `textarea.tsx` - Text inputs
+- `select.tsx` - Dropdown selects
+- `checkbox.tsx` - Checkboxes
+- `radio-group.tsx` - Radio buttons
+- `switch.tsx` - Toggle switches
+- `slider.tsx` - Range sliders
+- `calendar.tsx` - Date picker
+- `input-otp.tsx` - OTP input
+- `form.tsx` - Form wrapper (react-hook-form + zod)
+- `field.tsx` - Form field wrapper
+- `label.tsx` - Form labels
 
-**Success State:** User closes tab feeling "I know what happened in LLMs this week." No end-card needed — this section is browsable, not finite.
+**Data Display:**
+- `card.tsx` - Card containers
+- `badge.tsx` - Status badges
+- `avatar.tsx` - User avatars
+- `table.tsx` - Data tables
+- `empty.tsx` - Empty states
+- `item.tsx` - List items
+- `pagination.tsx` - Pagination controls
 
-**Error States:** Content not loaded → skeleton screens hold layout, retry automatically.
+**Advanced:**
+- `command.tsx` - Command palette (cmdk)
+- `collapsible.tsx` - Collapsible sections
+- `accordion.tsx` - Accordion lists
+- `resizable.tsx` - Resizable panels
+- `scroll-area.tsx` - Custom scrollbars
+- `carousel.tsx` - Image carousels
+- `chart.tsx` - Charts (recharts)
+- `aspect-ratio.tsx` - Aspect ratio containers
+- `toggle.tsx` + `toggle-group.tsx` - Toggle buttons
+- `tooltip.tsx` - Tooltip hints
+- `kbd.tsx` - Keyboard key display
+- `menubar.tsx` - Application menu bar
 
----
+**Utilities:**
+- `use-mobile.tsx` - Responsive hook
 
-#### Journey 2: Read a Concept Page (All Tiers — Primary)
+### 3.2 Custom Cherry Components
 
-**User Goal:** Learn about or reference a specific LLM concept (e.g., RAG, Fine-tuning).
-**Entry Points:** Sidebar nav (click concept name) · Search (⌘K) · Related concept card on another page · Roadmap graph node
-**Approach:** Direct navigation → focused reading → optional lateral exploration
+#### Component 1: Sidebar Navigation (`sidebar.tsx`)
 
-**Flow:**
+**Purpose:** Desktop navigation with tree-stem visual pattern
 
-1. **Click concept in sidebar** (e.g., "RAG" under Basics) → navigate to concept page
-2. **Oriented instantly:** See Basics/Advanced badge, page title, meta (updated date, sources, read time)
-3. **Read Section 01 — Overview:** Opinionated definition + when to use it + practical framing
-4. **Scan Section 02 — Related Concepts:** Cards showing prerequisite / subtopic / extends / related relationships
-   - Optional: Click a related concept card → navigate to that page (same journey restarts)
-   - Notice "⚡ New →" card → Contextual Retrieval just appeared in Newly Discovered
-5. **Read Section 03 — Progressive References:** Start Here → Next → Deeper
-   - Click reference → opens external resource in new tab
-6. **Optional: Use roadmap graph (right panel)** → see "YOU ARE HERE" in learning path, click next concept node
+**Features:**
+- Persistent 240px width on desktop (hidden on mobile)
+- Curved SVG connectors for child items
+- Active state highlighting with cherry color
+- Hover states with color transitions
+- Sections → Items → Child items hierarchy
+- Adaptive text sizing for long labels
 
-**Decision Points:**
+**Anatomy:**
+```tsx
+<section className="flex flex-col gap-6 px-6 py-8">
+  {/* Section header */}
+  <div className="font-semibold text-[10px] uppercase tracking-wider text-text-muted">
+    {section}
+  </div>
 
-- Follow related concept → re-enter Journey 2 at new concept
-- Follow reference link → leave Cherry temporarily (external tab)
-- Use roadmap graph → navigate to next concept in learning sequence
-- Click "⚡ New in Digest" callout → navigate to Newly Discovered item
+  {/* Items with tree stems */}
+  <div className="flex flex-col gap-1">
+    {items.map((item) => (
+      <div key={item.id}>
+        {/* Item with optional tree stem for children */}
+        <Link href={item.href}>...</Link>
 
-**Success State:** User understands the concept and knows what to read next. Time on page: 3–10 min.
+        {/* Child items with curved connector */}
+        {item.children && (
+          <div className="relative ml-4">
+            <svg className="absolute left-0">...</svg>
+            {item.children.map(child => ...)}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+</section>
+```
 
----
+**States:**
+- Default: Muted text color
+- Hover: Cherry background with cherry text
+- Active: Cherry background (`bg-[#C94B6E]`) with white text
+- Active-violet: Violet background for concept pages
 
-#### Journey 3: Patchnotes Catch-Up (All Tiers — Primary)
-
-**User Goal:** Know everything that changed in the LLM ecosystem since the last visit.
-**Entry Point:** Click "📋 Patchnotes" in sidebar
-**Approach:** Linear, finite — scroll from last visit to today → end card
-
-**Flow:**
-
-1. **Land on Patchnotes.** See "Last visit: [date] → Today: [date] · X days of updates" banner.
-2. **Scroll through timeline** (newest first). Each item: date + category dot + title + 2-line impact summary.
-3. **Optional: Click item** → external article or Cherry concept page for full detail
-4. **Reach end of timeline** → End Card appears: "You're caught up · [date range] · X updates reviewed · X areas changed · Status: Current"
-5. **Optional next action:** "Explore more" links to This Week's Highlight or a highlighted concept
-
-**Decision Points:**
-
-- First-time user (no previous visit) → "Welcome! Here's everything from this week."
-- Long absence (>30 days) → "It's been a while — here are the 10 most impactful changes since [date]."
-
-**Error States:** No updates since last visit → "Nothing changed that passed our quality threshold. Check back next week."
-
-**Success State:** End-card reached. Badge in header clears to zero. "Current" status visible.
-
----
-
-#### Journey 4: Signup + Paid Personalization Setup (Conversion Flow)
-
-**User Goal:** Upgrade from free browsing to a personalized My Feed.
-**Entry Point:** Click "✦ My Feed — Paid" button in sidebar
-**Approach:** Wizard (4 steps: Pricing → Account → Preferences → Feed Preview)
-
-**Flow:**
-
-1. **Click "My Feed — Paid"** → Modal opens: tier comparison (Free vs Paid vs Enterprise). Paid features listed: custom sources, natural language scoring, personalized digest.
-2. **Click "Start Paid Trial"** → Account creation: email + password OR Google/GitHub OAuth
-3. **Email verified** → Land on Personalization Setup (Onboarding step 1/2):
-   - Prompt: _"Describe what matters to you as an AI engineer."_
-   - Example hint: _"I care more about practical engineering than theory. Skip governance and model benchmarks."_
-4. **User types preference** → AI parses → shows "Interpreted as:" chip list:
-   - Business Cases ↑ · Practical Tools ↑ · Regulations ↓ · Benchmarks ↓
-   - User adjusts chips (drag to reorder, click to toggle) or clicks "Looks right"
-5. **"Build My Feed"** → First personalized My Feed loads. Items rescored and filtered.
-6. **Optional:** Add custom sources (Onboarding step 2/2): paste RSS feed or URL, Cherry ingests and scores.
-
-**Decision Points:**
-
-- Skip personalization → My Feed loads with default weights; preferences accessible in Settings anytime
-- OAuth vs email → both supported; OAuth preferred (fewer friction points)
-- Enterprise plan → routes to sales contact flow instead of self-serve
-
-**Success State:** User sees first personalized feed. Can confirm relevance immediately. Preferences editable at any time.
-
----
-
-#### Journey 5: Newsletter Studio — Draft Creation (Enterprise Tier)
-
-**User Goal:** Create a polished LLM newsletter from this week's curated content in under 15 minutes.
-**Entry Point:** "Newsletter Studio" nav item (visible to Enterprise users only, top of sidebar)
-**Approach:** 4-step creation wizard → editor → export
-
-**Flow:**
-
-1. **Open Newsletter Studio.** See draft history sidebar + "New Draft" button. Click "New Draft."
-2. **Step 1 — Configure:**
-   - Tone: Professional / Casual / Technical (radio)
-   - Structure template: Highlights → Deep dive → Tool spotlight / Custom sections
-   - Audience level: Beginner / Intermediate / Expert
-   - Focus: Business / Technical / Research / Mixed
-3. **Step 2 — Select Content:**
-   - Browse This Week's Highlight items. Click to include (cherry check). Mix community + private sources.
-   - Minimum 3, recommended 5–10 items. See selection summary on right.
-4. **Step 3 — Generate:**
-   - Click "Generate Draft" → Progress bar with status ("Organizing structure… Drafting sections… Finalizing…")
-   - Draft appears in editor panel. Sections collapsible. Inline editing enabled.
-5. **Step 4 — Review + Export:**
-   - Edit inline or regenerate individual sections
-   - Save draft (auto-versioned) OR Export (copy HTML / send to Mailchimp/Sendgrid / download)
-
-**Decision Points:**
-
-- Regenerate with different config → preserves source selection, reruns generation
-- A/B variants → generate 2 versions from same sources, compare side by side
-- Save for later → auto-saved with version history, accessible on return
-
-**Success State:** Newsletter marked "Ready to send." Editor satisfaction confirmed. Time: <15 minutes.
+**Accessibility:**
+- `role="navigation"`
+- `aria-label="Main navigation"`
+- Active item: `aria-current="page"`
+- Section headers: `role="group"`
 
 ---
 
-## 6. Component Library
+#### Component 2: Mobile Sidebar (`mobile-sidebar.tsx`)
 
-### 6.1 Component Strategy
+**Purpose:** Sheet-based mobile navigation
 
-**From shadcn/ui (use as-is or with CSS variable overrides):**
-Button, Input, Textarea, Select, Checkbox, RadioGroup, Switch, Form, Label, Card, Badge, Separator, Tabs, Dialog, Sheet (mobile drawer), DropdownMenu, NavigationMenu, Toast, Skeleton, Progress, ScrollArea, Tooltip, Avatar
+**Features:**
+- Full-height sheet on mobile
+- Same navigation structure as desktop
+- Swipe to dismiss
+- Trigger button in mobile header
 
-### 6.2 Custom Components
-
-Twelve custom components are required — none are covered adequately by shadcn/ui.
-
----
-
-**Component 1: Sidebar Navigation (`<SidebarNav>`)**
-
-|                |                                                                                                                          |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Purpose**    | 4-section hierarchical navigation — Digest, Basics, Advanced, Newly Discovered                                           |
-| **Why custom** | Requires 3-level hierarchy (section header → direct items → sub-items within sub-groups) not supported by NavigationMenu |
-
-_Anatomy:_
-
-- Section header (`.knav-h`): ALL-CAPS label, 10px, muted color, full width
-- Direct item (`.knav-item`): 12px, 20px left indent, hover: elevated bg
-- Sub-group label (`.knav-sg`): 8px, violet, 14px left indent, non-interactive
-- Sub-item (`.knav-sub`): 11px, 26px left indent, hover: elevated bg
-
-_States:_ Default · Hover (elevated bg) · Active/cherry (current top-level item) · Active-violet (current concept page item)
-
-_Accessibility:_ `role="navigation"`, `aria-label="Main navigation"`. Active item: `aria-current="page"`. Section headers: `role="group"`, `aria-label="[section name]"`.
+**Anatomy:**
+```tsx
+<Sheet>
+  <SheetTrigger className="lg:hidden">
+    {/* Menu button */}
+  </SheetTrigger>
+  <SheetContent side="left" className="w-[280px]">
+    {/* Navigation content */}
+  </SheetContent>
+</Sheet>
+```
 
 ---
 
-**Component 2: Treemap (`<BuzzTreemap>`)**
+#### Component 3: Buzz Treemap (`buzz-treemap.tsx`)
 
-|                |                                                                                                |
-| -------------- | ---------------------------------------------------------------------------------------------- |
-| **Purpose**    | Visualize weekly content distribution across sectors (Models, Frameworks, Business, Ecosystem) |
-| **Why custom** | No standard component; click-to-filter behavior is Cherry-specific                             |
+**Purpose:** Interactive category distribution visualization
 
-_Anatomy:_ CSS grid with 4 cells, proportional sizing by percentage. Each cell: sector label (8px caps), percentage (17px bold), item count + source names (9px).
+**Features:**
+- CSS grid with 4 cells (2x2 layout)
+- Responsive sizing (mobile: 72px/52px rows, desktop: 128px/88px rows)
+- Click-to-filter behavior
+- Radial gradients for depth
+- Dynamic font scaling based on percentage
 
-_States:_ Default · Hover (brightness +10%) · Selected (outline in sector color) · Loading (skeleton shimmer)
+**Anatomy:**
+```tsx
+<div className="grid grid-cols-2 gap-2 w-full">
+  {sectors.map(sector => (
+    <button
+      key={sector.id}
+      className={cn(
+        "relative overflow-hidden rounded-xl",
+        "transition-all duration-200",
+        "hover:brightness-90"
+      )}
+      style={{ backgroundColor: sector.color }}
+    >
+      {/* Percentage */}
+      <span className="text-[17px] font-bold">{sector.percentage}%</span>
 
-_Variants:_ Desktop (128px/88px rows) · Mobile (72px/52px rows, condensed labels)
+      {/* Label */}
+      <span className="text-[8px] uppercase tracking-wider">{sector.label}</span>
+    </button>
+  ))}
+</div>
+```
 
-_Behavior:_ Click sector → filter content feed to that sector. Click again → deselect (show all).
+**States:**
+- Default: Sector colors with gradients
+- Hover: Brightness reduced to 90%
+- Selected: Outline in sector color
 
----
-
-**Component 3: Keyword Pill (`<KeywordPill>`)**
-
-|                |                                                               |
-| -------------- | ------------------------------------------------------------- |
-| **Purpose**    | Display trending keyword with % change indicator              |
-| **Why custom** | Novel "hot" variant behavior (cherry fill + trend percentage) |
-
-_Anatomy:_ Rounded pill with keyword label + trend % badge.
-
-_Variants:_ Hot (cherry border + bg + cherry percentage) · Normal (muted border + muted color + green percentage) · Active (cherry fill)
-
-_States:_ Default · Hover (brightness shift) · Active (filled, click to filter)
-
----
-
-**Component 4: News Item (`<NewsItem>`)**
-
-|                |                                                                                   |
-| -------------- | --------------------------------------------------------------------------------- |
-| **Purpose**    | Compact list item in feeds — title, 1-line summary, category badge + score + date |
-| **Why custom** | Three-slot meta row (badge + stars + date) and read-state tracking                |
-
-_States:_ Default · Hover (elevated background) · Read (70% opacity, slightly dimmed) · Must-read (cherry left border accent)
-
-_Variants:_ Compact (title + meta only) · Full (title + summary + meta)
-
----
-
-**Component 5: Concept Card (`<ConceptCard>`)**
-
-|                |                                                                                            |
-| -------------- | ------------------------------------------------------------------------------------------ |
-| **Purpose**    | Related concept link in concept page Section 02                                            |
-| **Why custom** | Relationship label (prerequisite / subtopic / extends / related) + "new in digest" variant |
-
-_Anatomy:_ Relationship label (9px violet caps) + concept name (12px bold) + description (10px muted)
-
-_States:_ Default (subtle border) · Hover (violet border) · New-in-digest (cherry border + "⚡ New →" label)
+**Variants:**
+- Mobile: Condensed labels, smaller cells
+- Desktop: Full labels, larger cells
 
 ---
 
-**Component 6: Progressive Reference (`<ProgressiveRef>`)**
+#### Component 4: Top Items List (`top-items-list.tsx`)
 
-|                |                                                                                 |
-| -------------- | ------------------------------------------------------------------------------- |
-| **Purpose**    | Learning path reference item in concept page Section 03                         |
-| **Why custom** | Difficulty level indicator + "what it adds" annotation — no standard equivalent |
+**Purpose:** News cards with star ratings and badges
 
-_Anatomy:_ Left border (2px, colored by level) + level label (9px caps) + title (12px bold) + summary (11px) + adds-note (10px violet italic)
+**Features:**
+- Border cards with left accent border
+- Color-coded badges (cherry/violet/green)
+- Star ratings with ★ characters
+- Hover effects with shadow transitions
+- Responsive card list
 
-_Variants:_ Start Here (cherry border) · Next (border) · Deeper (border) · Expert (violet border)
+**Anatomy:**
+```tsx
+<Card className="border-l-4 border-l-[#C94B6E]">
+  <CardHeader>
+    <div className="flex items-start justify-between gap-3">
+      <div className="flex-1">
+        <Badge variant="cherry">{category}</Badge>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{summary}</CardDescription>
+      </div>
 
-_States:_ Default · Hover (border highlights to cherry) · Visited (subtle opacity)
+      {/* Star rating */}
+      <div className="flex gap-0.5">
+        {[1,2,3,4,5].map(star => (
+          <span className={cn(star <= rating ? "text-[#C94B6E]" : "text-text-muted")}>
+            ★
+          </span>
+        ))}
+      </div>
+    </div>
+  </CardHeader>
+</Card>
+```
 
----
+**States:**
+- Default: Subtle border
+- Hover: Shadow elevation (`shadow-card-hover`)
+- Must-read: Cherry left border accent
+- Read: 70% opacity
 
-**Component 7: Company Leaderboard Card (`<LeaderboardCard>`)**
-
-|                |                                                                     |
-| -------------- | ------------------------------------------------------------------- |
-| **Purpose**    | Company benchmark ranking in Newly Discovered / Model Updates       |
-| **Why custom** | Rank + score + model list layout; "new entry" and "leader" variants |
-
-_States:_ Default · Leading (cherry border + soft bg) · New-entry (cherry "NEW ↑" badge) · Hover (violet border)
-
----
-
-**Component 8: Rising Star Card (`<RisingStarCard>`)**
-
-|                |                                                                         |
-| -------------- | ----------------------------------------------------------------------- |
-| **Purpose**    | Full-width highlight for the week's most-trending model or tool         |
-| **Why custom** | Cherry-soft background card with stats row — unique to Newly Discovered |
-
-_Anatomy:_ Tag (9px caps, "🔥 Rising Star") + name (17px bold) + sub-headline (12px cherry) + body text + stats row (4 metrics)
-
----
-
-**Component 9: Completeness End Card (`<PatchnotesEndCard>`)**
-
-|                |                                                                                     |
-| -------------- | ----------------------------------------------------------------------------------- |
-| **Purpose**    | Signals "You're caught up" at the end of Patchnotes — the anti-FOMO payoff          |
-| **Why custom** | Novel pattern with no standard equivalent; only appears once per Patchnotes session |
-
-_Anatomy:_ ✓ icon (30px) + title "You're caught up" (18px bold, cherry) + date range sub-text + 3-stat row (updates reviewed / areas changed / status)
-
-_States:_ Default (appears when user scrolls to end) · Arrival animation (gentle fade-in scale) · Completed (persists on re-visit with grayed "already reviewed" state)
-
-_Accessibility:_ `role="status"`, `aria-live="polite"`. Screen reader: "End of Patchnotes. You are caught up as of [date]."
+**Badge Variants:**
+- Cherry: Primary category/action
+- Violet: Secondary
+- Green: Success/positive
 
 ---
 
-**Component 10: Roadmap Graph (`<ConceptRoadmap>`)**
+#### Component 5: Page Header (`page-header.tsx`)
 
-|                |                                                                                                      |
-| -------------- | ---------------------------------------------------------------------------------------------------- |
-| **Purpose**    | Learning path visualization showing concept prerequisites, current position, and next steps          |
-| **Why custom** | SVG-based directed graph with "YOU ARE HERE" highlighting; no library covers this specific structure |
+**Purpose:** Page title and subtitle component
 
-_Anatomy:_ SVG with vertical track line + concept nodes (rectangles with level label + name) + branch nodes (dashed lines for subtopics/related) + Basics/Advanced divider + legend
-
-_Current node:_ Cherry border (#C94B6E), cherry-soft fill, "YOU ARE HERE" label (9px caps, cherry)
-
-_Advanced nodes:_ Violet border (#7B5EA7), violet-soft fill
-
-_States:_ Default · Hover on node (cursor pointer, slight glow) · Click node (navigates to concept page)
-
----
-
-**Component 11: Personalization Criteria Input (`<ScoringCriteriaInput>`)**
-
-|                |                                                                                               |
-| -------------- | --------------------------------------------------------------------------------------------- |
-| **Purpose**    | Natural language → scoring weights. User describes preferences; AI interprets and shows chips |
-| **Why custom** | Two-phase input: free text → AI parse → editable chip list                                    |
-
-_Anatomy:_ Textarea (placeholder with example) → "Interpreted as:" chip row → each chip: label + up/down arrow weight control + remove × → Confirm CTA
-
-_States:_ Idle (textarea focused) · Parsing (spinner in corner) · Chips shown (editable) · Confirmed (locked, edit link appears)
+**Anatomy:**
+```tsx
+<div className="mb-8">
+  <h1 className="font-extrabold text-[#1A1626] leading-none mb-2.5 text-[20px] lg:text-[30px]">
+    {title}
+  </h1>
+  {subtitle && (
+    <p className="text-[13px] lg:text-[15px] text-text-muted leading-relaxed">
+      {subtitle}
+    </p>
+  )}
+</div>
+```
 
 ---
 
-**Component 12: Category Filter Tabs (`<CategoryTabs>`)**
+#### Component 6: Handbook Placeholder (`handbook-placeholder.tsx`)
 
-|                |                                                                                                |
-| -------------- | ---------------------------------------------------------------------------------------------- |
-| **Purpose**    | Filter content feed by category on dashboard and drill-down pages                              |
-| **Why custom** | Each tab has a distinct active color per category (models = cherry, frameworks = violet, etc.) |
+**Purpose:** Coming soon pages with status indicators
 
-_Variants:_ All (cherry active) · Models (cherry-warm active) · Frameworks (violet active) · Case Studies (teal active) · Custom (extensible per section)
+**Features:**
+- Status badges with timelines
+- 2-column grid for expectations
+- Color coding by section (BASICS/ADVANCED)
+- Notification button
 
----
+**Anatomy:**
+```tsx
+<div className="flex flex-col items-center justify-center py-16 px-4">
+  <Badge variant="outline" className="mb-4">
+    Coming {timeline}
+  </Badge>
 
-## 7. UX Pattern Decisions
+  <h2 className="text-[24px] font-bold text-text-primary mb-3">
+    {title}
+  </h2>
 
-### 7.1 Consistency Rules
+  <p className="text-[14px] text-text-body text-center max-w-md mb-8">
+    {description}
+  </p>
 
-Nine pattern categories establish consistent behavior across all screens.
+  {/* Expectations grid */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+    {expectations.map(expectation => (
+      <div key={expectation.id} className="flex items-start gap-3">
+        <CheckIcon className="text-[#2D7A5E]" />
+        <span className="text-[13px] text-text-body">{expectation.text}</span>
+      </div>
+    ))}
+  </div>
 
----
+  <Button variant="outline">
+    <BellIcon />
+    Notify me when ready
+  </Button>
+</div>
+```
 
-**Button Hierarchy**
-
-| Level     | Style                                              | Usage                                                        |
-| --------- | -------------------------------------------------- | ------------------------------------------------------------ |
-| Primary   | Cherry fill, white text                            | Account signup, newsletter generate, personalization confirm |
-| Secondary | Surface bg + border, text color                    | Sidebar actions, secondary CTAs, cancel                      |
-| Ghost     | Transparent, hover elevated bg                     | Nav items, icon buttons, tag filters                         |
-| Danger    | Error-colored border + text                        | Delete draft, remove source                                  |
-| Disabled  | `opacity-50`, `cursor-not-allowed` on all variants | Form incomplete, feature locked                              |
-
----
-
-**Feedback Patterns**
-
-| Event                | Pattern                      | Duration            | Rationale                                            |
-| -------------------- | ---------------------------- | ------------------- | ---------------------------------------------------- |
-| Content loaded       | No feedback (expected)       | —                   | Engineers expect instant; toasting "loaded" is noise |
-| Item read / seen     | Subtle opacity change (70%)  | Persistent          | Visual progress without celebration                  |
-| Account saved        | Bottom-right toast (success) | 4s auto-dismiss     | Account action warrants confirmation                 |
-| Newsletter generated | Progress bar + status text   | Until complete      | Long operation needs visible progress                |
-| Error (system)       | Toast (error, persistent)    | Until dismissed     | Errors must not auto-disappear                       |
-| Error (form)         | Inline beneath field         | Until corrected     | Contextual is clearer than toast                     |
-| Loading (page)       | Skeleton screens             | Until content ready | Holds layout, reduces perceived wait                 |
-
----
-
-**Form Patterns**
-
-| Decision          | Choice                                                 | Rationale                                             |
-| ----------------- | ------------------------------------------------------ | ----------------------------------------------------- |
-| Label position    | Above input                                            | Consistent with shadcn/ui defaults; clearest for scan |
-| Required fields   | No asterisk — all required unless labeled "(optional)" | Cherry forms are minimal; optional is the exception   |
-| Validation timing | On blur                                                | Validate when user leaves field, not while typing     |
-| Error display     | Inline beneath input, red icon + red text              | Contextual, impossible to miss                        |
-| Help text         | Caption beneath input (always visible)                 | Engineers want to see examples without extra clicks   |
+**Color Coding:**
+- BASICS sections: Cherry accent
+- ADVANCED sections: Violet accent
 
 ---
 
-**Modal Patterns**
+#### Component 7: Patch Notes Page (`patch-notes-page.tsx`)
 
-| Decision         | Choice                                                                   |
-| ---------------- | ------------------------------------------------------------------------ |
-| Size SM          | Confirmations, alerts — max 400px                                        |
-| Size MD          | Forms (login, account setup, preferences) — max 560px                    |
-| Size LG          | Newsletter editor preview, content selection — max 800px                 |
-| Dismiss          | Click outside + Escape, EXCEPT destructive confirm (explicit close only) |
-| Focus management | Auto-focus first interactive element; trap Tab within modal              |
-| Stacking         | No nested modals — navigate within the modal instead                     |
+**Purpose:** Release notes with timeline
 
----
-
-**Navigation Patterns**
-
-| Decision      | Choice                                                                                                                                  |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Active state  | Cherry bg + cherry text (`knav-item.active`) for digest/section items; violet bg + violet text (`knav-item.active-v`) for concept pages |
-| Breadcrumbs   | Shown in Dir 6 top bar when content is >1 level deep; not shown on top-level pages                                                      |
-| Back button   | Browser native — app does not override `history.back()`                                                                                 |
-| Deep links    | All pages deep-linkable: `/digest/highlight`, `/basics/rag`, `/newly-discovered/model-updates`, etc.                                    |
-| URL structure | `/[section]/[subsection]` — clean, shareable, bookmarkable                                                                              |
+**Features:**
+- Chronological timeline
+- Date markers
+- Update categories
+- Impact summaries
 
 ---
 
-**Empty State Patterns**
+#### Component 8: Frameworks/Model Updates/Case Studies Pages
 
-| Context                               | Message + Action                                                                      |
-| ------------------------------------- | ------------------------------------------------------------------------------------- |
-| First visit (no history)              | "Welcome to Cherry. Start with This Week's Highlight →"                               |
-| No search results                     | "No results for '[query]' — try a related concept" + suggested links                  |
-| My Feed (no preferences)              | "Set your scoring criteria to see a personalized feed" + CTA to Personalization Setup |
-| Newly Discovered (no items this week) | "Nothing passed our quality threshold this week. Check back next week."               |
+**Purpose:** Content pages for Newly Discovered section
 
----
-
-**Confirmation Patterns**
-
-| Action                                       | Confirmation Level                                                       |
-| -------------------------------------------- | ------------------------------------------------------------------------ |
-| Delete newsletter draft                      | Modal with draft title — "Delete '[Draft Name]'? This cannot be undone." |
-| Leave newsletter editor with unsaved changes | Modal: "Save your draft?" → Save / Discard / Cancel                      |
-| Remove custom source                         | Inline confirmation row: "Remove [source name]? [Yes] [Cancel]"          |
-| Export newsletter                            | No confirmation needed — exports can be regenerated                      |
-| Account deletion                             | Two-step: type "DELETE" in field, then confirm button                    |
+**Components:**
+- `nd-frameworks-page.tsx` - Framework showcase
+- `nd-model-updates-page.tsx` - Model updates timeline
+- `nd-case-studies-page.tsx` - Case studies presentation
+- `concept-reader-page.tsx` - Concept relationships visualization
 
 ---
 
-**Notification Patterns**
+## 4. Layout Patterns
 
-| Decision           | Choice                                                            |
-| ------------------ | ----------------------------------------------------------------- |
-| Placement          | Bottom-right corner (desktop); bottom center (mobile)             |
-| Auto-dismiss       | Success: 4s · Info: 5s · Warning: persistent · Error: persistent  |
-| Max stacked        | 3 at once; oldest auto-dismissed when 4th appears                 |
-| Priority hierarchy | Error > Warning > Success > Info (higher priority always visible) |
+### 4.1 Page Structure
+
+**Desktop Layout:**
+```tsx
+<div className="flex h-screen overflow-hidden bg-background">
+  {/* Desktop sidebar - 240px, hidden on mobile */}
+  <Sidebar className="hidden lg:flex" />
+
+  {/* Content column */}
+  <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+    {/* Mobile header - visible on mobile only */}
+    <header className="flex lg:hidden items-center gap-2.5 px-4 h-14 bg-white border-b">
+
+    {/* Main content - responsive padding */}
+    <main className="flex-1 overflow-y-auto px-4 py-4 lg:px-10 lg:py-8">
+      {renderContent()}
+    </main>
+  </div>
+</div>
+```
+
+**Key Layout Elements:**
+- Sidebar: Fixed 240px width, hidden on mobile
+- Mobile header: 56px height, visible below lg breakpoint
+- Main content: Responsive padding (16px mobile, 40px desktop)
+- Content container: Max 1440px
+
+### 4.2 Responsive Breakpoints
+
+| Breakpoint | Tailwind | Width | Layout |
+|------------|----------|-------|--------|
+| Mobile | `default` | `0 - 1023px` | Single column, bottom/hamburger nav |
+| Desktop | `lg:` | `≥ 1024px` | Persistent sidebar, multi-column |
+| Wide | Custom | `≥ 1440px` | Same as desktop, centered content |
+
+**Responsive Classes:**
+```tsx
+/* Hide on mobile, show on desktop */
+className="hidden lg:flex"
+
+/* Mobile: 16px, Desktop: 40px */
+className="px-4 py-4 lg:px-10 lg:py-8"
+
+/* Mobile: 20px, Desktop: 30px */
+className="text-[20px] lg:text-[30px]"
+```
 
 ---
 
-**Search Patterns (⌘K Command Palette)**
+## 5. UX Pattern Decisions
 
-| Decision     | Choice                                                                     |
-| ------------ | -------------------------------------------------------------------------- |
-| Trigger      | `⌘K` / `Ctrl+K` keyboard shortcut, or click search icon in sidebar         |
-| Results      | Instant, debounced 150ms — no submit needed                                |
-| Result types | Concept pages (Basics/Advanced) · Newly Discovered items · Recent searches |
-| Filters      | Not in search — category browsing done via sidebar nav                     |
-| No results   | "No results found" + "Browse [closest section] →" suggestion               |
+### 5.1 Button Hierarchy
+
+| Level | Style | Usage |
+|-------|-------|-------|
+| Primary | Cherry fill, white text | Account signup, newsletter generate |
+| Secondary | Light background, primary text | Sidebar actions, secondary CTAs |
+| Ghost | Transparent, elevated hover | Nav items, icon buttons |
+| Outline | Border only, colored text | Cancel, secondary actions |
+| Destructive | Cherry fill (same as primary) | Delete, remove actions |
+| Disabled | `opacity-50`, `cursor-not-allowed` | Form incomplete, locked |
+
+### 5.2 Feedback Patterns
+
+| Event | Pattern | Duration | Rationale |
+|-------|---------|----------|-----------|
+| Content loaded | No feedback | — | Expected behavior |
+| Item read/seen | Subtle opacity (70%) | Persistent | Visual progress |
+| Account saved | Toast (success) | 4s auto-dismiss | Confirmation |
+| Error (system) | Toast (error) | Until dismissed | Must not auto-hide |
+| Error (form) | Inline beneath field | Until corrected | Contextual |
+| Loading (page) | Skeleton screen | Until ready | Holds layout |
+
+### 5.3 Form Patterns
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Label position | Above input | Clearest for scanning |
+| Required fields | No asterisk | All required unless "(optional)" |
+| Validation timing | On blur | Don't interrupt typing |
+| Error display | Inline beneath input | Contextual, clear |
+| Help text | Caption beneath input | Always visible |
+
+### 5.4 Modal Patterns
+
+| Decision | Choice |
+|----------|--------|
+| Size SM | Max 400px (confirmations) |
+| Size MD | Max 560px (forms) |
+| Size LG | Max 800px (editor) |
+| Dismiss | Click outside + Escape |
+| Focus | Auto-focus first element |
+| Stacking | No nested modals |
+
+### 5.5 Navigation Patterns
+
+| Decision | Choice |
+|----------|--------|
+| Active state | Cherry bg + cherry text (digest); violet bg + violet text (concepts) |
+| Breadcrumbs | Shown in pages >1 level deep |
+| Back button | Browser native (`history.back()`) |
+| Deep links | All pages deep-linkable |
+| URL structure | `/[section]/[subsection]` |
+
+### 5.6 Empty State Patterns
+
+| Context | Message + Action |
+|---------|-----------------|
+| First visit | "Welcome to Cherry. Start with This Week's Highlight →" |
+| No search results | "No results for '[query]' — try a related concept" |
+| No items this week | "Nothing passed our quality threshold this week." |
+
+### 5.7 Notification Patterns
+
+| Decision | Choice |
+|----------|--------|
+| Placement | Bottom-right (desktop), bottom-center (mobile) |
+| Auto-dismiss | Success: 4s, Info: 5s, Warning/Error: persistent |
+| Max stacked | 3 at once |
+| Priority | Error > Warning > Success > Info |
+
+### 5.8 Search Patterns (⌘K)
+
+| Decision | Choice |
+|----------|--------|
+| Trigger | `⌘K` / `Ctrl+K` or sidebar icon |
+| Results | Instant, debounced 150ms |
+| Result types | Concepts, news items, recent searches |
+| No results | "No results found" + suggestion |
+
+### 5.9 Date/Time Patterns
+
+| Context | Format |
+|---------|--------|
+| Recent (≤7 days) | `Feb 25` |
+| Older (>7 days) | `Feb 25, 2026` |
+| Patchnotes range | `Feb 17 → Feb 28` |
+| Relative times | Avoid (engineers prefer specific dates) |
 
 ---
 
-**Date/Time Patterns**
+## 6. Responsive Design & Accessibility
 
-| Context                | Format                                                       |
-| ---------------------- | ------------------------------------------------------------ |
-| Recent items (≤7 days) | `Feb 25` — month + day only (same year implied)              |
-| Older items (>7 days)  | `Feb 25, 2026` — full date                                   |
-| Patchnotes range       | `Feb 17 → Feb 28` (date → date, always in Patchnotes banner) |
-| No relative times      | Avoid "3 days ago" — engineers prefer specific dates         |
+### 6.1 Responsive Strategy
 
----
-
-## 8. Responsive Design & Accessibility
-
-### 8.1 Responsive Strategy
-
-**Platform Decision:** Mobile-first (commute reading) with desktop-optimized deep work sessions.
+**Platform Decision:** Mobile-first with desktop-optimized deep work sessions
 
 **Breakpoints:**
 
-| Breakpoint | Range       | Layout                    | Navigation                                                                      |
-| ---------- | ----------- | ------------------------- | ------------------------------------------------------------------------------- |
-| Mobile     | 0–767px     | 4-column, full-width      | Bottom tab bar (Digest / Patchnotes / Learn / My Feed) + hamburger for full nav |
-| Tablet     | 768–1023px  | 8-column, 768px container | Hamburger → overlay sidebar (same 4-section nav)                                |
-| Desktop    | 1024–1439px | 12-column, max 1280px     | Persistent left sidebar (220px)                                                 |
-| Wide       | 1440px+     | Same as desktop, centered | Sidebar fixed; content container max 1280px                                     |
+| Breakpoint | Range | Layout | Navigation |
+|------------|-------|--------|------------|
+| Mobile | 0-1023px | Single column | Hamburger sheet |
+| Desktop | 1024px+ | Multi-column | Persistent sidebar (240px) |
+| Wide | 1440px+ | Centered, max 1440px | Same as desktop |
 
-**Adaptation Patterns per Component:**
+**Adaptation Patterns:**
 
-| Element           | Mobile                                                              | Tablet                             | Desktop                                |
-| ----------------- | ------------------------------------------------------------------- | ---------------------------------- | -------------------------------------- |
-| Sidebar           | Hidden; accessible via hamburger overlay                            | Overlay on demand                  | Persistent (220px)                     |
-| Treemap           | 2×2 grid, 72px/52px rows, abbreviated labels                        | 2×2 grid, 100px/70px rows          | 2×2 grid, 128px/88px rows, full labels |
-| Concept Reader    | Single column (no roadmap graph) — graph behind "Learning Path" tab | 2-column (nav + reading, no graph) | 3-column (nav + reading + graph)       |
-| Leaderboard grid  | Single column (cards stacked)                                       | 2-column                           | 3-column                               |
-| Metrics strip     | 2×2 grid                                                            | Full 4-column row                  | Full 4-column row                      |
-| Patchnotes        | Single column, compact timeline dots                                | Single column                      | Single column, generous max-width      |
-| Newsletter Studio | Not available on mobile (enterprise deep work only)                 | Tablet: simplified editor          | Full 3-panel editor                    |
-| Modals            | Full-screen sheet                                                   | Centered modal                     | Centered modal                         |
-| Touch targets     | Minimum 44×44px all interactive elements                            | 44×44px minimum                    | 32×32px minimum (pointer accuracy)     |
+| Element | Mobile | Desktop |
+|---------|--------|---------|
+| Sidebar | Sheet overlay | Persistent (240px) |
+| Content padding | 16px | 40px |
+| Page title | 20px | 30px |
+| Treemap | 72px/52px rows | 128px/88px rows |
+| Modals | Full-screen sheet | Centered modal |
+| Touch targets | 44×44px minimum | 32×32px minimum |
 
----
-
-### 8.2 Accessibility Strategy
+### 6.2 Accessibility Strategy
 
 **Target: WCAG 2.1 Level AA**
 
-Rationale: Cherry is a public web application with commercial intent. Level AA is the practical standard, legally expected for EU deployments, and achievable without sacrificing Cherry's visual identity.
+**Color Contrast:**
 
-**Color Contrast Audit:**
-
-| Pair                                                     | Ratio  | Requirement      | Status                                              |
-| -------------------------------------------------------- | ------ | ---------------- | --------------------------------------------------- |
-| `--color-text` (#E8E4F0) on `--color-bg` (#13111A)       | ~14:1  | 4.5:1            | ✓ Pass                                              |
-| `--color-cherry` (#C94B6E) on `--color-bg` (#13111A)     | ~4.8:1 | 4.5:1            | ✓ Pass                                              |
-| `--color-muted` (#8B849E) on `--color-surface` (#1C1927) | ~3.2:1 | 4.5:1            | ⚠ Fail — use only for non-essential decorative text |
-| `--color-muted` on `--color-bg`                          | ~3.5:1 | 3:1 (large text) | ✓ Pass for 18px+                                    |
-
-_Action item:_ Replace muted text (#8B849E) with a higher-contrast muted where AA is required for essential information. Recommend `#A09DB8` (~4.6:1 on `--color-bg`).
+| Pair | Ratio | Requirement | Status |
+|------|-------|-------------|--------|
+| Text (#1A1626) on BG (#F7F6F9) | ~14:1 | 4.5:1 | ✓ Pass |
+| Cherry (#C94B6E) on BG (#F7F6F9) | ~4.8:1 | 4.5:1 | ✓ Pass |
+| Muted (#9E97B3) on card (#FFFFFF) | ~3.5:1 | 4.5:1 | ⚠ Large text only |
 
 **Key Requirements:**
 
-| Requirement            | Implementation                                                                                                   |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Keyboard navigation    | All interactive elements reachable via Tab; logical order follows visual reading order                           |
-| Focus indicators       | 2px cherry outline (`outline: 2px solid var(--cherry); outline-offset: 2px`) on all interactive elements         |
-| Skip link              | "Skip to main content" visible on focus at top of page                                                           |
-| Semantic HTML          | `<nav>` sidebar, `<main>` content, `<article>` concept pages, `<aside>` roadmap panel, `<section>` page sections |
-| ARIA labels            | `aria-label` on treemap sectors, keyword pills, nav sections without visible headings                            |
-| ARIA live regions      | `aria-live="polite"` on toast notifications; `role="status"` on Patchnotes end card                              |
-| Screen reader end-card | "End of Patchnotes. You are caught up as of [date range]." announced on arrival                                  |
-| Alt text               | All meaningful images and SVG elements have descriptive labels                                                   |
-| Form labels            | All form inputs have associated `<label>` elements or `aria-label`                                               |
-| Error identification   | Form errors identified with `role="alert"` and linked to input with `aria-describedby`                           |
+| Requirement | Implementation |
+|-------------|----------------|
+| Keyboard navigation | Tab order follows visual flow |
+| Focus indicators | 2px cherry outline (`outline: 2px solid var(--cherry)`) |
+| Skip link | "Skip to main content" on focus |
+| Semantic HTML | `<nav>`, `<main>`, `<article>`, `<section>` |
+| ARIA labels | Icons without visible text |
+| ARIA live regions | `aria-live="polite"` on toasts |
+| Alt text | Descriptive labels for images |
+| Form labels | Associated `<label>` elements |
+| Error identification | `role="alert"` linked to input |
 
 **Testing Strategy:**
 
-| Type            | Tool                             | When                |
-| --------------- | -------------------------------- | ------------------- |
-| Automated       | Lighthouse (CI/CD pipeline)      | Every pull request  |
-| Automated       | axe DevTools browser extension   | Developer workflow  |
-| Manual keyboard | Tab-through all 5 user journeys  | Before each release |
-| Screen reader   | NVDA + Chrome (Windows)          | Sprint end          |
-| Screen reader   | VoiceOver + Safari (macOS + iOS) | Sprint end          |
+| Type | Tool | Frequency |
+|------|------|-----------|
+| Automated | Lighthouse (CI/CD) | Every PR |
+| Automated | axe DevTools | Dev workflow |
+| Manual keyboard | Tab-through flows | Pre-release |
+| Screen reader | NVDA/VoiceOver | Sprint end |
 
 ---
 
-## 9. Implementation Guidance
+## 7. Animation & Transitions
 
-### 9.1 Completion Summary
+### 7.1 Base Transitions
 
-Cherry's UX Design Specification is complete. All decisions were made collaboratively with rationale documented for future reference.
+```css
+/* Smooth transitions on interactive elements */
+button, a, [role="button"] {
+  transition: all 150ms ease;
+}
 
-**What was created:**
-
-| Area              | Decision                                                                                                                   |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Design System     | shadcn/ui (v2) + Tailwind CSS v4 — composable, accessible, full ownership                                                  |
-| Color Theme       | Obsidian Night — dark-mode native, treemap-forward, cherry-red singular accent                                             |
-| Typography        | Inter + JetBrains Mono — sharp headers, comfortable body, monospace for code                                               |
-| Design Direction  | Left sidebar (4-section nav) + context-appropriate content layouts                                                         |
-| Novel Pattern     | Completeness Signal (end-card) — Patchnotes only                                                                           |
-| User Journeys     | 5 flows: Browse Highlight, Read Concept, Patchnotes Catch-up, Signup + Personalization, Newsletter Studio                  |
-| Custom Components | 12 custom components beyond shadcn/ui baseline                                                                             |
-| UX Patterns       | 9 consistency categories: buttons, feedback, forms, modals, navigation, empty states, confirmations, notifications, search |
-| Responsive        | 3 breakpoints — mobile bottom nav, tablet overlay sidebar, desktop persistent sidebar                                      |
-| Accessibility     | WCAG 2.1 Level AA — contrast audit done, keyboard nav, screen reader requirements defined                                  |
-
-**Deliverables:**
-
-- UX Design Document: `docs/ux-design-specification.md`
-- Interactive Color Themes: `docs/ux-color-themes.html`
-- Design Direction Mockups: `docs/ux-design-directions.html`
-
-**What happens next:**
-
-- Developers can implement with the design system foundation and component specs as reference
-- Each custom component has states, anatomy, and accessibility requirements defined
-- User journeys inform story/epic breakdown in the BMAD development phase
-- The architecture document and this UX spec together provide the full implementation blueprint
-
-### 9.2 Implementation Notes for Developers
-
-**CSS Variable Setup:** Override shadcn/ui's default `--background`, `--foreground`, etc. with Cherry's Obsidian Night tokens. Full mapping:
-
-```
---background: 13111A    (--color-bg)
---card: 1C1927          (--color-surface)
---popover: 241F32       (--color-elevated)
---border: 2A2535        (--color-border)
---foreground: E8E4F0    (--color-text)
---muted-foreground: A09DB8  (high-contrast muted — see accessibility note)
---primary: C94B6E       (--color-cherry)
---secondary: 7B5EA7     (--color-violet)
---destructive: 8A2E3E   (--color-error)
+/* Focus states */
+*:focus-visible {
+  outline: 2px solid var(--cherry);
+  outline-offset: 2px;
+}
 ```
 
-**Component Priority for MVP:**
+### 7.2 Component Animations
 
-1. `<SidebarNav>` — navigation is the foundation of all journeys
-2. `<BuzzTreemap>` — hero element of the dashboard; Cherry's most distinctive UI
-3. `<NewsItem>` — used everywhere in feeds
-4. `<ConceptCard>` + `<ProgressiveRef>` — concept page reading experience
-5. `<PatchnotesEndCard>` — the anti-FOMO payoff (high impact, low complexity)
-6. `<ConceptRoadmap>` — roadmap graph (high value, higher complexity)
-7. `<ScoringCriteriaInput>` + `<CategoryTabs>` — paid tier features, phase 2
+| Component | Animation | Duration |
+|-----------|-----------|----------|
+| Skeleton | Pulse shimmer | 1.5s infinite |
+| Card hover | Shadow transition | 150ms ease |
+| Treemap hover | Brightness | 200ms ease |
+| Nav items | Color + bg | 150ms ease |
+| Toast | Slide in + fade | 300ms ease |
+| Dialog | Scale + fade | 200ms ease |
 
 ---
 
-## Appendix
+## 8. Implementation Notes
+
+### 8.1 CSS Variable Mapping
+
+**Override shadcn/ui defaults with Cherry tokens:**
+
+```css
+:root {
+  /* Surfaces */
+  --background: #F7F6F9;
+  --card: #FFFFFF;
+  --popover: #FFFFFF;
+  --border: #E4E1EE;
+  --input: #E4E1EE;
+
+  /* Text */
+  --foreground: #1A1626;
+  --card-foreground: #1A1626;
+  --popover-foreground: #1A1626;
+  --muted-foreground: #9E97B3;
+
+  /* Brand */
+  --primary: #C94B6E;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F2F0F7;
+  --secondary-foreground: #1A1626;
+  --accent: #FDF0F3;
+  --accent-foreground: #C94B6E;
+
+  /* Functional */
+  --destructive: #C94B6E;
+  --destructive-foreground: #FFFFFF;
+  --ring: #C94B6E;
+
+  /* Sidebar */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #6B6480;
+  --sidebar-primary: #C94B6E;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F2F0F7;
+  --sidebar-accent-foreground: #1A1626;
+  --sidebar-border: #E4E1EE;
+  --sidebar-ring: #C94B6E;
+
+  /* Custom brand tokens */
+  --cherry: #C94B6E;
+  --cherry-soft: #FDF0F3;
+  --cherry-border: #F2C4CE;
+  --violet: #7B5EA7;
+  --violet-soft: #F3EFFA;
+  --violet-border: #C7B8E8;
+  --success: #2D7A5E;
+  --success-soft: #EFF7F3;
+
+  /* Text hierarchy */
+  --text-primary: #1A1626;
+  --text-secondary: #6B6480;
+  --text-body: #3D3652;
+  --text-muted: #9E97B3;
+
+  /* Charts */
+  --chart-1: #C94B6E;
+  --chart-2: #7B5EA7;
+  --chart-3: #2D7A5E;
+  --chart-4: #D4854A;
+  --chart-5: #4A90D9;
+}
+```
+
+### 8.2 Component Priority
+
+**Implemented (Production Ready):**
+1. Sidebar Navigation - ✅ Complete
+2. Buzz Treemap - ✅ Complete
+3. Top Items List - ✅ Complete
+4. Page Header - ✅ Complete
+5. Handbook Placeholder - ✅ Complete
+6. Patch Notes Page - ✅ Complete
+7. Frameworks/Model Updates/Case Studies - ✅ Complete
+8. Mobile Sidebar - ✅ Complete
+
+**Shadcn/ui Components:** All 50+ components available
+
+---
+
+## 9. Appendix
 
 ### Related Documents
 
-- Product Requirements: `docs/PRD.md`
-- Architecture: `docs/architecture.md`
-
-### Core Interactive Deliverables
-
-This UX Design Specification was created through visual collaboration:
-
-- **Color Theme Visualizer**: `docs/ux-color-themes.html`
-  - Interactive HTML showing all color theme options explored
-  - Live UI component examples in each theme
-  - Side-by-side comparison and semantic color usage
-
-- **Design Direction Mockups**: `docs/ux-design-directions.html`
-  - Interactive HTML with direction screens (Dashboard, Patchnotes, Newly Discovered, Mobile, Concept Reader)
-  - Full-screen mockups with all 4 nav sections
-  - Design philosophy and rationale for each screen
+- Product Requirements: `docs/PRD/`
+- Architecture: `docs/architecture/`
+- Original UX Spec (backup): `docs/ux-design-specification-backup-20260404.md`
 
 ### Version History
 
-| Date       | Version | Changes                                                                                                   | Author |
-| ---------- | ------- | --------------------------------------------------------------------------------------------------------- | ------ |
-| 2026-02-28 | 1.0     | Initial UX Design Specification                                                                           | HK     |
-| 2026-02-28 | 1.1     | Completed Steps 4–9: design direction, user journeys, components, UX patterns, responsive + accessibility | HK     |
+| Date | Version | Changes | Author |
+|------|---------|---------|--------|
+| 2026-02-28 | 1.0 | Initial UX Design Specification | HK |
+| 2026-02-28 | 1.1 | Completed all sections | HK |
+| 2026-04-04 | 2.0 | **Updated to match actual web frontend implementation** | HK |
 
 ---
 
-_This UX Design Specification was created through collaborative design facilitation, not template generation. All decisions were made with user input and are documented with rationale._
+_This UX Design Specification (v2.0) reflects the ACTUAL implemented design from the web frontend at `apps/web/`. The previous specification (v1.0) is backed up as `docs/ux-design-specification-backup-20260404.md`._

@@ -43,7 +43,14 @@
 - **Rationale:** GraphDB and PostgreSQL cannot share a foreign key. Loose coupling via concept name enables independent scaling.
 - **Constraint:** `extracted_concept` MUST exactly match `concept_name` in GraphDB. `concept_matcher.py` is responsible for normalization.
 
-### ADR-008: Brownfield — `dev/` packages as reference implementations
+### ADR-008: Tailscale for Infrastructure Access
+
+- **Decision:** Tailscale for all secure infrastructure access (databases, services, internal tools)
+- **Rationale:** Zero-configuration secure networking; no VPN management overhead; works across cloud providers and local dev; built-in ACLs for access control
+- **Trade-off:** Requires Tailscale agent on all hosts; mitigated by easy install and cross-platform support
+- **Re-evaluate if:** Need features beyond Tailscale's capabilities (e.g., advanced BGP, custom routing policies)
+
+### ADR-009: Brownfield — `dev/` packages as reference implementations
 
 - **Decision:** `dev/packages/ontology/` and `dev/packages/pdf_knowledge_extractor/` are read as reference; logic is adapted into the new `handbook/` and `packages/pipeline/` structure
 - **Rationale:** Existing code represents validated prototypes. Rewriting from scratch wastes effort.

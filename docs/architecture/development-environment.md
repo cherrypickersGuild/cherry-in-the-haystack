@@ -7,6 +7,7 @@
 - Poetry 1.8+
 - Node.js 20+
 - pnpm
+- **Tailscale** — required for infrastructure access (databases, GraphDB, internal services)
 
 ### Setup Commands
 
