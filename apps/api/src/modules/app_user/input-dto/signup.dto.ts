@@ -8,7 +8,7 @@ export class SignupDto {
     timezone: z.string().trim().min(1).max(50).optional(),
   });
 
-  @ApiProperty({ example: 'alice@company.com' })
+  @ApiProperty({ example: 'tomatojams@naver.com' })
   email!: string;
 
   @ApiPropertyOptional({ example: 'Alice' })

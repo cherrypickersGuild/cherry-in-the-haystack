@@ -6,6 +6,6 @@ export class SigninDto {
     email: z.string().email(),
   });
 
-  @ApiProperty({ example: 'alice@company.com' })
+  @ApiProperty({ example: 'tomatojams@naver.com' })
   email!: string;
 }

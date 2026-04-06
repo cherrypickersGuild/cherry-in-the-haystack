@@ -1,7 +1,5 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 /**
  * 이메일 전송 함수
  * @param to 수신자 이메일
@@ -9,8 +7,9 @@ const resend = new Resend(process.env.RESEND_API_KEY);
  * @param html 이메일 HTML 내용
  */
 const sendEmail = async (to: string, subject: string, html: string) => {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL ?? 'no-reply@cherryinthehaystack.com',
+    from: process.env.RESEND_FROM_EMAIL ?? 'no-reply@solteti.site',
     to,
     subject,
     html,
