@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Sidebar, CherryIcon } from "@/components/cherry/sidebar"
 import { MobileSidebar } from "@/components/cherry/mobile-sidebar"
 import { PageHeader } from "@/components/cherry/page-header"
@@ -21,6 +23,21 @@ const TREND_GAUGES = [
 
 export default function CherryApp() {
   const [activeNav, setActiveNav] = useState("highlight")
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem("accessToken"))
+  }, [])
+
+  const handleAuthClick = () => {
+    if (isLoggedIn) {
+      localStorage.removeItem("accessToken")
+      setIsLoggedIn(false)
+    } else {
+      router.push("/login")
+    }
+  }
 
   /* ─────────────────────────────────────────────
      Route content based on active nav
@@ -134,10 +151,26 @@ export default function CherryApp() {
             <span className="text-[16px] font-bold text-text-primary tracking-tight">Cherry</span>
             <p className="text-[10px] text-text-muted font-medium">for AI Engineers</p>
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={handleAuthClick}
+              className="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors"
+            >
+              {isLoggedIn ? "Logout" : "Login"}
+            </button>
             <MobileSidebar active={activeNav} onSelect={setActiveNav} />
           </div>
         </header>
+
+        {/* Desktop top bar */}
+        <div className="hidden lg:flex items-center justify-end px-10 py-4 border-b border-[#E4E1EE] bg-white flex-shrink-0">
+          <button
+            onClick={handleAuthClick}
+            className="px-4 py-2 rounded-xl text-[13px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors"
+          >
+            {isLoggedIn ? "Logout" : "Login"}
+          </button>
+        </div>
 
         {/* Main scrollable content */}
         <main
