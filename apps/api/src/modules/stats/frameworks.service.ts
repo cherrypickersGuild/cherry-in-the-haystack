@@ -26,9 +26,21 @@ export interface FrameworksRisingstar {
   articleStateId: string;
 }
 
+export interface FrameworksArticleItem {
+  id: string;
+  articleStateId: string;
+  title: string;
+  oneLiner: string;
+  entityName: string;
+  categoryName: string;
+  score: number;
+  date: string;
+}
+
 export interface FrameworksResponse {
   categories: FrameworkCategoryItem[];
   risingstar: FrameworksRisingstar | null;
+  articles: FrameworksArticleItem[];
 }
 
 @Injectable()
@@ -64,7 +76,6 @@ export class FrameworksService {
       ORDER BY ec.sort_order ASC, te.name ASC
     `);
 
-    // 카테고리별로 그룹핑
     const categoryMap = new Map<string, FrameworkCategoryItem>();
     for (const r of placementRows.rows) {
       if (!categoryMap.has(r.category_id)) {
@@ -86,18 +97,17 @@ export class FrameworksService {
 
     const categories = Array.from(categoryMap.values());
 
-    // 2. 라이징스타: 최근 14일 FRAMEWORKS 아티클 중 최고점
-    const from = new Date();
-    from.setDate(from.getDate() - 14);
-
-    const risingRows = await this.knex.raw<{ rows: any[] }>(`
+    // 2. 아티클 쿼리 (기간 제한 없음 — 전체 FRAMEWORKS)
+    const articleRows = await this.knex.raw<{ rows: any[] }>(`
       SELECT
+        ar.id           AS article_raw_id,
         uas.id          AS article_state_id,
         ar.title,
         ar.published_at,
         aai.ai_summary,
         aai.ai_score,
-        aai.representative_entity_name AS entity_name
+        aai.representative_entity_name      AS entity_name,
+        ec.name                             AS category_name
       FROM content.user_article_state uas
       JOIN content.article_raw ar
         ON ar.id = uas.article_raw_id
@@ -109,27 +119,38 @@ export class FrameworksService {
        AND ef.user_id = :systemUserId::UUID
        AND ef.is_following = TRUE
        AND ef.revoked_at IS NULL
+      LEFT JOIN content.entity_category ec
+        ON ec.id = aai.representative_entity_category_id
       WHERE uas.user_id = :systemUserId::UUID
         AND uas.revoked_at IS NULL
         AND aai.representative_entity_page = 'FRAMEWORKS'
-        AND ar.published_at >= :from
-      ORDER BY aai.ai_score DESC, ar.published_at DESC
-      LIMIT 1
-    `, { systemUserId: SYSTEM_USER_ID, from });
+      ORDER BY ar.published_at DESC
+    `, { systemUserId: SYSTEM_USER_ID });
 
-    let risingstar: FrameworksRisingstar | null = null;
-    if (risingRows.rows.length > 0) {
-      const r = risingRows.rows[0];
-      risingstar = {
-        entityName: r.entity_name ?? '',
-        title: r.title,
-        oneLiner: r.ai_summary ?? '',
-        score: r.ai_score ?? 0,
-        date: new Date(r.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        articleStateId: r.article_state_id,
-      };
-    }
+    const articles: FrameworksArticleItem[] = articleRows.rows.map((r) => ({
+      id: r.article_raw_id,
+      articleStateId: r.article_state_id,
+      title: r.title,
+      oneLiner: r.ai_summary ?? '',
+      entityName: r.entity_name ?? '',
+      categoryName: r.category_name ?? '',
+      score: r.ai_score ?? 0,
+      date: new Date(r.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    }));
 
-    return { categories, risingstar };
+    // 3. 라이징스타: score 기준 최고점 1개
+    const topScored = [...articles].sort((a, b) => b.score - a.score)[0] ?? null;
+    const risingstar: FrameworksRisingstar | null = topScored
+      ? {
+          entityName: topScored.entityName,
+          title: topScored.title,
+          oneLiner: topScored.oneLiner,
+          score: topScored.score,
+          date: topScored.date,
+          articleStateId: topScored.articleStateId,
+        }
+      : null;
+
+    return { categories, risingstar, articles };
   }
 }

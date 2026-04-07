@@ -4,10 +4,9 @@
 import { useEffect, useState } from "react"
 import {
   fetchFrameworks,
-  fetchPatchNotes,
   FrameworkCategoryItem,
   FrameworksRisingstar,
-  PatchNoteItem,
+  FrameworksArticleItem,
 } from "@/lib/api"
 
 /* ─────────────────────────────────────────────
@@ -185,7 +184,7 @@ function RisingStarCard({ rs }: { rs: FrameworksRisingstar }) {
 /* ─────────────────────────────────────────────
    Article Item
 ───────────────────────────────────────────── */
-function ArticleItem({ item }: { item: PatchNoteItem }) {
+function ArticleItem({ item }: { item: FrameworksArticleItem }) {
   const style = getArticleStyle(item.categoryName)
   const initials = item.categoryName
     ? item.categoryName.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
@@ -210,7 +209,7 @@ function ArticleItem({ item }: { item: PatchNoteItem }) {
             className="px-2 py-0.5 rounded-full text-[10px] font-semibold border"
             style={{ backgroundColor: style.bg, color: style.color, borderColor: style.border }}
           >
-            {item.categoryName || item.area}
+            {item.categoryName || item.entityName}
           </span>
           <Stars count={item.score} color={style.color} />
           <span className="text-[11px] text-[#9E97B3]">{item.entityName} · {item.date}</span>
@@ -226,15 +225,15 @@ function ArticleItem({ item }: { item: PatchNoteItem }) {
 export function NDFrameworksPage() {
   const [categories, setCategories] = useState<FrameworkCategoryItem[]>([])
   const [risingstar, setRisingstar] = useState<FrameworksRisingstar | null>(null)
-  const [articles, setArticles] = useState<PatchNoteItem[]>([])
+  const [articles, setArticles] = useState<FrameworksArticleItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([fetchFrameworks(), fetchPatchNotes()])
-      .then(([fw, notes]) => {
+    fetchFrameworks()
+      .then((fw) => {
         setCategories(fw.categories)
         setRisingstar(fw.risingstar)
-        setArticles(notes.items.filter((item) => item.page === "FRAMEWORKS"))
+        setArticles(fw.articles)
       })
       .catch(console.error)
       .finally(() => setLoading(false))

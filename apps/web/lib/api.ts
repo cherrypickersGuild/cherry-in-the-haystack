@@ -96,9 +96,21 @@ export interface FrameworksRisingstar {
   articleStateId: string
 }
 
+export interface FrameworksArticleItem {
+  id: string
+  articleStateId: string
+  title: string
+  oneLiner: string
+  entityName: string
+  categoryName: string
+  score: number
+  date: string
+}
+
 export interface FrameworksResponse {
   categories: FrameworkCategoryItem[]
   risingstar: FrameworksRisingstar | null
+  articles: FrameworksArticleItem[]
 }
 
 export async function fetchFrameworks(): Promise<FrameworksResponse> {
