@@ -4,12 +4,14 @@
 import { useEffect, useState } from "react"
 import {
   fetchFrameworks,
+  fetchPatchNotes,
   FrameworkCategoryItem,
   FrameworksRisingstar,
+  PatchNoteItem,
 } from "@/lib/api"
 
 /* ─────────────────────────────────────────────
-   Category color map (by code)
+   Category color map (by code — for hierarchy boxes)
 ───────────────────────────────────────────── */
 const CATEGORY_COLORS: Record<string, string> = {
   "agent":        "#E94057",
@@ -33,22 +35,41 @@ const CATEGORY_ICONS: Record<string, string> = {
   "observability":"📊",
 }
 
+/* Article color map (by categoryName display name — for article list) */
+const ARTICLE_COLORS: Record<string, { color: string; bg: string; border: string }> = {
+  "Agent":              { color: "#E94057", bg: "#FFF8F9", border: "#FECDD3" },
+  "Fine-Tuning":        { color: "#8B5CF6", bg: "#FAF8FF", border: "#DDD6FE" },
+  "RAG":                { color: "#7C3AED", bg: "#F9F7FD", border: "#C4B5FD" },
+  "Prompt Engineering": { color: "#DC2626", bg: "#FFF8F8", border: "#FECACA" },
+  "Serving":            { color: "#10B981", bg: "#F5FAFA", border: "#A7F3D0" },
+  "Data & Storage":     { color: "#F97316", bg: "#FFFAF5", border: "#FED7AA" },
+  "LLMOps":             { color: "#0194E2", bg: "#F5FAFF", border: "#BAE6FD" },
+  "Observability":      { color: "#7B5EA7", bg: "#F3EFFA", border: "#C7B8E8" },
+}
+const DEFAULT_ARTICLE_STYLE = { color: "#9E97B3", bg: "#FFFFFF", border: "#E4E1EE" }
+const getArticleStyle = (name: string) => ARTICLE_COLORS[name] ?? DEFAULT_ARTICLE_STYLE
+
 function getCategoryColor(code: string) {
   return CATEGORY_COLORS[code] ?? "#9E97B3"
 }
 
 /* ─────────────────────────────────────────────
+   Stars
+───────────────────────────────────────────── */
+function Stars({ count, color = "#7B5EA7" }: { count: number; color?: string }) {
+  return (
+    <span className="flex items-center gap-[1px] text-[12px]" style={{ color }}>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <span key={i} style={{ opacity: i < count ? 1 : 0.2 }}>★</span>
+      ))}
+    </span>
+  )
+}
+
+/* ─────────────────────────────────────────────
    Entity Pill
 ───────────────────────────────────────────── */
-function EntityPill({
-  name,
-  isSpotlight,
-  color,
-}: {
-  name: string
-  isSpotlight: boolean
-  color: string
-}) {
+function EntityPill({ name, isSpotlight, color }: { name: string; isSpotlight: boolean; color: string }) {
   const abbr = name.slice(0, 2).toUpperCase()
   return (
     <div
@@ -64,10 +85,7 @@ function EntityPill({
       >
         {abbr}
       </div>
-      <span
-        className="text-[10px] font-medium"
-        style={{ color: isSpotlight ? "#C94B6E" : "#1A1626" }}
-      >
+      <span className="text-[10px] font-medium" style={{ color: isSpotlight ? "#C94B6E" : "#1A1626" }}>
         {name}
       </span>
     </div>
@@ -86,9 +104,7 @@ function CategoryCard({ cat }: { cat: FrameworkCategoryItem }) {
       style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
     >
       <div className="text-[18px] mb-1">{icon}</div>
-      <p className="text-[11px] font-bold uppercase tracking-[0.6px] text-[#1A1626] mb-2">
-        {cat.name}
-      </p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.6px] text-[#1A1626] mb-2">{cat.name}</p>
       <div className="flex flex-col gap-1.5">
         {cat.entities.map((e) => (
           <EntityPill key={e.id} name={e.name} isSpotlight={e.isSpotlight} color={color} />
@@ -99,7 +115,7 @@ function CategoryCard({ cat }: { cat: FrameworkCategoryItem }) {
 }
 
 /* ─────────────────────────────────────────────
-   Sparkline (upward curve)
+   Sparkline
 ───────────────────────────────────────────── */
 function Sparkline() {
   const pts = [55, 50, 48, 45, 42, 38, 32, 28, 22, 18, 12, 8]
@@ -130,7 +146,6 @@ function RisingStarCard({ rs }: { rs: FrameworksRisingstar }) {
       className="flex flex-col lg:flex-row items-start gap-5 rounded-[10px] border p-5"
       style={{ backgroundColor: "#FFFFFF", borderColor: "#E4E1EE", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
     >
-      {/* Left */}
       <div className="flex-1 min-w-0">
         <span
           className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold border mb-2"
@@ -140,16 +155,11 @@ function RisingStarCard({ rs }: { rs: FrameworksRisingstar }) {
         </span>
         <div className="flex items-center gap-2 mb-1">
           <h3 className="text-[20px] font-bold text-[#1A1626]">{rs.entityName}</h3>
-          <span
-            className="px-1.5 py-0.5 rounded text-[10px] font-bold text-white"
-            style={{ backgroundColor: "#7B5EA7" }}
-          >
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold text-white" style={{ backgroundColor: "#7B5EA7" }}>
             HOT
           </span>
         </div>
-        <p className="text-[13px] leading-relaxed mb-3" style={{ color: "#3D3652" }}>
-          {rs.oneLiner}
-        </p>
+        <p className="text-[13px] leading-relaxed mb-3" style={{ color: "#3D3652" }}>{rs.oneLiner}</p>
         <p className="text-[12px]" style={{ color: "#9E97B3" }}>{rs.title}</p>
         <div className="flex items-center gap-4 mt-3">
           <div>
@@ -162,17 +172,48 @@ function RisingStarCard({ rs }: { rs: FrameworksRisingstar }) {
           </div>
         </div>
       </div>
-
-      {/* Right — Sparkline */}
       <div className="w-full lg:w-[180px] lg:flex-shrink-0">
-        <div
-          className="rounded-[10px] border p-3"
-          style={{ backgroundColor: "#FFFFFF", borderColor: "#E4E1EE" }}
-        >
-          <p className="text-[9px] font-bold uppercase tracking-[0.6px] text-[#9E97B3] mb-2">
-            Trend
-          </p>
+        <div className="rounded-[10px] border p-3" style={{ backgroundColor: "#FFFFFF", borderColor: "#E4E1EE" }}>
+          <p className="text-[9px] font-bold uppercase tracking-[0.6px] text-[#9E97B3] mb-2">Trend</p>
           <Sparkline />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────
+   Article Item
+───────────────────────────────────────────── */
+function ArticleItem({ item }: { item: PatchNoteItem }) {
+  const style = getArticleStyle(item.categoryName)
+  const initials = item.categoryName
+    ? item.categoryName.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
+    : item.entityName.slice(0, 2).toUpperCase()
+
+  return (
+    <div
+      className="bg-white rounded-[10px] border border-[#E4E1EE] p-4 flex gap-3.5 cursor-pointer hover:shadow-md transition-shadow"
+      style={{ borderLeft: `3px solid ${style.color}`, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
+    >
+      <div
+        className="w-10 h-10 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 border"
+        style={{ backgroundColor: style.bg, color: style.color, borderColor: style.border }}
+      >
+        {initials}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[15px] font-bold text-[#1A1626] mb-1 leading-snug">{item.title}</p>
+        <p className="text-[13px] text-[#9E97B3] leading-relaxed mb-2 line-clamp-2">{item.oneLiner}</p>
+        <div className="flex items-center gap-2">
+          <span
+            className="px-2 py-0.5 rounded-full text-[10px] font-semibold border"
+            style={{ backgroundColor: style.bg, color: style.color, borderColor: style.border }}
+          >
+            {item.categoryName || item.area}
+          </span>
+          <Stars count={item.score} color={style.color} />
+          <span className="text-[11px] text-[#9E97B3]">{item.entityName} · {item.date}</span>
         </div>
       </div>
     </div>
@@ -185,13 +226,15 @@ function RisingStarCard({ rs }: { rs: FrameworksRisingstar }) {
 export function NDFrameworksPage() {
   const [categories, setCategories] = useState<FrameworkCategoryItem[]>([])
   const [risingstar, setRisingstar] = useState<FrameworksRisingstar | null>(null)
+  const [articles, setArticles] = useState<PatchNoteItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchFrameworks()
-      .then((data) => {
-        setCategories(data.categories)
-        setRisingstar(data.risingstar)
+    Promise.all([fetchFrameworks(), fetchPatchNotes()])
+      .then(([fw, notes]) => {
+        setCategories(fw.categories)
+        setRisingstar(fw.risingstar)
+        setArticles(notes.items.filter((item) => item.page === "FRAMEWORKS"))
       })
       .catch(console.error)
       .finally(() => setLoading(false))
@@ -199,7 +242,6 @@ export function NDFrameworksPage() {
 
   return (
     <div className="max-w-[900px]">
-      {/* Header */}
       <h1
         className="font-extrabold text-[#1A1626] mb-2 leading-tight text-[20px] lg:text-[26px]"
         style={{ letterSpacing: "-0.3px" }}
@@ -214,15 +256,12 @@ export function NDFrameworksPage() {
         <div className="text-[13px] text-[#9E97B3] py-12 text-center">Loading…</div>
       ) : (
         <>
-          {/* ── Section 1: Framework Hierarchy ── */}
+          {/* ── Section 1: Framework Landscape ── */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-3">
-              <h2 className="text-[15px] font-bold text-[#1A1626] whitespace-nowrap">
-                Framework Landscape
-              </h2>
+              <h2 className="text-[15px] font-bold text-[#1A1626] whitespace-nowrap">Framework Landscape</h2>
               <div className="flex-1 border-t border-[#E4E1EE]" />
             </div>
-
             {categories.length === 0 ? (
               <p className="text-[13px] text-[#9E97B3]">No data available</p>
             ) : (
@@ -237,16 +276,30 @@ export function NDFrameworksPage() {
           {/* ── Section 2: Rising Star ── */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-3">
-              <h2 className="text-[15px] font-bold text-[#1A1626] whitespace-nowrap">
-                Rising Star
-              </h2>
+              <h2 className="text-[15px] font-bold text-[#1A1626] whitespace-nowrap">Rising Star</h2>
               <div className="flex-1 border-t border-[#E4E1EE]" />
             </div>
-
             {risingstar ? (
               <RisingStarCard rs={risingstar} />
             ) : (
               <p className="text-[13px] text-[#9E97B3]">No FRAMEWORKS articles in the last 14 days</p>
+            )}
+          </div>
+
+          {/* ── Section 3: All Framework Updates ── */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-3">
+              <h2 className="text-[15px] font-bold text-[#1A1626] whitespace-nowrap">All Framework Updates</h2>
+              <div className="flex-1 border-t border-[#E4E1EE]" />
+            </div>
+            {articles.length === 0 ? (
+              <div className="text-[13px] text-[#9E97B3] py-6 text-center">No articles found</div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {articles.map((item) => (
+                  <ArticleItem key={item.id} item={item} />
+                ))}
+              </div>
             )}
           </div>
         </>
