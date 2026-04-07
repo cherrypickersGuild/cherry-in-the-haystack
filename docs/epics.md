@@ -1,1293 +1,1292 @@
-# cherry-in-the-haystack - Epic Breakdown
-
-**Author:** HK
-**Date:** 2026-03-19
-**Project Level:** High Complexity SaaS Platform (Brownfield Transformation)
-**Target Scale:** 50,000 MAU, 500 concurrent paid users, 50+ enterprise clients
-
 ---
+stepsCompleted: ["step-01-validate-prerequisites", "step-02-design-epics", "step-03-create-stories"]
+inputDocuments: ["docs/PRD/index.md", "docs/PRD/functional-requirements.md", "docs/PRD/non-functional-requirements.md", "docs/architecture/index.md", "docs/architecture/data-architecture.md", "docs/architecture/deployment-architecture.md", "docs/architecture/security-architecture.md", "docs/ux-design-specification.md"]
+currentEpic: All 7 epics completed
+epicsCompleted: [1, 2, 3, 4, 5, 6, 7]
+totalStories: 26
+---
+
+# cherry-in-the-haystack - Epic Breakdown
 
 ## Overview
 
-This document provides the complete epic and story breakdown for cherry-in-the-haystack, decomposing the requirements from the [PRD](./PRD/index.md) into implementable stories.
+This document provides the complete epic and story breakdown for cherry-in-the-haystack, decomposing the requirements from the PRD, UX Design if it exists, and Architecture requirements into implementable stories.
 
-The product transforms from a personal content curation pipeline into **Cherry for AI Engineers** — a multi-tier SaaS platform (Free / Paid / Enterprise) with community-curated knowledge, personalized intelligence, and enterprise content creation capabilities.
+## Requirements Inventory
 
-**10 Epics in total, sequenced for incremental value delivery:**
+### Functional Requirements
 
-| # | Epic | Value Delivered |
-|---|------|----------------|
-| 1 | Foundation & Core Infrastructure | Stable base for all subsequent work |
-| 2 | Content Ingestion & Newly Discovered Pipeline | Weekly fresh LLM content, automated |
-| 3 | Knowledge Graph & Evidence Layer | Concept-centric knowledge system |
-| 4 | Writer Agent & Knowledge Synthesis | Structured Basics/Advanced pages |
-| 5 | Web Application Frontend | Public-facing dynamic webapp |
-| 6 | User Management & Authentication | Accounts, tiers, billing |
-| 7 | Personalization Engine | Paid-tier custom feeds |
-| 8 | Adaptive Knowledge Base | Paid-tier personal KB |
-| 9 | Newsletter Studio | Enterprise newsletter generation |
-| 10 | Community & Quality Operations | Sustained content quality |
+**FR-1.1: Multi-Source Content Collection**
+- Automatically aggregate LLM-related content from diverse sources (Twitter, Discord, GitHub, papers, blogs, RSS feeds)
+- Content Ingestion Pipeline pulls from at least 10 configured sources
+- New content discovered within 24 hours of publication
+- Source metadata preserved (URL, date, author, platform)
+- Configurable source priorities and categories
+
+**FR-1.2: Intelligent Deduplication**
+- Identify and filter duplicate or redundant content before processing
+- Content-level deduplication before scoring (exact matches, near-duplicates)
+- Chunk-level deduplication for Basics/Advanced synthesis (paragraph similarity)
+- 95%+ accuracy in identifying true duplicates
+- Preserve original source for merged duplicates
+
+**FR-2.1: AI-Powered Content Scoring**
+- Automatically evaluate content relevance and quality on 1-5 scale
+- AI agent scores content based on defined criteria (relevance, depth, novelty, practicality)
+- Score 5 = top-tier content worthy of inclusion
+- Scoring completes within 5 minutes of ingestion
+- Pattern-based learning improves scoring accuracy over time
+
+**FR-2.2: Knowledge Team Review Workflow**
+- Structured weekly review and approval process managed by Knowledge Team in Notion
+- Score-5 items auto-assigned to Knowledge Team members in Notion
+- Team members can validate summaries, adjust scores, and request edits
+- Weekly review cycle (Wednesday) with structured meeting
+- LLM-assisted ontology graph mapping during review
+- Status tracking: pending → in_review → finished
+- Top 20 finished items (score 5) flow to newsletter generation
+- Audit trail of all review decisions
+
+**FR-2.3: Content Value Assessment**
+- AI identifies unique, value-adding information vs repetitive noise
+- Chunk-level (paragraph) analysis for novelty
+- Comparison against vector database of existing content
+- "Unique" flag for truly novel information
+- Value score based on: novelty, depth, practical applicability, evidence quality
+
+**FR-3.1: Graph Database Two-Layer Architecture**
+- Concept-centric knowledge system with stable ontology and dynamic evidence
+- **Concept Layer (Stable):** Store concepts as unique noun-phrase nodes only; Concepts must be reusable across all sources; Relation types: prerequisite, related, subtopic, extends, contradicts; Evidence NEVER stored in concept nodes; Concept schema: title, summary, relations, sources, contributors; Concepts must support dynamic relation block rendering in UI
+- **Evidence Layer (High Volume):** Store paragraphs/snippets separately from concepts; Required metadata: source, location, text, excerpt, comment, tags, linked_concepts; Evidence types: paraphrase, direct quote, figure reference; Evidence can link to multiple concepts (many-to-many)
+- **Performance:** Graph queries complete in under 500ms for writer agent; Support concurrent reads during page generation; Efficient traversal for concept → related concepts → evidence chains
+- **Integration:** Coexists with Vector DB (used only for deduplication); Graph view shows concepts only (no evidence nodes cluttering visualization)
+
+**FR-3.2: Ontology Extraction & Concept Discovery**
+- Monthly extraction of new concept noun phrases from evidence layer
+- Monthly batch job (2nd Saturday) extracts new concept candidates from evidence layer
+- Word count and frequency metrics filter noise vs meaningful concepts
+- LLM-assisted concept relationship detection
+- Concept candidates presented to Knowledge Team for review
+- Approved concepts added to Ontology Layer with initial relationships
+- New concepts default to Advanced section (promotion to Basics based on sustained importance)
+
+**FR-3.3: Evidence Collection & Study Sessions**
+- Knowledge Team study sessions populate Evidence Layer with curated texts
+- Wednesday study sessions review texts (books, papers, documentation)
+- Reviewed texts stored in Evidence Layer with metadata (source, date, topic, quality)
+- Text chunking for efficient storage and retrieval
+- Evidence tagged with relevant concept associations
+- Study session notes captured for context
+
+**FR-4.1: MECE Knowledge Organization**
+- Structure content into Mutually Exclusive, Collectively Exhaustive taxonomy
+- 3 main sections: Basics, Advanced, Newly Discovered
+- 2-level hierarchy: parent concepts → child implementations
+- No concept should fit in multiple categories
+- All LLM engineering topics covered (95% coverage target)
+- Taxonomy evolves based on emerging topics
+
+**FR-4.2: Writer Agent for Page Generation**
+- AI agent generates Basics/Advanced pages from knowledge graph using structured schemas
+- **Input:** Concept node from Ontology Layer (triggered monthly after concept review)
+- **Step 1:** Query CONCEPT schema from Graph DB - Load target concept + connected concepts + relationships; Retrieve relation types (prerequisite, related, subtopic, extends, contradicts)
+- **Step 2:** Query EVIDENCE schema to retrieve full evidence details - Full text, excerpts, source metadata, comment types
+- **Step 3:** Generate page structure following Concept Page UI Design: Title and summary; Dynamic relation blocks (only non-empty sections); Evidence previews embedded in each relation item; Sources & Commentary section with reading order; Contributors list
+- **Step 4:** Compose page content by: Citing evidence with proper attribution; Paraphrasing where appropriate; Maintaining evidence preview format; Including "why" explanations for each relation
+- Generated pages follow style guide (clarity, examples, trade-offs)
+- Flag conflicting evidence from multiple sources for Knowledge Team review
+- Page generation completes within 10 minutes per concept
+- Output: Markdown file conforming to Concept Page Structure
+
+**FR-4.3: Concept Promotion Flow (Advanced → Basics)**
+- Promote concepts from Advanced to Basics based on sustained importance
+- New concepts default to Advanced section
+- Metric-based evaluation tracks concept importance over time (mentions, usage, stability)
+- Monthly Knowledge Team review (2nd Saturday) evaluates promotion candidates
+- Promoted concepts move from Advanced → Basics with page updates
+- Promotion decisions documented with rationale
+
+**FR-4.4: Evolving Taxonomy Management**
+- Continuously update content categories as LLM field evolves
+- New categories can be added without restructuring
+- Content can be reassigned when taxonomy changes
+- Category deprecation with content migration plan
+- "Newly Discovered" categories reviewed quarterly for relevance
+
+**FR-5.1: Automated Publication Pipeline**
+- Approved content automatically flows from Notion → Public site
+- Weekly batch: Notion → Cherry app update (markdown files)
+- Zero-downtime deployments
+- Rollback capability for broken builds
+
+**FR-5.2: Structured Content Display**
+- Cherry renders content with professional layout and navigation
+- 3-section navigation (Basics, Advanced, Newly Discovered)
+- 2-level TOC with parent-child hierarchy
+- Built-in search functionality
+- Mobile-responsive design
+- Syntax highlighting for code
+- "Last updated" timestamps
+- Breadcrumb navigation
+
+**FR-6.1: URL Submission for Sources**
+- Community submits URLs for Content Ingestion Pipeline to monitor
+- Simple form/interface for URL submission
+- Validation: URL format, domain reachability
+- Queue for maintainer review
+- Approved URLs added to Content Ingestion Pipeline source list
+- Feedback to submitter (approved/rejected/reason)
+
+**FR-7.1: Content Source Configuration**
+- Manage which sources Content Ingestion Pipeline monitors for "Newly Discovered"
+- Configuration file lists: source URL, category mapping, polling frequency
+- Sources include: Twitter accounts, Discord channels, GitHub orgs, RSS feeds, blogs
+- Per-source enable/disable toggle
+- Source health monitoring (last successful pull, error rate)
+
+**FR-7.2: Curated Text Management for Basics/Advanced**
+- Manage library of curated sources (books, papers, canonical posts)
+- Document registry: source metadata (title, author, URL, PDF, publication date)
+- Extraction pipeline: PDF → text, web → markdown
+- Version tracking for updated sources
+- Source prioritization (canonical vs supplementary)
+
+**FR-8.1: Content Correction & Updates**
+- Fix errors, update outdated information, improve clarity
+- Error reporting mechanism (GitHub issues)
+- Fast-track corrections for critical errors
+- "Last updated" dates show freshness
+- Changelog for major page updates
+- Deprecated content marked clearly with alternatives
+
+**FR-9.1: Vector Storage for Deduplication**
+- Store embeddings of all unique content chunks
+- Embeddings generated for all approved content
+- Vector database indexes: source, category, date, topic
+- Similarity search: cosine similarity threshold for duplicates
+- Efficient querying (under 100ms for similarity check)
+
+**FR-10.1: User Registration & Login**
+- Secure user account creation and authentication system
+- Email/password registration with email verification
+- OAuth login (Google, GitHub)
+- Password reset flow
+- JWT-based session management
+- Secure password hashing (bcrypt/argon2)
+- Account email change with verification
+
+**FR-10.2: User Tier Management**
+- Support Free, Paid, and Enterprise tiers with appropriate feature access
+- Free tier: Access to all community content (no account required for read-only)
+- Paid tier: Personalization, custom sources, adaptive KB
+- Enterprise tier: Everything in Paid + Newsletter Studio
+- Tier-based feature gating in UI and API
+- Upgrade/downgrade flows with proration
+- Billing integration (Stripe or similar)
+
+**FR-10.3: User Profile Management**
+- Users can manage their account settings and preferences
+- Profile page: name, email, tier, join date
+- Preference management (separate from personalization settings)
+- Account deletion (GDPR compliance)
+- Export user data (GDPR compliance)
+- Reading history view (paid users)
+
+**FR-11.1: Custom Source Management**
+- Users can add private sources beyond community-curated content
+- Add/remove custom source URLs (RSS, Twitter, blogs, etc.)
+- Toggle which community sources to follow
+- Source validation (reachable, valid format)
+- Content Ingestion Pipeline ingests user's custom sources
+- Content from custom sources only visible to that user
+- Source management UI with active/inactive status
+
+**FR-11.2: Natural Language Scoring Criteria (Paid Tier)**
+- Users define scoring preferences in natural language, AI interprets into weights
+- Input field for natural language criteria
+- AI parses criteria and generates scoring weights
+- Confirmation UI showing interpreted weights
+- User can refine and iterate
+- Scoring applies to feed ranking and content prioritization
+- Default community scoring for users who don't customize
+
+**FR-11.3: Content Filtering & Feed Personalization (Paid Tier)**
+- Paid users personalize "Newly Discovered" through entity-level follows and category-level filtering
+- **Entity Follow (Registry-level):** Follow or unfollow specific tracked entities; Assign per-entity weight; Articles mentioning followed entities are surfaced; unfollowed entities are excluded
+- **Category Filtering:** Show/hide entire category groups; Assign per-category weight; Filters apply across all Newly Discovered category pages
+- **Personalized Page Output:** Newly Discovered category pages show filtered + reranked article list; Ranking signal: user_article_state.impact_score; Community page shown as fallback
+- Free users see full community-curated content; paid users see filtered/reranked view
+- Easy toggle between "Community" and "For You" views
+
+**FR-11.4: Adaptive Content Scoring**
+- Apply user's custom scoring criteria to content ranking
+- User-defined scoring weights applied to all content
+- Re-ranking of "Newly Discovered" feed based on user criteria
+- Score explanations: "This scored high because of your preference for X"
+- A/B comparison: community score vs personal score
+
+**FR-12.1: User-Controlled Topic Addition**
+- Paid users can add custom topics with reference articles
+- UI for adding new topics (not in community KB)
+- Upload or link reference articles/evidence
+- Topic name, category (Basics/Advanced), and description
+- Evidence extraction from user-provided references
+- Store in user-specific evidence layer linked to Graph DB
+- User's custom topics visible only to them
+
+**FR-12.2: Writer Agent Regeneration for Custom Topics**
+- Users command Writer Agent to generate pages for their custom topics
+- User clicks "Generate Page" for custom topic
+- Writer Agent loads user's custom evidence
+- Generates page in four-section format (Overview → Cherries → Child Concepts → Progressive References)
+- Page saved in user's personal knowledge base
+- Regeneration takes under 10 minutes
+- User can iterate: add more evidence → regenerate
+
+**FR-12.3: User Knowledge Base Management**
+- Manage custom topics and personal knowledge base
+- View all custom topics (list view)
+- Edit/delete custom topics
+- Add/remove/edit reference articles for topics
+- Trigger regeneration after changes
+- Export personal KB to markdown
+- Distinction between community content and personal custom content
+
+**FR-13.1: Multi-Language UI**
+- Platform interface available in multiple languages for global accessibility
+- **Initial Languages:** English (primary), Korean
+- Language selector in user settings and header
+- All UI elements translated: navigation, buttons, labels, form fields, error messages
+- User language preference saved (logged-in users)
+- Browser language detection for non-logged-in users (fallback to English)
+- RTL (Right-to-Left) layout support for future languages
+- Translation files: JSON-based i18n format
+- Easy addition of new languages
+
+**FR-13.2: Content Language Handling**
+- Clear distinction between UI language and content language
+- **MVP:** Content remains in original language (community-curated in English by default)
+- Language indicator on content pages
+- User can filter content by language (future enhancement)
+- **Post-MVP:** Machine translation option for content
+- Translation quality disclaimer when showing machine-translated content
+
+**FR-13.3: Internationalization Infrastructure**
+- Technical foundation for multi-language support
+- i18n library integrated (e.g., i18next, react-intl, vue-i18n)
+- Pluralization rules for different languages
+- Date/time formatting per locale
+- Number formatting per locale
+- Currency formatting (if applicable)
+- Translation management workflow
+- Translation coverage monitoring
+
+**FR-14.1: Newsletter Agent Configuration**
+- Enterprise users configure newsletter generation agent with custom parameters
+- **Prompt Configuration Panel:** Tone selection; Structure templates; Audience level; Focus areas
+- Save multiple configurations
+- Configuration presets for common newsletter types
+- Natural language custom instructions field
+
+**FR-14.2: Content Selection Interface**
+- Select evidence and sources for newsletter generation
+- **"Highly Rated News for This Week" View:** Show community-curated content; Show content from enterprise's custom sources; Filter by category, date range, topic
+- **Evidence Selection:** Multi-select UI for picking supporting evidence; Mix community + private sources; Preview selected items
+- **Source Selector:** Choose which sources newsletter references; Community sources + enterprise custom sources; Toggle sources on/off
+
+**FR-14.3: Newsletter Draft Generation**
+- One-click newsletter generation from configuration + selected evidence
+- **One-Click Generation:** Click "Generate Draft" button; Agent synthesizes content; Output formats: Markdown, Plain Text, HTML; Generation completes in under 5 minutes
+- **Draft Quality:** 90%+ of generated drafts require only minor edits; Proper citations and evidence attribution; Coherent structure; Matches specified tone and audience level
+- **In-App Editor:** Rich text editor for refinement; Markdown editing mode; Preview mode; Track changes/edits
+
+**FR-14.4: Version History & A/B Testing**
+- Track draft versions for iterative refinement and A/B testing
+- Automatic versioning on each regeneration or manual save
+- Version history panel showing all previous drafts
+- Compare versions side-by-side
+- Restore previous version
+- Tag versions for team collaboration
+- Notes field per version
+
+**FR-14.5: Email Distribution**
+- Send finished newsletters to email lists
+- Email list management (import, add, remove subscribers)
+- Send preview to test emails
+- Schedule send or send immediately
+- HTML email rendering from draft
+- Track send status (sent, failed, bounced)
+- Basic analytics: open rate, click rate
+- Integration with email service providers (SendGrid, Mailchimp, etc.)
+
+**FR-14.6: Team Collaboration (Growth Phase)**
+- Multi-user editing and approval workflows for Enterprise teams
+- Role-based access: Writer, Editor, Approver
+- Comment threads on drafts
+- Approval workflow: Draft → Review → Approved → Scheduled
+- Notification system for workflow state changes
+- Activity log: who edited what and when
+
+### NonFunctional Requirements
+
+**NFR-P1: Page Load Performance**
+- Pages load in under 2 seconds on 3G connection
+- Time to First Contentful Paint (FCP): under 1 second
+- Largest Contentful Paint (LCP): under 2.5 seconds
+- Images and assets optimized for web delivery
+- Lazy loading for images below the fold
+
+**NFR-P2: API Response Time**
+- API endpoints return responses in under 300ms (p95)
+- Database queries optimized with indexes and caching
+- Redis caching for frequently accessed content
+- GraphQL/REST API efficient batch loading
+
+**NFR-P3: Search Response Time**
+- Search returns results in under 500ms
+- Personalized search (paid users) under 700ms
+- Search indexes updated within 1 minute of content updates
+- Graceful degradation if search temporarily unavailable
+
+**NFR-P4: Pipeline Processing Performance**
+- Content ingestion: process 100+ items/hour
+- AI scoring: complete scoring within 5 minutes of ingestion
+- Deduplication check: under 100ms per item
+- Writer Agent page generation: under 10 minutes per concept
+- Database writes: batch operations for efficiency
+
+**NFR-P5: Personalization Performance**
+- Natural language criteria parsing: under 3 seconds
+- Personalized feed generation: under 2 seconds
+- Custom source ingestion: added to pipeline within 1 hour
+- User preference updates: reflected immediately
+
+**NFR-P6: Newsletter Studio Performance**
+- Newsletter draft generation: under 5 minutes
+- Version save: under 1 second
+- Email send: queued immediately, sent within 5 minutes
+- Large email lists (10,000+ subscribers): complete send within 30 minutes
+
+**NFR-S1: Content Volume Scaling**
+- Support 1,000+ pages without performance degradation
+- Graph DB handles 10,000+ concept nodes with 100,000+ relationships efficiently
+- Vector database handles 100,000+ embedded chunks efficiently
+- Database handles millions of content records with efficient indexing
+
+**NFR-S2: User Scaling**
+- Handle 50,000 monthly active users (MAU)
+- Support 500 concurrent paid users without degradation
+- 50+ enterprise clients with separate newsletter workspaces
+- Database connection pooling for efficiency
+- Horizontal scaling for web servers
+
+**NFR-S3: Traffic Scaling**
+- Handle 500,000+ page views per month
+- CDN handles traffic spikes
+- Concurrent user capacity: 1,000+ simultaneous users
+- Auto-scaling infrastructure responds to load within 2 minutes
+- API rate limiting per user tier
+
+**NFR-S4: Personalization Data Scaling**
+- Support 500+ users with custom sources (avg 10 sources per user = 5,000 custom sources)
+- Reading history: 1 million+ records efficiently queryable
+- User preferences: instant updates and retrieval
+
+**NFR-S5: Newsletter Studio Scaling**
+- Support 50+ enterprise clients generating newsletters concurrently
+- Email queue handles 100,000+ emails per hour
+- Version history: 1,000+ versions per newsletter without performance impact
+- Draft storage scales to 10,000+ drafts across all enterprise users
+
+**NFR-S6: Contributor Scaling**
+- Support 50+ active contributors (2.5x current team)
+- Notion review workflow supports 10+ reviewers
+- Clear contribution guidelines reduce maintainer bottleneck
+
+**NFR-S7: Source Scaling**
+- Content Ingestion Pipeline monitors 50+ community sources without degradation
+- Support 5,000+ user-specific custom sources (paid tier)
+- Add new sources without pipeline reconfiguration
+- Handle 500+ new items per day during major release cycles
+
+**NFR-R1: Application Uptime & Availability**
+- 99.5% uptime target for web application (SLA for paid/enterprise tiers)
+- 99.9% uptime for enterprise tier (higher SLA)
+- Zero-downtime deployments (blue-green or rolling updates)
+- Graceful degradation: read-only mode if write operations fail
+- Automated health checks and monitoring
+- Status page for transparency during incidents
+
+**NFR-R2: Pipeline Reliability**
+- Content ingestion: 99% successful pull rate from active sources
+- AI scoring: 95% success rate (with retry logic)
+- Weekly publish cycle: 100% execution (manual override if automation fails)
+- Failed pipeline stages alert maintainers via notifications
+
+**NFR-R3: Data Integrity**
+- No data loss during pipeline processing
+- Idempotent operations (re-running doesn't create duplicates)
+- Postgres backups: daily with 30-day retention
+- Graph DB backups: daily with 60-day retention
+- Vector database backups: weekly with 60-day retention
+- Git history serves as content version control
+
+**NFR-R4: Error Recovery**
+- Automated retry with exponential backoff for transient failures
+- Dead-letter queue for permanently failed items
+- Manual intervention workflow for critical failures
+- Rollback capability for bad deployments
+
+**NFR-SEC1: Credential Management**
+- API keys stored in environment variables (not in code)
+- GitHub Secrets for sensitive credentials in Actions
+- Notion API tokens rotated quarterly
+- LLM provider API keys with minimal required permissions
+- Postgres credentials use strong passwords with limited access
+
+**NFR-SEC2: Input Validation**
+- URL submissions validated (format, domain, reachability)
+- Markdown content sanitized to prevent XSS
+- File uploads restricted (if implemented)
+- Rate limiting on URL submission form (prevent spam)
+
+**NFR-SEC3: Dependency Security**
+- Automated dependency scanning (Dependabot, Snyk)
+- Quarterly security updates for critical dependencies
+- No known high-severity CVEs in production dependencies
+- Python packages from trusted sources (PyPI)
+
+**NFR-SEC4: User Authentication & Session Security**
+- Secure password storage using bcrypt or argon2
+- JWT tokens for session management with appropriate expiration
+- OAuth2 implementation for third-party authentication (Google, GitHub)
+- Password reset tokens expire after 24 hours
+- Session invalidation on logout
+- Multi-device session management
+- Account lockout after 5 failed login attempts
+
+**NFR-SEC5: Data Privacy & GDPR Compliance**
+- Personal Data Collection: Email, name, reading history, preferences, custom sources
+- User Rights: Right to access; Right to deletion; Right to portability; Right to opt-out
+- Data Retention: Active accounts (indefinite); Deleted accounts (30 days); Billing records (7 years)
+- Third-Party Data Sharing: No selling of user data; Data processing agreements with processors
+- Encryption: Data in transit (TLS 1.3); Data at rest (Database encryption); Passwords (never stored in plaintext)
+- Privacy Policy and Cookie Policy published
+- Compliance: GDPR (EU), CCPA (California), PIPEDA (Canada)
+
+**NFR-SEC6: Enterprise Data Isolation**
+- Enterprise client data isolated (multi-tenancy security)
+- Custom sources visible only to owning user/enterprise
+- Newsletter drafts private to enterprise workspace
+- No cross-enterprise data leakage
+- Audit logs for enterprise actions
+
+**NFR-A1: WCAG 2.1 AA Compliance**
+- Keyboard navigation for all interactive elements
+- Screen reader compatibility (semantic HTML, ARIA labels)
+- Sufficient color contrast (4.5:1 for normal text, 3:1 for large text)
+- Alt text for all meaningful images
+- Captions or transcripts for video content (if added)
+
+**NFR-A2: Responsive Design**
+- Mobile-friendly layout
+- Touch targets minimum 44x44 pixels
+- Text reflows without horizontal scrolling
+- Font size user-adjustable via browser settings
+
+**NFR-A3: Content Readability**
+- Plain language where possible (technical terms explained)
+- Hierarchical heading structure (H1 → H2 → H3)
+- Lists for scannable content
+- Code blocks with syntax highlighting
+- Avoid jargon without definitions
+
+**NFR-I1: Content Ingestion Pipeline Integration**
+- Clean API contract between Content Ingestion Pipeline, Notion and Postgres
+- Structured data format for content items (JSON schema)
+- Error handling for malformed data
+- Modular pipeline architecture for maintainability
+
+**NFR-I2: Notion Integration**
+- Notion API rate limits respected (3 requests/second)
+- Robust handling of Notion API changes
+- Fallback for Notion downtime (manual review queue)
+- Export capability if Notion migration needed
+
+**NFR-I3: GitHub Integration**
+- GitHub Actions workflows reliable and maintainable
+- Automated commits use dedicated bot account
+- Webhook for deployment notifications
+
+**NFR-I4: Graph Database Integration**
+- Two-layer architecture (Concept Ontology, Evidence) consistently maintained
+- Clean API for Writer Agent to query concepts, relationships, and evidence
+- Support for Neo4j or compatible graph database
+- Efficient graph traversal queries (under 500ms)
+- Backup/restore procedures for all two layers
+- Migration path if graph DB provider changes
+
+**NFR-I5: Vector Database Integration**
+- Pluggable architecture supports multiple providers (Milvus, ChromaDB, Pinecone)
+- Consistent embedding format across providers
+- Migration path between vector DB providers
+- Backup/restore procedures documented
+- Vector DB used only for deduplication (Graph DB is primary knowledge store)
+
+**NFR-I6: Multi-LLM Provider Support**
+- Graceful fallback between OpenAI, Gemini, Ollama
+- Configuration-driven provider selection
+- Cost tracking per provider
+- Consistent output format across providers
+
+**NFR-M1: Code Quality**
+- Python code follows PEP 8 style guide
+- Type hints for function signatures
+- Comprehensive docstrings for public APIs
+- Linting enforced in CI/CD (flake8, black)
+- Unit test coverage target: 70%+
+
+**NFR-M2: Documentation**
+- README files in all major directories
+- Architecture documentation
+- Setup/installation guide for new contributors
+- Troubleshooting guide for common issues
+- API documentation for internal modules
+
+**NFR-M3: Modularity**
+- Clear separation of concerns (ingestion, scoring, synthesis, publishing)
+- Operator pattern for content types (modular pipeline design)
+- Pluggable components (LLM providers, vector databases)
+- Configuration files, not hardcoded values
+
+**NFR-M4: Monitoring & Observability**
+- Structured logging for all pipeline stages
+- Log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
+- Scheduler monitoring dashboard (job status, execution logs)
+- GitHub Actions logs for build/deploy monitoring
+- Alerting for critical failures (email, Slack)
+
+**NFR-M5: Testing Strategy**
+- Unit tests for core logic (deduplication, scoring algorithms)
+- Integration tests for pipeline stages
+- End-to-end smoke tests for full pipeline
+- Manual testing checklist for deployments
+- Test data fixtures for reproducible testing
+
+**NFR-DQ1: Content Freshness**
+- "Newly Discovered" updated at least weekly
+- "Last updated" timestamps accurate to the hour
+- Stale content flagged after 6 months (for Basics/Advanced)
+- Major LLM releases reflected within 48 hours
+
+**NFR-DQ2: Content Accuracy**
+- Source citations required for all factual claims
+- Contradictory information flagged and surfaced
+- Error corrections within 24 hours of reported issue
+- Community review before major updates
+
+**NFR-DQ3: Metadata Quality**
+- All pages have required frontmatter (title, date, category, tags)
+- SEO metadata complete and descriptive
+- Categories assigned consistently
+- Tags follow controlled vocabulary
+
+### Additional Requirements
+
+**Infrastructure Requirements:**
+- Tailscale for secure access to all infrastructure resources (Database access via Tailscale IP; Internal services communicate over Tailscale network; Development and production use same Tailscale net with ACL separation; No public endpoints for databases)
+- Docker Compose for local development (PostgreSQL 16 with pgvector, port 5432; GraphDB, port 7200)
+- Cron scheduling for pipeline jobs (weekly-publish.ts: Sunday 00:00 UTC; notion-backup.ts: Daily 00:00; news-ingestion.ts: Every 6 hours; writer-agent: Daily at 02:10)
+- All jobs write results to pipeline_runs table with Slack + email alerts on failures
+
+**Backup Strategy:**
+- Evidence Layer (RDS): Automated RDS snapshots (Daily, 30 days retention); Point-in-time recovery (Continuous, 7-day window)
+- Concept Layer (GraphDB): JSON/RDF export → S3 (Weekly, 60 days retention)
+- Vector DB (pgvector): Included in RDS backups (Daily, with RDS)
+
+**Environment Variables:**
+- All credentials stored in environment variables only (never hardcoded, never committed)
+- .env.example shows required keys with placeholder values
+- Required: DATABASE_URL, GRAPH_DB_URL, ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY, NOTION_API_TOKEN, NOTION_DATABASE_ID, GITHUB_PAT, GITHUB_REPO, MCP_SERVER_URL, SLACK_WEBHOOK_URL, ALERT_EMAIL, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_BACKUP_BUCKET
+
+**Data Architecture Requirements:**
+- Tenancy model: user is top-level tenant (no separate company/entity)
+- News Pipeline: PostgreSQL 16 (crawl → dedup → per-user AI scoring → snapshots)
+- Entity Registries: PostgreSQL 16 (KT-maintained master lists of tracked models, frameworks, tools, benchmarks)
+- Books/Evidence Pipeline: PostgreSQL 16 (PDF/HTML → paragraphs → concept linkage → embeddings)
+- Concept Layer: GraphDB (RDF) for Ontology (stable concept nodes + relationships)
+- Personalization Layer: PostgreSQL 16 (per-user follow configs, scoring preferences, digest preferences, concept evidence selections)
+- Webapp Read Layer: PostgreSQL 16 (pre-built UI snapshots; O(1) reads, no JOIN at request time)
+- Operations: PostgreSQL 16 (run logs, processing progress, contributor registry)
+
+**Epic to Architecture Mapping:**
+- Epic 1: Foundation & Core Infrastructure - Databases, tooling, CI/CD, brownfield adaptation
+- Epic 2: Newly Discovered Pipeline - News ingestion → Notion → Postgres backup → GitHub weekly
+- Epic 3: Evidence Ingestion & Knowledge Graph - Documents → Evidence Layer → Concept Layer
+- Epic 4: Writer Agent & Publication - Knowledge graph → synthesis → webapp content
+- Epic 5: Community & Quality Operations - PR workflow, link validation, backup
+
+### UX Design Requirements
+
+**Design System Requirements:**
+- Use shadcn/ui (New York style) + Tailwind CSS
+- Light mode default with dark mode support (via next-themes)
+- OKLCH color space for better color management
+- Brand Colors: Cherry (#C94B6E), Violet (#7B5EA7), Success (#2D7A5E)
+- Typography: Geist (primary), Plus Jakarta Sans (display), Inter (fallback)
+- Responsive breakpoints: Mobile (default), Desktop (lg: 1024px+), Wide (1440px+)
+
+**Custom Components (Implemented):**
+- UX-DR1: Sidebar Navigation with tree-stem visual pattern and curved branches
+- UX-DR2: Mobile Sidebar using Sheet component
+- UX-DR3: Buzz Treemap for interactive category distribution visualization
+- UX-DR4: Top Items List with star ratings and badges
+- UX-DR5: Page Header component with title and subtitle
+- UX-DR6: Handbook Placeholder for coming soon pages
+- UX-DR7: Patch Notes Page with timeline
+- UX-DR8: Concept Pages (frameworks, model updates, case studies)
+
+**Accessibility Requirements:**
+- WCAG 2.1 Level AA target
+- Keyboard navigation for all interactive elements
+- Focus indicators: 2px cherry outline
+- Semantic HTML: nav, main, article, section
+- ARIA labels for icons without visible text
+- Touch targets: Minimum 44×44px on mobile
+
+**Animation Requirements:**
+- Base transitions: 150ms ease on interactive elements
+- Skeleton loading: Pulse animation (1.5s infinite)
+- Card hover: Shadow transition (150ms)
+- Treemap hover: Brightness reduction (200ms)
+- Toast: Slide in + fade (300ms)
+
+**Layout Requirements:**
+- Sidebar: 240px width (hidden on mobile)
+- Content padding: 16px (mobile), 40px (desktop)
+- Page title: 20px (mobile), 30px (desktop)
+- Container max-width: 1440px
+- Spacing scale: 4px grid base unit
+
+### FR Coverage Map
+
+**Epic 1 - Discover Curated Content (Universal):**
+FR-1.1: Multi-Source Content Collection
+FR-1.2: Intelligent Deduplication
+FR-2.1: AI-Powered Content Scoring
+FR-2.2: Knowledge Team Review Workflow
+FR-2.3: Content Value Assessment
+FR-5.1: Automated Publication Pipeline
+FR-7.1: Content Source Configuration
+FR-9.1: Vector Storage for Deduplication
+→ Creates ONE weekly digest everyone sees
+
+**Epic 2 - Learn Structured Concepts (Universal):**
+FR-3.1: Graph Database Two-Layer Architecture
+FR-3.2: Ontology Extraction & Concept Discovery
+FR-3.3: Evidence Collection & Study Sessions
+FR-4.1: MECE Knowledge Organization
+FR-4.2: Writer Agent for Page Generation
+FR-4.3: Concept Promotion Flow
+FR-4.4: Evolving Taxonomy Management
+FR-7.2: Curated Text Management
+FR-8.1: Content Correction & Updates
+→ Creates ONE knowledge base everyone references
+
+**Epic 3 - Web Platform (Frontend + Contributor Tools):**
+FR-5.2: Structured Content Display
+FR-6.1: URL Submission for Sources
+FR-8.1: Content Correction & Updates (contributor workflows)
+All UX-DRs: 8 custom components + 50+ shadcn/ui components
+
+**Epic 4 - Generate Newsletters:**
+FR-14.1: Newsletter Agent Configuration
+FR-14.2: Content Selection Interface
+FR-14.3: Newsletter Draft Generation
+FR-14.4: Version History & A/B Testing
+FR-14.5: Email Distribution
+FR-14.6: Team Collaboration
+
+**Epic 5 - Personalize Your Feed:**
+FR-10.1: User Registration & Login
+FR-10.2: User Tier Management
+FR-11.1: Custom Source Management
+FR-11.2: Natural Language Scoring Criteria
+FR-11.3: Content Filtering & Feed Personalization
+FR-11.4: Adaptive Content Scoring
+
+**Epic 6 - Build Your Knowledge Base:**
+FR-10.3: User Profile Management
+FR-12.1: User-Controlled Topic Addition
+FR-12.2: Writer Agent Regeneration for Custom Topics
+FR-12.3: User Knowledge Base Management
+
+**Epic 7 - Access in Your Language:**
+FR-13.1: Multi-Language UI
+FR-13.2: Content Language Handling
+FR-13.3: Internationalization Infrastructure
+
+**All NFRs apply across all epics** (Performance, Scalability, Reliability, Security, Accessibility, Integration, Maintainability, Data Quality)
+
+## Epic List
+
+### Epic 1: Discover Curated Content (Universal Version)
+Build the content pipeline that creates a single, high-quality weekly digest that **everyone** sees first. No personalization yet — one community-curated version for all users.
+**FRs covered:** FR-1.1, FR-1.2, FR-2.1, FR-2.2, FR-2.3, FR-5.1, FR-7.1, FR-9.1
+
+### Epic 2: Learn Structured Concepts (Universal Version)
+Build the knowledge graph and Writer Agent that creates comprehensive concept pages. Again, **one version for everyone** — the authoritative knowledge base all users reference.
+**FRs covered:** FR-3.1, FR-3.2, FR-3.3, FR-4.1, FR-4.2, FR-4.3, FR-4.4, FR-7.2, FR-8.1
+
+### Epic 3: Web Platform (Frontend + Contributor Tools)
+Connect your existing Next.js web frontend to the backend, making universal content accessible. Also add contributor tools so existing community members can easily submit sources and flag corrections.
+**FRs covered:** FR-5.2, FR-6.1, FR-8.1 (contributor workflows)
+**UX-DRs:** All 8 custom components + 50+ shadcn/ui components
+
+### Epic 4: Generate Newsletters
+Enterprise users can now generate newsletters from the universal content. Still **one version** being distributed to email lists, but now with newsletter generation workflows.
+**FRs covered:** FR-14.1, FR-14.2, FR-14.3, FR-14.4, FR-14.5, FR-14.6
+
+### Epic 5: Personalize Your Feed
+**NOW** introduce personalization. Paid users can customize their experience — custom sources, scoring preferences, filtered feeds, adaptive ranking. The universal version remains the default for free users.
+**FRs covered:** FR-10.1, FR-10.2, FR-11.1, FR-11.2, FR-11.3, FR-11.4
+
+### Epic 6: Build Your Knowledge Base
+Paid users can now create **personal concept pages** with custom evidence selection. The universal concept pages remain the default; users can opt into creating their own versions.
+**FRs covered:** FR-10.3, FR-12.1, FR-12.2, FR-12.3
+
+### Epic 7: Access in Your Language
+Add internationalization so users worldwide can navigate the UI in their preferred language. Content remains in original languages with clear indicators.
+**FRs covered:** FR-13.1, FR-13.2, FR-13.3
 
 ---
 
-## Epic 1: Foundation & Core Infrastructure
+## Epic 1: Discover Curated Content (Universal Version)
 
-**Goal:** Establish the monorepo, multi-database infrastructure, CI/CD pipelines, and shared tooling that all subsequent epics depend on. This epic adapts the existing curation pipeline into the brownfield SaaS project structure.
+Build the content pipeline that creates a single, high-quality weekly digest that **everyone** sees first. No personalization yet — one community-curated version for all users.
 
----
+**FRs covered:** FR-1.1, FR-1.2, FR-2.1, FR-2.2, FR-2.3, FR-5.1, FR-7.1, FR-9.1
 
-### Story 1.1: Monorepo & Project Scaffolding
+### Story 1.1: Status Check
 
-As a contributor,
-I want a well-structured monorepo with consistent tooling,
-So that I can develop any part of the system without configuration friction.
+As a developer working on this project,
+I want a comprehensive audit of existing code, database schema, and infrastructure,
+So that I understand the current state before making changes.
 
 **Acceptance Criteria:**
 
-**Given** the repository is cloned fresh
-**When** I run the setup command
-**Then** all workspaces (frontend, backend API, pipeline packages) are installed and lint/type-check passes with zero errors
-
-**And** the folder structure matches the architecture spec (`packages/pipeline/`, `apps/web/`, `apps/api/`, `handbook/`)
-**And** pnpm workspaces + Python virtual environment are both functional
-**And** a root `Makefile` or `justfile` provides unified commands (`make dev`, `make test`, `make lint`)
-
-**Prerequisites:** None
-
-**Technical Notes:** pnpm workspace monorepo; Python `handbook/` package alongside TypeScript packages; `.nvmrc` for Node version pinning; `pyproject.toml` for Python tooling (ruff, mypy); shared ESLint + Prettier config
-
----
-
-### Story 1.2: PostgreSQL Database Initialization
-
-As a developer,
-I want a production-ready PostgreSQL schema with migration tooling,
-So that all application data (users, content, preferences) is stored reliably.
-
-**Acceptance Criteria:**
-
-**Given** Docker Compose is running
-**When** I run the migration command
-**Then** all required tables are created with correct types, indexes, and constraints
-
-**And** the migration is idempotent (re-running does not create duplicates or errors)
-**And** a seed script populates test fixtures for local development
-**And** database connection pooling is configured (pg-pool or equivalent)
-
-**Prerequisites:** Story 1.1
-
-**Technical Notes:** Use Drizzle ORM or Prisma for TypeScript migrations; tables include: `content_items`, `sources`, `user_accounts`, `user_preferences`, `reading_history`, `newsletter_drafts`, `custom_topics`; indexes on frequently queried columns (source_id, score, status, created_at)
-
----
-
-### Story 1.3: Graph Database Initialization (Two-Layer Architecture)
-
-As a knowledge engineer,
-I want the Graph DB initialized with the two-layer concept-evidence schema,
-So that concept nodes and evidence records can be stored and queried efficiently.
-
-**Acceptance Criteria:**
-
-**Given** the graph database service is running
-**When** the setup script executes
-**Then** the Concept Layer schema is created (nodes: title, summary, relations, sources, contributors)
-
-**And** the Evidence Layer schema is created (nodes: evidence_id, source, location, text, excerpt, comment, tags, linked_concepts)
-**And** required indexes for efficient traversal are in place (concept → related concepts → evidence chains in < 500ms)
-**And** a sample concept with linked evidence can be inserted and retrieved via the query API
-
-**Prerequisites:** Story 1.1
-
-**Technical Notes:** Neo4j or compatible graph DB; Python `handbook/db_connection/graph_db.py` client; relation types defined: prerequisite, related, subtopic, extends, contradicts; evidence link is many-to-many (evidence ↔ concepts)
-
----
-
-### Story 1.4: Vector Database Initialization
-
-As a pipeline engineer,
-I want the vector database configured for content deduplication,
-So that embeddings can be stored and similarity searches run under 100ms.
-
-**Acceptance Criteria:**
-
-**Given** the vector DB service is running (Milvus, ChromaDB, or Pinecone)
-**When** an embedding is inserted
-**Then** a cosine similarity search returns the top-N matches within 100ms
-
-**And** the collection schema includes metadata fields: source, category, date, topic
-**And** the vector DB client is abstracted behind a pluggable interface (swap providers without code changes)
-**And** local dev uses an in-memory or file-backed provider; production uses cloud provider
-
-**Prerequisites:** Story 1.1
-
-**Technical Notes:** Python `handbook/db_connection/vector_db.py`; embedding model: OpenAI `text-embedding-3-small` or equivalent; pluggable interface pattern per NFR-I5; used only for deduplication (not primary knowledge store)
-
----
-
-### Story 1.5: Docker Compose Local Development Environment
-
-As a developer,
-I want a single `docker-compose up` command to run all services locally,
-So that I can develop and test without manual service configuration.
-
-**Acceptance Criteria:**
-
-**Given** Docker is installed
-**When** I run `docker-compose up`
-**Then** PostgreSQL, Graph DB, Vector DB, and Redis are all running and health-checked
-
-**And** environment variables are loaded from `.env.local` (with `.env.example` committed)
-**And** data volumes persist across restarts
-**And** services are accessible at documented localhost ports
-
-**Prerequisites:** Stories 1.2, 1.3, 1.4
-
-**Technical Notes:** `docker-compose.yml` at project root; Redis for caching (NFR-P2); include pgAdmin or similar for local DB inspection; `.env.example` documents all required vars
-
----
-
-### Story 1.6: CI/CD Pipelines (GitHub Actions)
-
-As a contributor,
-I want automated CI checks and deployment pipelines,
-So that every pull request is validated and merges are deployed reliably.
-
-**Acceptance Criteria:**
-
-**Given** a pull request is opened
-**When** GitHub Actions runs
-**Then** lint, type-check, and unit tests all pass before merge is allowed
-
-**And** the deploy workflow triggers on merge to `main` and achieves zero-downtime deployment
-**And** failed pipeline stages send alert notifications (email or Slack)
-**And** rollback via `git revert` + re-deploy is documented and tested
-
-**Prerequisites:** Story 1.1
-
-**Technical Notes:** `.github/workflows/ci.yml` (lint, test, type-check); `.github/workflows/deploy.yml` (blue-green or rolling deploy); dedicated bot account for automated commits; webhook for deployment notifications
-
----
-
-### Story 1.7: Database Backup Automation
-
-As an operator,
-I want automated daily backups for all databases with documented restore procedures,
-So that no data is lost in the event of a failure.
-
-**Acceptance Criteria:**
-
-**Given** the backup job is scheduled
-**When** it runs daily
-**Then** Postgres is backed up with 30-day retention
-
-**And** Graph DB is backed up with 60-day retention
-**And** Vector DB is backed up weekly with 60-day retention
-**And** restore procedure is documented and has been tested end-to-end
-
-**Prerequisites:** Stories 1.2, 1.3, 1.4, 1.6
-
-**Technical Notes:** `scripts/backup_databases.py`; use cloud storage (S3/GCS) for backup files; scheduled via GitHub Actions cron or cloud scheduler; alert on backup failure
-
----
-
-## Epic 2: Content Ingestion & "Newly Discovered" Pipeline
-
-**Goal:** Automatically aggregate LLM content from 10+ sources, deduplicate it, score it with AI, route it through Notion for Knowledge Team weekly review, and publish top-rated items to the webapp weekly.
-
----
-
-### Story 2.1: Content Source Configuration System
-
-As a pipeline operator,
-I want a configuration file that defines all monitored content sources,
-So that sources can be added, removed, or toggled without code changes.
-
-**Acceptance Criteria:**
-
-**Given** a `sources.yaml` (or equivalent) config file exists
-**When** the pipeline starts
-**Then** it reads source definitions (URL, category mapping, polling frequency, enable/disable toggle)
-
-**And** sources include: Twitter accounts, Discord channels, GitHub orgs, RSS feeds, blogs
-**And** per-source health is tracked (last successful pull, error rate)
-**And** adding a new source requires only a config file edit (no code changes)
-
-**Prerequisites:** Story 1.2
-
-**Technical Notes:** FR-7.1; config in `packages/pipeline/src/sources/sources.yaml`; source health stored in Postgres `sources` table; operator pattern for each source type (modular)
-
----
-
-### Story 2.2: Multi-Source Content Ingestion
-
-As a practitioner,
-I want LLM-related content aggregated automatically from all configured sources,
-So that I get comprehensive coverage without monitoring dozens of channels manually.
-
-**Acceptance Criteria:**
-
-**Given** sources are configured and the ingestion job runs
-**When** a new item is published on any monitored source
-**Then** it is discovered and stored within 24 hours
-
-**And** source metadata is preserved: URL, date, author, platform
-**And** the pipeline processes 100+ items per hour
-**And** source-specific adapters handle API auth, rate limits, and pagination
-
-**Prerequisites:** Stories 1.2, 2.1
-
-**Technical Notes:** FR-1.1; adapters in `packages/pipeline/src/newly-discovered/`; operator pattern for each source type; exponential backoff on transient failures; dead-letter queue for permanently failed items
-
----
-
-### Story 2.3: Content Deduplication
-
-As a user,
-I want unique insights in my feed — not the same story repeated 10 times,
-So that every item I see adds genuine value.
-
-**Acceptance Criteria:**
-
-**Given** a new content item is ingested
-**When** deduplication runs before AI scoring
-**Then** exact matches and near-duplicates (95%+ accuracy) are identified and filtered
-
-**And** chunk-level (paragraph) deduplication flags near-duplicate paragraphs within an item
-**And** the original source is preserved for merged duplicates
-**And** deduplication uses vector similarity (cosine threshold) against the Vector DB
-**And** the deduplication check completes in under 100ms per item
-
-**Prerequisites:** Stories 1.4, 2.2
-
-**Technical Notes:** FR-1.2; content-level dedup runs first (cheaper), then chunk-level; embeddings generated using configured embedding model; dedup must run before AI scoring to reduce API costs
-
----
-
-### Story 2.4: AI-Powered Content Scoring (1-5)
+**Given** the project repository exists
+**When** I run the status check
+**Then** a comprehensive report is generated documenting:
+  - All existing database tables with their schemas
+  - Current pipeline jobs and their schedules
+  - Environment configuration status
+  - Infrastructure components and their health
+  - Any gaps or issues identified
+
+**And** the report is saved to `{planning_artifacts}/status-check-report.md`
+
+### Story 1.2: Daily Publication Pipeline
 
 As a Knowledge Team member,
-I want content automatically scored 1-5 for relevance and quality,
-So that I can focus review time on the highest-value items.
+I want approved content to automatically publish daily from Notion to the live site,
+So that new content reaches users quickly without manual deployment.
 
 **Acceptance Criteria:**
 
-**Given** a deduplicated content item exists
-**When** the scoring agent runs
-**Then** it assigns a score 1-5 based on relevance, depth, novelty, and practicality
+**Given** the weekly publication pipeline exists (weekly-publish.ts)
+**When** the daily publication job runs
+**Then** approved Notion items are synced to Postgres and committed to GitHub daily
+**And** the job runs at a configured time (e.g., 00:00 UTC)
+**And** the job writes results to `pipeline_runs` table
+**And** failures trigger alerts (Slack + email)
+**And** zero-downtime deployment is maintained
 
-**And** scoring completes within 5 minutes of ingestion
-**And** score 5 = top-tier content worthy of inclusion in Newly Discovered
-**And** the scoring prompt and criteria are configurable without code changes
-**And** LLM provider failures trigger exponential backoff and retry
+### Story 1.3: Discover & Configure Additional Source
 
-**Prerequisites:** Story 2.3
+As a Content Curator,
+I want to discover and configure new content sources for the ingestion pipeline,
+So that we can expand our content coverage beyond the initial sources.
 
-**Technical Notes:** FR-2.1; scoring agent in `packages/pipeline/src/scoring/`; supports multi-LLM (OpenAI, Gemini, Ollama) per NFR-I6; score stored in `content_items.score` column; cost optimization via caching
+**Acceptance Criteria:**
+
+**Given** the content ingestion pipeline exists
+**When** I add a new source (Twitter, Discord, GitHub, RSS, blog)
+**Then** the source is validated (URL format, reachability)
+**And** the source is added to the source configuration
+**And** I can assign category mapping and polling frequency
+**And** the source appears in the source health monitoring
+**And** I can enable/disable the source toggle
+**And** content from the new source starts being ingested
 
 ---
 
-### Story 2.5: Notion Review Workflow Integration
+## Epic 2: Learn Structured Concepts (Universal Version)
+
+Build the knowledge graph and Writer Agent that creates comprehensive concept pages. One version for everyone — the authoritative knowledge base all users reference.
+
+**FRs covered:** FR-3.1, FR-3.2, FR-3.3, FR-4.1, FR-4.2, FR-4.3, FR-4.4, FR-7.2, FR-8.1
+
+### Story 2.1: Status Check
+
+As a developer working on the knowledge graph,
+I want a comprehensive audit of existing GraphDB, evidence layer, and related infrastructure,
+So that I understand the current state before making changes.
+
+**Acceptance Criteria:**
+
+**Given** the project repository exists
+**When** I run the knowledge graph status check
+**Then** a comprehensive report is generated documenting:
+  - GraphDB schema (Concept and Evidence layers)
+  - Existing concept nodes and relationships
+  - Evidence layer data (texts, chunks, metadata)
+  - Ontology extraction job status and schedule
+  - Writer Agent configuration and recent runs
+  - Any gaps or issues identified
+
+**And** the report is saved to `{planning_artifacts}/kg-status-check-report.md`
+
+### Story 2.2: Pipeline Integration
 
 As a Knowledge Team member,
-I want scored content items automatically surfaced in Notion for weekly review,
-So that I can validate summaries, adjust scores, and map items to the ontology.
+I want a unified pipeline that connects evidence ingestion, ontology extraction, and writer agent,
+So that the entire knowledge graph workflow runs seamlessly from source to published page.
 
 **Acceptance Criteria:**
 
-**Given** content items are scored
-**When** score-5 items exist
-**Then** they are auto-assigned to Knowledge Team members in Notion with status `pending`
+**Given** evidence ingestion, ontology extraction, and writer agent exist individually
+**When** I run the integrated knowledge graph pipeline
+**Then** evidence is ingested and stored in Evidence Layer
+**And** ontology extraction discovers and adds new concepts
+**And** Writer Agent generates pages for all updated concepts
+**And** the pipeline runs on a schedule (e.g., monthly after concept review)
+**And** the job writes results to `pipeline_runs` table
+**And** failures trigger alerts (Slack + email)
+**And** generated pages are ready for publication
 
-**And** team members can update: summary accuracy, score, ontology graph mapping
-**And** status flows: `pending` → `in_review` → `finished`
-**And** all review decisions are logged with an audit trail
-**And** Notion API rate limits (3 req/s) are respected with backoff
-
-**Prerequisites:** Story 2.4
-
-**Technical Notes:** FR-2.2; `packages/pipeline/src/integrations/notion-client.ts`; Notion DB schema: item, score, summary, assignee, status, review_notes, ontology_mapping; LLM-assisted ontology mapping suggestions during review
-
----
-
-### Story 2.6: Notion → PostgreSQL Backup Job
-
-As an operator,
-I want reviewed Notion content backed up to PostgreSQL automatically,
-So that content data is not solely dependent on Notion's availability.
-
-**Acceptance Criteria:**
-
-**Given** Notion review data exists
-**When** the backup job runs (daily)
-**Then** all reviewed items and their metadata are synced to the `content_items` Postgres table
-
-**And** the sync is idempotent (re-running does not create duplicates)
-**And** fallback to Postgres read-only mode activates if Notion is unavailable
-
-**Prerequisites:** Stories 1.2, 2.5
-
-**Technical Notes:** FR-NFR-I2; `packages/pipeline/src/jobs/notion-backup.ts`; incremental sync using `last_modified` timestamp; Notion downtime triggers manual review queue fallback
-
----
-
-### Story 2.7: Weekly Content Publication Job
-
-As a user,
-I want the top-rated content published to the webapp weekly,
-So that the Newly Discovered section always has fresh, high-quality items.
-
-**Acceptance Criteria:**
-
-**Given** the weekly publish job runs (e.g., Thursday after Wednesday review)
-**When** execution completes
-**Then** the top 20 `finished` score-5 items are exported as markdown files to the webapp content repo
-
-**And** deployment triggers automatically after export (zero-downtime)
-**And** rollback capability exists for broken builds
-**And** "Last updated" timestamps on published pages are accurate to the hour
-
-**Prerequisites:** Stories 2.5, 2.6, 1.6
-
-**Technical Notes:** FR-5.1; `packages/pipeline/src/jobs/weekly-publish.ts`; output: markdown files in `packages/pipeline/src/publication/`; score < 4 items go to Notion but are excluded from newsletter and top 20 must-reads (per project routing rules)
-
----
-
-## Epic 3: Knowledge Graph & Evidence Layer
-
-**Goal:** Build and populate the two-layer knowledge graph — curated evidence from authoritative sources forms the Evidence Layer, which is then organized into the Concept Ontology Layer that powers Writer Agent synthesis.
-
----
-
-### Story 3.1: Evidence Ingestion Pipeline (Curated Texts)
+### Story 2.3: Content Discovery for Initial Seeding & Ontology Creation
 
 As a Knowledge Team member,
-I want to ingest books, papers, and canonical posts into the Evidence Layer,
-So that authoritative source material is available for AI synthesis.
+I want to discover quality educational content for LLM engineers and create an initial ontology from it,
+So that we have a solid foundation of concepts and evidence to build upon.
 
 **Acceptance Criteria:**
 
-**Given** a curated text source (PDF, web URL, or markdown)
-**When** the ingestion pipeline runs
-**Then** the text is extracted, chunked, and stored in the Evidence Layer with full metadata
-
-**And** metadata includes: source title, author, URL/PDF reference, publication date, topic, quality rating
-**And** chunks are tagged with relevant concept associations (initial auto-tagging)
-**And** version tracking captures updated sources
-**And** text chunking uses semantic boundaries (paragraphs), not arbitrary character counts
-
-**Prerequisites:** Stories 1.2, 1.3
-
-**Technical Notes:** FR-3.3, FR-7.2; `handbook/pipeline/evidence_ingestion/`; PDF extraction via `pdfminer` or `pypdf`; web → markdown via `trafilatura`; chunk size ~500 tokens with overlap; Evidence Layer schema per FR-3.1
+**Given** the project needs initial knowledge base content
+**When** I execute the content discovery and ontology creation process
+**Then** quality sources are identified (papers, documentation, canonical posts, books)
+**And** sources are relevant to LLM engineering education
+**And** content is ingested into Evidence Layer with proper metadata
+**And** noun phrases are extracted from evidence paragraphs
+**And** word count and frequency metrics filter noise vs meaningful concepts
+**And** LLM-assisted concept relationship detection identifies: prerequisite, related, subtopic, extends, contradicts
+**And** initial ontology is created with core concepts and relationships
+**And** concepts are organized into Basics and Advanced sections
+**And** Knowledge Team reviews and approves the initial ontology
+**And** results are logged for audit trail
 
 ---
 
-### Story 3.2: Concept Node Management API
+## Epic 3: Web Platform (Frontend + Contributor Tools)
+
+Connect your existing Next.js web frontend to the backend, making universal content accessible. Also add contributor tools so existing community members can easily submit sources.
+
+**FRs covered:** FR-5.2, FR-6.1, FR-8.1 (contributor workflows)
+**UX-DRs:** All 8 custom components + 50+ shadcn/ui components
+
+### Story 3.1: Backend Integration
+
+As a user,
+I want to view curated content from the Postgres backend on the web frontend,
+So that I can access the knowledge base through a browser.
+
+**Acceptance Criteria:**
+
+**Given** the Next.js frontend exists
+**Given** content is stored in Postgres (from Epic 1 and Epic 2 pipelines)
+**When** I navigate to the site
+**Then** content is fetched from Postgres and displayed
+**And** the 3-section navigation is rendered (Basics, Advanced, Newly Discovered)
+**And** each section shows the appropriate content
+**And** pages render with proper markdown formatting
+**And** "Last updated" timestamps are displayed
+
+### Story 3.2: URL Submission Form
+
+
+
+As a community contributor,
+I want to submit URLs for new content sources through a web form,
+So that the Content Ingestion Pipeline can monitor them.
+
+**Acceptance Criteria:**
+
+**Given** the URL submission page exists
+**When** I submit a URL (Twitter, Discord, GitHub, RSS, blog)
+**Then** the URL is validated for format and reachability
+**And** the submission is queued for maintainer review
+**And** I receive feedback on submission status (pending/approved/rejected)
+**And** approved URLs are added to the source configuration
+**And** rate limiting prevents spam submissions
+
+### Story 3.3: Markdown Submission Page
 
 As a Knowledge Team member,
-I want to create, update, and relate concept nodes in the Ontology Layer,
-So that the knowledge graph accurately reflects the LLM engineering domain.
+I want to submit markdown content (papers, documentation, canonical posts) through a web form,
+So that it triggers the evidence ingestion pipeline from Epic 2.
 
 **Acceptance Criteria:**
 
-**Given** the Graph DB is initialized
-**When** I use the concept management API
-**Then** I can create concept nodes with: title (noun-phrase only), summary, relation types
-
-**And** relation types supported: prerequisite, related, subtopic, extends, contradicts
-**And** evidence is never stored in concept nodes — only linked via evidence_id
-**And** concept queries return connected concepts + relationship types in < 500ms
-**And** the API is callable by both the Writer Agent and the Notion review interface
-
-**Prerequisites:** Story 1.3
-
-**Technical Notes:** FR-3.1; `handbook/db_connection/graph_db.py`; enforce noun-phrase naming convention in validation; concepts are reusable across all sources; graph view shows concepts only (no evidence nodes cluttering visualization)
+**Given** the markdown submission page exists
+**When** I submit markdown content or a URL
+**Then** the content is queued for evidence ingestion pipeline
+**And** the pipeline extracts and chunks the text into paragraphs
+**And** chunks are stored in the Evidence Layer with metadata (source, date, topic)
+**And** embeddings are generated for deduplication
+**And** I can track the ingestion status (queued/processing/completed)
+**And** completed content is ready for ontology extraction and Writer Agent
 
 ---
 
-### Story 3.3: Evidence-to-Concept Linking
+## Epic 4: Generate Newsletters
 
-As a knowledge engineer,
-I want evidence chunks to be linked to relevant concept nodes,
-So that the Writer Agent can retrieve all evidence for a concept in one query.
+Enterprise users can now generate newsletters from the universal content. Still **one version** being distributed to email lists, but now with newsletter generation workflows.
+
+**FRs covered:** FR-14.1, FR-14.2, FR-14.3, FR-14.5
+
+### Story 4.1: Newsletter Agent Configuration
+
+As an Enterprise user,
+I want to configure newsletter generation parameters (tone, structure, audience level),
+So that the generated newsletters match my brand and communication style.
 
 **Acceptance Criteria:**
 
-**Given** evidence chunks exist in the Evidence Layer
-**When** the linking process runs (manual or LLM-assisted)
-**Then** each evidence chunk is associated with one or more concept nodes (many-to-many)
+**Given** I have Enterprise tier access
+**When** I access the Newsletter Configuration Panel
+**Then** I can set tone selection (professional, casual, technical)
+**And** I can select structure templates (weekly digest, deep dive, quick hits)
+**And** I can specify audience level (beginner, intermediate, advanced)
+**And** I can set focus areas for content prioritization
+**And** I can save multiple named configurations
+**And** I can use natural language custom instructions field
+**And** I can select from configuration presets for common newsletter types
 
-**And** evidence previews can be retrieved per concept: excerpt + source + comment type
-**And** evidence types are tracked: paraphrase, direct quote, figure reference
-**And** linking can be done via the Notion review interface (LLM-assisted suggestions)
+### Story 4.2: Content Selection Interface
 
-**Prerequisites:** Stories 3.1, 3.2
-
-**Technical Notes:** FR-3.1; evidence `linked_concepts` field stores concept IDs; LLM suggests likely concept links during Wednesday study sessions; Knowledge Team confirms/corrects suggestions
-
----
-
-### Story 3.4: Monthly Ontology Extraction Job
-
-As a knowledge engineer,
-I want a monthly batch job to identify new concept candidates from the Evidence Layer,
-So that the ontology stays current with emerging LLM concepts.
+As an Enterprise user,
+I want to select evidence and sources for newsletter generation from a curated interface,
+So that I can control what content appears in my newsletter.
 
 **Acceptance Criteria:**
 
-**Given** the monthly batch job runs (2nd Saturday)
-**When** execution completes
-**Then** new concept noun-phrase candidates are extracted from unlinked or under-linked evidence
+**Given** I have Enterprise tier access
+**When** I access the Content Selection Interface
+**Then** I see "Highly Rated News for This Week" view with community-curated content
+**And** I can filter content by category, date range, and topic
+**And** I can multi-select evidence items with a checkbox UI
+**And** I can mix community and private sources in my selection
+**And** I can preview selected items before generation
+**And** I can toggle sources on/off to control what the newsletter references
+**And** my selections persist until I change them
 
-**And** word count and frequency metrics filter noise from meaningful concepts
-**And** LLM-assisted relationship detection suggests where new concepts connect to existing ones
-**And** candidates are surfaced to the Knowledge Team in Notion for review and approval
-**And** approved concepts default to the Advanced section (not Basics)
+### Story 4.3: Newsletter Draft Generation
 
-**Prerequisites:** Stories 3.1, 3.2, 3.3
-
-**Technical Notes:** FR-3.2; `handbook/pipeline/evidence_ingestion/ontology_extractor.py`; scheduled via cron or GitHub Actions; noun-phrase extraction via spaCy or similar NLP library; frequency threshold configurable
-
----
-
-## Epic 4: Writer Agent & Knowledge Synthesis
-
-**Goal:** Transform the knowledge graph into polished, structured Basics/Advanced concept pages using an AI Writer Agent that produces the four-section format (Overview → Cherries → Child Concepts → Progressive References).
-
----
-
-### Story 4.1: Writer Agent Core Pipeline
-
-As a practitioner,
-I want structured concept pages generated from the knowledge graph,
-So that I get distilled, well-cited knowledge without reading dozens of sources myself.
+As an Enterprise user,
+I want to generate newsletter drafts with one click from my configuration and selected evidence,
+So that I can quickly create newsletters without manual writing.
 
 **Acceptance Criteria:**
 
-**Given** a concept node exists in the Ontology Layer with linked evidence
-**When** the Writer Agent runs for that concept
-**Then** it queries the CONCEPT schema (concept + connected concepts + relationships)
+**Given** I have configured newsletter parameters
+**And** I have selected content evidence
+**When** I click "Generate Draft"
+**Then** the agent synthesizes content from my configuration and selections
+**And** output is available in Markdown, Plain Text, and HTML formats
+**And** generation completes within 5 minutes
+**And** 90%+ of generated drafts require only minor edits
+**And** proper citations and evidence attribution are included
+**And** the structure is coherent and matches specified tone
+**And** an in-app editor is available for refinement (Markdown mode, Preview mode)
 
-**And** it queries the EVIDENCE schema (full text, excerpts, source metadata, comment types)
-**And** it generates a page following the four-section format:
-  1. Overview (definition + why it matters + practical relevance)
-  2. Cherries (MECE summaries: source title + structured key insight)
-  3. Child Concepts / Co-occurring Concepts (relationships with brief explanations)
-  4. Progressive References (MECE learning path: "Start here → Next → Deeper")
-**And** page generation completes within 10 minutes per concept
-**And** output is a markdown file conforming to the Concept Page Structure
+### Story 4.4: Email Distribution
 
-**Prerequisites:** Stories 3.2, 3.3
-
-**Technical Notes:** FR-4.2; `handbook/pipeline/writer_agent/`; LLM prompt templates for each section; evidence citations use proper attribution; paraphrasing vs direct quote tracked; multi-LLM support (OpenAI, Gemini, Ollama)
-
----
-
-### Story 4.2: Conflicting Evidence Detection & Flagging
-
-As a Knowledge Team member,
-I want conflicting evidence from multiple sources flagged during page generation,
-So that I can review and resolve contradictions before publishing.
+As an Enterprise user,
+I want to send finished newsletters to my email lists,
+So that my subscribers receive the content on my schedule.
 
 **Acceptance Criteria:**
 
-**Given** the Writer Agent generates a page
-**When** evidence from multiple sources contradicts on the same claim
-**Then** the conflict is flagged in the output markdown (e.g., `<!-- CONFLICT: Source A says X, Source B says Y -->`)
-
-**And** flagged pages are queued for Knowledge Team review before publication
-**And** conflicting sections are not published until resolved
-
-**Prerequisites:** Story 4.1
-
-**Technical Notes:** FR-4.2 domain constraint; contradiction detection via LLM comparison of evidence excerpts on the same claim; conflict queue stored in Postgres
-
----
-
-### Story 4.3: Concept Promotion Flow (Advanced → Basics)
-
-As a practitioner,
-I want the Basics section to reflect truly foundational concepts — not just trendy ones,
-So that I can trust the Basics section as a stable learning foundation.
-
-**Acceptance Criteria:**
-
-**Given** the monthly review runs (2nd Saturday)
-**When** concept promotion candidates are evaluated
-**Then** concepts with sustained importance metrics (mentions, usage, stability over 3+ months) are surfaced for review
-
-**And** Knowledge Team approves/rejects promotion candidates
-**And** promoted concepts move from Advanced → Basics with page updates and re-generation trigger
-**And** promotion decisions are documented with rationale in the Graph DB
-
-**Prerequisites:** Stories 4.1, 3.4
-
-**Technical Notes:** FR-4.3; importance metric = aggregate of: evidence link count, mention frequency in new content, cross-concept relation density; promotion flag stored on concept node; Writer Agent re-runs for promoted concepts
+**Given** I have a completed newsletter draft
+**When** I access the Email Distribution interface
+**Then** I can manage email lists (import, add, remove subscribers)
+**And** I can send a preview to test emails
+**And** I can schedule send for a specific time or send immediately
+**And** HTML email is rendered properly from my draft
+**And** I can track send status (sent, failed, bounced)
+**And** basic analytics are available (open rate, click rate)
+**And** integration works with email service providers (SendGrid, Mailchimp, etc.)
 
 ---
 
-### Story 4.4: Evolving Taxonomy Management
+## Epic 5: Personalize Your Feed
 
-As a knowledge engineer,
-I want to add, reassign, or deprecate content categories without restructuring the system,
-So that Cherry stays current as the LLM field evolves.
+NOW introduce personalization. Paid users can customize their experience — custom sources, scoring preferences, filtered feeds, adaptive ranking. The universal version remains the default for free users.
 
-**Acceptance Criteria:**
+**FRs covered:** FR-10.1, FR-10.2, FR-11.1, FR-11.2, FR-11.3, FR-11.4
 
-**Given** a new LLM topic category emerges
-**When** I add it to the taxonomy config
-**Then** concepts can be assigned to the new category immediately without pipeline changes
-
-**And** content can be reassigned when taxonomy changes
-**And** deprecated categories show a migration plan and redirect to replacement categories
-**And** "Newly Discovered" categories are reviewed quarterly (automated reminder)
-
-**Prerequisites:** Story 4.1
-
-**Technical Notes:** FR-4.4; taxonomy defined in `packages/pipeline/src/sources/taxonomy.yaml`; category assignments stored in Postgres with soft-delete for deprecation
-
----
-
-### Story 4.5: Writer Agent Publication to Webapp
-
-As a contributor,
-I want generated concept pages automatically deployed to the webapp,
-So that Basics/Advanced content stays up-to-date without manual file copying.
-
-**Acceptance Criteria:**
-
-**Given** the Writer Agent generates a new or updated page
-**When** the page passes conflict checks
-**Then** the markdown file is committed to the webapp content directory and deployment triggers
-
-**And** deployment is zero-downtime
-**And** "Last updated" timestamps are accurate
-**And** failed deploys alert maintainers and do not overwrite the previous good state
-
-**Prerequisites:** Stories 4.1, 4.2, 1.6
-
-**Technical Notes:** FR-5.1; `packages/pipeline/src/jobs/writer-agent.ts` orchestrates Python agent + Git commit; automated bot account for commits; rollback via `git revert`
-
----
-
-## Epic 5: Web Application Frontend
-
-**Goal:** Replace the static Jupyter Book with a dynamic, responsive web application that renders all Cherry content (Basics, Advanced, Newly Discovered) with professional navigation, search, and i18n support.
-
----
-
-### Story 5.1: Web App Foundation & Routing
-
-As a user,
-I want to access Cherry through a fast, modern web application,
-So that I can browse knowledge without the limitations of a static site.
-
-**Acceptance Criteria:**
-
-**Given** the web app is deployed
-**When** I visit the homepage
-**Then** the app loads with FCP < 1 second and LCP < 2.5 seconds on a 3G connection
-
-**And** three top-level routes exist: `/basics`, `/advanced`, `/newly-discovered`
-**And** server-side rendering (SSR) or static generation is used for content pages
-**And** the app is mobile-responsive with touch targets ≥ 44×44px
-
-**Prerequisites:** Story 1.6
-
-**Technical Notes:** Next.js (App Router) or equivalent SSR framework; Tailwind CSS for styling; content loaded from markdown files generated by pipeline; deployed to Vercel or equivalent cloud host; replaces GitHub Pages / Jupyter Book
-
----
-
-### Story 5.2: Content Navigation & Two-Level TOC
-
-As a practitioner,
-I want clear, hierarchical navigation across all knowledge sections,
-So that I can orient myself and jump to exactly what I need.
-
-**Acceptance Criteria:**
-
-**Given** I am on any content page
-**When** I look at the sidebar/navigation
-**Then** I see a two-level TOC: parent concepts → child implementations for Basics and Advanced
-
-**And** the Newly Discovered section shows the 4 main categories with subcategories
-**And** breadcrumb navigation is present on all pages
-**And** active section is highlighted in the navigation
-**And** navigation is accessible via keyboard (WCAG 2.1 AA)
-
-**Prerequisites:** Story 5.1
-
-**Technical Notes:** FR-5.2; dynamic TOC generated from markdown frontmatter; Newly Discovered categories: Research & Models, Service & System Building, Industry & Business Applications, Ecosystem & Governance
-
----
-
-### Story 5.3: Concept Page Rendering (Four-Section Format)
-
-As a practitioner,
-I want concept pages rendered with the full four-section structure,
-So that I get a clear, evidence-backed understanding of each concept.
-
-**Acceptance Criteria:**
-
-**Given** I navigate to a Basics or Advanced concept page
-**When** the page renders
-**Then** I see: Overview → Cherries → Child Concepts → Progressive References sections in order
-
-**And** relation blocks are rendered dynamically (only non-empty sections shown)
-**And** evidence previews in Cherries show: excerpt + source + comment type
-**And** Progressive References show the MECE learning path with clear "Start here → Next" progression
-**And** code blocks have syntax highlighting
-**And** "Last updated" timestamp is visible
-
-**Prerequisites:** Stories 5.1, 4.5
-
-**Technical Notes:** FR-5.2, FR-4.2; MDX or remark plugins for custom rendering; relation block components are reusable; syntax highlighting via Prism or Shiki
-
----
-
-### Story 5.4: Search Functionality
-
-As a user,
-I want to search across all Cherry content,
-So that I can find specific concepts, techniques, or topics in seconds.
-
-**Acceptance Criteria:**
-
-**Given** I type a query in the search bar
-**When** results load
-**Then** relevant pages appear within 500ms
-
-**And** search covers titles, summaries, and content body across all sections
-**And** results show: page title, section (Basics/Advanced/Newly Discovered), brief excerpt
-**And** search index updates within 1 minute of new content being published
-**And** graceful degradation message is shown if search is temporarily unavailable
-
-**Prerequisites:** Story 5.1
-
-**Technical Notes:** FR-5.2; use Algolia, MeiliSearch, or Pagefind (static-friendly); search index built during deploy pipeline; query under 500ms per NFR-P3
-
----
-
-### Story 5.5: Internationalization (i18n) Infrastructure
-
-As a global user,
-I want the Cherry interface available in my language,
-So that I can use the platform comfortably in English or Korean.
-
-**Acceptance Criteria:**
-
-**Given** I visit Cherry for the first time
-**When** my browser language is Korean
-**Then** the UI defaults to Korean (navigation, buttons, labels, error messages, form fields)
-
-**And** a language selector in the header lets me switch between English and Korean
-**And** my language preference is saved (for logged-in users) or via cookie (anonymous)
-**And** adding a new language requires only adding a translation JSON file (no code changes)
-**And** date/time and number formatting respect the selected locale
-
-**Prerequisites:** Story 5.1
-
-**Technical Notes:** FR-13.1, FR-13.3; i18next or next-intl; translation files in `apps/web/locales/en.json` and `apps/web/locales/ko.json`; browser language detection via `Accept-Language` header; RTL layout scaffolded for future languages; content language separate from UI language
-
----
-
-### Story 5.6: Newly Discovered Category Pages
-
-As a practitioner,
-I want to browse the Newly Discovered section organized by category,
-So that I can quickly scan the freshest LLM developments relevant to me.
-
-**Acceptance Criteria:**
-
-**Given** I navigate to `/newly-discovered`
-**When** the page loads
-**Then** I see the 4 main categories with their subcategories listed
-
-**And** each category page shows a ranked list of articles (title, summary, source, date, score)
-**And** articles are sorted by score descending, then by date
-**And** "Last updated" timestamp reflects the latest weekly publish cycle
-
-**Prerequisites:** Stories 5.1, 5.2, 2.7
-
-**Technical Notes:** FR-5.2; category pages are statically generated from markdown; article list component is shared and reused for personalized views in Epic 7
-
----
-
-### Story 5.7: Performance, SEO & Accessibility Polish
-
-As a user,
-I want Cherry to load fast, be findable via search engines, and be accessible to all,
-So that the platform is inclusive and performant under real-world conditions.
-
-**Acceptance Criteria:**
-
-**Given** any content page is loaded
-**When** measured by Lighthouse or Core Web Vitals
-**Then** Performance ≥ 90, Accessibility ≥ 90, SEO ≥ 90
-
-**And** all pages have complete SEO metadata (title, description, Open Graph tags)
-**And** all meaningful images have alt text
-**And** keyboard navigation works for all interactive elements
-**And** lazy loading is applied to images below the fold
-**And** CDN handles traffic spikes (configured in deploy)
-
-**Prerequisites:** Stories 5.1–5.6
-
-**Technical Notes:** NFR-A1, NFR-A2, NFR-P1; Core Web Vitals budgets enforced in CI; `next/image` for optimized images; semantic HTML and ARIA labels throughout
-
----
-
-## Epic 6: User Management & Authentication
-
-**Goal:** Enable secure user accounts with tier-based access (Free / Paid / Enterprise), billing integration, and GDPR-compliant data management — the gateway to all personalization and monetization features.
-
----
-
-### Story 6.1: User Registration & Email Verification
+### Story 5.1: User Registration & Login
 
 As a new user,
-I want to create an account with email and password,
-So that I can access personalized features.
+I want to register for an account and log in securely,
+So that I can access personalized features and manage my preferences.
 
 **Acceptance Criteria:**
 
-**Given** I submit the registration form
-**When** the form is valid
-**Then** my account is created with a hashed password (bcrypt/argon2)
+**Given** I am a new user
+**When** I register for an account
+**Then** I can sign up with email/password (with email verification)
+**And** I can sign up with OAuth (Google, GitHub)
+**And** my password is securely hashed (bcrypt/argon2)
+**And** I receive a password reset flow via email
+**And** my session is managed with JWT tokens
+**And** I can log out and invalidate my session
 
-**And** a verification email is sent with a token that expires after 24 hours
-**And** I cannot access authenticated features until email is verified
-**And** the form validates: email format, password strength, duplicate email check
-**And** account lockout activates after 5 failed login attempts
+**Given** I have an existing account
+**When** I log in with valid credentials
+**Then** I am authenticated and redirected to the dashboard
+**And** after 5 failed login attempts, my account is locked for security
 
-**Prerequisites:** Stories 1.2, 5.1
+### Story 5.2: User Tier Management
 
-**Technical Notes:** FR-10.1; password hashing with argon2id; email via SendGrid or equivalent; verification token stored in Postgres with expiry; rate limiting on registration endpoint
-
----
-
-### Story 6.2: OAuth Login (Google & GitHub)
-
-As a user,
-I want to sign in with Google or GitHub,
-So that I don't need to remember another password.
-
-**Acceptance Criteria:**
-
-**Given** I click "Sign in with Google" or "Sign in with GitHub"
-**When** OAuth flow completes
-**Then** I am logged in and my account is created if it doesn't exist
-
-**And** OAuth accounts can be linked to existing email/password accounts
-**And** JWT session token is issued with appropriate expiration
-**And** sessions are invalidated on logout across all devices
-
-**Prerequisites:** Story 6.1
-
-**Technical Notes:** FR-10.1; OAuth2 with PKCE; NextAuth.js or equivalent; JWT stored in httpOnly cookie; multi-device session tracking in Postgres
-
----
-
-### Story 6.3: User Tier Management & Feature Gating
-
-As a product manager,
-I want users assigned to Free, Paid, or Enterprise tiers with corresponding feature access,
-So that tier-based value differentiation is enforced consistently across the product.
+As a platform administrator,
+I want to manage user tiers (Free, Paid, Enterprise) with appropriate feature access,
+So that users have the right features based on their subscription level.
 
 **Acceptance Criteria:**
 
-**Given** a user has a specific tier (Free / Paid / Enterprise)
-**When** they access a feature
-**Then** tier-gated features are accessible to the correct tiers and blocked for others
+**Given** the user tier system exists
+**When** a user accesses any feature
+**Then** Free tier users can access all community content (no account required for read-only)
+**And** Paid tier users have access to personalization, custom sources, adaptive KB
+**And** Enterprise tier users have everything in Paid + Newsletter Studio
+**And** tier-based feature gating is enforced in UI and API
+**And** users can upgrade/downgrade with proration
+**And** billing integration works with Stripe or similar
+**And** account changes (email, tier) require verification
 
-**And** Free tier: all community content, read-only, no auth required for browsing
-**And** Paid tier: everything in Free + custom sources, personalization, adaptive KB
-**And** Enterprise tier: everything in Paid + Newsletter Studio
-**And** upgrade/downgrade flows work with Stripe proration
+### Story 5.3: Custom Source Management
 
-**Prerequisites:** Stories 6.1, 6.2
+As a Paid tier user,
+I want to add and manage private sources beyond the community-curated content,
+So that my feed includes content from sources I care about.
 
-**Technical Notes:** FR-10.2; tier stored in `user_accounts.tier` column; middleware checks tier on each authenticated route; Stripe webhook updates tier on subscription changes; feature flags via tier check (not a separate feature flag system)
+**Acceptance Criteria:**
+
+**Given** I have Paid tier access
+**When** I access Custom Source Management
+**Then** I can add/remove custom source URLs (RSS, Twitter, blogs, etc.)
+**And** I can toggle which community sources to follow
+**And** each source is validated (reachable, valid format)
+**And** the Content Ingestion Pipeline ingests my custom sources
+**And** content from my custom sources is visible only to me
+**And** I can view all my sources with active/inactive status
+**And** new sources are added to the pipeline within 1 hour
+
+### Story 5.4: Natural Language Scoring Criteria
+
+As a Paid tier user,
+I want to define my content scoring preferences in natural language,
+So that the AI interprets and applies my personal criteria to content ranking.
+
+**Acceptance Criteria:**
+
+**Given** I have Paid tier access
+**When** I access the Scoring Preferences interface
+**Then** I see an input field for natural language criteria
+**And** I can enter preferences like "prioritize practical tutorials over theory"
+**And** the AI parses my criteria and generates scoring weights
+**And** I see a confirmation UI showing the interpreted weights
+**And** I can refine and iterate until satisfied
+**And** my scoring preferences are applied to feed ranking
+**And** community scoring remains the default for users who don't customize
+**And** I can see score explanations for why content ranked high
+
+### Story 5.5: Content Filtering & Feed Personalization
+
+As a Paid tier user,
+I want to personalize my "Newly Discovered" feed through entity-level follows and category-level filtering,
+So that I see only content relevant to my interests.
+
+**Acceptance Criteria:**
+
+**Given** I have Paid tier access
+**When** I access Feed Personalization settings
+**Then** I can follow or unfollow specific tracked entities (models, frameworks, tools)
+**And** I can assign per-entity weight (high/medium/low interest)
+**And** I can show/hide entire category groups
+**And** I can assign per-category weights
+**And** my personalized "For You" page shows filtered + reranked articles
+**And** ranking signals include my user_article_state.impact_score
+**And** Community page is shown as fallback
+**And** I can easily toggle between "Community" and "For You" views
+**And** Free users see full community-curated content without personalization
+
+### Story 5.6: Adaptive Content Scoring
+
+As a Paid tier user,
+I want my custom scoring criteria applied to all content ranking,
+So that my feeds prioritize what matters most to me.
+
+**Acceptance Criteria:**
+
+**Given** I have configured custom scoring preferences
+**When** I view any content feed or ranking
+**Then** my user-defined scoring weights are applied to all content
+**And** "Newly Discovered" feed is reranked based on my criteria
+**And** score explanations show "This scored high because of your preference for X"
+**And** I can compare community score vs personal score (A/B view)
+**And** my preferences are reflected immediately when updated
+**And** default community scoring applies to users without custom criteria
 
 ---
 
-### Story 6.4: User Profile & Account Management
+## Epic 6: Build Your Knowledge Base
 
-As a user,
-I want to view and manage my account details and preferences,
-So that I have control over my personal information.
+Paid users can now create **personal concept pages** with custom evidence selection. The universal concept pages remain the default; users can opt into creating their own versions.
+
+**FRs covered:** FR-10.3, FR-12.1, FR-12.2, FR-12.3
+
+### Story 6.1: User Profile Management
+
+As a logged-in user,
+I want to manage my account settings and preferences,
+So that I have control over my profile and data.
 
 **Acceptance Criteria:**
 
 **Given** I am logged in
-**When** I visit my profile page
-**Then** I see: name, email, tier, join date, and preference settings
+**When** I access my profile page
+**Then** I can view my profile information (name, email, tier, join date)
+**And** I can update my account preferences
+**And** I can request account deletion (GDPR compliance)
+**And** I can export my user data (GDPR compliance)
+**And** I can view my reading history (Paid tier users)
+**And** I can change my email with verification
+**And** all changes are saved immediately
 
-**And** I can change my email (with verification), name, and password
-**And** I can delete my account (GDPR right to deletion — personal data purged within 30 days)
-**And** I can export all my data as JSON (GDPR right to portability)
-**And** I can opt out of reading history tracking
+### Story 6.2: User-Controlled Topic Addition
 
-**Prerequisites:** Story 6.3
-
-**Technical Notes:** FR-10.3; NFR-SEC5; soft-delete on account deletion (personal data purged via scheduled job at 30 days, billing records retained 7 years per tax law); data export endpoint streams JSON
-
----
-
-### Story 6.5: Billing Integration (Stripe)
-
-As a user,
-I want to upgrade to Paid or Enterprise tier via a secure checkout,
-So that I can access advanced features.
+As a Paid tier user,
+I want to add custom topics with reference articles,
+So that I can build a personal knowledge base beyond the community content.
 
 **Acceptance Criteria:**
 
-**Given** I am on the upgrade page
-**When** I complete Stripe checkout
-**Then** my tier is updated immediately via Stripe webhook
+**Given** I have Paid tier access
+**When** I access the custom topics interface
+**Then** I can add a new topic (not in community KB)
+**And** I can provide topic name, category (Basics/Advanced), and description
+**And** I can upload or link reference articles/evidence
+**And** evidence is extracted from my provided references
+**And** evidence is stored in my user-specific evidence layer linked to Graph DB
+**And** my custom topics are visible only to me
+**And** there's clear distinction between community content and my personal custom content
 
-**And** Stripe billing portal allows managing subscriptions, updating payment methods
-**And** downgrade at period end (not immediate cancellation) is supported
-**And** failed payments trigger grace period notification emails
+### Story 6.3: Writer Agent Regeneration for Custom Topics
 
-**Prerequisites:** Story 6.3
-
-**Technical Notes:** FR-10.2; Stripe Checkout + Customer Portal; webhook endpoint validates Stripe signature; subscription metadata maps to `user_accounts.tier`; proration calculated by Stripe automatically
-
----
-
-## Epic 7: Personalization Engine
-
-**Goal:** Give paid users a fully personalized experience — custom sources, natural language scoring criteria, entity-level entity follows, and category-level filtering — so "Newly Discovered" shows exactly what matters to them.
-
----
-
-### Story 7.1: Custom Source Management (Paid Tier)
-
-As a paid user,
-I want to add and manage my own private content sources,
-So that my feed includes sources unique to my work and interests.
+As a Paid tier user,
+I want to generate concept pages for my custom topics using the Writer Agent,
+So that I can have comprehensive, well-structured personal knowledge pages.
 
 **Acceptance Criteria:**
 
-**Given** I am a paid user on the custom sources page
-**When** I add a new source URL (RSS, Twitter, blog)
-**Then** the source is validated (format, domain reachability) and added to my profile
-
-**And** the Content Ingestion Pipeline ingests my custom sources within 1 hour
-**And** content from my custom sources is visible only to me
-**And** I can toggle sources active/inactive and delete sources
-**And** community sources can be followed/unfollowed from a browseable registry
-
-**Prerequisites:** Stories 6.3, 2.2
-
-**Technical Notes:** FR-11.1; custom sources stored in `user_sources` table with user_id; pipeline adapts existing source adapters for user-specific sources; isolation via user_id filter on all content queries
-
----
-
-### Story 7.2: Natural Language Scoring Criteria (Paid Tier)
-
-As a paid user,
-I want to define my content preferences in plain English,
-So that Cherry scores and ranks content exactly how I want — without configuring weights manually.
-
-**Acceptance Criteria:**
-
-**Given** I enter natural language criteria (e.g., "I care more about business cases than theory")
-**When** I confirm the settings
-**Then** an AI interprets my criteria and generates scoring weights
-
-**And** a confirmation UI shows the interpreted weights (e.g., "Business Cases: 2×, Theory: 0.5×")
-**And** I can refine and iterate (re-enter criteria → see new weights)
-**And** scoring weights apply to my personalized feed ranking and content prioritization
-**And** users who don't configure criteria see the community default scoring
-
-**Prerequisites:** Story 6.3
-
-**Technical Notes:** FR-11.2; preference parsing via LLM in < 3 seconds (NFR-P5); weights stored in `user_preferences.scoring_weights` (JSON); A/B comparison: community score vs personal score visible in UI
-
----
-
-### Story 7.3: Entity Follow Registry (Paid Tier)
-
-As a paid user,
-I want to follow specific models, frameworks, and tools from a registry,
-So that articles mentioning what I care about are surfaced prominently.
-
-**Acceptance Criteria:**
-
-**Given** I open the Entity Registry
-**When** I follow an entity (e.g., "Claude", "LangChain") and assign a weight
-**Then** articles mentioning that entity are ranked higher in my feed
-
-**And** entities I unfollow are excluded from my Newly Discovered feed
-**And** per-entity weight is configurable (e.g., Claude = 2×, GPT-4 = 1×)
-**And** no follow config = neutral (all entities shown at weight 1.0 default)
-**And** entity registry is maintained by the Knowledge Team and synchronized from the Graph DB
-
-**Prerequisites:** Stories 6.3, 3.2
-
-**Technical Notes:** FR-11.3; entity registry stored in Postgres `entities` table (populated from Graph DB concept nodes tagged as models/frameworks/tools); user follows stored in `user_entity_follows`; impact_score calculated per NFR-S4
-
----
-
-### Story 7.4: Category Filtering & Personalized Feed (Paid Tier)
-
-As a paid user,
-I want to show/hide entire Newly Discovered categories and assign per-category weights,
-So that my feed only shows what I care about, ranked by what matters to me.
-
-**Acceptance Criteria:**
-
-**Given** I configure my category preferences
-**When** I view the Newly Discovered section
-**Then** hidden categories are excluded and shown categories are ranked by my per-category weights
-
-**And** a "Community | For You" toggle per category page switches between views
-**And** community page is the fallback for categories with no preference set
-**And** personalized pages show filtered + reranked article lists (same structure as community pages, no synthesis)
-**And** all preferences persist across sessions and update immediately (no cache delay)
-
-**Prerequisites:** Stories 6.3, 5.6, 7.2, 7.3
-
-**Technical Notes:** FR-11.3; ranking signal: `user_article_state.impact_score` (source weight × entity weight × scoring preference); personalized feed generated in < 2 seconds (NFR-P5); preferences stored in `user_preferences.category_filters`
-
----
-
-### Story 7.5: Adaptive Content Scoring with Explanations
-
-As a paid user,
-I want to understand why content is ranked the way it is for me,
-So that I can trust and refine my personalization settings.
-
-**Acceptance Criteria:**
-
-**Given** I view an article in my personalized feed
-**When** I expand the score explanation
-**Then** I see: "This scored high because of your preference for Business Cases (2×) and your follow of Claude"
-
-**And** a side-by-side A/B comparison shows my personal score vs the community score
-**And** score explanations are generated without additional LLM calls (purely from weight math)
-
-**Prerequisites:** Story 7.4
-
-**Technical Notes:** FR-11.4; explanation template: "Scored {personal_score} (community: {community_score}) — boosted by: {factors}"; factors derived from `user_article_state` breakdown; no LLM needed for explanation generation
-
----
-
-## Epic 8: Adaptive Knowledge Base (Paid Tier)
-
-**Goal:** Let paid users build their own private knowledge base by adding custom topics with reference articles, then commanding the Writer Agent to generate personalized concept pages — a KB that rewrites itself on demand.
-
----
-
-### Story 8.1: Custom Topic Creation
-
-As a paid user,
-I want to add custom topics that aren't in the community knowledge base,
-So that Cherry covers my team's internal context and specialized use cases.
-
-**Acceptance Criteria:**
-
-**Given** I am on the Custom KB page
-**When** I create a new topic with name, category (Basics/Advanced), and description
-**Then** the topic is saved to my private knowledge base
-
-**And** I can upload or link reference articles/evidence for the topic
-**And** evidence is extracted from my references (PDF or URL) and stored in my user-specific Evidence Layer
-**And** my custom topics are visible only to me (isolated from community content)
-**And** topic list view shows all my custom topics with status (has references, generated, not generated)
-
-**Prerequisites:** Story 6.3
-
-**Technical Notes:** FR-12.1; `custom_topics` table with `user_id` FK; user-specific evidence stored with `user_id` isolation in Evidence Layer; PDF/URL extraction reuses pipeline from Story 3.1; evidence tagged with custom topic associations
-
----
-
-### Story 8.2: Writer Agent Regeneration for Custom Topics
-
-As a paid user,
-I want to trigger the Writer Agent to generate a page for my custom topic,
-So that my knowledge base adapts to my context on-demand.
-
-**Acceptance Criteria:**
-
-**Given** I have a custom topic with reference evidence
-**When** I click "Generate Page"
-**Then** the Writer Agent loads my custom evidence and generates a four-section page
-
+**Given** I have created a custom topic with evidence
+**When** I click "Generate Page" for that topic
+**Then** the Writer Agent loads my custom evidence
+**And** the agent generates a page in four-section format (Overview → Cherries → Child Concepts → Progressive References)
+**And** the page is saved in my personal knowledge base
 **And** generation completes within 10 minutes
-**And** the generated page is saved in my personal knowledge base
-**And** I can add more evidence and regenerate (iterate freely)
-**And** my custom page is private — not visible to other users
+**And** I can iterate by adding more evidence and regenerating
+**And** my generated pages follow the same structure as community pages
 
-**Prerequisites:** Stories 8.1, 4.1
+### Story 6.4: User Knowledge Base Management
 
-**Technical Notes:** FR-12.2; Writer Agent runs with user-specific evidence context + community Graph DB for related concepts; page stored in `custom_topic_pages` table (not in community content files); generation queued as async job with progress indicator
-
----
-
-### Story 8.3: Custom KB Management
-
-As a paid user,
-I want to manage my custom topics, edit evidence, and export my knowledge base,
-So that I have full control over my personalized knowledge.
+As a Paid tier user,
+I want to manage my custom topics and personal knowledge base,
+So that I can organize and maintain my personal content.
 
 **Acceptance Criteria:**
 
-**Given** I am on the Custom KB management page
-**When** I interact with my topics
-**Then** I can edit topic name/description, delete topics, add/remove/edit reference articles
-
+**Given** I have Paid tier access and custom topics
+**When** I access my Knowledge Base Management interface
+**Then** I can view all my custom topics in a list view
+**And** I can edit/delete custom topics
+**And** I can add/remove/edit reference articles for topics
 **And** I can trigger regeneration after making changes
-**And** I can export my entire personal KB as markdown files
-**And** the UI clearly distinguishes between community content and my custom content
-
-**Prerequisites:** Story 8.2
-
-**Technical Notes:** FR-12.3; export endpoint streams a ZIP of markdown files; soft-delete on topic deletion; regeneration clears old page and triggers new Writer Agent job
+**And** I can export my personal KB to markdown
+**And** there's clear visual distinction between community content and personal custom content
+**And** I can navigate between my custom topics and community topics
 
 ---
 
-## Epic 9: Newsletter Studio (Enterprise Tier)
+## Epic 7: Access in Your Language
 
-**Goal:** Enable enterprise teams to go from curated content → polished newsletter in 15 minutes — with configurable agent, one-click draft generation, version history, and email distribution.
+Add internationalization so users worldwide can navigate the UI in their preferred language. Content remains in original languages with clear indicators.
 
----
+**FRs covered:** FR-13.1, FR-13.2, FR-13.3
 
-### Story 9.1: Newsletter Configuration Panel
+### Story 7.1: Internationalization Infrastructure
 
-As an enterprise user,
-I want to configure my newsletter agent with tone, structure, and audience settings,
-So that every generated draft matches my brand voice and target audience automatically.
+As a developer,
+I want to set up the technical foundation for multi-language support,
+So that the platform can be easily localized for different languages.
 
 **Acceptance Criteria:**
 
-**Given** I open the Newsletter Studio
-**When** I configure a newsletter profile
-**Then** I can set: tone (Professional/Casual/Technical/Friendly), structure template, audience level, focus areas
-
-**And** I can save multiple configurations (e.g., "Weekly Tech Brief", "Monthly Executive Summary")
-**And** each config has a natural language custom instructions field
-**And** configuration presets exist for common newsletter types
-**And** saved configs are private to my enterprise workspace
-
-**Prerequisites:** Story 6.3
-
-**Technical Notes:** FR-14.1; `newsletter_configs` table with `enterprise_id`; multi-tenancy: configs isolated per enterprise workspace (NFR-SEC6); no cross-enterprise data leakage
-
----
-
-### Story 9.2: Content Selection Interface
-
-As an enterprise user,
-I want to browse and select content items and evidence for my newsletter,
-So that I pick the best stories from the curated pool before generating a draft.
-
-**Acceptance Criteria:**
-
-**Given** I open the content selection panel
-**When** the "Highly Rated This Week" view loads
-**Then** I see score-5 community-curated content + my enterprise's custom source content
-
-**And** I can filter by: category, date range, topic
-**And** I can multi-select articles and evidence items
-**And** selected items show a preview before generation
-**And** I can toggle which sources (community + enterprise custom) are included
-
-**Prerequisites:** Stories 9.1, 7.1, 2.7
-
-**Technical Notes:** FR-14.2; selection state stored in session (not persisted until draft is created); community content from Postgres `content_items` (score=5, status=finished); enterprise custom source content isolated per workspace
-
----
-
-### Story 9.3: One-Click Newsletter Draft Generation
-
-As an enterprise user,
-I want to generate a polished newsletter draft in one click from my configuration and selected content,
-So that I go from curation to draft in under 5 minutes.
-
-**Acceptance Criteria:**
-
-**Given** I have a configuration and selected content items
-**When** I click "Generate Draft"
-**Then** the Newsletter Agent synthesizes a draft based on config + selected evidence
-
-**And** generation completes in under 5 minutes
-**And** output formats are available: Markdown, Plain Text, HTML
-**And** 90%+ of generated drafts require only minor edits (not major rewrites)
-**And** the draft includes proper citations and evidence attribution
-**And** the draft follows the selected structure template and matches the specified tone and audience level
-
-**Prerequisites:** Stories 9.2, 9.1
-
-**Technical Notes:** FR-14.3; generation queued as async job with progress indicator; newsletter agent prompt = config settings + selected evidence; output stored in `newsletter_drafts` table; multi-LLM support
-
----
-
-### Story 9.4: In-App Editor & Draft Refinement
-
-As an enterprise user,
-I want to edit and refine my generated draft in the app,
-So that I can polish the newsletter without switching to another tool.
-
-**Acceptance Criteria:**
-
-**Given** a draft has been generated
-**When** I open the editor
-**Then** I can edit in rich-text mode, markdown mode, or preview mode
-
-**And** changes are auto-saved (version save < 1 second)
-**And** the editor supports track changes/edit history within a session
-**And** I can switch between editor and preview without losing changes
-
-**Prerequisites:** Story 9.3
-
-**Technical Notes:** FR-14.3; TipTap or ProseMirror for rich-text editing; markdown ↔ rich-text sync; preview renders the HTML email version
-
----
-
-### Story 9.5: Version History & A/B Testing
-
-As an enterprise user,
-I want to compare different draft versions and restore previous ones,
-So that I can test different angles and always revert if needed.
-
-**Acceptance Criteria:**
-
-**Given** I have multiple draft versions
-**When** I open the version history panel
-**Then** I see all previous versions with timestamps and optional tags (e.g., "Draft 1 - Technical Focus")
-
-**And** I can compare any two versions side-by-side
-**And** I can restore any previous version (creates a new version — does not overwrite)
-**And** each version has a notes field for team collaboration context
-**And** version history supports 1,000+ versions without performance impact
-
-**Prerequisites:** Story 9.4
-
-**Technical Notes:** FR-14.4; append-only versions table; restore = copy content of old version into new version record; side-by-side diff via `diff-match-patch` or similar; versions capped per draft (configurable, default 100 before archiving old ones)
-
----
-
-### Story 9.6: Email Distribution
-
-As an enterprise user,
-I want to send my finished newsletter to my email list directly from Cherry,
-So that my workflow stays within one tool from curation to inbox.
-
-**Acceptance Criteria:**
-
-**Given** I have a finished newsletter draft
-**When** I send to my email list
-**Then** the newsletter is delivered to all subscribers
-
-**And** I can import, add, and remove subscribers from my list
-**And** I can send a preview to test emails before full send
-**And** I can schedule a send or send immediately
-**And** send status is tracked per recipient (sent, failed, bounced)
-**And** send queue processes 100,000+ emails per hour for large lists (< 30 min for 10K subscribers)
-
-**Prerequisites:** Story 9.3
-
-**Technical Notes:** FR-14.5; email via SendGrid or Mailchimp integration; HTML rendering from draft markdown; subscriber list stored in `newsletter_subscribers` table with `enterprise_id` isolation; batch send via queue (Redis/BullMQ)
-
----
-
-## Epic 10: Community & Quality Operations
-
-**Goal:** Sustain content quality and community trust through URL submission, source management, error reporting, monitoring, and observability — the operational backbone that keeps Cherry running reliably.
-
----
-
-### Story 10.1: Community URL Submission for Sources
-
-As a community member,
-I want to submit URLs for the Knowledge Team to consider adding as monitored sources,
-So that the community helps expand Cherry's coverage.
-
-**Acceptance Criteria:**
-
-**Given** I submit a URL via the contribution form
-**When** the form validates the input
-**Then** the URL (format, domain reachability) is validated and queued for maintainer review
-
-**And** I receive feedback (approved/rejected/reason)
-**And** approved URLs are added to the Content Ingestion Pipeline source config
-**And** the submission form has rate limiting to prevent spam
-
-**Prerequisites:** Story 5.1
-
-**Technical Notes:** FR-6.1; submission stored in `source_submissions` table; rate limiting via IP + session; maintainer review UI (admin-only route); on approval, source is added to `sources.yaml` config
-
----
-
-### Story 10.2: Curated Text Source Library Management
-
-As a Knowledge Team member,
-I want a managed library of authoritative sources (books, papers, canonical posts),
-So that Evidence Layer ingestion always starts from high-quality, versioned references.
-
-**Acceptance Criteria:**
-
-**Given** I add a new source to the library
-**When** it is saved
-**Then** it is registered with full metadata: title, author, URL/PDF, publication date, priority (canonical/supplementary)
-
-**And** the extraction pipeline (PDF → text, URL → markdown) runs automatically on new additions
-**And** updated versions of sources are tracked (version history)
-**And** the library is browseable with filter/sort
-
-**Prerequisites:** Stories 3.1, 1.2
-
-**Technical Notes:** FR-7.2; `curated_sources` table; PDF extraction triggered on upload; web extraction re-runs on URL change; priority field influences evidence weighting in Writer Agent
-
----
-
-### Story 10.3: Error Reporting & Content Correction Workflow
+**Given** the Next.js application exists
+**When** I implement internationalization infrastructure
+**Then** an i18n library is integrated (i18next, react-intl, or vue-i18n)
+**And** translation files are structured in JSON format
+**And** pluralization rules are configured for different languages
+**And** date/time formatting adapts per locale
+**And** number formatting adapts per locale
+**And** currency formatting is configured (if applicable)
+**And** translation coverage monitoring is in place
+**And** adding new languages is a simple process
+
+### Story 7.2: Multi-Language UI
 
 As a user,
-I want to report errors in Cherry's content and see them fixed quickly,
-So that I can trust Cherry as an accurate, authoritative reference.
+I want to navigate the platform interface in my preferred language,
+So that I can use the site comfortably regardless of which languages I speak.
 
 **Acceptance Criteria:**
 
-**Given** I spot an error on a content page
-**When** I click "Report Error"
-**Then** a GitHub Issue is created with: page URL, reported error, reporter info
+**Given** the i18n infrastructure is in place
+**When** I access the platform
+**Then** I can select my language from a language selector in the header and user settings
+**And** all UI elements are translated (navigation, buttons, labels, form fields, error messages)
+**And** English is the primary language with Korean as the initial secondary language
+**And** my language preference is saved (for logged-in users)
+**And** browser language detection works for non-logged-in users (fallback to English)
+**And** RTL (Right-to-Left) layout support is available for future languages
+**And** translations are consistently applied across all pages
 
-**And** critical errors have a fast-track correction path (same-day fix target)
-**And** corrections update the "Last updated" timestamp and add to the page changelog
-**And** deprecated content is marked clearly with alternatives linked
+### Story 7.3: Content Language Handling
 
-**Prerequisites:** Story 5.3
-
-**Technical Notes:** FR-8.1; GitHub Issues integration via API; error types: factual error, outdated info, broken link, unclear explanation; corrections committed via bot account; changelog stored in page frontmatter
-
----
-
-### Story 10.4: Monitoring, Observability & Alerting
-
-As an operator,
-I want structured logging, pipeline monitoring, and alerting for critical failures,
-So that I can detect and resolve issues before users are impacted.
+As a user,
+I want to see clear language indicators on content pages,
+So that I understand which language the content is in (separate from the UI language).
 
 **Acceptance Criteria:**
 
-**Given** the system is running in production
-**When** any pipeline stage fails or a service goes down
-**Then** an alert is sent via email and Slack within 5 minutes
-
-**And** structured logs exist for all pipeline stages (ingestion, scoring, review, publication) with log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
-**And** a scheduler monitoring dashboard shows job status and execution logs
-**And** GitHub Actions logs cover build/deploy monitoring
-**And** a public status page is available for transparency during incidents
-
-**Prerequisites:** Stories 1.6, 2.7, 4.5
-
-**Technical Notes:** NFR-M4, NFR-R1; logging via `structlog` (Python) and `pino` (TypeScript); Sentry for error tracking; uptime monitoring via Betterstack or similar; status page via Statuspage.io or custom; Slack webhook integration for alerts
-
----
-
----
-
-_For implementation: Use the `create-story` workflow to generate individual story implementation plans from this epic breakdown._
+**Given** the platform has multi-language UI
+**When** I view any content page
+**Then** a language indicator is displayed showing the content's original language
+**And** the content remains in its original language (community content is English by default)
+**And** there is a clear distinction between UI language and content language
+**And** users can filter content by language (future enhancement placeholder)
+**And** machine-translated content (when added) includes a quality disclaimer
+**And** the language indicator is consistent across all content types

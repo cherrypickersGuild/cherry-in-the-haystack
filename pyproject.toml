@@ -18,6 +18,8 @@ requests = ">=2.31"
 python-dotenv = ">=1.0"
 loguru = ">=0.7"
 pymupdf = ">=1.24"
+fastapi = ">=0.104"
+uvicorn = { extras = ["standard"], version = ">=0.24" }
 
 [tool.poetry.group.dev.dependencies]
 ruff = ">=0.6"
