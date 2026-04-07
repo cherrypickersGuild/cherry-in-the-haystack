@@ -43,4 +43,4 @@ logs/
 n8n-atmt-d7a9a05899be.json
 
 #pdf files
-.assets_pdf
+.assets_pdf.claude/worktrees/
