@@ -326,11 +326,8 @@ CREATE TABLE core.app_user (
                                    CHECK (schedule_weekday IS NULL OR schedule_weekday BETWEEN 0 AND 6),
 
                                CONSTRAINT chk_app_user_magic_token_hash_len
-                                   CHECK (magic_token_hash IS NULL OR octet_length(magic_token_hash) = 32),
-
-                               CONSTRAINT chk_app_user_id_not_reserved
-                                   CHECK (id <> '00000000-0000-0000-0000-000000000000'::uuid)
-    );
+                                   CHECK (magic_token_hash IS NULL OR octet_length(magic_token_hash) = 32)
+);
 
 CREATE UNIQUE INDEX uq_app_user_email_active
     ON core.app_user (email)
