@@ -14,7 +14,7 @@ RUN pnpm install --frozen-lockfile --filter=api...
 
 # Copy source and build
 COPY apps/api ./apps/api
-RUN pnpm --filter=api run build
+RUN cd apps/api && ./node_modules/.bin/nest build
 
 # ---- Production Stage ----
 FROM node:20-alpine AS runner
