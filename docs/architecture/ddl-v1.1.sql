@@ -1716,7 +1716,12 @@ CREATE TABLE snapshot.platform_weekly_stat (
                                                    CHECK (trending_keywords_json IS NULL OR jsonb_typeof(trending_keywords_json) = 'array'),
 
                                                CONSTRAINT chk_platform_weekly_stat_treemap_is_array
-                                                   CHECK (jsonb_typeof(treemap_distribution_json) = 'array')
+                                                   CHECK (jsonb_typeof(treemap_distribution_json) = 'array'),
+
+                                               top_momentum_entities_json JSONB NULL,
+
+                                               CONSTRAINT chk_platform_weekly_stat_momentum_is_array
+                                                   CHECK (top_momentum_entities_json IS NULL OR jsonb_typeof(top_momentum_entities_json) = 'array')
 );
 
 CREATE INDEX idx_platform_weekly_stat

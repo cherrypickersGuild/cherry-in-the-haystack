@@ -150,3 +150,44 @@ export async function fetchCaseStudies(): Promise<CaseStudiesResponse> {
   if (!res.ok) throw new Error("Failed to fetch case studies")
   return res.json()
 }
+
+export interface LandingTreemapItem {
+  page: string
+  articleCount: number
+  percent: number
+}
+
+export interface LandingMomentumEntity {
+  entityId: string
+  entityName: string
+  page: string
+  categoryName: string
+  thisWeekCount: number
+  prevWeekCount: number
+  changePct: number
+}
+
+export interface LandingTopArticle {
+  id: string
+  title: string
+  oneLiner: string
+  entityName: string
+  categoryName: string
+  score: number
+  date: string
+  page: string
+}
+
+export interface LandingResponse {
+  weekStart: string
+  weekEnd: string
+  treemap: LandingTreemapItem[]
+  topMomentumEntities: LandingMomentumEntity[]
+  topArticles: LandingTopArticle[]
+}
+
+export async function fetchLanding(): Promise<LandingResponse> {
+  const res = await fetch(`${API_URL}/api/stats/landing`, { cache: "no-store" })
+  if (!res.ok) throw new Error("Failed to fetch landing stats")
+  return res.json()
+}

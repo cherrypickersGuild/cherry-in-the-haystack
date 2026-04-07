@@ -7,27 +7,25 @@ import { Sidebar, CherryIcon } from "@/components/cherry/sidebar"
 import { MobileSidebar } from "@/components/cherry/mobile-sidebar"
 import { PageHeader } from "@/components/cherry/page-header"
 import { CategoryTreemap } from "@/components/cherry/buzz-treemap"
-import { TopItemsList } from "@/components/cherry/top-items-list"
 import { PatchNotesPage } from "@/components/cherry/patch-notes-page"
+import { fetchLanding, LandingResponse } from "@/lib/api"
 import { NDFrameworksPage } from "@/components/cherry/nd-frameworks-page"
 import { NDModelUpdatesPage } from "@/components/cherry/nd-model-updates-page"
 import { NDCaseStudiesPage } from "@/components/cherry/nd-case-studies-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
 import { HandbookPlaceholder } from "@/components/cherry/handbook-placeholder"
 
-const TREND_GAUGES = [
-  { label: "MCP", growth: "+245%", value: 92, color: "#C94B6E" },
-  { label: "DSPy", growth: "+189%", value: 81, color: "#7B5EA7" },
-  { label: "Reasoning", growth: "+67%", value: 56, color: "#2D7A5E" },
-]
+const MOMENTUM_COLORS = ["#C94B6E", "#7B5EA7", "#2D7A5E", "#D4854A", "#0194E2"]
 
 export default function CherryApp() {
   const [activeNav, setActiveNav] = useState("highlight")
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [landing, setLanding] = useState<LandingResponse | null>(null)
   const router = useRouter()
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("accessToken"))
+    fetchLanding().then(setLanding).catch(() => {})
   }, [])
 
   const handleAuthClick = () => {
@@ -84,51 +82,100 @@ export default function CherryApp() {
 
             {/* Category treemap + Side panel row */}
             <div className="flex flex-col lg:flex-row gap-4 mb-6">
-              {/* Treemap - flex to fill remaining space */}
+              {/* Treemap */}
               <div className="flex-1">
-                <CategoryTreemap />
+                <CategoryTreemap items={landing?.treemap} />
               </div>
-              
-              {/* Side panel: Trending gauges */}
+
+              {/* Side panel: Trending Momentum */}
               <div className="w-full lg:w-[260px] lg:flex-shrink-0">
                 <p className="text-[13px] uppercase font-bold tracking-[0.5px] text-text-secondary mb-3">
                   Trending Momentum
                 </p>
                 <div className="space-y-2.5">
-                  {TREND_GAUGES.map((trend) => (
-                    <div
-                      key={trend.label}
-                      className="rounded-[10px] p-3"
-                      style={{ backgroundColor: "white", border: "1px solid #E4E1EE" }}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-[12px] font-semibold text-text-primary">
-                          {trend.label}
-                        </p>
-                        <p className="text-[11px] font-bold" style={{ color: trend.color }}>
-                          {trend.growth}
-                        </p>
-                      </div>
-                      <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: "#F2F0F7" }}>
+                  {landing && landing.topMomentumEntities.length > 0 ? (
+                    landing.topMomentumEntities.map((e, idx) => {
+                      const color = MOMENTUM_COLORS[idx % MOMENTUM_COLORS.length]
+                      const maxPct = Math.max(...landing.topMomentumEntities.map((x) => x.changePct))
+                      const barWidth = Math.round((e.changePct / maxPct) * 100)
+                      return (
                         <div
-                          className="h-full rounded-full transition-all duration-300"
-                          style={{
-                            width: `${trend.value}%`,
-                            background: `linear-gradient(90deg, ${trend.color} 0%, ${trend.color}CC 100%)`,
-                          }}
-                        />
-                      </div>
-                      <p className="text-[10px] text-text-muted mt-1.5">
-                        Momentum score {trend.value}/100
-                      </p>
-                    </div>
-                  ))}
+                          key={e.entityId}
+                          className="rounded-[10px] p-3"
+                          style={{ backgroundColor: "white", border: "1px solid #E4E1EE" }}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="min-w-0">
+                              <p className="text-[12px] font-semibold text-text-primary truncate">{e.entityName}</p>
+                              <p className="text-[10px] text-text-muted">{e.categoryName}</p>
+                            </div>
+                            <p className="text-[11px] font-bold ml-2 flex-shrink-0" style={{ color }}>
+                              +{e.changePct}%
+                            </p>
+                          </div>
+                          <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: "#F2F0F7" }}>
+                            <div
+                              className="h-full rounded-full transition-all duration-300"
+                              style={{
+                                width: `${barWidth}%`,
+                                background: `linear-gradient(90deg, ${color} 0%, ${color}CC 100%)`,
+                              }}
+                            />
+                          </div>
+                          <p className="text-[10px] text-text-muted mt-1.5">
+                            {e.thisWeekCount} articles this week · {e.page}
+                          </p>
+                        </div>
+                      )
+                    })
+                  ) : (
+                    <p className="text-[12px] text-text-muted py-4 text-center">
+                      {landing ? "No momentum data yet" : "Loading…"}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Top picks list */}
-            <TopItemsList />
+            {/* Top picks this week */}
+            <section aria-labelledby="top-picks-heading">
+              <p
+                id="top-picks-heading"
+                className="text-[13px] font-bold uppercase tracking-[0.5px] text-text-secondary mb-3"
+              >
+                Top Picks This Week
+              </p>
+              {landing && landing.topArticles.length > 0 ? (
+                <div className="flex flex-col gap-3">
+                  {landing.topArticles.map((article) => (
+                    <article
+                      key={article.id}
+                      className="bg-white border border-[#E4E1EE] rounded-[12px] px-5 py-[18px] cursor-pointer hover:shadow-md transition-shadow"
+                      style={{ borderLeft: "3px solid #C94B6E" }}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span
+                          className="text-[11px] font-bold uppercase tracking-[0.6px] px-2.5 py-1 rounded-full"
+                          style={{ backgroundColor: "#FDF0F3", color: "#C94B6E" }}
+                        >
+                          {article.categoryName}
+                        </span>
+                        <span className="text-[12px]" style={{ color: "#C94B6E" }}>
+                          {"★".repeat(article.score)}{"☆".repeat(5 - article.score)}
+                        </span>
+                      </div>
+                      <h3 className="text-[15px] font-bold text-[#1A1626] leading-snug mb-2">{article.title}</h3>
+                      <p className="text-[13px] text-[#9E97B3] leading-relaxed mb-2 line-clamp-2">{article.oneLiner}</p>
+                      <p className="text-[11px] text-text-muted">{article.entityName} · {article.date} · {article.page}</p>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[13px] text-text-muted py-6 text-center">
+                  {landing ? "No articles found" : "Loading…"}
+                </p>
+              )}
+            </section>
 
             {/* Bottom breathing room */}
             <div className="h-12" aria-hidden />

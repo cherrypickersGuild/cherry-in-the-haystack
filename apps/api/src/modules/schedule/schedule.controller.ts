@@ -17,7 +17,7 @@ export class ScheduleController {
 
   @Post('run-daily-stats')
   @HttpCode(200)
-  @ApiOperation({ summary: '[수동] 일간 통계 집계 즉시 실행 (MODEL_UPDATES 순위)' })
+  @ApiOperation({ summary: '[수동] 일간 통계 집계 즉시 실행 (MODEL_UPDATES + FRAMEWORKS 순위 + 랜딩 stat)' })
   async runDailyStats(): Promise<{ ok: boolean }> {
     await this.scheduleService.runDailyStats();
     return { ok: true };

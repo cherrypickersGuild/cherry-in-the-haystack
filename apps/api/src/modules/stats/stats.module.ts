@@ -4,11 +4,12 @@ import { StatsController } from './stats.controller';
 import { ModelUpdatesRankService } from './model-updates-rank.service';
 import { FrameworksRankService } from './frameworks-rank.service';
 import { FrameworksService } from './frameworks.service';
+import { LandingStatService } from './landing-stat.service';
 
 @Module({
   imports: [DatabaseModule],
   controllers: [StatsController],
-  providers: [ModelUpdatesRankService, FrameworksRankService, FrameworksService],
-  exports: [ModelUpdatesRankService, FrameworksRankService, FrameworksService],
+  providers: [ModelUpdatesRankService, FrameworksRankService, FrameworksService, LandingStatService],
+  exports: [ModelUpdatesRankService, FrameworksRankService, FrameworksService, LandingStatService],
 })
 export class StatsModule {}

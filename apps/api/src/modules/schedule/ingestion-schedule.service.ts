@@ -6,6 +6,7 @@ import { AiStatePreGenService } from 'src/modules/pipeline/ai-state-pregen.servi
 import { AgentJsonParserService } from 'src/modules/pipeline/agent-json-parser.service';
 import { ModelUpdatesRankService } from 'src/modules/stats/model-updates-rank.service';
 import { FrameworksRankService } from 'src/modules/stats/frameworks-rank.service';
+import { LandingStatService } from 'src/modules/stats/landing-stat.service';
 
 @Injectable()
 export class IngestionScheduleService {
@@ -19,6 +20,7 @@ export class IngestionScheduleService {
     private readonly parserService: AgentJsonParserService,
     private readonly modelUpdatesRankService: ModelUpdatesRankService,
     private readonly frameworksRankService: FrameworksRankService,
+    private readonly landingStatService: LandingStatService,
   ) {}
 
   /**
@@ -74,10 +76,13 @@ export class IngestionScheduleService {
       this.logger.log('Daily stats build started');
 
       const modelUpdatesResult = await this.modelUpdatesRankService.buildDailyRank();
-      this.logger.log(`[1/2] model-updates rank — upserted=${modelUpdatesResult.upserted}`);
+      this.logger.log(`[1/3] model-updates rank — upserted=${modelUpdatesResult.upserted}`);
 
       const frameworksResult = await this.frameworksRankService.buildDailyRank();
-      this.logger.log(`[2/2] frameworks rank — upserted=${frameworksResult.upserted}`);
+      this.logger.log(`[2/3] frameworks rank — upserted=${frameworksResult.upserted}`);
+
+      const landingResult = await this.landingStatService.buildDailyStat();
+      this.logger.log(`[3/3] landing stat — upserted=${landingResult.upserted}`);
 
       this.logger.log('Daily stats build done');
     } catch (err) {
