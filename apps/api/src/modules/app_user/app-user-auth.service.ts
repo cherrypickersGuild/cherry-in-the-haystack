@@ -88,9 +88,13 @@ export class AppUserAuthService {
   }
 
   async signin(dto: SigninDto, req: Request): Promise<SigninResponseDto> {
-    const user = await this.getActiveUserByEmail(dto.email);
+    let user = await this.getActiveUserByEmail(dto.email);
     if (!user) {
-      throw new UnauthorizedException('User not found or inactive.');
+      await this.signup({ email: dto.email });
+      user = await this.getActiveUserByEmail(dto.email);
+      if (!user) {
+        throw new UnauthorizedException('Failed to create user.');
+      }
     }
 
     const signInToken = randomBytes(24).toString('hex');
