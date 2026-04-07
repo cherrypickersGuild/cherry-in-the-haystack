@@ -43,4 +43,22 @@ These patterns ensure consistent implementation across all AI dev agents working
 | Evidence citation in pages | `"[excerpt]" — [Source] ([type])`   | `"RAG reduces hallucinations" — LLM Handbook (paraphrase)` |
 | Cost tracking              | `cost_cents` as `NUMERIC(10,2)`     | Field in `pipeline_runs`, `paragraph_chunks`               |
 
+### Documentation Placement Patterns
+
+| Type | Location | Examples |
+|------|----------|----------|
+| Architecture docs | `docs/architecture/` | ADRs, DDL, patterns |
+| Developer/AI-facing docs | `docs/` | Technical guides, agent context |
+| User-facing docs | `docs/user/` | End-user guides, tutorials |
+| Planning artifacts | `_bmad-output/planning-artifacts/` | Epics, integration plans, memos |
+| BMAD outputs | `_bmad-output/` | Automated artifacts |
+
+**Rule:** All documentation goes into `docs/` or `_bmad-output/planning-artifacts/`
+
+**Documentation audience distinction:**
+- `docs/` (root level) — Internal development documentation for developers and AI agents
+- `docs/user/` — End-user documentation (guides, tutorials, help content)
+- `docs/architecture/` — System design and architectural decisions
+- `_bmad-output/` — BMAD agent-generated artifacts and planning documents
+
 ---
