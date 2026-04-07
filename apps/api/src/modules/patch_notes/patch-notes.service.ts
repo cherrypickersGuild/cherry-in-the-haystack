@@ -32,6 +32,7 @@ export interface PatchNoteItem {
   date: string;
   page: string;
   area: string;
+  categoryName: string;
   dotColor: string;
   entityName: string;
   title: string;
@@ -77,6 +78,7 @@ export class PatchNotesService {
         aai.ai_score,
         aai.representative_entity_page           AS page,
         aai.representative_entity_name           AS entity_name,
+        ec.name                                  AS category_name,
         sc.code                                  AS side_category_code,
         uas.read_at
       FROM content.user_article_state uas
@@ -90,6 +92,8 @@ export class PatchNotesService {
        AND ef.user_id = :systemUserId::UUID
        AND ef.is_following = TRUE
        AND ef.revoked_at IS NULL
+      LEFT JOIN content.entity_category ec
+        ON ec.id = aai.representative_entity_category_id
       LEFT JOIN content.side_category sc
         ON sc.id = uas.side_category_id
       WHERE uas.user_id = :systemUserId::UUID
@@ -105,6 +109,7 @@ export class PatchNotesService {
       date: this.formatDate(r.published_at),
       page: r.page ?? '',
       area: PAGE_LABEL[r.page] ?? r.page ?? 'Unknown',
+      categoryName: r.category_name ?? '',
       dotColor: PAGE_COLOR[r.page] ?? '#9E97B3',
       entityName: r.entity_name ?? '',
       title: r.title,

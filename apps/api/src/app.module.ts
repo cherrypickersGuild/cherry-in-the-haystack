@@ -5,9 +5,10 @@ import { PipelineModule } from './modules/pipeline/pipeline.module';
 import { PipelineUserModule } from './modules/pipeline_user/pipeline-user.module';
 import { AppScheduleModule } from './modules/schedule/schedule.module';
 import { PatchNotesModule } from './modules/patch_notes/patch-notes.module';
+import { StatsModule } from './modules/stats/stats.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AppUserModule, PipelineModule, PipelineUserModule, AppScheduleModule, PatchNotesModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AppUserModule, PipelineModule, PipelineUserModule, AppScheduleModule, PatchNotesModule, StatsModule],
   controllers: [],
   providers: [],
 })

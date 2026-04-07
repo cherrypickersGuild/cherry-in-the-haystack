@@ -2076,6 +2076,50 @@ CREATE TRIGGER trg_user_entity_weekly_stat_set_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION core.set_updated_at();
 
+-- MODEL_UPDATES 카테고리별 순위 (매일 생성, 최근 7일 롤링 윈도우)
+-- 이번 7일 vs 이전 7일 기사 수 비교, 순위 변동 + 카테고리 내 top entity 2개 포함
+CREATE TABLE snapshot.model_updates_weekly_rank (
+    id                   UUID           NOT NULL,
+    stat_date            DATE           NOT NULL, -- 생성 기준일 (매일)
+    week_start           DATE           NOT NULL, -- stat_date - 6
+    week_end             DATE           NOT NULL, -- stat_date
+    entity_category_id   UUID           NOT NULL,
+    rank                 SMALLINT       NOT NULL,
+    prev_rank            SMALLINT       NULL,     -- NULL = 신규 진입 (NEW)
+    article_count        INT            NOT NULL DEFAULT 0, -- 이번 7일
+    prev_article_count   INT            NOT NULL DEFAULT 0, -- 이전 7일
+    change_pct           NUMERIC(6,1)   NULL,     -- 전주 대비 % 변동, NULL = 신규
+    top_entities_json    JSONB          NOT NULL DEFAULT '[]', -- 상위 2개 엔터티
+    -- [{"id": "...", "name": "GPT-5.4", "article_count": 3}, ...]
+    created_at           TIMESTAMPTZ    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMPTZ    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+
+    CONSTRAINT uq_model_updates_weekly_rank UNIQUE (stat_date, entity_category_id),
+
+    CONSTRAINT fk_model_updates_weekly_rank_category
+        FOREIGN KEY (entity_category_id) REFERENCES content.entity_category(id)
+            ON UPDATE RESTRICT ON DELETE RESTRICT,
+
+    CONSTRAINT chk_model_updates_weekly_rank_period
+        CHECK (week_end >= week_start),
+
+    CONSTRAINT chk_model_updates_weekly_rank_positive
+        CHECK (rank > 0 AND article_count >= 0 AND prev_article_count >= 0),
+
+    CONSTRAINT chk_model_updates_weekly_rank_top_entities_is_array
+        CHECK (jsonb_typeof(top_entities_json) = 'array')
+);
+
+CREATE INDEX idx_model_updates_weekly_rank_date
+    ON snapshot.model_updates_weekly_rank (stat_date DESC, rank ASC);
+
+CREATE TRIGGER trg_model_updates_weekly_rank_set_updated_at
+    BEFORE UPDATE ON snapshot.model_updates_weekly_rank
+    FOR EACH ROW
+    EXECUTE FUNCTION core.set_updated_at();
+
 -- ============================================================
 -- PUBLISHING
 -- ============================================================
