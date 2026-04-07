@@ -71,3 +71,38 @@ export async function fetchModelUpdatesRank(): Promise<ModelUpdatesRankResponse>
   if (!res.ok) throw new Error("Failed to fetch model updates rank")
   return res.json()
 }
+
+export interface FrameworkEntityItem {
+  id: string
+  name: string
+  url: string | null
+  isSpotlight: boolean
+}
+
+export interface FrameworkCategoryItem {
+  id: string
+  code: string
+  name: string
+  sortOrder: number
+  entities: FrameworkEntityItem[]
+}
+
+export interface FrameworksRisingstar {
+  entityName: string
+  title: string
+  oneLiner: string
+  score: number
+  date: string
+  articleStateId: string
+}
+
+export interface FrameworksResponse {
+  categories: FrameworkCategoryItem[]
+  risingstar: FrameworksRisingstar | null
+}
+
+export async function fetchFrameworks(): Promise<FrameworksResponse> {
+  const res = await fetch(`${API_URL}/api/stats/frameworks`, { cache: "no-store" })
+  if (!res.ok) throw new Error("Failed to fetch frameworks")
+  return res.json()
+}
