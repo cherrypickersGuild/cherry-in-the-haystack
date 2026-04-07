@@ -88,12 +88,11 @@ export interface FrameworkCategoryItem {
 }
 
 export interface FrameworksRisingstar {
-  entityName: string
-  title: string
-  oneLiner: string
-  score: number
-  date: string
-  articleStateId: string
+  categoryName: string
+  isNew: boolean
+  changePct: string | null
+  articleCount: number
+  topEntities: { id: string; name: string; article_count: number }[]
 }
 
 export interface FrameworksArticleItem {

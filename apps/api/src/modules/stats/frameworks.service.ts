@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { SYSTEM_USER_ID } from '../pipeline/article-ingestion.service';
+import { FrameworksRankService } from './frameworks-rank.service';
 
 export interface FrameworkEntityItem {
   id: string;
@@ -18,12 +19,11 @@ export interface FrameworkCategoryItem {
 }
 
 export interface FrameworksRisingstar {
-  entityName: string;
-  title: string;
-  oneLiner: string;
-  score: number;
-  date: string;
-  articleStateId: string;
+  categoryName: string;
+  isNew: boolean;
+  changePct: string | null;
+  articleCount: number;
+  topEntities: { id: string; name: string; article_count: number }[];
 }
 
 export interface FrameworksArticleItem {
@@ -48,6 +48,7 @@ export class FrameworksService {
   constructor(
     @Inject('KNEX_CONNECTION')
     private readonly knex: Knex,
+    private readonly frameworksRankService: FrameworksRankService,
   ) {}
 
   async getFrameworks(): Promise<FrameworksResponse> {
@@ -97,7 +98,7 @@ export class FrameworksService {
 
     const categories = Array.from(categoryMap.values());
 
-    // 2. 아티클 쿼리 (기간 제한 없음 — 전체 FRAMEWORKS)
+    // 2. 아티클 목록 (기간 제한 없음)
     const articleRows = await this.knex.raw<{ rows: any[] }>(`
       SELECT
         ar.id           AS article_raw_id,
@@ -138,19 +139,9 @@ export class FrameworksService {
       date: new Date(r.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     }));
 
-    // 3. 라이징스타: score 기준 최고점 1개
-    const topScored = [...articles].sort((a, b) => b.score - a.score)[0] ?? null;
-    const risingstar: FrameworksRisingstar | null = topScored
-      ? {
-          entityName: topScored.entityName,
-          title: topScored.title,
-          oneLiner: topScored.oneLiner,
-          score: topScored.score,
-          date: topScored.date,
-          articleStateId: topScored.articleStateId,
-        }
-      : null;
+    // 3. 라이징스타: rank 테이블에서 조회
+    const rankData = await this.frameworksRankService.getLatestRank();
 
-    return { categories, risingstar, articles };
+    return { categories, risingstar: rankData.risingstar, articles };
   }
 }

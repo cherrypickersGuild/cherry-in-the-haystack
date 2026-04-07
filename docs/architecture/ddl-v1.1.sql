@@ -2120,6 +2120,47 @@ CREATE TRIGGER trg_model_updates_weekly_rank_set_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION core.set_updated_at();
 
+CREATE TABLE snapshot.frameworks_weekly_rank (
+    id                   UUID           NOT NULL,
+    stat_date            DATE           NOT NULL,
+    week_start           DATE           NOT NULL,
+    week_end             DATE           NOT NULL,
+    entity_category_id   UUID           NOT NULL,
+    rank                 SMALLINT       NOT NULL,
+    prev_rank            SMALLINT       NULL,
+    article_count        INT            NOT NULL DEFAULT 0,
+    prev_article_count   INT            NOT NULL DEFAULT 0,
+    change_pct           NUMERIC(6,1)   NULL,
+    top_entities_json    JSONB          NOT NULL DEFAULT '[]',
+    created_at           TIMESTAMPTZ    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMPTZ    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+
+    CONSTRAINT uq_frameworks_weekly_rank UNIQUE (stat_date, entity_category_id),
+
+    CONSTRAINT fk_frameworks_weekly_rank_category
+        FOREIGN KEY (entity_category_id) REFERENCES content.entity_category(id)
+            ON UPDATE RESTRICT ON DELETE RESTRICT,
+
+    CONSTRAINT chk_frameworks_weekly_rank_period
+        CHECK (week_end >= week_start),
+
+    CONSTRAINT chk_frameworks_weekly_rank_positive
+        CHECK (rank > 0 AND article_count >= 0 AND prev_article_count >= 0),
+
+    CONSTRAINT chk_frameworks_weekly_rank_top_entities_is_array
+        CHECK (jsonb_typeof(top_entities_json) = 'array')
+);
+
+CREATE INDEX idx_frameworks_weekly_rank_date
+    ON snapshot.frameworks_weekly_rank (stat_date DESC, rank ASC);
+
+CREATE TRIGGER trg_frameworks_weekly_rank_set_updated_at
+    BEFORE UPDATE ON snapshot.frameworks_weekly_rank
+    FOR EACH ROW
+    EXECUTE FUNCTION core.set_updated_at();
+
 -- ============================================================
 -- PUBLISHING
 -- ============================================================

@@ -140,6 +140,12 @@ function Sparkline() {
    Rising Star Card
 ───────────────────────────────────────────── */
 function RisingStarCard({ rs }: { rs: FrameworksRisingstar }) {
+  const pct = rs.changePct !== null ? Number(rs.changePct) : null
+  const topEntity = rs.topEntities?.[0]
+  const summary = topEntity
+    ? `${topEntity.article_count} articles this week featuring ${topEntity.name}.${rs.isNew ? " First time in rankings." : pct && pct > 0 ? ` Up ${pct}% from last week.` : ""}`
+    : `${rs.articleCount} articles this week in ${rs.categoryName}.`
+
   return (
     <div
       className="flex flex-col lg:flex-row items-start gap-5 rounded-[10px] border p-5"
@@ -153,22 +159,31 @@ function RisingStarCard({ rs }: { rs: FrameworksRisingstar }) {
           Rising Star — Framework to Watch
         </span>
         <div className="flex items-center gap-2 mb-1">
-          <h3 className="text-[20px] font-bold text-[#1A1626]">{rs.entityName}</h3>
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold text-white" style={{ backgroundColor: "#7B5EA7" }}>
-            HOT
+          <h3 className="text-[20px] font-bold text-[#1A1626]">{rs.categoryName}</h3>
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold text-white" style={{ backgroundColor: rs.isNew ? "#E94057" : "#7B5EA7" }}>
+            {rs.isNew ? "NEW" : "HOT"}
           </span>
         </div>
-        <p className="text-[13px] leading-relaxed mb-3" style={{ color: "#3D3652" }}>{rs.oneLiner}</p>
-        <p className="text-[12px]" style={{ color: "#9E97B3" }}>{rs.title}</p>
-        <div className="flex items-center gap-4 mt-3">
+        <p className="text-[13px] leading-relaxed mb-4" style={{ color: "#3D3652" }}>{summary}</p>
+        <div className="flex items-center gap-5">
           <div>
-            <p className="text-[14px] font-bold text-[#1A1626]">{rs.score}/5</p>
-            <p className="text-[11px] text-[#9E97B3]">AI Score</p>
+            <p className="text-[14px] font-bold text-[#1A1626]">{rs.articleCount}</p>
+            <p className="text-[11px] text-[#9E97B3]">articles this week</p>
           </div>
-          <div>
-            <p className="text-[14px] font-bold text-[#1A1626]">{rs.date}</p>
-            <p className="text-[11px] text-[#9E97B3]">Published</p>
-          </div>
+          {pct !== null && (
+            <div>
+              <p className="text-[14px] font-bold" style={{ color: pct >= 0 ? "#10B981" : "#E94057" }}>
+                {pct >= 0 ? "+" : ""}{pct}%
+              </p>
+              <p className="text-[11px] text-[#9E97B3]">vs last week</p>
+            </div>
+          )}
+          {rs.isNew && (
+            <div>
+              <p className="text-[14px] font-bold text-[#E94057]">NEW</p>
+              <p className="text-[11px] text-[#9E97B3]">first appearance</p>
+            </div>
+          )}
         </div>
       </div>
       <div className="w-full lg:w-[180px] lg:flex-shrink-0">
