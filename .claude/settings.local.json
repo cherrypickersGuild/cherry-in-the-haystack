@@ -72,7 +72,11 @@
       "Bash(ls:*)",
       "Bash(grep -E \"\\\\.\\(ts|py|sql\\)$\")",
       "Bash(find /Users/soma/IdeaProjects/cherry-in-the-haystack/docs -type f -name *.md)",
-      "Bash(find /Users/soma/IdeaProjects/cherry-in-the-haystack/packages -type f -name *.ts)"
+      "Bash(find /Users/soma/IdeaProjects/cherry-in-the-haystack/packages -type f -name *.ts)",
+      "Bash(wc -l /Users/soma/IdeaProjects/cherry-in-the-haystack/docs/staged_mock/*.sql /Users/soma/IdeaProjects/cherry-in-the-haystack/docs/staged_mock/README.md)",
+      "Bash(/Users/soma/IdeaProjects/cherry-in-the-haystack/docs/staged_mock/stage-5-worker-parse.sql:*)",
+      "Bash(/Users/soma/IdeaProjects/cherry-in-the-haystack/docs/staged_mock/staged-rollback.sql:*)",
+      "Bash(./node_modules/.bin/nest build:*)"
     ],
     "deny": [],
     "ask": []
