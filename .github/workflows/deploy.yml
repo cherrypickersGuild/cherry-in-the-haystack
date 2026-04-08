@@ -1,0 +1,15 @@
+name: Deploy to Dokploy
+
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Dokploy Deploy
+        run: |
+          curl -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json"
