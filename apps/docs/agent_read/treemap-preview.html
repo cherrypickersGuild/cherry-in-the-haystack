@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Treemap Preview — Binary Recursive (Mondrian)</title>
+<style>
+  body { font-family: Inter, sans-serif; background: #f5f3ff; display: flex; flex-direction: column; align-items: center; padding: 40px; }
+  h2 { color: #555; margin-bottom: 8px; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+  #container-wrap {
+    background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(238,233,248,0.98));
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 18px;
+    padding: 6px;
+    width: 720px;
+    height: 360px;
+    box-shadow: 0 4px 24px rgba(34,26,63,0.10);
+  }
+  #container { position: relative; width: 100%; height: 100%; }
+  .tile {
+    position: absolute;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.62), 0 5px 18px rgba(34,26,63,0.14);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px;
+    box-sizing: border-box;
+    overflow: hidden;
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  .tile:hover { filter: brightness(0.94); }
+  .tile-label {
+    font-weight: 800;
+    line-height: 1.15;
+    word-break: break-all;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.22);
+    letter-spacing: 0.03em;
+  }
+  .tile-badge {
+    align-self: flex-end;
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.78);
+    border: 1px solid rgba(255,255,255,0.92);
+    box-shadow: 0 2px 8px rgba(22,16,42,0.12);
+    letter-spacing: 0.04em;
+  }
+  #legend {
+    display: flex; flex-wrap: wrap; gap: 6px 16px;
+    margin-top: 12px; font-size: 11px; color: #888;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<h2>Buzz Distribution — Binary Recursive Treemap (Mondrian)</h2>
+<div id="container-wrap"><div id="container"></div></div>
+<div id="legend"></div>
+
+<script>
+const DATA = [
+  { label: "MODEL_UPDATES",    percent: 18, color: "#7B5EA7", bgColor: "#F3EFFA" },
+  { label: "PAPER_BENCHMARK",  percent: 15, color: "#C94B6E", bgColor: "#FDF0F3" },
+  { label: "FRAMEWORKS",       percent: 14, color: "#2D7A5E", bgColor: "#EFF7F3" },
+  { label: "TOOLS",            percent: 12, color: "#D4854A", bgColor: "#FDF6EE" },
+  { label: "SHARED_RESOURCES", percent: 11, color: "#4A90D9", bgColor: "#EEF4FC" },
+  { label: "CASE_STUDIES",     percent: 9,  color: "#1A1626", bgColor: "#F2F0F7" },
+  { label: "REGULATIONS",      percent: 8,  color: "#9E97B3", bgColor: "#F7F6F9" },
+  { label: "BIG_TECH_TRENDS",  percent: 7,  color: "#6B6480", bgColor: "#F7F6F9" },
+  { label: "THIS_WEEKS_POSTS", percent: 6,  color: "#2E5C94", bgColor: "#EEF4FC" },
+]
+
+const GAP = 3
+
+function findSplitIndex(items) {
+  const total = items.reduce((s, i) => s + i.norm, 0)
+  const half = total / 2
+  let cumSum = 0, bestIdx = 0, bestDiff = Infinity
+  for (let k = 0; k < items.length - 1; k++) {
+    cumSum += items[k].norm
+    const diff = Math.abs(cumSum - half)
+    if (diff < bestDiff) { bestDiff = diff; bestIdx = k }
+  }
+  return bestIdx + 1
+}
+
+function binaryRec(items, x, y, W, H, out) {
+  if (!items.length || W <= 0 || H <= 0) return
+  if (items.length === 1) { out.push({ ...items[0].item, x, y, w: W, h: H }); return }
+
+  const splitAt = findSplitIndex(items)
+  const g1 = items.slice(0, splitAt)
+  const g2 = items.slice(splitAt)
+  const total = items.reduce((s, i) => s + i.norm, 0)
+  const ratio = g1.reduce((s, i) => s + i.norm, 0) / total
+
+  if (W >= H) {
+    const w1 = ratio * W
+    binaryRec(g1, x, y, w1, H, out)
+    binaryRec(g2, x + w1, y, W - w1, H, out)
+  } else {
+    const h1 = ratio * H
+    binaryRec(g1, x, y, W, h1, out)
+    binaryRec(g2, x, y + h1, W, H - h1, out)
+  }
+}
+
+function computeTiles(data, W, H) {
+  const sorted = [...data].sort((a, b) => b.percent - a.percent)
+  const total = sorted.reduce((s, i) => s + i.percent, 0)
+  const items = sorted.map(i => ({ item: i, norm: i.percent / total }))
+  const out = []
+  binaryRec(items, 0, 0, W, H, out)
+  return out
+}
+
+function render() {
+  const wrap = document.getElementById('container')
+  const W = wrap.clientWidth, H = wrap.clientHeight
+  const tiles = computeTiles(DATA, W, H)
+  wrap.innerHTML = ''
+
+  for (const tile of tiles) {
+    const x = tile.x + GAP, y = tile.y + GAP
+    const w = tile.w - GAP * 2, h = tile.h - GAP * 2
+    if (w <= 0 || h <= 0) continue
+
+    const minDim = Math.min(w, h)
+    const labelSize = Math.max(9, Math.min(17, minDim * 0.155))
+    const pctSize   = Math.max(8, Math.min(15, minDim * 0.13))
+    const showLabel = w > 42 && h > 32
+    const showBadge = w > 52 && h > 44
+
+    const el = document.createElement('div')
+    el.className = 'tile'
+    el.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;
+      background-color:${tile.bgColor};
+      background-image:radial-gradient(circle at 16% 12%,rgba(255,255,255,0.42),transparent 56%);`
+
+    if (showLabel) {
+      const p = document.createElement('p')
+      p.className = 'tile-label'
+      p.textContent = tile.label
+      p.style.cssText = `color:${tile.color};font-size:${labelSize}px;`
+      el.appendChild(p)
+    }
+    if (showBadge) {
+      const span = document.createElement('span')
+      span.className = 'tile-badge'
+      span.textContent = tile.percent + '%'
+      span.style.cssText = `color:${tile.color};font-size:${pctSize * 0.68}px;`
+      el.appendChild(span)
+    }
+    wrap.appendChild(el)
+  }
+}
+
+const legend = document.getElementById('legend')
+DATA.forEach(d => {
+  const item = document.createElement('div')
+  item.className = 'legend-item'
+  item.innerHTML = `<span class="legend-dot" style="background:${d.bgColor};border:1px solid ${d.color}44"></span>${d.label} ${d.percent}%`
+  legend.appendChild(item)
+})
+
+window.addEventListener('load', render)
+window.addEventListener('resize', render)
+</script>
+</body>
+</html>

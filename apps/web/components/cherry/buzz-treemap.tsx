@@ -1,8 +1,11 @@
 "use client"
 
+import { useRef, useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/components/ui/use-mobile"
 import type { LandingTreemapItem } from "@/lib/api"
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 type BuzzItem = {
   label: string
@@ -10,6 +13,17 @@ type BuzzItem = {
   color: string
   bgColor: string
 }
+
+type TileRect = BuzzItem & {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+type NormItem = { item: BuzzItem; norm: number }
+
+// ── Static data ───────────────────────────────────────────────────────────────
 
 const PAGE_STYLE: Record<string, { color: string; bgColor: string }> = {
   "MODEL_UPDATES":    { color: "#7B5EA7", bgColor: "#F3EFFA" },
@@ -38,10 +52,79 @@ const STATIC_BUZZ_DATA: BuzzItem[] = [
 const TREEMAP_FONT_STACK =
   'var(--font-rounded), "Inter", "Segoe UI", system-ui, sans-serif'
 
-function scaleFontSize(percent: number, min: number, max: number) {
-  const lo = 6, hi = 18
-  return min + ((percent - lo) / (hi - lo)) * (max - min)
+const GAP = 3
+
+// ── Binary Recursive Treemap (Mondrian style) ─────────────────────────────────
+//
+// 아이템을 내림차순 정렬 후, 합이 최대한 균등해지는 지점에서 두 그룹으로 분할.
+// 사각형의 긴 변 방향으로 분할 → 재귀.
+// → 다양한 방향의 블록들이 생겨 몬드리안 느낌이 남.
+
+function findSplitIndex(items: NormItem[]): number {
+  const total = items.reduce((s, i) => s + i.norm, 0)
+  const half = total / 2
+  let cumSum = 0
+  let bestIdx = 0
+  let bestDiff = Infinity
+
+  for (let k = 0; k < items.length - 1; k++) {
+    cumSum += items[k].norm
+    const diff = Math.abs(cumSum - half)
+    if (diff < bestDiff) {
+      bestDiff = diff
+      bestIdx = k
+    }
+  }
+  return bestIdx + 1
 }
+
+function binaryRec(
+  items: NormItem[],
+  x: number,
+  y: number,
+  W: number,
+  H: number,
+  out: TileRect[],
+): void {
+  if (items.length === 0 || W <= 0 || H <= 0) return
+
+  if (items.length === 1) {
+    out.push({ ...items[0].item, x, y, w: W, h: H })
+    return
+  }
+
+  const splitAt = findSplitIndex(items)
+  const g1 = items.slice(0, splitAt)
+  const g2 = items.slice(splitAt)
+
+  const total = items.reduce((s, i) => s + i.norm, 0)
+  const sum1  = g1.reduce((s, i) => s + i.norm, 0)
+  const ratio = sum1 / total
+
+  if (W >= H) {
+    // 가로가 길면 세로로 잘라서 좌/우 분할
+    const w1 = ratio * W
+    binaryRec(g1, x,      y, w1,     H, out)
+    binaryRec(g2, x + w1, y, W - w1, H, out)
+  } else {
+    // 세로가 길면 가로로 잘라서 상/하 분할
+    const h1 = ratio * H
+    binaryRec(g1, x, y,      W, h1,     out)
+    binaryRec(g2, x, y + h1, W, H - h1, out)
+  }
+}
+
+function computeTiles(data: BuzzItem[], W: number, H: number): TileRect[] {
+  if (W <= 0 || H <= 0) return []
+  const sorted = [...data].sort((a, b) => b.percent - a.percent)
+  const total  = sorted.reduce((s, i) => s + i.percent, 0)
+  const items: NormItem[] = sorted.map((i) => ({ item: i, norm: i.percent / total }))
+  const out: TileRect[] = []
+  binaryRec(items, 0, 0, W, H, out)
+  return out
+}
+
+// ── Components ────────────────────────────────────────────────────────────────
 
 function toDisplayItems(items: LandingTreemapItem[]): BuzzItem[] {
   return items.map((item) => ({
@@ -51,38 +134,25 @@ function toDisplayItems(items: LandingTreemapItem[]): BuzzItem[] {
   }))
 }
 
-/**
- * % 합이 target(≈ total/numRows)에 가까워지면 행 마감
- * → row height ∝ row sum, item width ∝ item/rowSum → area ∝ item.percent
- */
-function buildRows(items: BuzzItem[], numRows = 3): BuzzItem[][] {
-  const sorted = [...items].sort((a, b) => b.percent - a.percent)
-  const total = sorted.reduce((s, i) => s + i.percent, 0)
-  const target = total / numRows
-
-  const rows: BuzzItem[][] = []
-  let cur: BuzzItem[] = []
-  let curSum = 0
-
-  for (const item of sorted) {
-    if (rows.length === numRows - 1) { cur.push(item); continue }
-    cur.push(item)
-    curSum += item.percent
-    if (curSum >= target) { rows.push(cur); cur = []; curSum = 0 }
-  }
-  if (cur.length > 0) rows.push(cur)
-  return rows
-}
-
 export function CategoryTreemap({ items }: { items?: LandingTreemapItem[] }) {
-  const isMobile = useIsMobile()
+  const isMobile  = useIsMobile()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [size, setSize] = useState<{ w: number; h: number } | null>(null)
 
-  const data = items && items.length > 0 ? toDisplayItems(items) : STATIC_BUZZ_DATA
-  const numRows = data.length <= 4 ? 2 : 3
-  const rows = buildRows(data, numRows)
-  const totalPct = data.reduce((s, i) => s + i.percent, 0)
+  const data       = items && items.length > 0 ? toDisplayItems(items) : STATIC_BUZZ_DATA
+  const containerH = isMobile ? 420 : 310
 
-  const containerH = isMobile ? 420 : 288
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const update = () => setSize({ w: el.clientWidth, h: el.clientHeight })
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  const tiles = size ? computeTiles(data, size.w, size.h) : []
 
   return (
     <div>
@@ -108,22 +178,14 @@ export function CategoryTreemap({ items }: { items?: LandingTreemapItem[] }) {
           height: containerH,
         }}
       >
-        <div className="flex flex-col gap-[6px] h-full">
-          {rows.map((row, ri) => {
-            const rowSum = row.reduce((s, i) => s + i.percent, 0)
-            return (
-              <div key={ri} className="flex gap-[6px]" style={{ flex: rowSum / totalPct }}>
-                {row.map((item) => (
-                  <TreemapTile
-                    key={item.label}
-                    item={item}
-                    flexRatio={item.percent / rowSum}
-                    isMobile={isMobile}
-                  />
-                ))}
-              </div>
-            )
-          })}
+        <div
+          ref={containerRef}
+          className="relative w-full h-full"
+          style={{ opacity: size ? 1 : 0 }}
+        >
+          {tiles.map((tile) => (
+            <TreemapTile key={tile.label} tile={tile} />
+          ))}
         </div>
       </div>
 
@@ -147,73 +209,86 @@ export function CategoryTreemap({ items }: { items?: LandingTreemapItem[] }) {
   )
 }
 
-function TreemapTile({
-  item,
-  flexRatio,
-  isMobile,
-}: {
-  item: BuzzItem
-  flexRatio: number
-  isMobile: boolean
-}) {
-  const labelSize  = scaleFontSize(item.percent, isMobile ? 8 : 11, isMobile ? 13 : 18)
-  const pctSize    = scaleFontSize(item.percent, isMobile ? 9 : 12, isMobile ? 14 : 19)
-  const fontWeight = item.percent >= 20 ? 900 : item.percent >= 14 ? 800 : item.percent >= 10 ? 700 : 600
+function TreemapTile({ tile }: { tile: TileRect }) {
+  const x = tile.x + GAP
+  const y = tile.y + GAP
+  const w = tile.w - GAP * 2
+  const h = tile.h - GAP * 2
+
+  if (w <= 0 || h <= 0) return null
+
+  const minDim    = Math.min(w, h)
+  const labelSize = Math.max(9,  Math.min(17, minDim * 0.155))
+  const pctSize   = Math.max(8,  Math.min(15, minDim * 0.13))
+  const fontWeight =
+    tile.percent >= 18 ? 900 : tile.percent >= 14 ? 800 : tile.percent >= 10 ? 700 : 600
+
+  const showLabel = w > 42 && h > 32
+  const showBadge = w > 52 && h > 44
 
   return (
     <button
       className={cn(
-        "group relative flex h-full flex-col justify-between text-left",
+        "group absolute flex flex-col justify-between text-left",
         "rounded-[14px] border transition-all duration-200 cursor-pointer overflow-hidden",
         "border-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.62),0_5px_18px_rgba(34,26,63,0.14)]",
         "hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-        "p-3"
+        "p-3",
       )}
       style={{
-        flex: flexRatio,
-        backgroundColor: item.bgColor,
-        backgroundImage: "radial-gradient(circle at 16% 12%, rgba(255,255,255,0.42), transparent 56%)",
+        left: x,
+        top: y,
+        width: w,
+        height: h,
+        backgroundColor: tile.bgColor,
+        backgroundImage:
+          "radial-gradient(circle at 16% 12%, rgba(255,255,255,0.42), transparent 56%)",
       }}
-      aria-label={`${item.label}: ${item.percent}%`}
+      aria-label={`${tile.label}: ${tile.percent}%`}
     >
       <span
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         style={{
-          background: "linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.02) 48%, rgba(0,0,0,0.05))",
+          background:
+            "linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.02) 48%, rgba(0,0,0,0.05))",
         }}
       />
 
-      <p
-        className="relative max-w-[88%] leading-[1.12] break-all"
-        style={{
-          color: item.color,
-          fontSize: labelSize,
-          fontWeight,
-          fontFamily: TREEMAP_FONT_STACK,
-          letterSpacing: "0.03em",
-          textShadow: "0 1px 0 rgba(255,255,255,0.22)",
-        }}
-      >
-        {item.label}
-      </p>
+      {showLabel && (
+        <p
+          className="relative max-w-[88%] leading-[1.12] break-all"
+          style={{
+            color: tile.color,
+            fontSize: labelSize,
+            fontWeight,
+            fontFamily: TREEMAP_FONT_STACK,
+            letterSpacing: "0.03em",
+            textShadow: "0 1px 0 rgba(255,255,255,0.22)",
+          }}
+        >
+          {tile.label}
+        </p>
+      )}
 
-      <span
-        className="relative ml-auto rounded-full px-2 py-1"
-        style={{
-          color: item.color,
-          fontSize: pctSize * 0.68,
-          fontWeight: 700,
-          lineHeight: 1,
-          fontFamily: TREEMAP_FONT_STACK,
-          letterSpacing: "0.04em",
-          fontVariantNumeric: "tabular-nums",
-          backgroundColor: "rgba(255,255,255,0.78)",
-          border: "1px solid rgba(255,255,255,0.92)",
-          boxShadow: "0 2px 8px rgba(22,16,42,0.12)",
-        }}
-      >
-        {item.percent}%
-      </span>
+      {showBadge && (
+        <span
+          className="relative ml-auto rounded-full px-2 py-1"
+          style={{
+            color: tile.color,
+            fontSize: pctSize * 0.68,
+            fontWeight: 700,
+            lineHeight: 1,
+            fontFamily: TREEMAP_FONT_STACK,
+            letterSpacing: "0.04em",
+            fontVariantNumeric: "tabular-nums",
+            backgroundColor: "rgba(255,255,255,0.78)",
+            border: "1px solid rgba(255,255,255,0.92)",
+            boxShadow: "0 2px 8px rgba(22,16,42,0.12)",
+          }}
+        >
+          {tile.percent}%
+        </span>
+      )}
     </button>
   )
 }
