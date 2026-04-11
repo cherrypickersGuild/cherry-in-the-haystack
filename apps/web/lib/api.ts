@@ -200,3 +200,149 @@ export async function fetchLandingArticles(): Promise<LandingArticlesResponse> {
   if (!res.ok) throw new Error("Failed to fetch landing articles")
   return res.json()
 }
+
+/* ═══════════════════════════════════════════
+   Prompt Template
+═══════════════════════════════════════════ */
+
+export interface TemplateVersion {
+  id: string
+  prompt_template_id: string
+  version_no: number
+  version_tag: string
+  prompt_text: string
+  few_shot_examples: string | null
+  parameters_json: Record<string, unknown> | null
+  change_note: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface PromptTemplate {
+  id: string
+  type: string
+  scope: string
+  code: string
+  name: string
+  description: string | null
+  tone_text: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+  versions: TemplateVersion[]
+}
+
+/** 전체 템플릿 목록 (버전 포함) */
+export async function fetchTemplates(): Promise<PromptTemplate[]> {
+  const res = await fetch(`${API_URL}/api/prompt-templates/list`, { cache: "no-store" })
+  if (!res.ok) throw new Error("Failed to fetch templates")
+  return res.json()
+}
+
+/** 템플릿 생성 (+ 초기 버전 A) */
+export async function createTemplate(body: {
+  type: string
+  code: string
+  name: string
+  description?: string
+  tone_text: string
+  prompt_text: string
+  few_shot_examples?: string
+  parameters_json?: Record<string, unknown>
+  change_note?: string
+}): Promise<PromptTemplate[]> {
+  const res = await fetch(`${API_URL}/api/prompt-templates/create`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error("Failed to create template")
+  return res.json()
+}
+
+/** 템플릿 메타 수정 */
+export async function updateTemplate(
+  id: string,
+  body: { name?: string; description?: string; tone_text?: string },
+): Promise<PromptTemplate[]> {
+  const res = await fetch(`${API_URL}/api/prompt-templates/${id}/patch`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error("Failed to update template")
+  return res.json()
+}
+
+/** 템플릿 소프트 삭제 */
+export async function deleteTemplate(id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/prompt-templates/${id}/delete`, {
+    method: "DELETE",
+  })
+  if (!res.ok) throw new Error("Failed to delete template")
+}
+
+/** 버전 추가 */
+export async function addVersion(
+  templateId: string,
+  body: {
+    prompt_text: string
+    few_shot_examples?: string
+    parameters_json?: Record<string, unknown>
+    change_note?: string
+  },
+): Promise<TemplateVersion> {
+  const res = await fetch(`${API_URL}/api/prompt-templates/${templateId}/add-new-versions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error("Failed to add version")
+  return res.json()
+}
+
+/** 버전 수정 */
+export async function updateVersion(
+  templateId: string,
+  versionId: string,
+  body: {
+    prompt_text?: string
+    few_shot_examples?: string
+    parameters_json?: Record<string, unknown>
+    change_note?: string
+  },
+): Promise<TemplateVersion> {
+  const res = await fetch(
+    `${API_URL}/api/prompt-templates/${templateId}/versions/${versionId}/patch`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  )
+  if (!res.ok) throw new Error("Failed to update version")
+  return res.json()
+}
+
+/** 활성 버전 지정 */
+export async function activateVersion(
+  templateId: string,
+  versionId: string,
+): Promise<TemplateVersion> {
+  const res = await fetch(
+    `${API_URL}/api/prompt-templates/${templateId}/versions/${versionId}/activate`,
+    { method: "PATCH" },
+  )
+  if (!res.ok) throw new Error("Failed to activate version")
+  return res.json()
+}
+
+/** 버전 소프트 삭제 */
+export async function deleteVersion(templateId: string, versionId: string): Promise<void> {
+  const res = await fetch(
+    `${API_URL}/api/prompt-templates/${templateId}/versions/${versionId}/delete`,
+    { method: "DELETE" },
+  )
+  if (!res.ok) throw new Error("Failed to delete version")
+}

@@ -23,15 +23,28 @@ const STATIC_MOMENTUM = [
   { entityId: "s3", entityName: "Gemini 2.0", categoryName: "Google Family", page: "MODEL_UPDATES", thisWeekCount: 8, prevWeekCount: 3, changePct: 166 },
 ]
 
+/** JWT payload에서 role 추출 (검증 없이 디코딩만) */
+function parseJwtRole(token: string): string | null {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]))
+    return payload.role ?? null
+  } catch {
+    return null
+  }
+}
+
 export default function CherryApp() {
   const [activeNav, setActiveNav] = useState("highlight")
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userRole, setUserRole] = useState<string | null>(null)
   const [landing, setLanding] = useState<LandingResponse | null>(null)
   const [topArticles, setTopArticles] = useState<LandingTopArticle[]>([])
   const router = useRouter()
 
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem("accessToken"))
+    const token = localStorage.getItem("accessToken")
+    setIsLoggedIn(!!token)
+    if (token) setUserRole(parseJwtRole(token))
     // 통계(treemap+momentum)와 기사 목록 동시에 fetch
     fetchLanding().then(setLanding).catch(() => {})
     fetchLandingArticles().then((r) => setTopArticles(r.items)).catch(() => {})
@@ -41,10 +54,13 @@ export default function CherryApp() {
     if (isLoggedIn) {
       localStorage.removeItem("accessToken")
       setIsLoggedIn(false)
+      setUserRole(null)
     } else {
       router.push("/login")
     }
   }
+
+  const isAdmin = userRole === "ADMIN"
 
   /* ─────────────────────────────────────────────
      Route content based on active nav
@@ -207,6 +223,15 @@ export default function CherryApp() {
             <p className="text-[10px] text-text-muted font-medium">for AI Engineers</p>
           </div>
           <div className="ml-auto flex items-center gap-2">
+            {isAdmin && (
+              <Link
+                href="/template/edit"
+                className="px-3 py-1.5 rounded-lg text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#C94B6E" }}
+              >
+                Manage
+              </Link>
+            )}
             <button
               onClick={handleAuthClick}
               className="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors"
@@ -218,7 +243,16 @@ export default function CherryApp() {
         </header>
 
         {/* Desktop top bar */}
-        <div className="hidden lg:flex items-center justify-end px-10 py-4 border-b border-[#E4E1EE] bg-white flex-shrink-0">
+        <div className="hidden lg:flex items-center justify-end gap-3 px-10 py-4 border-b border-[#E4E1EE] bg-white flex-shrink-0">
+          {isAdmin && (
+            <Link
+              href="/template/edit"
+              className="px-4 py-2 rounded-xl text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "#C94B6E" }}
+            >
+              Manage
+            </Link>
+          )}
           <button
             onClick={handleAuthClick}
             className="px-4 py-2 rounded-xl text-[13px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors"

@@ -76,7 +76,12 @@
       "Bash(wc -l /Users/soma/IdeaProjects/cherry-in-the-haystack/docs/staged_mock/*.sql /Users/soma/IdeaProjects/cherry-in-the-haystack/docs/staged_mock/README.md)",
       "Bash(/Users/soma/IdeaProjects/cherry-in-the-haystack/docs/staged_mock/stage-5-worker-parse.sql:*)",
       "Bash(/Users/soma/IdeaProjects/cherry-in-the-haystack/docs/staged_mock/staged-rollback.sql:*)",
-      "Bash(./node_modules/.bin/nest build:*)"
+      "Bash(./node_modules/.bin/nest build:*)",
+      "Bash(find . -type f \\\\\\( -name \"*.md\" -o -name \"*.txt\" -o -name \"*.json\" \\\\\\) -exec grep -l \"shop\\\\|marketplace\\\\|skill.*purchase\\\\|buy.*skill\" {} \\\\;)",
+      "Bash(find /Users/soma/IdeaProjects/cherry-in-the-haystack/docs -type f -name \"*.md\" -exec grep -l \"marketplace\\\\|agent.*shop\\\\|shop.*feature\\\\|skill.*buy\\\\|CLI.*purchase\" {} \\\\;)",
+      "Bash(find /Users/soma/IdeaProjects/cherry-in-the-haystack -type f \\\\\\( -name \"*.md\" -o -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.json\" -o -name \"*.py\" \\\\\\) ! -path \"*/node_modules/*\" ! -path \"*/.git/*\" ! -path \"*/.claude/worktrees/*\" -exec grep -l \"skill.*shop\\\\|agent.*marketplace\\\\|agent.*store\\\\|CLI.*skill.*purchase\\\\|에이전트.*마켓\\\\|에이전트.*샵\" {} \\\\;)",
+      "Bash(find /Users/soma/IdeaProjects/cherry-in-the-haystack/docs -type f -name \"*.md\" -exec grep -l \"future.*marketplace\\\\|future.*shop\\\\|long.term.*marketplace\\\\|deferred.*marketplace\\\\|phase.*2.*marketplace\" {} \\\\;)",
+      "Bash(grep -i \"marketplace\\\\|shop.*skill\\\\|skill.*shop\" /Users/soma/IdeaProjects/cherry-in-the-haystack/docs/PRD/*.md)"
     ],
     "deny": [],
     "ask": []

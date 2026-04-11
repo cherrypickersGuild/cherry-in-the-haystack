@@ -268,6 +268,15 @@ FOR rec IN (
                 'id',   rec.entity_id,
                 'page', rec.page
             ),
+            'side_category_code',
+              CASE
+                WHEN rec.page = 'CASE_STUDIES' THEN
+                  CASE
+                    WHEN rec.seq IN (455, 460, 464) THEN 'APPLIED_RESEARCH'
+                    ELSE 'CASE_STUDY'
+                  END
+                ELSE NULL
+              END,
             'ai_summary', rec.summary,
             'ai_score',   rec.score,
             'ai_model_name', 'claude-opus-4-6'
