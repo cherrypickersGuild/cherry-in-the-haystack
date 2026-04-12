@@ -218,22 +218,30 @@ export class AgentCommService {
   ═══════════════════════════════════════════ */
 
   async saveEvaluationResults(
-    results: { ai_state_id: string; version_id: string; result: Record<string, unknown> }[],
+    results: Record<string, unknown>[],
   ) {
     let saved = 0;
     let skipped = 0;
 
-    for (const item of results) {
+    for (const result of results) {
+      // idempotency_key: "uas:{user_article_state_id}"
+      const idempotencyKey = result['idempotency_key'] as string;
+      const userArticleStateId = idempotencyKey?.replace(/^uas:/, '');
+
+      if (!userArticleStateId) {
+        skipped++;
+        continue;
+      }
+
       const updated = await this.knex('content.user_article_ai_state')
         .where({
-          id: item.ai_state_id,
+          user_article_state_id: userArticleStateId,
           user_id: SYSTEM_USER_ID,
           ai_status: 'PENDING',
         })
         .whereNull('agent_json_raw')
         .update({
-          agent_json_raw: JSON.stringify(item.result),
-          prompt_template_version_id: item.version_id,
+          agent_json_raw: JSON.stringify(result),
           ai_processed_at: new Date(),
         });
 
@@ -254,6 +262,7 @@ export class AgentCommService {
       `
       SELECT
         aai.id                  AS ai_state_id,
+        uas.id                  AS user_article_state_id,
         ar.title                AS article_title,
         ar.content_raw          AS article_content,
         ar.url                  AS article_url,
@@ -278,6 +287,7 @@ export class AgentCommService {
 
     return rows.rows.map((r: Record<string, unknown>) => ({
       id: r.ai_state_id,
+      idempotency_key: `uas:${(r.user_article_state_id as string).toLowerCase()}`,
       article: {
         title: r.article_title,
         content: r.article_content,

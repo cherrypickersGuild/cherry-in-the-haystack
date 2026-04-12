@@ -43,6 +43,6 @@ export class AgentCommController {
   async finishEvaluation(
     @Body(new ZodValidationPipe(FinishEvaluationDto.schema)) dto: FinishEvaluationDto,
   ) {
-    return this.service.saveEvaluationResults(dto.results);
+    return this.service.saveEvaluationResults(dto.results as Record<string, unknown>[]);
   }
 }
