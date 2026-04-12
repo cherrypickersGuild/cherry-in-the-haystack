@@ -157,47 +157,48 @@ export class AgentCommService {
   }
 
   private async getCatalog() {
+    const CATALOG_PAGES = ['MODEL_UPDATES', 'FRAMEWORKS', 'CASE_STUDIES'];
+
     const entityRows = await this.knex.raw(`
       SELECT
-        ec.entity_page        AS page,
+        tep.entity_page       AS page,
+        ec.id                 AS category_id,
         ec.name               AS category_name,
+        te.id                 AS entity_id,
         te.name               AS entity_name
-      FROM content.entity_category ec
-      LEFT JOIN content.tracked_entity_placement tep
-        ON tep.entity_category_id = ec.id
-       AND tep.entity_page = ec.entity_page
-       AND tep.is_active = TRUE
-       AND tep.revoked_at IS NULL
-      LEFT JOIN content.tracked_entity te
+      FROM content.tracked_entity_placement tep
+      JOIN content.entity_category ec
+        ON ec.id = tep.entity_category_id
+       AND ec.is_active = TRUE
+       AND ec.revoked_at IS NULL
+      JOIN content.tracked_entity te
         ON te.id = tep.tracked_entity_id
        AND te.is_active = TRUE
        AND te.revoked_at IS NULL
-      WHERE ec.is_active = TRUE
-        AND ec.revoked_at IS NULL
-      ORDER BY ec.entity_page, ec.sort_order, te.name
-    `);
+      WHERE tep.revoked_at IS NULL
+        AND tep.entity_page = ANY(:pages)
+      ORDER BY tep.entity_page, ec.sort_order, te.name
+    `, { pages: CATALOG_PAGES });
 
-    const pageMap = new Map<string, Map<string, string[]>>();
+    type CatEntry = { id: string; name: string; entities: { id: string; name: string }[] };
+    const pageMap = new Map<string, Map<string, CatEntry>>();
 
     for (const r of entityRows.rows) {
       if (!pageMap.has(r.page)) pageMap.set(r.page, new Map());
       const catMap = pageMap.get(r.page)!;
 
-      if (!catMap.has(r.category_name)) {
-        catMap.set(r.category_name, []);
+      if (!catMap.has(r.category_id)) {
+        catMap.set(r.category_id, { id: r.category_id, name: r.category_name, entities: [] });
       }
 
-      if (r.entity_name) {
-        catMap.get(r.category_name)!.push(r.entity_name);
+      if (r.entity_id && r.entity_name) {
+        catMap.get(r.category_id)!.entities.push({ id: r.entity_id, name: r.entity_name });
       }
     }
 
     const pages = Array.from(pageMap.entries()).map(([page, catMap]) => ({
       page,
-      categories: Array.from(catMap.entries()).map(([name, entities]) => ({
-        name,
-        entities,
-      })),
+      categories: Array.from(catMap.values()),
     }));
 
     const sideRows = await this.knex('content.side_category')
