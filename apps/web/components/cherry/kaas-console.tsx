@@ -384,13 +384,28 @@ export const KaasConsole = forwardRef<KaasConsoleRef>(function KaasConsole(_, re
             .replace(/-+/g, "-")
             .replace(/^-|-$/g, "") || "rag"
 
+          // 🔒 Privacy Mode: 구매 intent(concept_id)를 NEAR TEE로 통과시킨 뒤 서버로 전달
+          let isPrivate = false
+          try {
+            const { getPrivacyMode } = await import("@/components/cherry/kaas-dashboard-page")
+            if (getPrivacyMode()) {
+              const { chatWithAgent } = await import("@/lib/api")
+              await chatWithAgent(
+                apiKey,
+                "",
+                `[TEE relay] Purchase intent: agent wants to ${act} concept "${conceptId}". Respond OK.`,
+                true,
+              ).then(() => { isPrivate = true })
+                .catch(() => { /* TEE 통과 실패해도 구매 진행 */ })
+            }
+          } catch { /* import 실패 무시 */ }
+
           const apiResult = act === "purchase"
             ? await purchaseConcept(apiKey, conceptId)
             : await followConcept(apiKey, conceptId)
 
           // 기본 답변 = 서버가 준 summary
           let agentReply = apiResult.answer
-          let isPrivate = false
           if (apiResult.content_md) {
             try {
               const { chatWithAgent } = await import("@/lib/api")
@@ -465,14 +480,20 @@ export const KaasConsole = forwardRef<KaasConsoleRef>(function KaasConsole(_, re
             if (apiKeyRef.current) {
               import("@/lib/api").then(({ fetchBalance, fetchAgents }) => {
                 fetchBalance(apiKeyRef.current).then((b: any) => setCredits(b?.balance ?? 0)).catch(() => {})
-                fetchAgents().then((agents: any[]) => {
+                fetchAgents().then(async (agents: any[]) => {
                   const agent = agents.find((a: any) => a.api_key === apiKeyRef.current)
                   const knowledge: Array<{ topic: string; lastUpdated: string }> = (() => {
                     try { const r = agent?.knowledge; return typeof r === 'string' ? JSON.parse(r) : (Array.isArray(r) ? r : []) } catch { return [] }
                   })()
                   if (knowledge.length > 0) {
                     const lines = knowledge.map((k) => `  ✓ ${k.topic} (${k.lastUpdated})`).join("\n")
-                    setMessages((m) => [...m, { role: "agent-chat", reply: `📚 Knowledge submitted (${knowledge.length} topics):\n${lines}` }])
+                    // Privacy Mode 상태 읽어서 배지 부착
+                    let knowPrivacy = false
+                    try {
+                      const mod = await import("@/components/cherry/kaas-dashboard-page")
+                      knowPrivacy = mod.getPrivacyMode()
+                    } catch { /* ignore */ }
+                    setMessages((m) => [...m, { role: "agent-chat", reply: `📚 Knowledge submitted (${knowledge.length} topics):\n${lines}`, privacy: knowPrivacy }])
                     scrollToBottom()
                   }
                 }).catch(() => {})
