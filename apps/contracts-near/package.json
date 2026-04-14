@@ -1,0 +1,14 @@
+{
+  "name": "cherry-kaas-near-contract",
+  "version": "1.0.0",
+  "description": "Cherry KaaS CherryCredit contract for NEAR Testnet",
+  "scripts": {
+    "build": "near-sdk-js build src/cherry_credit.ts build/cherry_credit.wasm",
+    "deploy": "near deploy --wasmFile build/cherry_credit.wasm --accountId $CONTRACT_ACCOUNT",
+    "test": "echo 'No tests yet'"
+  },
+  "dependencies": {
+    "near-sdk-js": "^2.0.0"
+  },
+  "type": "module"
+}

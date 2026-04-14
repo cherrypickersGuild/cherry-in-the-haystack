@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export const FollowSchema = z.object({
   concept_id: z.string().min(1),
   api_key: z.string().optional(),
+  chain: z.enum(['status', 'near', 'mock']).optional(),
 });
 
 export class FollowDto {
@@ -14,4 +15,7 @@ export class FollowDto {
 
   @ApiProperty({ required: false, description: '에이전트 API Key (생략 시 첫 번째 에이전트 사용)' })
   api_key?: string;
+
+  @ApiProperty({ example: 'status', enum: ['status', 'near', 'mock'], required: false })
+  chain?: 'status' | 'near' | 'mock';
 }

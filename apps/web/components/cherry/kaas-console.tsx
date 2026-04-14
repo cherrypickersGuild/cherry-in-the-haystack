@@ -400,9 +400,16 @@ export const KaasConsole = forwardRef<KaasConsoleRef>(function KaasConsole(_, re
             }
           } catch { /* import 실패 무시 */ }
 
+          // 선택된 체인 읽기 (Status / NEAR)
+          let selectedChain: "status" | "near" = "status"
+          try {
+            const mod = await import("@/components/cherry/kaas-dashboard-page")
+            selectedChain = mod.getSelectedChain()
+          } catch { /* 기본값 status */ }
+
           const apiResult = act === "purchase"
-            ? await purchaseConcept(apiKey, conceptId)
-            : await followConcept(apiKey, conceptId)
+            ? await purchaseConcept(apiKey, conceptId, selectedChain)
+            : await followConcept(apiKey, conceptId, selectedChain)
 
           // 기본 답변 = 서버가 준 summary
           let agentReply = apiResult.answer

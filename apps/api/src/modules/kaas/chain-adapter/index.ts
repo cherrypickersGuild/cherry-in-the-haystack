@@ -11,6 +11,7 @@
 import { IChainAdapter } from "./interface";
 import { MockAdapter } from "./mock-adapter";
 import { StatusAdapter } from "./status-adapter";
+import { NearAdapter } from "./near-adapter";
 
 export function createChainAdapter(): IChainAdapter {
   // DEMO_FALLBACK이면 무조건 Mock
@@ -23,11 +24,10 @@ export function createChainAdapter(): IChainAdapter {
   switch (adapter) {
     case "status":
       return new StatusAdapter();
-    // Day 4에 추가:
+    case "near":
+      return new NearAdapter();
     // case "bnb":
-    //   return new BnbAdapter();
-    // case "near":
-    //   return new NearAdapter();
+    //   return new BnbAdapter(); // Day 4 (opBNB skipped)
     default:
       return new MockAdapter();
   }
@@ -36,3 +36,4 @@ export function createChainAdapter(): IChainAdapter {
 export type { IChainAdapter, TxResult, KarmaTier } from "./interface";
 export { MockAdapter } from "./mock-adapter";
 export { StatusAdapter } from "./status-adapter";
+export { NearAdapter } from "./near-adapter";

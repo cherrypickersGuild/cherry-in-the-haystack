@@ -89,6 +89,7 @@ export class KaasQueryController {
 
       const prov = await this.provenance.recordQuery(
         agent.id, dto.concept_id, 'purchase', consumed, responseData,
+        (dto as any).chain, // chain override (status | near | mock)
       );
 
       // 큐레이터 보상 40% 자동 지급 (비동기)
@@ -153,6 +154,7 @@ export class KaasQueryController {
 
     const prov = await this.provenance.recordQuery(
       agent.id, dto.concept_id, 'follow', consumed, responseData,
+      (dto as any).chain,
     );
 
     // 큐레이터 보상 40% 자동 지급 (비동기)

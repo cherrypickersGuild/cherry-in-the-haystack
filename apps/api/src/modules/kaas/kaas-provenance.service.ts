@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Knex } from 'knex';
 import { createHash } from 'crypto';
-import { getSharedChainAdapter } from './chain-adapter/shared-adapter';
+import { getSharedChainAdapter, getChainAdapter, type ChainName } from './chain-adapter/shared-adapter';
 import type { IChainAdapter } from './chain-adapter';
 
 @Injectable()
@@ -27,16 +27,17 @@ export class KaasProvenanceService {
     return '0x' + createHash('sha256').update(JSON.stringify(data)).digest('hex');
   }
 
-  /** 쿼리 로그 기록 + 온체인 프로비넌스 기록 (동기) */
+  /** 쿼리 로그 기록 + 온체인 프로비넌스 기록 (동기)
+   *  chainOverride: 요청별로 체인 지정 ('status' | 'near' | 'mock'). 미지정 시 env 기본값 */
   async recordQuery(
     agentId: string,
     conceptId: string,
     actionType: string,
     creditsConsumed: number,
     responseData: Record<string, unknown>,
-  ): Promise<{ queryLogId: string; provenanceHash: string | null; explorerUrl: string | null; onChain: boolean; error?: string }> {
-    // 매 구매마다 고유한 hash 생성: 응답 데이터 + agent + timestamp + random nonce
-    // (같은 에이전트가 같은 컨셉을 재구매해도 온체인 중복 기록 방지 로직에 걸리지 않도록)
+    chainOverride?: ChainName,
+  ): Promise<{ queryLogId: string; provenanceHash: string | null; explorerUrl: string | null; onChain: boolean; chain: string; error?: string }> {
+    // 매 구매마다 고유한 hash 생성
     const uniqueData = {
       ...responseData,
       _agent: agentId,
@@ -44,7 +45,7 @@ export class KaasProvenanceService {
       _nonce: Math.random().toString(36).slice(2),
     };
     const localHash = this.generateHash(uniqueData);
-    const chain = process.env.CHAIN_ADAPTER ?? 'mock';
+    const chain = chainOverride ?? (process.env.CHAIN_ADAPTER as ChainName) ?? 'mock';
 
     // 1차: 로컬 해시로 DB 선저장
     const [log] = await this.knex('kaas.query_log')
@@ -59,12 +60,16 @@ export class KaasProvenanceService {
       })
       .returning('*');
 
+    // 체인별 어댑터 선택 (runtime override 지원)
+    const adapter = chainOverride ? getChainAdapter(chainOverride) : this.chainAdapter;
+
     // 2차: 온체인 기록 (동기 — 실제 tx hash를 응답에 포함)
     try {
       const agent = await this.knex('kaas.agent').where({ id: agentId }).first();
-      const walletAddress = agent?.wallet_address ?? '0x0000000000000000000000000000000000000000';
+      // NEAR는 계정ID, Status는 지갑 주소. fallback 처리
+      const walletAddress = agent?.wallet_address ?? agent?.name ?? '0x0000000000000000000000000000000000000000';
 
-      const result = await this.chainAdapter.recordProvenance(localHash, walletAddress, conceptId);
+      const result = await adapter.recordProvenance(localHash, walletAddress, conceptId);
 
       // 실제 tx hash로 DB 업데이트
       await this.knex('kaas.query_log').where({ id: log.id }).update({
@@ -72,17 +77,16 @@ export class KaasProvenanceService {
         chain: result.chain,
       });
 
-      this.logger.log(`On-chain provenance: ${result.hash} (${result.explorerUrl})`);
-      return { queryLogId: log.id, provenanceHash: result.hash, explorerUrl: result.explorerUrl, onChain: true };
+      this.logger.log(`On-chain provenance [${result.chain}]: ${result.hash} (${result.explorerUrl})`);
+      return { queryLogId: log.id, provenanceHash: result.hash, explorerUrl: result.explorerUrl, onChain: true, chain: result.chain };
     } catch (err: any) {
       const errMsg = err?.message ?? String(err);
-      this.logger.warn(`On-chain recording failed: ${errMsg} | code=${err?.code} | cause=${err?.cause?.message}`);
-      // 실패 시 온체인 tx 없음 — 가짜 hash/URL 반환 안 함
+      this.logger.warn(`On-chain recording failed [${chain}]: ${errMsg} | code=${err?.code} | cause=${err?.cause?.message}`);
       await this.knex('kaas.query_log').where({ id: log.id }).update({
         provenance_hash: null,
         chain: 'failed',
       });
-      return { queryLogId: log.id, provenanceHash: null, explorerUrl: null, onChain: false, error: errMsg };
+      return { queryLogId: log.id, provenanceHash: null, explorerUrl: null, onChain: false, chain: 'failed', error: errMsg };
     }
   }
 

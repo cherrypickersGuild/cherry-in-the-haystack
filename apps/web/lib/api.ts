@@ -412,12 +412,12 @@ export async function depositCredits(apiKey: string, amount: number, chain?: str
   return res.json()
 }
 
-/** 구매 */
-export async function purchaseConcept(apiKey: string, conceptId: string) {
+/** 구매 — chain 지정 시 해당 체인에 온체인 기록 (status | near) */
+export async function purchaseConcept(apiKey: string, conceptId: string, chain?: "status" | "near" | "mock") {
   const res = await fetch(`${KAAS_BASE}/purchase`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ concept_id: conceptId, api_key: apiKey }),
+    body: JSON.stringify({ concept_id: conceptId, api_key: apiKey, ...(chain ? { chain } : {}) }),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
@@ -426,12 +426,12 @@ export async function purchaseConcept(apiKey: string, conceptId: string) {
   return res.json()
 }
 
-/** 팔로우 */
-export async function followConcept(apiKey: string, conceptId: string) {
+/** 팔로우 — chain 지정 시 해당 체인에 온체인 기록 */
+export async function followConcept(apiKey: string, conceptId: string, chain?: "status" | "near" | "mock") {
   const res = await fetch(`${KAAS_BASE}/follow`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ concept_id: conceptId, api_key: apiKey }),
+    body: JSON.stringify({ concept_id: conceptId, api_key: apiKey, ...(chain ? { chain } : {}) }),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))

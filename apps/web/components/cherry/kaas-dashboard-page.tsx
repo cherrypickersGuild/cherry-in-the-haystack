@@ -27,6 +27,75 @@ function setPrivacyMode(value: boolean) {
   window.dispatchEvent(new CustomEvent(PRIVACY_MODE_EVENT, { detail: value }))
 }
 
+/* ═══════════════════════════════════════════════
+   Chain Selector (Status / NEAR)
+   — 구매/팔로우 시 어느 체인에 on-chain 기록할지 결정
+═══════════════════════════════════════════════ */
+const CHAIN_KEY = "kaas-selected-chain"
+const CHAIN_EVENT = "kaas-selected-chain-changed"
+export type SelectedChain = "status" | "near"
+
+export function getSelectedChain(): SelectedChain {
+  if (typeof window === "undefined") return "status"
+  return (window.localStorage.getItem(CHAIN_KEY) as SelectedChain) || "status"
+}
+
+function setSelectedChain(value: SelectedChain) {
+  if (typeof window === "undefined") return
+  window.localStorage.setItem(CHAIN_KEY, value)
+  window.dispatchEvent(new CustomEvent(CHAIN_EVENT, { detail: value }))
+}
+
+function ChainSelector() {
+  const [chain, setChain] = useState<SelectedChain>("status")
+  useEffect(() => {
+    setChain(getSelectedChain())
+    const handler = (e: Event) => setChain((e as CustomEvent).detail)
+    window.addEventListener(CHAIN_EVENT, handler)
+    return () => window.removeEventListener(CHAIN_EVENT, handler)
+  }, [])
+  const toggle = (next: SelectedChain) => {
+    setChain(next)
+    setSelectedChain(next)
+  }
+  return (
+    <div className="flex items-center gap-1 p-1 rounded-lg border border-[#E4E1EE] bg-[#FAFAFA] flex-shrink-0">
+      <button
+        onClick={() => toggle("status")}
+        title="Status Network Sepolia — gasless L2, 수수료 0"
+        className={cn(
+          "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] font-semibold transition-colors cursor-pointer leading-tight",
+          chain === "status"
+            ? "bg-[#EFF7F3] text-[#2D7A5E]"
+            : "text-[#6B727E] hover:text-[#3D3652]",
+        )}
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-[#2D7A5E] flex-shrink-0" />
+        <span className="flex flex-col items-start">
+          <span>Status Network</span>
+          <span className="text-[9px] font-medium opacity-70">Gasless L2</span>
+        </span>
+      </button>
+      <button
+        onClick={() => toggle("near")}
+        title="NEAR Protocol Testnet — L1, 소액 NEAR 수수료"
+        className={cn(
+          "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] font-semibold transition-colors cursor-pointer leading-tight",
+          chain === "near"
+            ? "bg-[#F3EFFA] text-[#5B3D87]"
+            : "text-[#6B727E] hover:text-[#3D3652]",
+        )}
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-[#7B5EA7] flex-shrink-0" />
+        <span className="flex flex-col items-start">
+          <span>NEAR Protocol</span>
+          <span className="text-[9px] font-medium opacity-70">L1 Testnet</span>
+        </span>
+      </button>
+    </div>
+  )
+}
+
 function CompactPrivacyToggle() {
   const [enabled, setEnabled] = useState(false)
   useEffect(() => {
@@ -712,6 +781,17 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
     <div className="flex flex-col gap-4">
       <h3 className="text-[15px] font-bold text-[#1A1626]">Wallet & Rewards</h3>
 
+      {/* 결제 체인 선택 */}
+      <div className="rounded-lg border border-[#E4E1EE] bg-white p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold uppercase tracking-[0.6px] text-[#6B727E]">결제 방식</p>
+            <p className="text-[10px] text-[#9E97B3] mt-0.5">구매 시 온체인 영수증이 기록될 체인을 선택하세요</p>
+          </div>
+          <ChainSelector />
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2.5">
         <div className="rounded-lg border border-[#E4E1EE] bg-white p-3">
@@ -770,7 +850,12 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
                 const hash = q.provenance_hash ?? q.provenanceHash ?? ""
                 const chain = q.chain ?? ""
                 const time = q.created_at ?? q.timestamp ?? ""
-                const explorerUrl = hash ? `https://sepoliascan.status.network/tx/${hash}` : ""
+                // 체인별 Explorer URL (NEAR는 Nearblocks — 구 explorer.testnet.near.org 죽음)
+                const explorerUrl = hash
+                  ? chain === "near"
+                    ? `https://testnet.nearblocks.io/txns/${hash}`
+                    : `https://sepoliascan.status.network/tx/${hash}`
+                  : ""
                 const onChainFailed = chain === "failed" || !hash
                 return (
                   <div key={q.id} className="flex items-center gap-3 py-2.5 border-b border-[#F2F0F7] last:border-0">
