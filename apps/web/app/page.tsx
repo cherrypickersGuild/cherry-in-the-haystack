@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Sidebar, CherryIcon } from "@/components/cherry/sidebar"
 import { MobileSidebar } from "@/components/cherry/mobile-sidebar"
@@ -14,6 +13,10 @@ import { NDModelUpdatesPage } from "@/components/cherry/nd-model-updates-page"
 import { NDCaseStudiesPage } from "@/components/cherry/nd-case-studies-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
 import { HandbookPlaceholder } from "@/components/cherry/handbook-placeholder"
+import { KaasCatalogPage } from "@/components/cherry/kaas-catalog-page"
+import { KaasDashboardPage } from "@/components/cherry/kaas-dashboard-page"
+// KaasAdminPage는 KaasDashboardPage 내부 탭으로 통합됨
+import { KaasConsole, KaasConsoleRef } from "@/components/cherry/kaas-console"
 
 const MOMENTUM_COLORS = ["#C94B6E", "#7B5EA7", "#2D7A5E", "#D4854A", "#0194E2"]
 
@@ -40,6 +43,8 @@ export default function CherryApp() {
   const [landing, setLanding] = useState<LandingResponse | null>(null)
   const [topArticles, setTopArticles] = useState<LandingTopArticle[]>([])
   const router = useRouter()
+  const consoleRef = useRef<KaasConsoleRef>(null)
+  const [showDashboard, setShowDashboard] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken")
@@ -78,6 +83,23 @@ export default function CherryApp() {
 
       case "case-studies":
         return <NDCaseStudiesPage />
+
+      case "kaas-catalog":
+        return <KaasCatalogPage
+          onQuery={(title, depth, conceptId) => consoleRef.current?.query(title, depth, conceptId)}
+          onCompareResult={(result) => {
+            const upToDate = result.upToDate?.length ?? 0
+            const outdated = result.outdated?.length ?? 0
+            const gaps = result.gaps?.length ?? 0
+            const topics = [
+              ...result.upToDate?.map((c: any) => `  ✅ ${c.title}`) ?? [],
+              ...result.outdated?.map((c: any) => `  🔄 ${c.title} (outdated)`) ?? [],
+              ...result.gaps?.slice(0, 3).map((c: any) => `  ⬜ ${c.title} (gap)`) ?? [],
+              gaps > 3 ? `  ... +${gaps - 3} more gaps` : null,
+            ].filter(Boolean).join("\n")
+            consoleRef.current?.notify(`📊 Compare (${result.source ?? "db"}) — ${result.agentName ?? "agent"}\n${topics}\n\nup-to-date: ${upToDate} | outdated: ${outdated} | gaps: ${gaps}`)
+          }}
+        />
 
       case "concept-reader":
         return <ConceptReaderPage />
@@ -223,14 +245,14 @@ export default function CherryApp() {
             <p className="text-[10px] text-text-muted font-medium">for AI Engineers</p>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            {isAdmin && (
-              <Link
-                href="/template/edit"
+            {isLoggedIn && (
+              <button
+                onClick={() => setShowDashboard(true)}
                 className="px-3 py-1.5 rounded-lg text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#C94B6E" }}
               >
-                Admin
-              </Link>
+                Dashboard
+              </button>
             )}
             <button
               onClick={handleAuthClick}
@@ -243,19 +265,19 @@ export default function CherryApp() {
         </header>
 
         {/* Desktop top bar */}
-        <div className="hidden lg:flex items-center justify-end gap-3 px-10 py-4 border-b border-[#E4E1EE] bg-white flex-shrink-0">
-          {isAdmin && (
-            <Link
-              href="/template/edit"
-              className="px-4 py-2 rounded-xl text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+        <div className="hidden lg:flex items-center justify-end gap-2 px-10 py-4 border-b border-[#E4E1EE] bg-white flex-shrink-0">
+          {isLoggedIn && (
+            <button
+              onClick={() => setShowDashboard(true)}
+              className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-white transition-opacity hover:opacity-90 cursor-pointer"
               style={{ backgroundColor: "#C94B6E" }}
             >
-              Admin
-            </Link>
+              Dashboard
+            </button>
           )}
           <button
             onClick={handleAuthClick}
-            className="px-4 py-2 rounded-xl text-[13px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors"
+            className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors cursor-pointer"
           >
             {isLoggedIn ? "Logout" : "Login"}
           </button>
@@ -270,6 +292,28 @@ export default function CherryApp() {
           {renderContent()}
         </main>
       </div>
+
+      {/* Floating Agent Console — visible on KaaS pages */}
+      {activeNav.startsWith("kaas") && <KaasConsole ref={consoleRef} />}
+
+      {/* Dashboard modal (통합: Dashboard + 지식 큐레이팅 + 프롬프트 템플릿) */}
+      {showDashboard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowDashboard(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div
+            className="relative bg-white rounded-2xl shadow-xl w-full max-w-[1200px] h-[95vh] lg:h-[90vh] animate-in zoom-in-95 duration-150 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowDashboard(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-md hover:bg-gray-200 cursor-pointer z-10"
+            >
+              <span className="text-text-muted text-[16px]">✕</span>
+            </button>
+            <KaasDashboardPage isAdmin={isAdmin} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -346,3 +346,283 @@ export async function deleteVersion(templateId: string, versionId: string): Prom
   )
   if (!res.ok) throw new Error("Failed to delete version")
 }
+
+/* ═══════════════════════════════════════════════
+   KaaS API
+═══════════════════════════════════════════════ */
+
+const KAAS_BASE = `${API_URL}/api/v1/kaas`
+
+/** 카탈로그 — 전체 개념 목록 (Public) */
+export async function fetchCatalog(q?: string, category?: string) {
+  const params = new URLSearchParams()
+  if (q) params.set("q", q)
+  if (category) params.set("category", category)
+  const url = `${KAAS_BASE}/catalog${params.toString() ? "?" + params : ""}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error("Failed to fetch catalog")
+  return res.json()
+}
+
+/** 카탈로그 — 개념 상세 */
+export async function fetchConcept(conceptId: string) {
+  const res = await fetch(`${KAAS_BASE}/catalog/${conceptId}`)
+  if (!res.ok) throw new Error("Failed to fetch concept")
+  return res.json()
+}
+
+/** 에이전트 등록 */
+export async function registerAgent(data: { name: string; wallet_address?: string; llm_provider?: string; llm_model?: string; llm_api_key?: string; domain_interests: string[] }) {
+  const res = await fetch(`${KAAS_BASE}/agents/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) throw new Error("Failed to register agent")
+  return res.json()
+}
+
+export async function deleteAgent(agentId: string) {
+  const res = await fetch(`${KAAS_BASE}/agents/${agentId}`, { method: "DELETE" })
+  if (!res.ok) throw new Error("Failed to delete agent")
+}
+
+/** 에이전트 목록 */
+export async function fetchAgents() {
+  const res = await fetch(`${KAAS_BASE}/agents`)
+  if (!res.ok) throw new Error("Failed to fetch agents")
+  return res.json()
+}
+
+/** 크레딧 잔액 */
+export async function fetchBalance(apiKey: string) {
+  const res = await fetch(`${KAAS_BASE}/credits/balance?api_key=${apiKey}`)
+  if (!res.ok) throw new Error("Failed to fetch balance")
+  return res.json()
+}
+
+/** 크레딧 충전 */
+export async function depositCredits(apiKey: string, amount: number, chain?: string) {
+  const res = await fetch(`${KAAS_BASE}/credits/deposit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount, api_key: apiKey, chain }),
+  })
+  if (!res.ok) throw new Error("Failed to deposit")
+  return res.json()
+}
+
+/** 구매 */
+export async function purchaseConcept(apiKey: string, conceptId: string) {
+  const res = await fetch(`${KAAS_BASE}/purchase`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ concept_id: conceptId, api_key: apiKey }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(err.message || "Purchase failed"), { code: err.code, status: res.status })
+  }
+  return res.json()
+}
+
+/** 팔로우 */
+export async function followConcept(apiKey: string, conceptId: string) {
+  const res = await fetch(`${KAAS_BASE}/follow`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ concept_id: conceptId, api_key: apiKey }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(err.message || "Follow failed"), { code: err.code, status: res.status })
+  }
+  return res.json()
+}
+
+/** 구매/팔로우 이력 */
+export async function fetchHistory(apiKey: string) {
+  const res = await fetch(`${KAAS_BASE}/credits/history?api_key=${apiKey}`)
+  if (!res.ok) throw new Error("Failed to fetch history")
+  return res.json()
+}
+
+/** LLM 프록시 — 에이전트가 구매한 지식으로 대화 */
+export async function chatWithAgent(apiKey: string, contentMd: string, question: string) {
+  const res = await fetch(`${KAAS_BASE}/llm/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ api_key: apiKey, content_md: contentMd, question }),
+  })
+  if (!res.ok) throw new Error("LLM chat failed")
+  return res.json()
+}
+
+/** WebSocket 채팅 — 에이전트에게 직접 메시지 전달 */
+export async function wsChat(agentId: string, message: string) {
+  const res = await fetch(`${KAAS_BASE}/mcp/ws-chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ agent_id: agentId, message }),
+  })
+  if (!res.ok) throw new Error("WS chat failed")
+  return res.json()
+}
+
+/** MCP Sampling — 3자 대화 (유저 → Cherry → 에이전트 LLM) */
+export async function mcpChat(message: string, agentId?: string) {
+  const res = await fetch(`${KAAS_BASE}/mcp/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message, agent_id: agentId }),
+  })
+  if (!res.ok) throw new Error("MCP chat failed")
+  return res.json()
+}
+
+/** MCP Elicitation — 에이전트에게 지식 목록 요청 후 gap 분석 */
+export async function elicitKnowledge(agentId?: string) {
+  const res = await fetch(`${KAAS_BASE}/mcp/elicit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ agent_id: agentId }),
+  })
+  if (!res.ok) throw new Error("Elicitation failed")
+  return res.json()
+}
+
+/** MCP 세션 목록 */
+export async function fetchMcpSessions() {
+  const res = await fetch(`${KAAS_BASE}/mcp/sessions`)
+  if (!res.ok) throw new Error("Failed to fetch sessions")
+  return res.json()
+}
+
+/** 큐레이터 보상 잔액 조회 */
+export async function fetchCuratorRewards(curatorName: string) {
+  const res = await fetch(`${KAAS_BASE}/rewards/balance?curator=${encodeURIComponent(curatorName)}`)
+  if (!res.ok) throw new Error("Failed to fetch rewards")
+  return res.json()
+}
+
+/** 전체 큐레이터 보상 현황 */
+export async function fetchAllRewards() {
+  const res = await fetch(`${KAAS_BASE}/rewards/all`)
+  if (!res.ok) throw new Error("Failed to fetch rewards")
+  return res.json()
+}
+
+/* ═══════════════════════════════════════════════
+   KaaS Admin API
+═══════════════════════════════════════════════ */
+
+export interface AdminConcept {
+  id: string
+  title: string
+  category: string
+  summary: string
+  contentMd: string | null
+  qualityScore: number
+  sourceCount: number
+  updatedAt: string
+  relatedConcepts: string[]
+  isActive: boolean
+  evidence: AdminEvidence[]
+}
+
+export interface AdminEvidence {
+  id: string
+  source: string
+  summary: string
+  curator: string
+  curatorTier: string
+  comment: string
+}
+
+export async function fetchConceptsAdmin(): Promise<AdminConcept[]> {
+  const res = await fetch(`${KAAS_BASE}/admin/concepts`, { cache: "no-store" })
+  if (!res.ok) throw new Error("Failed to fetch admin concepts")
+  return res.json()
+}
+
+export async function fetchConceptAdmin(id: string): Promise<AdminConcept> {
+  const res = await fetch(`${KAAS_BASE}/admin/concepts/${id}`, { cache: "no-store" })
+  if (!res.ok) throw new Error("Failed to fetch admin concept")
+  return res.json()
+}
+
+export async function createConceptAdmin(body: {
+  id: string
+  title: string
+  category: string
+  summary: string
+  content_md?: string
+  quality_score?: number
+  source_count?: number
+  related_concepts?: string[]
+}) {
+  const res = await fetch(`${KAAS_BASE}/admin/concepts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error("Failed to create concept")
+  return res.json()
+}
+
+export async function updateConceptAdmin(id: string, body: Record<string, unknown>) {
+  const res = await fetch(`${KAAS_BASE}/admin/concepts/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error("Failed to update concept")
+  return res.json()
+}
+
+export async function deleteConceptAdmin(id: string) {
+  const res = await fetch(`${KAAS_BASE}/admin/concepts/${id}`, { method: "DELETE" })
+  if (!res.ok) throw new Error("Failed to delete concept")
+}
+
+export async function addEvidenceAdmin(conceptId: string, body: {
+  source: string
+  summary: string
+  curator: string
+  curator_tier?: string
+  comment?: string
+}) {
+  const res = await fetch(`${KAAS_BASE}/admin/concepts/${conceptId}/evidence`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error("Failed to add evidence")
+  return res.json()
+}
+
+export async function updateEvidenceAdmin(conceptId: string, evidenceId: string, body: Record<string, unknown>) {
+  const res = await fetch(`${KAAS_BASE}/admin/concepts/${conceptId}/evidence/${evidenceId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error("Failed to update evidence")
+  return res.json()
+}
+
+export async function deleteEvidenceAdmin(conceptId: string, evidenceId: string) {
+  const res = await fetch(`${KAAS_BASE}/admin/concepts/${conceptId}/evidence/${evidenceId}`, { method: "DELETE" })
+  if (!res.ok) throw new Error("Failed to delete evidence")
+}
+
+/** Knowledge Gap Analysis */
+export async function compareKnowledge(knownTopics: { topic: string; lastUpdated: string }[]) {
+  const res = await fetch(`${KAAS_BASE}/catalog/compare`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ known_topics: knownTopics }),
+  })
+  if (!res.ok) throw new Error("Failed to compare")
+  return res.json()
+}

@@ -2,16 +2,19 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { 
-  Home, 
-  FileText, 
-  Sparkles, 
-  Link2, 
-  Lightbulb, 
-  BookOpen, 
+import {
+  Home,
+  FileText,
+  Sparkles,
+  Link2,
+  Lightbulb,
+  BookOpen,
   ChevronRight,
   GraduationCap,
   Zap,
+  ShoppingBag,
+  LayoutDashboard,
+  Cherry as CherryLucide,
 } from "lucide-react"
 
 /* ─────────────────────────────────────────────
@@ -33,6 +36,7 @@ type NavItem = {
 type SectionDef = {
   id: string
   label: string
+  highlight?: boolean
   items: NavItem[]
 }
 
@@ -170,6 +174,14 @@ const SECTIONS: SectionDef[] = [
     ],
   },
   {
+    id: "agent-shopping",
+    label: "AGENT SHOPPING",
+    highlight: true,
+    items: [
+      { id: "kaas-catalog", icon: <ShoppingBag size={16} />, label: "Knowledge Catalog" },
+    ],
+  },
+  {
     id: "newly-discovered",
     label: "NEWLY DISCOVERED",
     items: [
@@ -214,23 +226,13 @@ const SECTIONS: SectionDef[] = [
 ───────────────────────────────────────────── */
 export function CherryIcon({ className }: { className?: string }) {
   return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
+    <div
+      className={cn("w-8 h-8 rounded-[10px] bg-[#C94B6E] flex items-center justify-center", className)}
       aria-label="cherry"
       role="img"
     >
-      <rect width="32" height="32" rx="8" fill="#C94B6E" />
-      <path d="M12.5 16.5 Q14 12 16 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-      <path d="M19.5 16.5 Q18 12 16 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-      <path d="M16 9 C19 4 27 5 25 12.5 C22.5 11 19.5 9.5 16 9Z" fill="white" />
-      <circle cx="11.5" cy="21" r="5" fill="white" />
-      <circle cx="20.5" cy="21" r="5" fill="white" />
-    </svg>
+      <CherryLucide size={18} className="text-white" />
+    </div>
   )
 }
 
@@ -308,8 +310,20 @@ export function Sidebar({
       <nav className="flex-1 overflow-y-auto px-2 py-4 pb-6 flex flex-col gap-0.5">
         {SECTIONS.map((section, si) => (
           <div key={section.id} className={si > 0 ? "mt-3" : ""}>
-            <p className="text-[10px] font-bold uppercase tracking-[0.8px] text-text-muted px-2 mb-1">
+            <p
+              className={cn(
+                "text-[10px] font-bold uppercase tracking-[0.8px] px-2 mb-1",
+                section.highlight
+                  ? "text-[var(--cherry)]"
+                  : "text-text-muted"
+              )}
+            >
               {section.label}
+              {section.highlight && (
+                <span className="ml-1.5 text-[9px] font-semibold tracking-normal bg-[var(--cherry)] text-white rounded px-1 py-[1px] align-middle">
+                  HOT
+                </span>
+              )}
             </p>
 
             <div className="flex flex-col gap-0.5">

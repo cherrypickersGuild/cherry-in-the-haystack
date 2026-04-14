@@ -8,6 +8,7 @@ import { PatchNotesModule } from './modules/patch_notes/patch-notes.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { PromptTemplateModule } from './modules/prompt_template/prompt-template.module';
 import { AgentCommModule } from './modules/agent_comm/agent-comm.module';
+import { KaasModule } from './modules/kaas/kaas.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AgentCommModule } from './modules/agent_comm/agent-comm.module';
     StatsModule,
     PromptTemplateModule,
     AgentCommModule,
+    KaasModule,
   ],
   controllers: [],
   providers: [],

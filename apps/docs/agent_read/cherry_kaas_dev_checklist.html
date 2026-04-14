@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cherry KaaS Dev Checklist</title>
+</head>
+<body>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.wrap { padding: 1rem 0; }
+.day { margin-bottom: 1.5rem; }
+.day-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--color-border-tertiary); }
+.epic { margin-bottom: 1rem; }
+.epic-label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 6px; }
+.badge { font-size: 11px; padding: 2px 7px; border-radius: 99px; font-weight: 400; }
+.b-must { background: var(--color-background-danger); color: var(--color-text-danger); }
+.b-should { background: var(--color-background-warning); color: var(--color-text-warning); }
+.b-done { background: var(--color-background-success, #EFF7F3); color: var(--color-text-success, #2D7A5E); }
+.story { display: flex; align-items: flex-start; gap: 8px; padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: background 0.15s; margin-bottom: 2px; }
+.story:hover { background: var(--color-background-secondary); }
+.story input[type=checkbox] { margin-top: 2px; flex-shrink: 0; flex-shrink: 0; accent-color: var(--color-text-success); pointer-events: none; }
+.story-text { font-size: 14px; color: var(--color-text-primary); line-height: 1.4; }
+.story-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+.story.done .story-text { text-decoration: line-through; color: var(--color-text-tertiary); }
+.progress-bar { height: 4px; background: var(--color-border-tertiary); border-radius: 2px; margin-bottom: 1.5rem; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--color-text-success); border-radius: 2px; transition: width 0.3s; }
+.stats { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 1rem; }
+</style>
+<div class="wrap">
+  <div class="stats" id="stats">0 / 0 완료</div>
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+
+  <div class="day">
+    <div class="day-title">Day -1 — 사전 준비 <span class="badge b-done">완료</span></div>
+    <div class="epic">
+      <div class="epic-label">인프라 & 환경 셋업 <span class="badge b-done">완료</span></div>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">MetaMask 설치 + 테스트넷 지갑 생성</div><div class="story-sub">Private Key 추출 → .env에 저장</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Status Network Sepolia MetaMask 추가</div><div class="story-sub">RPC: public.sepolia.rpc.status.network, Chain ID: 1660990954</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">.env에 블록체인 환경변수 추가</div><div class="story-sub">DEPLOYER_PRIVATE_KEY, CHERRY_CREDIT_ADDRESS 등</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">기존 API 서버 정상 동작 확인</div><div class="story-sub">pnpm start:dev → NestJS 모듈 전체 로드 성공</div></div></label>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-title">Day 0  · 프론트엔드 퍼블리싱 <span class="badge b-done">완료</span></div>
+    <div class="epic">
+      <div class="epic-label">Epic 5: 프론트엔드 퍼블리싱 (목 데이터, API 없이) <span class="badge b-done">완료</span></div>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 5.0 — 사이드바 AGENT SHOPPING 섹션 추가</div><div class="story-sub">sidebar.tsx에 AGENT SHOPPING (HOT 뱃지) + Knowledge Catalog (ShoppingBag 아이콘)</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 5.1 — 플로팅 콘솔 퍼블리싱 ⭐ P0 "와!" 순간</div><div class="story-sub">kaas-console.tsx, 3자 대화 (User→Agent→Cherry), Purchase/Follow, 프로비넌스 해시 1.5초 팝인 (목 데이터)</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 5.2 — Catalog 페이지 퍼블리싱</div><div class="story-sub">9개 개념 카드, 검색 필터, 상세 모달 (큐레이터 코멘트+Karma), Purchase/Follow 버튼 → 콘솔 연결</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 5.3 — Dashboard 모달 퍼블리싱</div><div class="story-sub">2패널 (멀티에이전트 목록+등록 / Wallet+Rewards), 글로벌 헤더 My Dashboard 버튼</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 5.4 — Agent Knowledge Compare 퍼블리싱</div><div class="story-sub">에이전트 드롭다운 선택 → 3단계 비교 (Up to date / Update / Gap), 카드 뱃지 표시</div></div></label>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-title">Day 1  <span class="badge b-done">완료</span></div>
+    <div class="epic">
+      <div class="epic-label">Epic 1: 스마트 컨트랙트 &amp; 블록체인 <span class="badge b-done">완료</span></div>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 1.1 — CherryCredit.sol 작성 &amp; Status Network 배포</div><div class="story-sub">apps/contracts/ Hardhat, 4함수+3이벤트, gasPrice:0 배포 성공. 주소: 0x153DAcC...682b</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 1.2 — Chain Adapter 구현 (IChainAdapter + StatusAdapter + MockAdapter)</div><div class="story-sub">apps/api/src/modules/kaas/chain-adapter/ 생성, 팩토리 함수, CHAIN_ADAPTER env var 스위칭</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 1.3 — DB 테이블 생성 (kaas_* 4개 테이블)</div><div class="story-sub">kaas-tables.sql 작성 → RDS에 직접 실행 완료</div></div></label>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-title">Day 2  <span class="badge b-done">완료</span></div>
+    <div class="epic">
+      <div class="epic-label">Epic 2: Knowledge API &amp; Catalog <span class="badge b-done">완료</span></div>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 2.1 — DB 기반 KnowledgeService 구현</div><div class="story-sub">kaas.concept + kaas.evidence DB 조회, content_md 포함, 시드 SQL 9개 concept + 20 evidence</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 2.2 — 에이전트 등록 API (POST /api/v1/kaas/agents/register)</div><div class="story-sub">kaas.module.ts + kaas-agent.controller.ts, 멀티에이전트 지원, API 키 발급</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 2.3 — 카탈로그 브라우징 API (GET /catalog, GET /catalog/:id)</div><div class="story-sub">public endpoint, 검색 지원, CONCEPT_NOT_FOUND 404, content_md 미포함 확인</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 2.4 — 지식 구매/팔로우 API (POST /purchase, POST /follow)</div><div class="story-sub">Purchase 20cr, Follow 25cr, content_md 포함, evidence, provenance 해시</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 2.5 — Knowledge Gap Analysis API (POST /catalog/compare)</div><div class="story-sub">upToDate/outdated/gaps/recommendations 반환, 키워드 매칭</div></div></label>
+    </div>
+    <div class="epic">
+      <div class="epic-label">Epic 3: 크레딧 시스템 &amp; 프로비넌스 <span class="badge b-done">완료</span></div>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 3.1 — 크레딧 잔액 조회 &amp; 차감 (GET /credits/balance)</div><div class="story-sub">Purchase 20cr / Follow 25cr 차감, Karma 할인, 401 인증 검증 완료</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 3.2 — 크레딧 충전 (POST /credits/deposit)</div><div class="story-sub">DB 기반 충전, 250cr 충전 → 잔액 확인 완료 (온체인 검증은 TODO)</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 3.3 — 프로비넌스 해시 생성 &amp; DB 기록</div><div class="story-sub">SHA256 해시 생성, query_log DB 기록, explorer_url 포함 (비동기 온체인은 TODO)</div></div></label>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-title">Day 3 </div>
+    <div class="epic">
+      <div class="epic-label">Epic 5: 프론트엔드 API 연결 (퍼블리싱 → 실데이터 바인딩) <span class="badge b-done">완료</span></div>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 5.5 — app.module.ts KaasModule import + API 연결 세팅</div><div class="story-sub">KaasModule import 완료, lib/api.ts에 12개 fetch 함수 추가</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 5.6 — 콘솔 API 연결 ⭐ P0</div><div class="story-sub">purchaseConcept/followConcept API 호출 + mock fallback, 실해시 + explorer_url</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 5.7 — Catalog 페이지 API 연결</div><div class="story-sub">fetchCatalog + fetchAgents + compareKnowledge API 호출 + mock fallback</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 5.8 — Dashboard API 연결</div><div class="story-sub">fetchAgents API 호출 + MOCK_AGENTS fallback</div></div></label>
+    </div>
+    <div class="epic">
+      <div class="epic-label">Admin 지식 큐레이팅 <span class="badge b-done">완료</span></div>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Admin 페이지 리디자인 (iframe → React 컴포넌트)</div><div class="story-sub">2탭 구조: 지식 큐레이팅 + 프롬프트 템플릿, 대시보드 스타일 통일</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Knowledge Admin CRUD API (8개 엔드포인트)</div><div class="story-sub">concept CRUD + evidence CRUD, Zod DTO, KaasAdminController</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">지식 큐레이팅 UI (기본정보/콘텐츠/Evidence)</div><div class="story-sub">content_md 에디터 + .md 파일 업로드, Evidence 인라인 추가/편집/삭제</div></div></label>
+    </div>
+    <div class="epic">
+      <div class="epic-label">Epic 4: MCP 서버 <span class="badge b-done">완료</span></div>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Story 4.1 — MCP 서버 구현 (5 Tools + 2 Resources)</div><div class="story-sub">search_catalog, get_concept, purchase_concept, follow_concept, compare_knowledge + Claude Desktop 연동</div></div></label>
+    </div>
+    <div class="epic">
+      <div class="epic-label">에이전트 등록 &amp; LLM 연동 <span class="badge b-done">완료</span></div>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">에이전트 등록 (MetaMask + LLM 타입/모델/API Key)</div><div class="story-sub">Claude/GPT/Custom 선택, 모델 변경, 삭제</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">LLM 프록시 + 콘솔 연동</div><div class="story-sub">POST /llm/chat, 구매 시 GPT/Claude가 학습한 내용으로 응답</div></div></label>
+      <label class="story"><input type="checkbox" checked disabled><div><div class="story-text">Dashboard 통합 (3탭: 대시보드/지식 큐레이팅/프롬프트 템플릿)</div></div></label>
+    </div>
+    <div class="epic">
+      <div class="epic-label">MCP Streamable HTTP (원격 에이전트 접속) <span class="badge b-must">필수</span></div>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">MCP stdio → Streamable HTTP 전환</div><div class="story-sub">HTTP POST + SSE, 단일 엔드포인트, 원격 에이전트 접속 가능</div></div></label>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">API Key 인증 + 세션 관리</div><div class="story-sub">Bearer token 인증, 연결된 에이전트 추적, Dashboard 상태 표시</div></div></label>
+    </div>
+    <div class="epic">
+      <div class="epic-label">Elicitation (지식 비교) <span class="badge b-must">필수</span></div>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">Cherry → 에이전트 지식 목록 요청 (Elicitation)</div><div class="story-sub">웹 Compare 버튼 → 에이전트에 보유 지식 제출 요청 → gap 분석 → 카탈로그 태그</div></div></label>
+    </div>
+    <div class="epic">
+      <div class="epic-label">Sampling (3자 대화) <span class="badge b-must">필수</span></div>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">Cherry → 에이전트 LLM 호출 (Sampling)</div><div class="story-sub">유저 채팅 → 에이전트 LLM 처리 → 에이전트가 Cherry tool 호출 → 3자 대화</div></div></label>
+    </div>
+    <div class="epic">
+      <div class="epic-label">온체인 트랜잭션 기록 <span class="badge b-must">필수</span></div>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">chain-adapter → provenance 서비스 연결</div><div class="story-sub">StatusAdapter.recordProvenance() 호출, 실제 Status Network 트랜잭션</div></div></label>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">Explorer에서 트랜잭션 확인</div><div class="story-sub">sepoliascan.status.network에서 실제 tx hash 조회 가능</div></div></label>
+    </div>
+    <div class="epic">
+      <div class="epic-label">Epic 6: 큐레이터 보상 <span class="badge b-must">필수</span></div>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">Story 6.1 — 큐레이터 보상 계산 &amp; 출금</div><div class="story-sub">40% 수익 분배, GET /rewards/balance, POST /rewards/withdraw gasless</div></div></label>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-title">Day 4 </div>
+    <div class="epic">
+      <div class="epic-label">Epic 7: 멀티체인 제출 <span class="badge b-should">권장</span></div>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">Story 7.1 — BNB Chain (opBNB) 배포 &amp; 2건 트랜잭션</div><div class="story-sub">bnb-adapter.ts, CHAIN_ADAPTER=bnb, 데모 영상, #ConsumerAIonBNB 트윗</div></div></label>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">Story 7.2 — NEAR AI Cloud 연동 데모</div><div class="story-sub">near-adapter.ts, TEE 추론 데모, 데모 영상</div></div></label>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-title">테스트 &amp; 제출</div>
+    <div class="epic">
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">해피패스 5회 연속 성공 검증</div><div class="story-sub">구매 → 온체인 해시 → Explorer 확인 전체 플로우</div></div></label>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">데모 영상 촬영 (Status 2분, BNB/NEAR 각 2-4분)</div></div></label>
+      <label class="story"><input type="checkbox" disabled><div><div class="story-text">Ludium 포털 제출 (4/16 23:59 KST)</div><div class="story-sub">프로젝트 설명, 데모 링크, GitHub README</div></div></label>
+    </div>
+  </div>
+</div>
+<script>
+function update() {
+  const all = document.querySelectorAll('.story input[type=checkbox]');
+  const done = document.querySelectorAll('.story input[type=checkbox]:checked');
+  all.forEach(cb => {
+    cb.closest('.story').classList.toggle('done', cb.checked);
+  });
+  const pct = Math.round(done.length / all.length * 100);
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('stats').textContent = done.length + ' / ' + all.length + ' 완료';
+}
+update();
+</script>
+</body>
+</html>

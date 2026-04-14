@@ -44,3 +44,9 @@ n8n-atmt-d7a9a05899be.json
 
 #pdf files
 .assets_pdf.claude/worktrees/
+
+# KaaS local docs
+apps/docs/KaaS/
+apps/docs/KaaS_plan/
+docs/KaaS/
+

@@ -20,7 +20,7 @@ X-Api-Key: c63be...
 
 ## 1. 기사 삽입
 
-### `POST /api/agent/insert-article`
+### `POST https://api.solteti.site/api/agent/insert-article`
 
 크롤링한 기사를 DB에 삽입한다. URL 중복이면 기존 ID를 반환하고 삽입하지 않는다. 소스(`source_name`)가 없으면 자동 생성된다.
 
@@ -65,7 +65,7 @@ X-Api-Key: c63be...
 
 ## 2. 평가 패키지 요청
 
-### `GET /api/agent/ask-evaluation`
+### `GET https://api.solteti.site/api/agent/ask-evaluation`
 
 에이전트가 평가를 수행하기 위해 필요한 모든 정보를 한 번에 반환한다.  
 - **prompts**: 사용할 프롬프트 템플릿 및 버전
@@ -80,7 +80,7 @@ X-Api-Key: c63be...
 | `version_tags` | ✅ | 버전 태그. 단일(`A`) 또는 쉼표 구분 복수(`A,B`) |
 
 ```
-GET /api/agent/ask-evaluation?type=ARTICLE_AI&version_tags=A
+GET https://api.solteti.site/api/agent/ask-evaluation?type=ARTICLE_AI&version_tags=A
 ```
 
 ### Response `200 OK`
@@ -160,7 +160,7 @@ GET /api/agent/ask-evaluation?type=ARTICLE_AI&version_tags=A
 
 ## 3. 평가 결과 저장
 
-### `POST /api/agent/finish-evaluation`
+### `POST https://api.solteti.site/api/agent/finish-evaluation`
 
 에이전트가 생성한 평가 결과를 DB에 저장한다. 이후 파싱 파이프라인이 `agent_json_raw`를 정규 컬럼으로 투영한다.
 

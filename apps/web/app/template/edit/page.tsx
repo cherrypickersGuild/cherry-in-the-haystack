@@ -62,15 +62,15 @@ function ToneEditor({
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-[#E4E1EE] bg-[#F7F6F9] px-4 py-2.5">
+    <div className="mt-3 rounded-lg border border-[#E0E0E0] bg-[#FAFAFA] px-4 py-2.5">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-bold uppercase tracking-[0.8px] text-[#9E97B3]">
+        <span className="text-[10px] font-bold uppercase tracking-[0.8px] text-[#888]">
           톤 / 방향
         </span>
         {!editing ? (
           <button
             onClick={() => setEditing(true)}
-            className="text-[11px] text-[#9E97B3] transition-colors hover:text-[#C94B6E]"
+            className="text-[11px] text-[#888] transition-colors hover:text-[#D4854A]"
           >
             편집
           </button>
@@ -78,14 +78,14 @@ function ToneEditor({
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => { setValue(toneText); setEditing(false) }}
-              className="text-[11px] text-[#9E97B3] transition-colors hover:text-[#1A1626]"
+              className="text-[11px] text-[#888] transition-colors hover:text-[#D4854A]"
             >
               취소
             </button>
             <button
               onClick={handleSave}
               disabled={saving || value === toneText}
-              className="text-[11px] font-semibold text-[#C94B6E] transition-colors hover:opacity-80 disabled:opacity-40"
+              className="text-[11px] font-semibold text-[#6B727E] transition-colors hover:opacity-80 disabled:opacity-40"
             >
               {saving ? "저장 중..." : "저장"}
             </button>
@@ -93,13 +93,13 @@ function ToneEditor({
         )}
       </div>
       {!editing ? (
-        <p className="mt-0.5 text-[13px] leading-relaxed text-[#3D3652]">{toneText}</p>
+        <p className="mt-0.5 text-[13px] leading-relaxed text-[#3F3F46]">{toneText}</p>
       ) : (
         <textarea
           value={value}
           onChange={(e) => setValue(e.target.value)}
           rows={3}
-          className="mt-1 w-full resize-none rounded-lg border border-[#E4E1EE] bg-white px-3 py-2 text-[13px] leading-relaxed text-[#1A1626] outline-none focus:border-[#C94B6E]"
+          className="mt-1 w-full resize-none rounded-lg border border-[#E0E0E0] bg-white px-3 py-2 text-[13px] leading-relaxed text-[#1A1626] outline-none focus:border-[#D4854A]"
         />
       )}
     </div>
@@ -157,20 +157,20 @@ function VersionEditor({
   }
 
   const field = "flex flex-col gap-1.5"
-  const label = "text-[11px] font-semibold uppercase tracking-[0.8px] text-[#9E97B3]"
+  const label = "text-[11px] font-semibold uppercase tracking-[0.8px] text-[#888]"
   const inputBase =
-    "w-full rounded-lg border border-[#E4E1EE] bg-white px-3 py-2 text-[13px] text-[#1A1626] outline-none transition-colors placeholder:text-[#9E97B3] focus:border-[#C94B6E]"
+    "w-full rounded-lg border border-[#E0E0E0] bg-white px-3 py-2 text-[13px] text-[#1A1626] outline-none transition-colors placeholder:text-[#888] focus:border-[#D4854A]"
 
   return (
     <div className="flex flex-col gap-6">
       {/* 버전 표시 */}
-      <div className="flex items-center gap-2 rounded-lg border border-[#E4E1EE] bg-[#F7F6F9] px-3 py-2.5">
-        <Clock className="h-3.5 w-3.5 shrink-0 text-[#9E97B3]" />
-        <span className="text-[12px] text-[#6B6480]">
+      <div className="flex items-center gap-2 rounded-lg border border-[#E0E0E0] bg-[#FAFAFA] px-3 py-2.5">
+        <Clock className="h-3.5 w-3.5 shrink-0 text-[#888]" />
+        <span className="text-[12px] text-[#6B727E]">
           편집 중: <strong className="text-[#1A1626]">버전 {version.version_tag}</strong>
         </span>
         {version.is_active && (
-          <span className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-[#C94B6E]">
+          <span className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-[#6B727E]">
             <Check className="h-3 w-3" /> 현재 활성
           </span>
         )}
@@ -192,7 +192,7 @@ function VersionEditor({
       <div className={field}>
         <div className="flex items-baseline justify-between">
           <label className={label}>프롬프트 본문</label>
-          <span className="text-[11px] text-[#9E97B3]">{"{article_content}"} 등 변수 사용 가능</span>
+          <span className="text-[11px] text-[#888]">{"{article_content}"} 등 변수 사용 가능</span>
         </div>
         <textarea
           value={promptText}
@@ -206,7 +206,7 @@ function VersionEditor({
       <div className={field}>
         <label className={label}>
           Few-shot 예시{" "}
-          <span className="font-normal normal-case tracking-normal text-[#C8C3D8]">— 선택</span>
+          <span className="font-normal normal-case tracking-normal text-[#AAA]">— 선택</span>
         </label>
         <textarea
           value={fewShot}
@@ -224,16 +224,16 @@ function VersionEditor({
           value={params}
           onChange={(e) => setParams(e.target.value)}
           rows={4}
-          className={cn(inputBase, "resize-none bg-[#F7F6F9] font-mono leading-relaxed")}
+          className={cn(inputBase, "resize-none bg-[#FAFAFA] font-mono leading-relaxed")}
         />
       </div>
 
       {/* 저장 */}
-      <div className="flex items-center justify-end gap-2 border-t border-[#E4E1EE] pt-4">
+      <div className="flex items-center justify-end gap-2 border-t border-[#E0E0E0] pt-4">
         <button
           onClick={() => handleSave(false)}
           disabled={saving}
-          className="rounded-lg border border-[#E4E1EE] px-4 py-2 text-[13px] text-[#6B6480] transition-colors hover:bg-[#F7F6F9] disabled:opacity-50"
+          className="rounded-lg border border-[#E0E0E0] px-4 py-2 text-[13px] text-[#6B727E] transition-colors hover:bg-[#FAFAFA] disabled:opacity-50"
         >
           저장 (비활성)
         </button>
@@ -241,7 +241,7 @@ function VersionEditor({
           onClick={() => handleSave(true)}
           disabled={saving}
           className="flex items-center gap-1.5 rounded-lg px-4 py-2 text-[13px] font-semibold text-white transition-colors disabled:opacity-50"
-          style={{ background: saved ? "#2D7A5E" : "#C94B6E" }}
+          style={{ background: saved ? "#2D7A5E" : "#555" }}
         >
           {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
           {saved && <Check className="h-3.5 w-3.5" />}
@@ -255,7 +255,8 @@ function VersionEditor({
 /* ─────────────────────────────────────────────
    메인 페이지
 ───────────────────────────────────────────── */
-export default function TemplateEditPage() {
+/** 템플릿 에디터 본체 (Admin 모달에서 재사용 가능) */
+export function TemplateEditorBody() {
   const [templates, setTemplates] = useState<PromptTemplate[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -343,8 +344,8 @@ export default function TemplateEditPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#F7F6F9]">
-        <Loader2 className="h-6 w-6 animate-spin text-[#9E97B3]" />
+      <div className="flex flex-1 items-center justify-center bg-[#FAFAFA]">
+        <Loader2 className="h-6 w-6 animate-spin text-[#888]" />
       </div>
     )
   }
@@ -352,48 +353,33 @@ export default function TemplateEditPage() {
   // selected가 null이면 오른쪽 영역에서 빈 상태 표시 (사이드바는 유지)
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[#F7F6F9] text-[#1A1626]">
-      {/* 헤더 */}
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-[#E4E1EE] bg-white px-5">
-        <div className="flex items-center gap-2">
-          <Link
-            href="/"
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-[13px] text-[#6B6480] transition-colors hover:bg-[#F7F6F9]"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            홈
-          </Link>
-          <span className="text-[#C8C3D8]">/</span>
-          <span className="text-[13px] font-semibold">프롬프트 템플릿</span>
-        </div>
-      </header>
-
-      <div className="flex flex-1 overflow-hidden">
-        {/* 왼쪽 패널 */}
-        <aside className="flex w-64 shrink-0 flex-col border-r border-[#E4E1EE] bg-white">
-          <div className="border-b border-[#E4E1EE] p-3">
+    <div className="flex flex-col lg:flex-row flex-1 gap-4 lg:gap-5 overflow-hidden bg-[#FAFAFA] p-4 lg:p-5 text-[#1A1626]">
+        {/* 왼쪽 패널 — 카드 */}
+        <div className="flex w-full lg:w-[300px] shrink-0 flex-col rounded-xl border border-[#E0E0E0] bg-white overflow-hidden max-h-[35vh] lg:max-h-none">
+          <div className="px-4 pt-4 pb-2">
+            <h3 className="text-[14px] font-bold text-[#1A1626] mb-2">Templates</h3>
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#9E97B3]" />
+              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#888]" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="이름 또는 코드"
-                className="w-full rounded-lg border border-[#E4E1EE] bg-[#F7F6F9] py-1.5 pl-8 pr-3 text-[13px] outline-none transition-colors placeholder:text-[#9E97B3] focus:border-[#C94B6E] focus:bg-white"
+                className="w-full rounded-lg border border-[#E0E0E0] bg-[#FBFAF8] py-1.5 pl-8 pr-3 text-[12px] outline-none transition-colors placeholder:text-[#888] focus:border-[#D4854A] focus:bg-white"
               />
             </div>
           </div>
 
-          <div className="flex flex-col gap-0.5 border-b border-[#E4E1EE] p-2">
+          <div className="flex gap-1 px-3 pb-2">
             {TYPE_FILTERS.map((f) => (
               <button
                 key={f.value}
                 onClick={() => setTypeFilter(f.value)}
                 className={cn(
-                  "w-full rounded-md px-3 py-1.5 text-left text-[13px] transition-colors",
+                  "rounded-full px-2.5 py-1 text-[11px] transition-colors",
                   typeFilter === f.value
-                    ? "bg-[#FDF0F3] font-semibold text-[#C94B6E]"
-                    : "text-[#6B6480] hover:bg-[#F7F6F9]",
+                    ? "bg-[#FAFAFA] font-semibold text-[#6B727E]"
+                    : "text-[#888] hover:bg-[#FAFAFA]",
                 )}
               >
                 {f.label}
@@ -401,55 +387,55 @@ export default function TemplateEditPage() {
             ))}
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto px-2">
             {filtered.length === 0 ? (
-              <p className="p-4 text-center text-[13px] text-[#9E97B3]">결과 없음</p>
+              <p className="p-4 text-center text-[13px] text-[#888]">결과 없음</p>
             ) : (
               filtered.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => selectTemplate(t)}
                   className={cn(
-                    "w-full border-b border-[#E4E1EE] px-4 py-3 text-left transition-colors last:border-b-0",
+                    "w-full rounded-lg px-3 py-2.5 mb-1 text-left transition-all",
                     selectedId === t.id
-                      ? "border-l-2 border-l-[#C94B6E] bg-[#FDF0F3] pl-[14px]"
-                      : "hover:bg-[#F7F6F9]",
+                      ? "border border-[#D4854A] bg-[#FFF8F0]"
+                      : "border border-transparent hover:bg-[#FAFAFA]",
                   )}
                 >
                   <p
                     className={cn(
-                      "mb-0.5 text-[13px] font-semibold leading-snug",
-                      selectedId === t.id ? "text-[#C94B6E]" : "text-[#1A1626]",
+                      "mb-0.5 text-[12px] font-semibold leading-snug truncate",
+                      selectedId === t.id ? "text-[#1A1626]" : "text-[#1A1626]",
                     )}
                   >
                     {t.name}
                   </p>
-                  <p className="text-[11px] text-[#9E97B3]">
+                  <p className="text-[10px] text-[#888]">
                     {TYPE_LABEL[t.type] ?? t.type} · {t.scope}
-                    {!t.is_active && <span className="ml-1.5 text-[#C8C3D8]">비활성</span>}
+                    {!t.is_active && <span className="ml-1.5 text-[#AAA]">비활성</span>}
                   </p>
                 </button>
               ))
             )}
           </div>
-        </aside>
+        </div>
 
-        {/* 오른쪽 영역 */}
-        <main className="flex flex-1 flex-col overflow-hidden">
+        {/* 오른쪽 영역 — 카드 */}
+        <div className="flex flex-1 flex-col rounded-xl border border-[#E0E0E0] bg-white overflow-hidden min-w-0">
           {!selected ? (
-            <div className="flex flex-1 items-center justify-center text-[14px] text-[#9E97B3]">
+            <div className="flex flex-1 items-center justify-center text-[14px] text-[#888]">
               해당 타입의 템플릿이 없습니다.
             </div>
           ) : (
           <>
-          {/* 템플릿 정보 바 */}
-          <div className="shrink-0 border-b border-[#E4E1EE] bg-white px-6 py-4">
-            <div className="flex items-center gap-2">
-              <h1 className="text-[16px] font-bold">{selected.name}</h1>
-              {!selected.is_active && <span className="text-[11px] text-[#9E97B3]">비활성</span>}
+          {/* 템플릿 정보 바 + 탭 */}
+          <div className="shrink-0 border-b border-[#E0E0E0] px-5 pt-4 pb-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-[14px] font-bold">{selected.name}</h1>
+              {!selected.is_active && <span className="text-[11px] text-[#888]">비활성</span>}
             </div>
             {selected.description && (
-              <p className="mt-1 text-[13px] leading-relaxed text-[#6B6480]">{selected.description}</p>
+              <p className="text-[12px] leading-relaxed text-[#6B727E]">{selected.description}</p>
             )}
 
             <ToneEditor
@@ -457,29 +443,29 @@ export default function TemplateEditPage() {
               toneText={selected.tone_text}
               onSaved={loadTemplates}
             />
-          </div>
 
-          {/* 탭 */}
-          <div className="flex shrink-0 gap-0 border-b border-[#E4E1EE] bg-white px-6">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={cn(
-                  "border-b-2 px-4 py-3 text-[13px] font-semibold transition-colors",
-                  activeTab === tab.key
-                    ? "border-[#C94B6E] text-[#C94B6E]"
-                    : "border-transparent text-[#6B6480] hover:text-[#1A1626]",
-                )}
-              >
-                {tab.label}
-                {tab.key === "list" && (
-                  <span className="ml-1.5 text-[11px] font-normal text-[#9E97B3]">
-                    {visibleVersions.length}
-                  </span>
-                )}
-              </button>
-            ))}
+            {/* 탭 */}
+            <div className="flex gap-0 mt-3">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={cn(
+                    "border-b-2 px-3 py-2 text-[12px] font-semibold transition-colors",
+                    activeTab === tab.key
+                      ? "border-[#D4854A] text-[#1A1626]"
+                      : "border-transparent text-[#888] hover:text-[#3F3F46]",
+                  )}
+                >
+                  {tab.label}
+                  {tab.key === "list" && (
+                    <span className="ml-1.5 text-[11px] font-normal text-[#888]">
+                      {visibleVersions.length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* 탭 콘텐츠 */}
@@ -497,7 +483,7 @@ export default function TemplateEditPage() {
                         "group relative flex flex-col rounded-2xl border bg-white p-5 transition-all",
                         isConfirming
                           ? "border-red-200 bg-red-50"
-                          : "border-[#E4E1EE] hover:border-[#C8C3D8] hover:shadow-sm",
+                          : "border-[#E0E0E0] hover:border-[#AAA] hover:shadow-sm",
                       )}
                     >
                       {/* 상단: 버전 태그 + 활성 표시 */}
@@ -506,8 +492,8 @@ export default function TemplateEditPage() {
                           onClick={() => !v.is_active && handleActivateVersion(selected.id, v.id)}
                           className="flex h-9 w-9 items-center justify-center rounded-xl text-[15px] font-bold transition-colors"
                           style={{
-                            background: v.is_active ? "#FDF0F3" : "#F7F6F9",
-                            color: v.is_active ? "#C94B6E" : "#9E97B3",
+                            background: v.is_active ? "#EFF7F3" : "#FFF8F0",
+                            color: v.is_active ? "#2D7A5E" : "#D4854A",
                           }}
                           title={v.is_active ? "현재 활성" : "클릭하여 활성 지정"}
                         >
@@ -515,7 +501,7 @@ export default function TemplateEditPage() {
                         </button>
 
                         {v.is_active ? (
-                          <span className="flex items-center gap-1 text-[11px] font-semibold text-[#C94B6E]">
+                          <span className="flex items-center gap-1 text-[11px] font-semibold text-[#2D7A5E]">
                             <Check className="h-3 w-3" />
                             활성
                           </span>
@@ -523,7 +509,7 @@ export default function TemplateEditPage() {
                           !isConfirming && (
                             <button
                               onClick={() => setConfirmDeleteId(v.id)}
-                              className="flex items-center gap-1 rounded-md p-1.5 text-[#C8C3D8] opacity-0 transition-all group-hover:opacity-100 hover:bg-red-50 hover:text-red-400"
+                              className="flex items-center gap-1 rounded-md p-1.5 text-[#AAA] opacity-0 transition-all group-hover:opacity-100 hover:bg-red-50 hover:text-red-400"
                               title="삭제"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -533,13 +519,13 @@ export default function TemplateEditPage() {
                       </div>
 
                       {/* 변경 메모 */}
-                      <p className="mb-4 flex-1 text-[13px] leading-relaxed text-[#3D3652]">
+                      <p className="mb-4 flex-1 text-[13px] leading-relaxed text-[#3F3F46]">
                         {v.change_note ?? ""}
                       </p>
 
                       {/* 하단: 날짜 + 편집 버튼 */}
-                      <div className="flex items-center justify-between border-t border-[#E4E1EE] pt-3">
-                        <span className="text-[11px] text-[#9E97B3]">
+                      <div className="flex items-center justify-between border-t border-[#E0E0E0] pt-3">
+                        <span className="text-[11px] text-[#888]">
                           {new Date(v.created_at).toLocaleDateString("ko-KR")}
                         </span>
 
@@ -549,7 +535,7 @@ export default function TemplateEditPage() {
                               setSelectedVersionId(v.id)
                               setActiveTab("editor")
                             }}
-                            className="rounded-lg border border-[#E4E1EE] px-3 py-1 text-[12px] text-[#6B6480] transition-colors hover:border-[#C94B6E] hover:text-[#C94B6E]"
+                            className="rounded-lg border border-[#E0E0E0] px-3 py-1 text-[12px] text-[#6B727E] transition-colors hover:border-[#D4854A] hover:text-[#D4854A]"
                           >
                             편집
                           </button>
@@ -564,7 +550,7 @@ export default function TemplateEditPage() {
                             </button>
                             <button
                               onClick={() => setConfirmDeleteId(null)}
-                              className="rounded px-2 py-0.5 text-[11px] text-[#9E97B3] transition-colors hover:bg-[#F7F6F9]"
+                              className="rounded px-2 py-0.5 text-[11px] text-[#888] transition-colors hover:bg-[#FAFAFA]"
                             >
                               취소
                             </button>
@@ -586,7 +572,7 @@ export default function TemplateEditPage() {
                     })
                     await loadTemplates()
                   }}
-                  className="flex min-h-[140px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[#E4E1EE] text-[13px] text-[#9E97B3] transition-colors hover:border-[#C94B6E] hover:text-[#C94B6E]"
+                  className="flex min-h-[140px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[#E0E0E0] text-[13px] text-[#888] transition-colors hover:border-[#D4854A] hover:text-[#D4854A]"
                 >
                   <Plus className="h-5 w-5" />
                   새 버전 만들기
@@ -607,31 +593,31 @@ export default function TemplateEditPage() {
             {/* 미리보기 */}
             {activeTab === "preview" && activeVersion && (
               <div className="flex flex-col gap-5">
-                <div className="rounded-xl border border-[#E4E1EE] bg-white p-5">
-                  <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.8px] text-[#9E97B3]">
+                <div className="rounded-xl border border-[#E0E0E0] bg-white p-5">
+                  <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.8px] text-[#888]">
                     활성 버전 ({activeVersion.version_tag}) — 프롬프트 본문
                   </p>
-                  <pre className="whitespace-pre-wrap rounded-lg border border-[#E4E1EE] bg-[#F7F6F9] p-4 font-mono text-[12px] leading-relaxed text-[#3D3652]">
+                  <pre className="whitespace-pre-wrap rounded-lg border border-[#E0E0E0] bg-[#FAFAFA] p-4 font-mono text-[12px] leading-relaxed text-[#3F3F46]">
                     {activeVersion.prompt_text}
                   </pre>
                 </div>
 
                 {activeVersion.few_shot_examples && (
-                  <div className="rounded-xl border border-[#E4E1EE] bg-white p-5">
-                    <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.8px] text-[#9E97B3]">
+                  <div className="rounded-xl border border-[#E0E0E0] bg-white p-5">
+                    <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.8px] text-[#888]">
                       Few-shot 예시
                     </p>
-                    <pre className="whitespace-pre-wrap rounded-lg border border-[#E4E1EE] bg-[#F7F6F9] p-4 font-mono text-[12px] leading-relaxed text-[#3D3652]">
+                    <pre className="whitespace-pre-wrap rounded-lg border border-[#E0E0E0] bg-[#FAFAFA] p-4 font-mono text-[12px] leading-relaxed text-[#3F3F46]">
                       {activeVersion.few_shot_examples}
                     </pre>
                   </div>
                 )}
 
-                <div className="rounded-xl border border-[#E4E1EE] bg-white p-5">
-                  <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.8px] text-[#9E97B3]">
+                <div className="rounded-xl border border-[#E0E0E0] bg-white p-5">
+                  <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.8px] text-[#888]">
                     파라미터
                   </p>
-                  <pre className="whitespace-pre-wrap rounded-lg border border-[#E4E1EE] bg-[#F7F6F9] p-4 font-mono text-[12px] leading-relaxed text-[#3D3652]">
+                  <pre className="whitespace-pre-wrap rounded-lg border border-[#E0E0E0] bg-[#FAFAFA] p-4 font-mono text-[12px] leading-relaxed text-[#3F3F46]">
                     {JSON.stringify(activeVersion.parameters_json, null, 2)}
                   </pre>
                 </div>
@@ -640,8 +626,29 @@ export default function TemplateEditPage() {
           </div>
           </>
           )}
-        </main>
-      </div>
+        </div>
+    </div>
+  )
+}
+
+/** 페이지 래퍼 (기존 /template/edit 라우트용) */
+export default function TemplateEditPage() {
+  return (
+    <div className="flex h-screen flex-col overflow-hidden bg-[#FAFAFA] text-[#1A1626]">
+      <header className="flex h-12 shrink-0 items-center justify-between border-b border-[#E0E0E0] bg-white px-5">
+        <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-[13px] text-[#6B727E] transition-colors hover:bg-[#FAFAFA]"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            홈
+          </Link>
+          <span className="text-[#AAA]">/</span>
+          <span className="text-[13px] font-semibold">프롬프트 템플릿</span>
+        </div>
+      </header>
+      <TemplateEditorBody />
     </div>
   )
 }
