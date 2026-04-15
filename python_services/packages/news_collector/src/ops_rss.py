@@ -15,9 +15,15 @@ from ops_milvus import OperatorMilvus
 from ops_notion import OperatorNotion
 from config.rss_feeds import get_enabled_feeds
 
+from agent_communication_api import AgentAPIClient
+from dotenv import load_dotenv
+
 import feedparser
 import requests
 
+load_dotenv(os.path.join(os.path.dirname(__file__), "../api.env"))
+
+agent_api_key = os.environ["AGENT_API_KEY"]
 
 class OperatorRSS(OperatorBase):
     """
@@ -505,11 +511,21 @@ class OperatorRSS(OperatorBase):
                 if not database_id:
                     print("[ERROR] no index db pages found... skip")
                     break
-
+                
+                client = AgentAPIClient(api_key=agent_api_key)
                 for page in pages:
                     stat["total"] += 1
 
                     try:
+                        # 1. 기사 삽입
+                        insert_result = client.insert_article(page)
+
+                        # 2. 평가 패키지 요청
+                        evaluation_package = client.ask_evaluation(type="ARTICLE_AI", version_tags="A")
+
+                        # 3. 평가 결과 저장
+                        save_result = client.finish_evaluation(results=evaluation_package["items"])
+
                         page_id = page["id"]
                         list_name = page["list_name"]
                         title = page["title"]
