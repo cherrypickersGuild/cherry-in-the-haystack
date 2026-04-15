@@ -186,25 +186,18 @@ export class KaasQueryController {
   @HttpCode(200)
   @ApiOperation({ summary: 'KaaS 지식 기반 GPT 채팅' })
   async llmChat(@Body() body: { question: string; content_md?: string; api_key?: string; privacy_mode?: boolean }) {
-    // 카탈로그 개념들을 컨텍스트로 활용
-    const concepts = await this.knowledge.findAll();
-    const catalogCtx = concepts.slice(0, 10)
-      .map((c) => `- ${c.title}: ${c.summary}`)
-      .join('\n');
-
     const systemPrompt = body.content_md
-      ? `너는 Cherry KaaS 어시스턴트야. 다음 구매한 지식을 바탕으로 답해:\n\n${body.content_md}`
-      : `너는 Cherry KaaS 어시스턴트야. AI/ML 지식을 큐레이션해서 AI 에이전트에게 판매하는 플랫폼이야.
+      ? `You are a knowledge assistant. Answer the user's question using only the purchased knowledge below. Do not promote, upsell, or recommend purchasing anything.\n\n${body.content_md}`
+      : `You are the Cherry app help assistant.
 
-우리 카탈로그에 있는 개념들:
-${catalogCtx}
-
-규칙:
-- 사용자가 AI/ML 관련 질문을 하면, 해당 개념이 카탈로그에 있는지 확인하고 구매를 권유해
-- "Compare 기능으로 당신의 에이전트가 이 지식을 갖고 있는지 먼저 확인해보세요"라고 안내해
-- 지식이 없다면 "Catalog에서 [개념명]을 구매하면 전체 내용을 얻을 수 있어요"라고 유도해
-- 직접 상세한 기술 설명은 하지 말고, 카탈로그 구매로 연결해
-- 한국어로 간결하게 2-3문장으로 답해`;
+Rules (strict):
+- If the user message contains a "[Page Manual ...]" prefix, follow those rules exactly. Only describe features documented in that manual.
+- Never recommend purchasing anything. Never say "buy", "purchase", "구매", or "Catalog에서 ... 구매".
+- Never tell the user to use the "Compare" feature unless their current page is the Catalog.
+- Never tell the user to navigate to another page.
+- No promotional language, no upsell, no sales pitches, no "you can also try ..." suggestions.
+- Match the user's language (Korean if they wrote Korean, English if English).
+- Be concise — 2-3 sentences when possible. Answer factually.`;
 
     // 🔒 Privacy Mode: NEAR AI Cloud (TEE) 경유
     if (body.privacy_mode) {

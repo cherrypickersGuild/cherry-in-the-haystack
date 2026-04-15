@@ -101,6 +101,145 @@ function ChainSelector() {
    — 에이전트가 자기 지식 상태를 점검해서 생성한 리포트
    — 터미널 스타일 output으로 "학습 증거" 명확히
 ═══════════════════════════════════════════════ */
+/**
+ * SelfReportLog — shared terminal-style self-report renderer.
+ * Used both by the KnowledgeDiffModal (large) and by the floating agent console (small).
+ * Size-in-chars is intentionally not displayed (it is often zero in the live report).
+ */
+export function SelfReportLog({
+  data,
+  agentId,
+  agentName,
+  generatedAt,
+  source,
+}: {
+  data: any
+  agentId: string
+  agentName: string
+  generatedAt: string
+  source: "agent" | "none"
+}) {
+  const addedTopics = new Set<string>(
+    (data?.timeline ?? []).filter((t: any) => t.action === "purchase").map((t: any) => t.conceptId),
+  )
+  const modifiedTopics = new Set<string>(
+    (data?.timeline ?? []).filter((t: any) => t.action === "follow").map((t: any) => t.conceptId),
+  )
+  const allKnowledge: Array<{ topic: string; lastUpdated: string }> = data?.currentKnowledge ?? []
+  const unchanged = allKnowledge.filter(
+    (k) => !addedTopics.has(k.topic) && !modifiedTopics.has(k.topic),
+  )
+  const categoryOf = (id: string) => {
+    if (["rag", "embeddings", "chain-of-thought"].includes(id)) return "basics"
+    if (["multi-agent", "agent-architectures", "fine-tuning"].includes(id)) return "advanced"
+    if (["evaluation", "prompt-engineering"].includes(id)) return "core"
+    return "misc"
+  }
+  const fmtTime = (iso: string) => {
+    if (!iso) return ""
+    return new Date(iso).toLocaleString("ko-KR", {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+    })
+  }
+  const timelineByConcept = new Map<string, any>()
+  ;(data?.timeline ?? []).forEach((t: any) => {
+    if (!timelineByConcept.has(t.conceptId)) timelineByConcept.set(t.conceptId, t)
+  })
+
+  return (
+    <>
+      {/* Header — agent + generated + agent-signed badge */}
+      <div className="text-[#7C8490] flex items-center gap-2 flex-wrap">
+        <span className="text-[#A8B3C1]">📝 AGENT SELF-REPORT</span>
+        {source === "agent" && (
+          <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#27C93F] text-black font-bold uppercase">
+            ✓ agent-signed
+          </span>
+        )}
+        <span className="text-[#C7A7FF] ml-auto">{agentName}</span>
+        <span className="text-[#6B7280]">· {fmtTime(generatedAt)}</span>
+      </div>
+
+      {/* Added */}
+      {addedTopics.size > 0 && (
+        <div className="mt-3">
+          <p className="text-[#27C93F]">+ ADDED ({addedTopics.size})</p>
+          {[...addedTopics].map((topic) => {
+            const t = timelineByConcept.get(topic)
+            if (!t) return null
+            return (
+              <div key={topic} className="mt-1.5 pl-1">
+                <p className="text-[#27C93F]">+ <span className="font-bold">{t.conceptTitle}</span></p>
+                <div className="pl-4 text-[11px]">
+                  <p><span className="text-[#6B7280]">★ </span>{t.qualityScore}<span className="text-[#6B7280]"> · {fmtTime(t.at)} · </span><span className="text-[#F59E6A]">{t.action}</span> ({t.creditsConsumed}cr)</p>
+                  {t.onChainFailed ? (
+                    <p className="text-[#FFBD2E]">⚠ on-chain failed</p>
+                  ) : (
+                    <p>
+                      <span className={cn(t.chain === "status" || t.chain === "status-hoodi" ? "text-[#27C93F]" : "text-[#C7A7FF]")}>{t.chain}</span>
+                      {" · "}
+                      <a href={t.explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B9CE8] underline break-all">
+                        {t.txHash.slice(0, 12)}...{t.txHash.slice(-6)}
+                      </a>
+                    </p>
+                  )}
+                  {t.evidence?.length > 0 && t.evidence.map((e: any, ei: number) => (
+                    <p key={ei} className="text-[10px]">
+                      <span className="text-[#6B7280]">├─ </span>
+                      <span className="text-[#C7A7FF]">{e.source}</span>
+                      {e.curator && <span className="text-[#6B7280]"> ({e.curator}/{e.curatorTier})</span>}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Modified */}
+      {modifiedTopics.size > 0 && (
+        <div className="mt-3">
+          <p className="text-[#FFBD2E]">~ MODIFIED ({modifiedTopics.size})</p>
+          {[...modifiedTopics].map((topic) => {
+            const t = timelineByConcept.get(topic)
+            if (!t) return null
+            return (
+              <div key={topic} className="mt-1 pl-1">
+                <p className="text-[#FFBD2E]">~ <span className="font-bold">{t.conceptTitle}</span> <span className="text-[#6B7280]">(follow)</span></p>
+                <p className="pl-4 text-[11px] text-[#6B7280]">{fmtTime(t.at)} · {t.creditsConsumed}cr
+                  {!t.onChainFailed && t.explorerUrl && (
+                    <> · <a href={t.explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B9CE8] underline break-all">{t.txHash.slice(0, 12)}...</a></>
+                  )}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Unchanged */}
+      {unchanged.length > 0 && (
+        <div className="mt-3">
+          <p className="text-[#6B7280]">= UNCHANGED ({unchanged.length})</p>
+          {unchanged.map((k) => (
+            <p key={k.topic} className="text-[#6B7280] pl-1">= {k.topic} <span className="text-[#4A5160]">({k.lastUpdated})</span></p>
+          ))}
+        </div>
+      )}
+
+      {/* Summary */}
+      <div className="mt-3 pt-2 border-t border-[#2A2F3B] text-[#7C8490]">
+        <span>total {allKnowledge.length} · </span>
+        <span className="text-[#27C93F]">+{addedTopics.size}</span>
+        <span> · spent </span>
+        <span className="text-[#D4854A]">{data.summary?.totalSpent ?? 0}cr</span>
+      </div>
+    </>
+  )
+}
+
 function KnowledgeDiffModal({ agentId, agentName, onClose }: { agentId: string; agentName: string; onClose: () => void }) {
   const [data, setData] = useState<any>(null)
   const [error, setError] = useState("")
@@ -140,7 +279,7 @@ function KnowledgeDiffModal({ agentId, agentName, onClose }: { agentId: string; 
                   : e.chain === "status-hoodi" ? `https://hoodiscan.status.network/tx/${e.txHash}`
                   : e.chain === "status" ? `https://sepoliascan.status.network/tx/${e.txHash}`
                   : "" : "",
-                onChainFailed: !e.onChain,
+                onChainFailed: !e.txHash || e.onChain === false,
               })),
               summary: {
                 limit: rpt.recent_events?.length ?? 0,
@@ -170,38 +309,6 @@ function KnowledgeDiffModal({ agentId, agentName, onClose }: { agentId: string; 
   useEffect(() => { loadReport() }, [agentId])
 
   // ─── 데이터 조합: added / modified / unchanged ───
-  const addedTopics = new Set<string>(
-    (data?.timeline ?? []).filter((t: any) => t.action === "purchase").map((t: any) => t.conceptId),
-  )
-  const modifiedTopics = new Set<string>(
-    (data?.timeline ?? []).filter((t: any) => t.action === "follow").map((t: any) => t.conceptId),
-  )
-  const allKnowledge: Array<{ topic: string; lastUpdated: string }> = data?.currentKnowledge ?? []
-  const unchanged = allKnowledge.filter(
-    (k) => !addedTopics.has(k.topic) && !modifiedTopics.has(k.topic),
-  )
-
-  // Category 판정 (id에 기반한 간단 분류)
-  const categoryOf = (id: string) => {
-    if (["rag", "embeddings", "chain-of-thought"].includes(id)) return "basics"
-    if (["multi-agent", "agent-architectures", "fine-tuning"].includes(id)) return "advanced"
-    if (["evaluation", "prompt-engineering"].includes(id)) return "core"
-    return "misc"
-  }
-
-  const fmtTime = (iso: string) => {
-    if (!iso) return ""
-    return new Date(iso).toLocaleString("ko-KR", {
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
-    })
-  }
-
-  const timelineByConcept = new Map<string, any>()
-  ;(data?.timeline ?? []).forEach((t: any) => {
-    if (!timelineByConcept.has(t.conceptId)) timelineByConcept.set(t.conceptId, t)
-  })
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
       <div
@@ -241,147 +348,7 @@ function KnowledgeDiffModal({ agentId, agentName, onClose }: { agentId: string; 
           {!data && !error && <p className="text-[#7C8490]">$ requesting self-report from agent via WebSocket...</p>}
 
           {data && (
-            <>
-              {/* Header */}
-              <div className="text-[#7C8490]">
-                <p>{'='.repeat(64)}</p>
-                <p className="text-[#A8B3C1] flex items-center gap-2">
-                  📝 AGENT SELF-REPORT
-                  {source === "agent" && (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#27C93F] text-black font-bold uppercase">
-                      ✓ agent-signed
-                    </span>
-                  )}
-                </p>
-                <p>{'='.repeat(64)}</p>
-                <p><span className="text-[#6B7280]">agent:       </span><span className="text-[#C7A7FF]">{agentName}</span></p>
-                <p><span className="text-[#6B7280]">agent_id:    </span><span className="text-[#8B9AB5]">{agentId}</span></p>
-                <p><span className="text-[#6B7280]">generated:   </span><span className="text-[#8B9AB5]">{fmtTime(generatedAt)}</span></p>
-                <p><span className="text-[#6B7280]">scope:       </span><span className="text-[#8B9AB5]">last {data.summary?.limit ?? 5} events</span></p>
-                {data._meta && (
-                  <>
-                    <p><span className="text-[#6B7280]">reporter:    </span><span className="text-[#C7A7FF]">{data._meta.reporter}</span></p>
-                    <p><span className="text-[#6B7280]">pid:         </span><span className="text-[#8B9AB5]">{data._meta.pid}</span> <span className="text-[#6B7280]">uptime: {data._meta.uptime}s</span></p>
-                  </>
-                )}
-              </div>
-
-              {/* Added */}
-              {addedTopics.size > 0 && (
-                <div className="mt-4">
-                  <p className="text-[#7C8490]">{'─'.repeat(64)}</p>
-                  <p className="text-[#27C93F]">+ ADDED ({addedTopics.size} files)</p>
-                  <p className="text-[#7C8490]">{'─'.repeat(64)}</p>
-                  {[...addedTopics].map((topic) => {
-                    const t = timelineByConcept.get(topic)
-                    if (!t) return null
-                    return (
-                      <div key={topic} className="mt-2 pl-1">
-                        <p className="text-[#27C93F]">+ <span className="text-[#A8B3C1]">{categoryOf(topic)}/</span><span className="font-bold">{topic}.md</span></p>
-                        <div className="pl-6 text-[11px]">
-                          <p><span className="text-[#6B7280]">topic:     </span>{t.conceptTitle}</p>
-                          <p><span className="text-[#6B7280]">size:      </span>{t.contentMd?.length ?? 0} chars</p>
-                          <p><span className="text-[#6B7280]">sources:   </span>{t.evidence?.length ?? 0} evidence</p>
-                          <p><span className="text-[#6B7280]">quality:   </span>★ {t.qualityScore}</p>
-                          <p><span className="text-[#6B7280]">acquired:  </span>{fmtTime(t.at)} via <span className="text-[#F59E6A]">{t.action}</span> ({t.creditsConsumed}cr)</p>
-                          {t.onChainFailed ? (
-                            <p><span className="text-[#6B7280]">on-chain:  </span><span className="text-[#FFBD2E]">⚠ failed</span></p>
-                          ) : (
-                            <p>
-                              <span className="text-[#6B7280]">on-chain:  </span>
-                              <span className={cn(t.chain === "status" ? "text-[#27C93F]" : "text-[#C7A7FF]")}>{t.chain}</span>
-                              {" · "}
-                              <a href={t.explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B9CE8] underline">
-                                {t.txHash.slice(0, 12)}...{t.txHash.slice(-6)}
-                              </a>
-                            </p>
-                          )}
-                          {t.evidence?.length > 0 && (
-                            <div className="mt-1">
-                              <p className="text-[#6B7280]">evidence:</p>
-                              {t.evidence.map((e: any, ei: number) => (
-                                <p key={ei} className="pl-4 text-[10px]">
-                                  <span className="text-[#6B7280]">  ├─ </span>
-                                  <span className="text-[#C7A7FF]">{e.source}</span>
-                                  {e.curator && <span className="text-[#6B7280]"> ({e.curator}/{e.curatorTier})</span>}
-                                </p>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-
-              {/* Modified */}
-              {modifiedTopics.size > 0 && (
-                <div className="mt-4">
-                  <p className="text-[#7C8490]">{'─'.repeat(64)}</p>
-                  <p className="text-[#FFBD2E]">~ MODIFIED ({modifiedTopics.size} files)</p>
-                  <p className="text-[#7C8490]">{'─'.repeat(64)}</p>
-                  {[...modifiedTopics].map((topic) => {
-                    const t = timelineByConcept.get(topic)
-                    if (!t) return null
-                    return (
-                      <div key={topic} className="mt-2 pl-1">
-                        <p className="text-[#FFBD2E]">~ <span className="text-[#A8B3C1]">{categoryOf(topic)}/</span><span className="font-bold">{topic}.md</span> <span className="text-[#6B7280]">(follow subscription)</span></p>
-                        <div className="pl-6 text-[11px]">
-                          <p><span className="text-[#6B7280]">updated:   </span>{fmtTime(t.at)}</p>
-                          <p><span className="text-[#6B7280]">credits:   </span>{t.creditsConsumed}cr</p>
-                          {!t.onChainFailed && t.explorerUrl && (
-                            <p>
-                              <span className="text-[#6B7280]">on-chain:  </span>
-                              <a href={t.explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B9CE8] underline">
-                                {t.txHash.slice(0, 12)}...
-                              </a>
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-
-              {/* Unchanged */}
-              {unchanged.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-[#7C8490]">{'─'.repeat(64)}</p>
-                  <p className="text-[#6B7280]">= UNCHANGED ({unchanged.length} files, from earlier)</p>
-                  <p className="text-[#7C8490]">{'─'.repeat(64)}</p>
-                  {unchanged.map((k) => (
-                    <p key={k.topic} className="text-[#6B7280]">
-                      = <span className="text-[#8B9AB5]">{categoryOf(k.topic)}/</span>{k.topic}.md <span className="text-[#4A5160]">(last_updated: {k.lastUpdated})</span>
-                    </p>
-                  ))}
-                </div>
-              )}
-
-              {/* Summary */}
-              <div className="mt-4">
-                <p className="text-[#7C8490]">{'─'.repeat(64)}</p>
-                <p className="text-[#A8B3C1]">SUMMARY</p>
-                <p className="text-[#7C8490]">{'─'.repeat(64)}</p>
-                <p><span className="text-[#6B7280]">total_files:     </span>{allKnowledge.length} <span className="text-[#27C93F]">(+{addedTopics.size} new)</span></p>
-                <p><span className="text-[#6B7280]">credits_spent:   </span>{data.summary?.totalSpent ?? 0}cr</p>
-                <p>
-                  <span className="text-[#6B7280]">on-chain_txs:    </span>
-                  {Object.entries(data.summary?.byChain ?? {}).map(([k, v]) => (
-                    <span key={k} className="mr-3">
-                      <span className={cn(k === "status" ? "text-[#27C93F]" : k === "near" ? "text-[#C7A7FF]" : "text-[#6B7280]")}>{k}</span>:{v as number}
-                    </span>
-                  ))}
-                </p>
-                <p className="text-[#7C8490] mt-2">{'='.repeat(64)}</p>
-              </div>
-
-              {/* Verification hint */}
-              <p className="mt-4 text-[#4A5160] text-[11px]">
-                $ <span className="text-[#7C8490]">verify: click any tx link above to inspect on-chain record</span>
-              </p>
-            </>
+            <SelfReportLog data={data} agentId={agentId} agentName={agentName} generatedAt={generatedAt} source={source} />
           )}
         </div>
       </div>
@@ -550,11 +517,6 @@ type LedgerEntry = { id: string; type: "deposit" | "consume"; amount: number; de
 /* ═══════════════════════════════════════════════
    Mock data
 ═══════════════════════════════════════════════ */
-const DOMAIN_OPTIONS = [
-  "AI Engineering", "LLM Frameworks", "Embeddings", "Agent Systems",
-  "Fine-tuning", "Prompt Engineering", "Evaluation", "RAG Pipelines",
-  "Semantic Search", "Multi-Agent",
-]
 
 const MOCK_AGENTS: Agent[] = [
   {
@@ -633,13 +595,28 @@ function AgentPanel({
   const [cmdCopied, setCmdCopied] = useState(false)
   const [removeCopied, setRemoveCopied] = useState(false)
   const [mcpConnected, setMcpConnected] = useState(false)
-  const [diffOpen, setDiffOpen] = useState(false)
   const [onchainKarma, setOnchainKarma] = useState<import("@/lib/api").OnchainKarma | null>(null)
   const [karmaLoading, setKarmaLoading] = useState(false)
   const [karmaError, setKarmaError] = useState<string | null>(null)
 
-  // Reset onchain karma snapshot when switching agents
-  useEffect(() => { setOnchainKarma(null); setKarmaError(null) }, [selected?.id])
+  // Auto-load onchain Karma when selecting an agent (cancels stale requests on switch)
+  useEffect(() => {
+    if (!selected?.id) { setOnchainKarma(null); setKarmaError(null); return }
+    setOnchainKarma(null); setKarmaError(null); setKarmaLoading(true)
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { fetchAgentKarma } = await import("@/lib/api")
+        const r = await fetchAgentKarma(selected.id)
+        if (!cancelled) setOnchainKarma(r)
+      } catch (e: any) {
+        if (!cancelled) setKarmaError(e?.message ?? "Onchain read failed")
+      } finally {
+        if (!cancelled) setKarmaLoading(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [selected?.id])
 
   const refreshOnchainKarma = async () => {
     if (!selected?.id) return
@@ -707,7 +684,7 @@ function AgentPanel({
         </div>
         <div className="space-y-1.5">
           {agents.map((a) => (
-            <button
+            <div
               key={a.id}
               onClick={() => onSelect(a.id)}
               className={cn(
@@ -721,44 +698,60 @@ function AgentPanel({
                 <span className="text-[14px]">{a.icon}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-[12px] font-semibold text-[#1A1626] truncate">{a.name}</p>
-                  <p className="text-[10px] text-[#6B727E] truncate">{a.domainInterests.join(", ")}</p>
                 </div>
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    try {
+                      const { fetchAgentSelfReport } = await import("@/lib/api")
+                      const r = await fetchAgentSelfReport(a.id)
+                      if (r?.ok && r?.report) {
+                        window.dispatchEvent(new CustomEvent("kaas-self-report", {
+                          detail: { report: r.report, agentId: a.id, agentName: a.name },
+                        }))
+                      } else {
+                        window.dispatchEvent(new CustomEvent("kaas-self-report-error", {
+                          detail: { error: r?.error ?? "Self-report unavailable", hint: r?.hint },
+                        }))
+                      }
+                    } catch (err: any) {
+                      window.dispatchEvent(new CustomEvent("kaas-self-report-error", {
+                        detail: { error: err?.message ?? "Self-report request failed" },
+                      }))
+                    }
+                  }}
+                  title="View Knowledge Diff (self-report)"
+                  className="flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded border border-[#D4854A] text-[#A85D2C] bg-white hover:bg-[#FFF3E5] hover:border-[#A85D2C] cursor-pointer flex-shrink-0 transition-colors"
+                >
+                  📚 <span>Diff</span>
+                </button>
                 <div className="text-right flex-shrink-0">
-                  <p className="text-[11px] font-bold" style={{ color: TIER_COLOR[a.karmaTier] ?? "#9E97B3" }}>{a.karmaTier}</p>
-                  <p className="text-[10px] text-[#6B727E]">{a.credits}cr</p>
+                  <p className="text-[11px] font-bold text-[#1A1626]">{a.credits}<span className="text-[9px] font-semibold text-[#6B727E]"> cr</span></p>
                 </div>
               </div>
-            </button>
+            </div>
           ))}
         </div>
       </div>
 
       {/* Selected agent detail — 고정 하단 */}
       <div className="shrink-0 border-t border-[#E4E1EE] pt-3 mt-3 space-y-3">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Wallet</p>
-          <div className="flex items-center gap-2">
-            <Wallet size={13} className="text-[#7B5EA7]" />
-            <span className="text-[12px] font-mono font-semibold text-[#1A1626]">{selected.walletAddress && selected.walletAddress.length > 12 ? `${selected.walletAddress.slice(0, 6)}...${selected.walletAddress.slice(-4)}` : selected.walletAddress || "—"}</span>
-          </div>
-        </div>
-
+        {/* Wallet block — address + its Karma (Karma is a wallet-level property on Status Network, not an agent-level one) */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E]">Karma Tier</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E]">Wallet</p>
             <button
               onClick={refreshOnchainKarma}
               disabled={karmaLoading}
               className="text-[9px] font-semibold px-1.5 py-0.5 rounded border border-[#E4E1EE] hover:border-[#7B5EA7] text-[#7B5EA7] disabled:opacity-50 cursor-pointer transition-colors flex items-center gap-1"
               title="Read live from Status Network Karma contract"
             >
-              {karmaLoading ? "…" : "🔗"} {onchainKarma ? "Refresh chain" : "Read onchain"}
+              {karmaLoading ? "…" : "🔗"} Refresh onchain
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <Shield size={13} style={{ color: TIER_COLOR[selected.karmaTier] }} />
-            <span className="text-[13px] font-bold" style={{ color: TIER_COLOR[selected.karmaTier] }}>{selected.karmaTier}</span>
-            <span className="text-[11px] text-[#6B727E]">{selected.karmaBalance.toLocaleString()} pts</span>
+            <Wallet size={13} className="text-[#7B5EA7]" />
+            <span className="text-[12px] font-mono font-semibold text-[#1A1626]">{selected.walletAddress && selected.walletAddress.length > 12 ? `${selected.walletAddress.slice(0, 6)}...${selected.walletAddress.slice(-4)}` : selected.walletAddress || "—"}</span>
           </div>
           {karmaError && (
             <p className="text-[10px] text-[#C94B6E] mt-1">⚠ {karmaError}</p>
@@ -766,7 +759,7 @@ function AgentPanel({
           {onchainKarma && !karmaError && (
             <div className="mt-1.5 rounded-md border border-[#E4E1EE] bg-[#FAF8FF] px-2 py-1.5 space-y-1">
               <div className="flex items-center justify-between text-[10px]">
-                <span className="text-[#6B727E]">Onchain</span>
+                <span className="text-[#6B727E]">Wallet Karma (Status Hoodi)</span>
                 <span className="font-mono text-[#1A1626]">
                   {onchainKarma.balance.toFixed(2)} KARMA · tier {onchainKarma.onchainTierId} ({onchainKarma.onchainTierName})
                 </span>
@@ -797,15 +790,6 @@ function AgentPanel({
           )}
         </div>
 
-
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Domains</p>
-          <div className="flex flex-wrap gap-1">
-            {selected.domainInterests.map((d) => (
-              <span key={d} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#F3EFFA] text-[#7B5EA7] border border-[#C7B8E8]">{d}</span>
-            ))}
-          </div>
-        </div>
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">MCP Server</p>
@@ -853,23 +837,12 @@ function AgentPanel({
         </div>
 
         <button
-          onClick={() => setDiffOpen(true)}
-          className="w-full text-[12px] font-semibold py-2 rounded-lg border border-[#7B5EA7] text-[#7B5EA7] hover:bg-[#F3EFFA] cursor-pointer transition-colors flex items-center justify-center gap-1.5"
-        >
-          📚 View Learning History (Knowledge Diff)
-        </button>
-
-        <button
           onClick={() => { if (confirm(`Delete agent "${selected.name}"?`)) onDelete(selected.id) }}
-          className="w-full text-[11px] text-[#999] hover:text-red-400 py-2 cursor-pointer transition-colors"
+          className="w-full text-[10px] text-[#999] hover:text-red-400 py-0.5 cursor-pointer transition-colors"
         >
           Delete Agent
         </button>
       </div>
-
-      {diffOpen && (
-        <KnowledgeDiffModal agentId={selected.id} agentName={selected.name} onClose={() => setDiffOpen(false)} />
-      )}
     </div>
   )
 }
@@ -1313,11 +1286,14 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
 /* ═══════════════════════════════════════════════
    Main — 2 panel layout
 ═══════════════════════════════════════════════ */
-export function KaasDashboardPage({ isAdmin = false }: { isAdmin?: boolean }) {
+export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: boolean; onTabChange?: (tab: "dashboard" | "curation" | "template") => void }) {
   const [agents, setAgents] = useState<Agent[]>([])
   const [selectedAgentId, setSelectedAgentId] = useState("")
   const [showRegister, setShowRegister] = useState(false)
   const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "template">("dashboard")
+
+  // Notify parent when the active sub-tab changes (so the floating Agent Console can show the right context)
+  useEffect(() => { onTabChange?.(activeTab) }, [activeTab, onTabChange])
 
   const loadAgents = async () => {
     try {

@@ -1,0 +1,13 @@
+{
+  "_comment": "currentPage value (from Sidebar nav id or Dashboard sub-tab) → manual filename. The KaaS Agent Console fetches the matching .md and adds it to the LLM context for page-specific answers.",
+  "_default": "_overview.md",
+  "highlight": "highlight.md",
+  "patch-notes": "patch-notes.md",
+  "kaas-catalog": "kaas-catalog.md",
+  "model-updates": "model-updates.md",
+  "frameworks": "frameworks.md",
+  "case-studies": "case-studies.md",
+  "Dashboard": "kaas-dashboard.md",
+  "Dashboard › Knowledge Curation": "kaas-knowledge-curation.md",
+  "Dashboard › Prompt Templates": "kaas-prompt-templates.md"
+}

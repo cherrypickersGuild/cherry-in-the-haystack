@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback, useImperativeHandle, forwardR
 import { cn } from "@/lib/utils"
 import { Send, ExternalLink, ChevronDown, Shield, Bot, Cherry, Minus, X } from "lucide-react"
 import { purchaseConcept, followConcept } from "@/lib/api"
+import { SelfReportLog } from "./kaas-dashboard-page"
 
 /* ═══════════════════════════════════════════════
    Knowledge base (mock) — same 9 concepts as catalog
@@ -120,7 +121,7 @@ type Message =
   | { role: "agent-chat"; reply: string; privacy?: boolean }
   | { role: "kaas-chat"; reply: string; privacy?: boolean }
   | { role: "agent-done"; hash: string; blocked?: boolean }
-  | { role: "agent-report"; reporter: string; pid: number; uptime: number; knowledgeCount: number; eventsCount: number; creditsSpent: number; chainsUsed: string[]; triggeredBy: string; events: Array<{ at: string; action: string; conceptId: string; conceptTitle: string; creditsConsumed: number; chain: string; txHash: string; explorerUrl: string; onChain: boolean; evidenceCount: number; qualityScore: number }> }
+  | { role: "agent-report"; reportData: any; agentId: string; agentName: string; generatedAt: string }
   | { role: "room"; from: "user" | "claude" | "cherry"; to: "user" | "claude" | "cherry"; content: string; ts: string }
 
 /* ═══════════════════════════════════════════════
@@ -292,7 +293,11 @@ function AgentDoneMsg({ hash, blocked }: { hash: string; blocked?: boolean }) {
 /* ═══════════════════════════════════════════════
    Floating Console
 ═══════════════════════════════════════════════ */
-export const KaasConsole = forwardRef<KaasConsoleRef>(function KaasConsole(_, ref) {
+export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(function KaasConsole({ currentPage }, ref) {
+  // Keep latest page in a ref so callbacks pick up the freshest value without re-binding
+  const currentPageRef = useRef<string | undefined>(currentPage)
+  useEffect(() => { currentPageRef.current = currentPage }, [currentPage])
+
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
@@ -336,7 +341,71 @@ export const KaasConsole = forwardRef<KaasConsoleRef>(function KaasConsole(_, re
   useEffect(() => {
     reloadConsoleAgents()
     window.addEventListener("kaas-agents-changed", reloadConsoleAgents)
-    return () => window.removeEventListener("kaas-agents-changed", reloadConsoleAgents)
+
+    // Manual self-report trigger from a My Agents 📚 button — shapes the report
+    // exactly like the WS auto-push path and appends an agent-report message.
+    const onSelfReport = (ev: Event) => {
+      const detail = (ev as CustomEvent).detail as { report: any; agentId: string; agentName: string }
+      if (!detail?.report) return
+      const r = detail.report
+      const timeline = (r.recent_events ?? []).map((e: any) => ({
+        at: e.at,
+        action: e.action,
+        conceptId: e.conceptId,
+        conceptTitle: e.conceptTitle,
+        creditsConsumed: e.creditsConsumed,
+        chain: e.chain,
+        txHash: e.txHash ?? "",
+        onChainFailed: !e.txHash || e.onChain === false,
+        qualityScore: e.qualityScore ?? 0,
+        evidence: Array.isArray(e.evidence) ? e.evidence.map((ev: any) => ({
+          source: ev.source ?? "",
+          curator: ev.curator ?? "",
+          curatorTier: ev.curatorTier ?? ev.curator_tier ?? "",
+        })) : [],
+        explorerUrl: e.txHash
+          ? e.chain === "near" ? `https://testnet.nearblocks.io/txns/${e.txHash}`
+          : e.chain === "status-hoodi" ? `https://hoodiscan.status.network/tx/${e.txHash}`
+          : e.chain === "status" ? `https://sepoliascan.status.network/tx/${e.txHash}`
+          : "" : "",
+      }))
+      const reportData = {
+        timeline,
+        currentKnowledge: r.current_knowledge ?? [],
+        summary: {
+          limit: r.recent_events?.length ?? 0,
+          totalSpent: r.summary?.credits_spent ?? 0,
+          byChain: timeline.reduce((acc: any, t: any) => { acc[t.chain ?? "mock"] = (acc[t.chain ?? "mock"] ?? 0) + 1; return acc }, {}),
+        },
+        _meta: {
+          reporter: r.reporter ?? "cherry-kaas-mcp-stdio",
+          pid: r.session_pid ?? 0,
+          uptime: r.uptime_seconds ?? 0,
+        },
+      }
+      setMessages((m) => [...m, {
+        role: "agent-report",
+        reportData,
+        agentId: detail.agentId,
+        agentName: detail.agentName,
+        generatedAt: r.reported_at ?? new Date().toISOString(),
+      }])
+      setOpen(true)
+      setTimeout(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }), 50)
+    }
+    const onSelfReportError = (ev: Event) => {
+      const detail = (ev as CustomEvent).detail as { error: string; hint?: string }
+      setMessages((m) => [...m, { role: "agent-chat", reply: `⚠ ${detail?.error ?? "Self-report unavailable"}${detail?.hint ? `\n💡 ${detail.hint}` : ""}` }])
+      setOpen(true)
+      setTimeout(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }), 50)
+    }
+    window.addEventListener("kaas-self-report", onSelfReport)
+    window.addEventListener("kaas-self-report-error", onSelfReportError)
+    return () => {
+      window.removeEventListener("kaas-agents-changed", reloadConsoleAgents)
+      window.removeEventListener("kaas-self-report", onSelfReport)
+      window.removeEventListener("kaas-self-report-error", onSelfReportError)
+    }
   }, [])
 
   const currentAgent = agents[selectedAgentIdx]
@@ -382,33 +451,49 @@ export const KaasConsole = forwardRef<KaasConsoleRef>(function KaasConsole(_, re
           if (cancelled) return
           if (evt?.agentId !== currentAgent.id) return // 내 에이전트 리포트만
           const r = evt.report ?? {}
-          const events = (r.recent_events ?? []).map((e: any) => ({
+          // Map the raw self-report into the exact shape SelfReportLog expects
+          const timeline = (r.recent_events ?? []).map((e: any) => ({
             at: e.at,
             action: e.action,
             conceptId: e.conceptId,
             conceptTitle: e.conceptTitle,
             creditsConsumed: e.creditsConsumed,
             chain: e.chain,
-            txHash: e.txHash,
-            onChain: e.onChain,
-            evidenceCount: e.evidenceCount ?? 0,
+            txHash: e.txHash ?? "",
+            // tx hash가 있으면 성공. onChain 필드는 백엔드 소스마다 형식이 달라 기준으로 안 씀
+            onChainFailed: !e.txHash || e.onChain === false,
             qualityScore: e.qualityScore ?? 0,
+            evidence: Array.isArray(e.evidence) ? e.evidence.map((ev: any) => ({
+              source: ev.source ?? "",
+              curator: ev.curator ?? "",
+              curatorTier: ev.curatorTier ?? ev.curator_tier ?? "",
+            })) : [],
             explorerUrl: e.txHash
               ? e.chain === "near" ? `https://testnet.nearblocks.io/txns/${e.txHash}`
+              : e.chain === "status-hoodi" ? `https://hoodiscan.status.network/tx/${e.txHash}`
               : e.chain === "status" ? `https://sepoliascan.status.network/tx/${e.txHash}`
               : "" : "",
           }))
+          const reportData = {
+            timeline,
+            currentKnowledge: r.current_knowledge ?? [],
+            summary: {
+              limit: r.recent_events?.length ?? 0,
+              totalSpent: r.summary?.credits_spent ?? 0,
+              byChain: timeline.reduce((acc: any, t: any) => { acc[t.chain ?? "mock"] = (acc[t.chain ?? "mock"] ?? 0) + 1; return acc }, {}),
+            },
+            _meta: {
+              reporter: r.reporter ?? "cherry-kaas-mcp-stdio",
+              pid: r.session_pid ?? 0,
+              uptime: r.uptime_seconds ?? 0,
+            },
+          }
           setMessages((m) => [...m, {
             role: "agent-report",
-            reporter: r.reporter ?? "cherry-kaas-mcp-stdio",
-            pid: r.session_pid ?? 0,
-            uptime: r.uptime_seconds ?? 0,
-            knowledgeCount: r.summary?.total_knowledge ?? 0,
-            eventsCount: r.summary?.recent_events ?? 0,
-            creditsSpent: r.summary?.credits_spent ?? 0,
-            chainsUsed: r.summary?.chains_used ?? [],
-            triggeredBy: r.triggered_by ?? "request",
-            events,
+            reportData,
+            agentId: currentAgent.id,
+            agentName: currentAgent.name,
+            generatedAt: r.reported_at ?? new Date().toISOString(),
           }])
           setOpen(true)
           setTimeout(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }), 50)
@@ -612,11 +697,54 @@ export const KaasConsole = forwardRef<KaasConsoleRef>(function KaasConsole(_, re
         const apiKey = apiKeyRef.current
         if (!apiKey) throw new Error("no key")
         const privacy = getPrivacyMode()
-        const result = await chatWithAgent(apiKey, "", text, privacy)
-        const isPrivate = !!(privacy && result.privacy)
-        setMessages((m) => [...m, { role: "kaas-chat", reply: result.reply || "No response", privacy: isPrivate }])
+
+        // Prepend page-context metadata + the page's manual (if available) so the LLM
+        // can answer page-specific questions. Manuals live in /public/cherry-manuals/.
+        // No vector search — straight page→file lookup via _index.json.
+        const page = currentPageRef.current
+        let manual = ""
+        if (page) {
+          try {
+            const idxRes = await fetch("/cherry-manuals/_index.json", { cache: "force-cache" })
+            const idx = await idxRes.json() as Record<string, string>
+            const file = idx[page] ?? idx._default
+            if (file) {
+              const mdRes = await fetch(`/cherry-manuals/${file}`, { cache: "force-cache" })
+              if (mdRes.ok) manual = await mdRes.text()
+            }
+          } catch { /* manual fetch best-effort — never block chat */ }
+        }
+        const questionWithCtx = page
+          ? [
+              `[Page Manual — STRICT RULES]`,
+              `1. Only describe features that are documented in the manual below — these are the features available on the user's CURRENT page.`,
+              `2. Do NOT mention or recommend features that exist on other pages of the app (e.g. do not suggest "use Compare on the Catalog page" unless the user is on the Catalog page).`,
+              `3. Do NOT tell the user to navigate to another page to do something.`,
+              `4. No promotional language, no sales pitches, no "try X" suggestions.`,
+              `5. If the question is about something not in this manual, answer factually with general knowledge — do not redirect to other Cherry pages.`,
+              "",
+              manual ? manual.trim() : "(no manual available)",
+              "",
+              `[Context: user is currently viewing the "${page}" page in the Cherry app]`,
+              "",
+              text,
+            ].join("\n")
+          : text
+        const BUSY_MSG = "지금은 체리가 중요한 업무를 처리중입니다. 차후에 응대해 드리겠습니다."
+        const result = await chatWithAgent(apiKey, "", questionWithCtx, privacy)
+        // LLM quota / rate-limit / any backend error → show a polite busy message
+        const reply = (result?.reply ?? "").trim()
+        const looksLikeError = !reply
+          || result?.error === true
+          || /quota|rate[-\s]?limit|insufficient|exceeded|429|503|오류|error/i.test(reply)
+        if (looksLikeError) {
+          setMessages((m) => [...m, { role: "agent-chat", reply: BUSY_MSG }])
+        } else {
+          const isPrivate = !!(privacy && result.privacy)
+          setMessages((m) => [...m, { role: "kaas-chat", reply, privacy: isPrivate }])
+        }
       } catch {
-        setMessages((m) => [...m, { role: "agent-chat", reply: "Response failed" }])
+        setMessages((m) => [...m, { role: "agent-chat", reply: "지금은 체리가 중요한 업무를 처리중입니다. 차후에 응대해 드리겠습니다." }])
       } finally {
         setLoading(false)
         scrollToBottom()
@@ -665,7 +793,7 @@ export const KaasConsole = forwardRef<KaasConsoleRef>(function KaasConsole(_, re
       {!open && (
         <button
           onClick={() => { setOpen(true); scrollToBottom() }}
-          className="fixed bottom-5 right-5 z-40 flex items-center gap-2 px-3 py-2 rounded-xl bg-[#1A1520] text-white shadow-lg hover:shadow-xl transition-all cursor-pointer border border-[#333]"
+          className="fixed bottom-5 right-5 z-[60] flex items-center gap-2 px-3 py-2 rounded-xl bg-[#1A1520] text-white shadow-lg hover:shadow-xl transition-all cursor-pointer border border-[#333]"
         >
           <Cherry size={16} className="text-[#C94B6E]" />
           <span className="text-[12px] font-semibold">Agent Console</span>
@@ -674,7 +802,7 @@ export const KaasConsole = forwardRef<KaasConsoleRef>(function KaasConsole(_, re
       )}
 
     {/* 콘솔 패널 — DOM에 유지해서 스크롤 위치 보존 */}
-    <div ref={consoleRef} className={cn("fixed bottom-5 right-5 z-40 w-[420px] h-[520px] flex flex-col rounded-2xl bg-[#0D0D12] border border-[#333] shadow-2xl", !open && "hidden")}>
+    <div ref={consoleRef} className={cn("fixed bottom-5 right-5 z-[60] w-[420px] h-[520px] flex flex-col rounded-2xl bg-[#0D0D12] border border-[#333] shadow-2xl", !open && "hidden")}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#222] flex-shrink-0">
         <div className="flex items-center gap-2">
@@ -780,60 +908,14 @@ export const KaasConsole = forwardRef<KaasConsoleRef>(function KaasConsole(_, re
             }
             case "agent-report": return (
               <div key={i} className="mb-2">
-                <p className="text-[10px] text-[#27C93F] font-semibold mb-1 flex items-center gap-1.5">
-                  {currentAgent?.name ?? "Agent"} · self-report
-                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#27C93F] text-black uppercase tracking-wide">
-                    ✓ agent-signed
-                  </span>
-                </p>
-                <div className="bg-[#0D1017] border-l-2 border-[#27C93F] rounded-lg px-3 py-2 max-w-[95%] font-mono text-[10px] leading-relaxed">
-                  <p className="text-[#A8B3C1] mb-1">📤 Self-report submitted</p>
-                  <p className="text-[#7C8490]">reporter: <span className="text-[#C7A7FF]">{msg.reporter}</span> · pid: <span className="text-[#8B9AB5]">{msg.pid}</span> · uptime: <span className="text-[#8B9AB5]">{msg.uptime}s</span></p>
-                  <p className="text-[#7C8490]">triggered_by: <span className="text-[#FFBD2E]">{msg.triggeredBy}</span> · knowledge: {msg.knowledgeCount} · events: {msg.eventsCount} · spent: <span className="text-[#D4854A]">{msg.creditsSpent}cr</span></p>
-
-                  {(msg.events?.length ?? 0) > 0 && (
-                    <div className="mt-2 pt-2 border-t border-[#2A2F3B]">
-                      <p className="text-[#A8B3C1] mb-1">Recent events ({msg.events?.length ?? 0}):</p>
-                      {(msg.events ?? []).map((e, ei) => (
-                        <div key={ei} className="pl-2 mt-1.5">
-                          <p>
-                            <span className={cn(
-                              "text-[9px] px-1 rounded uppercase font-bold",
-                              e.action === "purchase" ? "bg-[#27C93F]/20 text-[#27C93F]" : "bg-[#FFBD2E]/20 text-[#FFBD2E]",
-                            )}>{e.action}</span>
-                            {" "}
-                            <span className="text-[#D0D7E0] font-semibold">{e.conceptTitle}</span>
-                          </p>
-                          <p className="text-[#7C8490] pl-2 text-[9px]">
-                            ├─ {new Date(e.at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
-                            {" · "}
-                            <span className="text-[#D4854A]">{e.creditsConsumed}cr</span>
-                            {" · ★ "}{e.qualityScore}
-                            {" · evidence "}{e.evidenceCount}
-                          </p>
-                          <p className="text-[#7C8490] pl-2 text-[9px]">
-                            └─
-                            {e.onChain && e.explorerUrl ? (
-                              <>
-                                <span className={cn(
-                                  "ml-1 px-1 rounded uppercase font-bold",
-                                  e.chain === "status" ? "bg-[#27C93F]/20 text-[#27C93F]" :
-                                  e.chain === "near" ? "bg-[#C7A7FF]/20 text-[#C7A7FF]" :
-                                  "bg-[#7C8490]/20 text-[#7C8490]",
-                                )}>{e.chain}</span>
-                                {" · "}
-                                <a href={e.explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B9CE8] underline">
-                                  {e.txHash.slice(0, 12)}...{e.txHash.slice(-4)}
-                                </a>
-                              </>
-                            ) : (
-                              <span className="ml-1 text-[#FFBD2E]">⚠ on-chain failed</span>
-                            )}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <div className="bg-[#0D1017] border border-[#2A2F3B] rounded-lg px-3 py-2.5 font-mono text-[10px] leading-[1.55] text-[#D0D7E0]" style={{ fontFamily: "'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace" }}>
+                  <SelfReportLog
+                    data={msg.reportData}
+                    agentId={msg.agentId}
+                    agentName={msg.agentName}
+                    generatedAt={msg.generatedAt}
+                    source="agent"
+                  />
                 </div>
               </div>
             )

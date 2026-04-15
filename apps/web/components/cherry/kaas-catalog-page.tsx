@@ -490,7 +490,7 @@ type CompareStatus = "up-to-date" | "outdated" | "gap"
 type AgentKnowledge = { topic: string; lastUpdated: string }
 
 type GapResult = {
-  upToDate: { conceptId: string; qualityScore: number }[]
+  upToDate: { conceptId: string; title: string; qualityScore: number }[]
   outdated: { conceptId: string; title: string; agentDate: string; catalogDate: string; newEvidence: number }[]
   gaps: { conceptId: string; title: string; qualityScore: number }[]
   recommendations: { conceptId: string; suggestedDepth: string; estimatedCredits: number; reason: string }[]
@@ -517,7 +517,7 @@ function analyzeGaps(agentKnowledge: AgentKnowledge[]): GapResult {
       const catalogTime = new Date(concept.updatedAt).getTime()
 
       if (agentTime >= catalogTime) {
-        upToDate.push({ conceptId: concept.id, qualityScore: concept.qualityScore })
+        upToDate.push({ conceptId: concept.id, title: concept.title, qualityScore: concept.qualityScore })
       } else {
         const daysBehind = Math.floor((catalogTime - agentTime) / 86400000)
         outdated.push({

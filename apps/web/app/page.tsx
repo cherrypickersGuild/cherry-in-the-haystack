@@ -38,6 +38,7 @@ function parseJwtRole(token: string): string | null {
 
 export default function CherryApp() {
   const [activeNav, setActiveNav] = useState("highlight")
+  const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "template">("dashboard")
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [landing, setLanding] = useState<LandingResponse | null>(null)
@@ -293,8 +294,21 @@ export default function CherryApp() {
         </main>
       </div>
 
-      {/* Floating Agent Console — visible on KaaS pages */}
-      {activeNav.startsWith("kaas") && <KaasConsole ref={consoleRef} />}
+      {/* Floating Agent Console — visible on all pages.
+          When the Dashboard modal is open, surface the active sub-tab so the LLM
+          can answer page-specific questions (Dashboard / Knowledge Curation / Prompt Templates). */}
+      <KaasConsole
+        ref={consoleRef}
+        currentPage={
+          showDashboard
+            ? dashboardTab === "curation"
+              ? "Dashboard › Knowledge Curation"
+              : dashboardTab === "template"
+              ? "Dashboard › Prompt Templates"
+              : "Dashboard"
+            : activeNav
+        }
+      />
 
       {/* Dashboard modal (통합: Dashboard + 지식 큐레이팅 + 프롬프트 템플릿) */}
       {showDashboard && (
@@ -310,7 +324,7 @@ export default function CherryApp() {
             >
               <span className="text-text-muted text-[16px]">✕</span>
             </button>
-            <KaasDashboardPage isAdmin={isAdmin} />
+            <KaasDashboardPage isAdmin={isAdmin} onTabChange={setDashboardTab} />
           </div>
         </div>
       )}
