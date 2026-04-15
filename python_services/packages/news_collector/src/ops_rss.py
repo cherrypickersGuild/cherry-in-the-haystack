@@ -13,7 +13,11 @@ from ops_base import OperatorBase
 from db_cli import DBClient
 from ops_milvus import OperatorMilvus
 from ops_notion import OperatorNotion
-from config.rss_feeds import get_enabled_feeds
+# Use config_loader with fallback to legacy config
+try:
+    from config_loader import get_enabled_feeds
+except ImportError:
+    from config.rss_feeds import get_enabled_feeds
 
 import feedparser
 import requests

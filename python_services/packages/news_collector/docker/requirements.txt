@@ -20,6 +20,10 @@ tweepy
 mysql-connector-python
 redis
 
+# PostgreSQL for source sync
+psycopg2-binary
+sqlalchemy
+
 youtube-transcript-api
 pytube
 

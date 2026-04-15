@@ -4,9 +4,9 @@ from datetime import date, datetime
 
 from dotenv import load_dotenv
 
-from ops_todo import OperatorTODO
-from ops_deepdive import OperatorDeepDive
-import utils
+from packages.auto_news.src.ops_todo import OperatorTODO
+from packages.auto_news.src.ops_deepdive import OperatorDeepDive
+import packages.auto_news.src.utils as utils
 
 
 parser = argparse.ArgumentParser()

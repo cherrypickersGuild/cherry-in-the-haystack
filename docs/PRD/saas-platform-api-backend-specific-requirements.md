@@ -411,7 +411,7 @@ Tables:
 
 **Mobile Support:**
 
-- Responsive design (Jupyter Book default)
+- Responsive design
 - Touch-friendly navigation
 - Optimized for mobile reading experience
 

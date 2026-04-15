@@ -796,10 +796,10 @@ So that new content reaches users quickly without manual deployment.
 
 **Given** the weekly publication pipeline exists (weekly-publish.ts)
 **When** the daily publication job runs
-**Then** approved Notion items are synced to Postgres and committed to GitHub daily
+**Then** approved Notion items are synced to Postgres and committed to webapp daily
 **And** the job runs at a configured time (e.g., 00:00 UTC)
 **And** the job writes results to `pipeline_runs` table
-**And** failures trigger alerts (Slack + email)
+**And** failures trigger alerts (Discord + email)
 **And** zero-downtime deployment is maintained
 
 ### Story 1.3: Discover & Configure Additional Source
@@ -913,8 +913,6 @@ So that I can access the knowledge base through a browser.
 **And** "Last updated" timestamps are displayed
 
 ### Story 3.2: URL Submission Form
-
-
 
 As a community contributor,
 I want to submit URLs for new content sources through a web form,

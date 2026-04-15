@@ -12,15 +12,15 @@
 
 ## Layer Overview
 
-| Layer | Storage | Responsibility |
-| ----- | ------- | -------------- |
-| News Pipeline | PostgreSQL 16 | Crawl → dedup → per-user AI scoring → snapshots |
-| Entity Registries | PostgreSQL 16 | KT-maintained master lists of tracked models, frameworks, tools, benchmarks, shared resources |
-| Books / Evidence Pipeline | PostgreSQL 16 | PDF/HTML → paragraphs → concept linkage → embeddings |
-| Concept Layer | GraphDB (RDF) | Ontology — stable concept nodes + relationships |
-| Personalization Layer | PostgreSQL 16 | Per-user follow configs, scoring preferences, digest preferences, concept evidence selections |
-| Webapp Read Layer | PostgreSQL 16 | Pre-built UI snapshots; O(1) reads, no JOIN at request time |
-| Operations | PostgreSQL 16 | Run logs, processing progress, contributor registry |
+| Layer                     | Storage       | Responsibility                                                                                |
+| ------------------------- | ------------- | --------------------------------------------------------------------------------------------- |
+| News Pipeline             | PostgreSQL 16 | Crawl → dedup → per-user AI scoring → snapshots                                               |
+| Entity Registries         | PostgreSQL 16 | KT-maintained master lists of tracked models, frameworks, tools, benchmarks, shared resources |
+| Books / Evidence Pipeline | PostgreSQL 16 | PDF/HTML → paragraphs → concept linkage → embeddings                                          |
+| Concept Layer             | GraphDB (RDF) | Ontology — stable concept nodes + relationships                                               |
+| Personalization Layer     | PostgreSQL 16 | Per-user follow configs, scoring preferences, digest preferences, concept evidence selections |
+| Webapp Read Layer         | PostgreSQL 16 | Pre-built UI snapshots; O(1) reads, no JOIN at request time                                   |
+| Operations                | PostgreSQL 16 | Run logs, processing progress, contributor registry                                           |
 
 ---
 

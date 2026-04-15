@@ -4,111 +4,101 @@
 cherry-in-the-haystack/
 │
 ├── apps/
-│   └── web/                            # Nest.js application (TypeScript)
-│       ├── app/
-│       │   ├── (public)/               # Public routes — no auth required
-│       │   │   ├── basics/[slug]/
-│       │   │   ├── advanced/[slug]/
-│       │   │   └── newly-discovered/
-│       │   ├── (dashboard)/            # Authenticated routes (Phase 2)
-│       │   └── api/                    # Nest.js API routes
-│       │       ├── content/
-│       │       ├── users/
-│       │       └── newsletter/
-│       ├── components/
-│       ├── lib/
-│       │   ├── db.ts                   # Postgres client (Prisma / postgres.js)
-│       │   └── notion.ts               # Notion client wrapper
-│       ├── package.json
-│       └── tsconfig.json
-│
-├── packages/
-│   └── pipeline/                       # TypeScript data pipeline scripts
+│   ├── web/                            # Next.js application (TypeScript)
+│   │   ├── app/                         # App Router
+│   │   │   ├── (public)/                # Public routes — no auth required
+│   │   │   │   ├── basics/[slug]/
+│   │   │   │   ├── advanced/[slug]/
+│   │   │   │   └── newly-discovered/
+│   │   │   ├── (dashboard)/             # Authenticated routes (Phase 2)
+│   │   │   └── api/                     # API routes (forward to FastAPI)
+│   │   ├── components/
+│   │   ├── lib/
+│   │   └── package.json
+│   │
+│   └── api/                            # NestJS application (TypeScript)
 │       ├── src/
-│       │   ├── jobs/                   # Cron job entry points
-│       │   │   ├── news-ingestion.ts   # Fetch + score → Notion DB
-│       │   │   ├── notion-backup.ts    # Daily 00:00 UTC: Notion → Postgres
-│       │   │   ├── weekly-publish.ts   # Sunday 00:00 UTC: Notion approved → GitHub
-│       │   │   └── writer-agent.ts     # Monthly: invoke Python Writer Agent
-│       │   ├── newly-discovered/
-│       │   │   ├── category-matcher.ts # LLM classification → category + topics
-│       │   │   ├── format-dispatcher.ts # Handlebars/template → category markdown
-│       │   │   └── sources/            # Source-specific fetchers
-│       │   ├── publication/
-│       │   │   ├── github-committer.ts # Octokit atomic commits to main
-│       │   │   └── templates/          # Handlebars templates per category
-│       │   └── integrations/
-│       │       ├── notion-client.ts    # Notion API v2 wrapper
-│       │       └── github-client.ts    # Octokit wrapper
-│       ├── package.json
-│       └── tsconfig.json
+│       │   ├── modules/
+│       │   └── main.ts
+│       └── package.json
 │
-├── handbook/                           # Python AI/LLM modules
-│   ├── config/
-│   │   └── logging_config.py           # Loguru setup, log format, levels
-│   ├── db_connection/
-│   │   ├── postgres.py                 # psycopg3, connection pool (max 20), context manager
-│   │   ├── graph_db.py                 # GraphDB SPARQL queries, concept CRUD
-│   │   └── vector_db.py                # pgvector, cosine similarity search, batch insert
-│   └── pipeline/
-│       ├── evidence_ingestion/
-│       │   ├── document_chunker.py     # PDF/HTML/markdown → paragraphs
-│       │   ├── concept_extractor.py    # Claude → extracted_concept per paragraph
-│       │   ├── concept_matcher.py      # GraphDB similarity match / create new concept
-│       │   ├── graph_updater.py        # Create concept nodes, add relations
-│       │   └── deduplication.py        # simhash64 + vector cosine for near-dupes
-│       └── writer_agent/
-│           ├── graph_query.py          # Two-step query: GraphDB + Postgres
-│           ├── page_synthesizer.py     # Claude 3.5 Sonnet, four-section format
-│           ├── synthesis_prompts.py    # Prompt templates per section type
-│           ├── patchnote_aggregator.py # Track all page changes in patchnote.md
-│           └── image_generation/
-│               ├── image_agent.py      # Custom Agent for diagram planning
-│               ├── mcp_client.py       # MCP Server communication
-│               └── markdown_inserter.py # Insert image refs into Markdown
-│
-│
-├── dev/                                # EXISTING — prototype packages (reference only)
+├── python_services/                    # Python packages and API
+│   ├── api.py                           # FastAPI application entry point
+│   │
 │   ├── packages/
-│   │   ├── ontology/                   # GraphDB prototype → adapt to handbook/db_connection/graph_db.py
-│   │   └── pdf_knowledge_extractor/    # PDF extraction → adapt to handbook/pipeline/evidence_ingestion/
-│   └── apps/
-│       ├── agent/writer_agent/         # Writer Agent prototype → adapt to handbook/pipeline/writer_agent/
-│       └── api/                        # Legacy pipeline reference (do not reuse directly)
+│   │   ├── agent/                       # Agent-based packages
+│   │   │   ├── news_agent/              # News processing agents
+│   │   │   └── writer_agent/            # Handbook page synthesis
+│   │   │       ├── test_evidence_db_connection.py
+│   │   │       └── test_graphdb_connection.py
+│   │   │
+│   │   ├── news_collector/              # News ingestion pipeline
+│   │   │   ├── (RSS, Twitter, YouTube, arxiv crawlers)
+│   │   │   └── pyproject.toml
+│   │   │
+│   │   ├── idea_to_graph_ontology/      # Concept extraction → GraphDB
+│   │   │   ├── src/                      # LangChain, RDFlib, SPARQLWrapper
+│   │   │   └── pyproject.toml
+│   │   │
+│   │   └── text_extract_ideas/          # PDF/HTML → evidence extraction
+│   │       ├── src/                      # PyMuPDF, pipeline logic
+│   │       ├── tests/                    # Package tests
+│   │       ├── run_chapters.py
+│   │       ├── run_pipeline.py
+│   │       └── requirements.txt
+│   │
+│   ├── requirements.txt                 # Core dependencies
+│   ├── pyproject.toml                   # Project metadata
+│   └── README.md
 │
-├── scripts/
-│   ├── setup_evidence_layer.sql        # Postgres schema migration
-│   ├── setup_graph_db.py               # GraphDB schema + sample concepts
-│   ├── setup_local.sh                  # Docker up + migrations + seed
-│   └── backup_databases.py             # GraphDB weekly export to S3
+├── scripts/                            # Standalone utility scripts
+│   ├── setup_evidence_layer.sql         # Postgres schema migration
+│   ├── setup_graph_db.py                # GraphDB initialization
+│   └── backup_db.py                     # Database backups
 │
-├── templates/                          # Community contribution templates
-│   ├── basics-template.md
-│   ├── advanced-template.md
-│   └── newly-discovered-template.md
+├── docker-compose.yml                   # Local development: Postgres, GraphDB, Redis
+├── pyproject.toml                       # Root Python project metadata
+├── package.json                         # Root TypeScript project metadata
+├── pnpm-workspace.yaml                  # PNPM workspace configuration
 │
-├── .github/
-│   ├── workflows/
-│   │   ├── ci.yml                      # PR: ruff, mypy, tsc, pytest, markdown-lint
-│   │   ├── deploy.yml                  # main push: Nest.js build → deploy to AWS/Oracle
-│   │   └── link-check.yml             # Weekly: validate all external URLs
-│   ├── ISSUE_TEMPLATE/
-│   │   ├── report-error.md
-│   │   └── submit-source.md
-│   └── pull_request_template.md
-│
-├── tests/                              # pytest test suite (Python)
-│   ├── unit/
-│   └── integration/
-│
-├── docker-compose.yml                  # Postgres 16 + pgvector + GraphDB
-├── package.json                        # pnpm workspace root
-├── pnpm-workspace.yaml                 # Declares apps/* and packages/*
-├── pyproject.toml                      # Python deps (Poetry) + Ruff + mypy config
-├── .env.example                        # Required env var template
-├── README.md
-├── CONTRIBUTING.md
-└── STYLE_GUIDE.md
+	└── docs/                               # Documentation
+    ├── PRD/                             # Product Requirements
+    └── architecture/                    # Architecture documents
 ```
 
+## Language Distribution
+
+| Component | Language | Primary Purpose |
+|-----------|----------|-----------------|
+| **Frontend UI** | TypeScript | Next.js web application |
+| **Web Backend** | TypeScript | NestJS API (main backend) |
+| **Python AI Service** | Python | FastAPI (AI/LLM operations only) |
+| **Celery Workers** | Python | Background task processing |
+| **AI/LLM** | Python | Concept extraction, Writer Agent |
+| **Data Pipeline** | Python | News ingestion, evidence processing |
+
+## Service Communication
+
+```
+Next.js (Frontend)
+    ↓ REST API
+NestJS (Web Backend)
+    ↓ HTTP (when AI needed)
+FastAPI (Python AI Service)
+    ↓ Celery protocol
+Celery Workers (Python)
+```
+
+## Key Points
+
+- **NestJS is the main backend** — handles most API routes and business logic
+- **FastAPI is a specialized AI service** — called only when AI/LLM operations are needed
+- **Tests** reside within each package directory (e.g., `packages/agent/writer_agent/test_*.py`)
+- **No `handbook/` folder** — Python code is in `python_services/`
+- **No `pipeline/` folder** — Pipeline code is in individual packages
+- **No `templates/` folder** — Templates are handled differently
+- **`python_services`** uses underscore, not hyphen
+
 ---
+
+_Last updated: 2026-04-07_

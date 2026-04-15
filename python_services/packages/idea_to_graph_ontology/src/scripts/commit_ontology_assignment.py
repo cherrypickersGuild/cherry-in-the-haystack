@@ -13,10 +13,10 @@ from typing import Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from storage.graph_query_engine import GraphQueryEngine
-from storage.vector_store import VectorStore
-from storage.new_concept_manager import NewConceptManager
-from pipeline.ontology_updater import OntologyUpdater
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
+from packages.ontology.src.storage.vector_store import VectorStore
+from packages.ontology.src.storage.new_concept_manager import NewConceptManager
+from packages.ontology.src.pipeline.ontology_updater import OntologyUpdater
 
 
 def normalize_concept_id(concept_id: str) -> str:

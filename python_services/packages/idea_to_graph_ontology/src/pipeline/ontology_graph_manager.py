@@ -2,8 +2,8 @@
 
 import networkx as nx
 from typing import Dict, List, Optional, Set, Tuple
-from storage.graph_query_engine import GraphQueryEngine
-from storage.vector_store import VectorStore
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
+from packages.ontology.src.storage.vector_store import VectorStore
 
 
 class OntologyGraphManager:

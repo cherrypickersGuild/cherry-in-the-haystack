@@ -1,0 +1,85 @@
+# Source Scoring Rules
+# Defines how candidates are scored before human review
+
+scoring:
+  # Maximum score: 5
+
+  components:
+    relevance:
+      weight: 2.0
+      max_points: 2
+      method: "llm_evaluation"
+      prompt_template: |
+        Rate the relevance of this source to the following topics on a scale of 0-2:
+        Topics: {topics}
+
+        Source Name: {source_name}
+        Source URL: {source_url}
+        Type: {source_type}
+        Sample Content: {sample_content}
+
+        Scoring guide:
+        2 = Directly focused on one or more topics
+        1 = Occasionally covers topics
+        0 = Rarely or never covers topics
+
+        Return only the number (0, 1, or 2).
+
+    consistency:
+      weight: 1.0
+      max_points: 1
+      method: "frequency_analysis"
+      rules:
+        - posts_per_month >= 8: 1.0
+        - posts_per_month >= 4: 0.7
+        - posts_per_month >= 1: 0.4
+        - posts_per_month < 1: 0.0
+
+    authority:
+      weight: 1.0
+      max_points: 1
+      method: "signal_accumulation"
+      signals:
+        domain_age_years:
+          - ">= 2": 0.3
+          - ">= 1": 0.15
+        has_about_page: 0.2
+        has_author_bios: 0.15
+        cited_by_known_sources: 0.35  # If referenced by existing sources
+
+    engagement:
+      weight: 1.0
+      max_points: 1
+      method: "relative_to_niche"
+      # Engagement is evaluated relative to the source type/niche
+      rules:
+        # For RSS/Blogs
+        rss_comments_per_post:
+          - ">= 10": 0.5
+          - ">= 5": 0.3
+        # For YouTube
+        youtube_engagement_rate:
+          - ">= 0.05": 0.5  # 5% like-to-view ratio
+          - ">= 0.02": 0.3
+        # For Twitter
+        twitter_engagement_rate:
+          - ">= 0.03": 0.5  # 3% engagement
+          - ">= 0.01": 0.3
+        # For Reddit
+        reddit_avg_upvotes:
+          - ">= 100": 0.5
+          - ">= 50": 0.3
+
+thresholds:
+  auto_approve: null  # Disabled - all require human review
+  auto_reject: 2.0    # Score < 2.0 filtered before staging
+  staging: 3.0        # Score >= 3.0 goes to staging queue
+  high_priority: 4.0  # Score >= 4.0 flagged for priority review
+
+# Deduplication rules
+deduplication:
+  check_existing_sources: true
+  check_staging_queue: true
+  url_normalization: true
+  fuzzy_name_matching: true
+  similarity_threshold: 0.85

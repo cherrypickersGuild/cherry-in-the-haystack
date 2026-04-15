@@ -69,7 +69,7 @@ OpenAI embedding cost is negligible. Claude concept extraction dominates.
 | Typical textbook | 500 | $1.65 | $0.004 |
 | Long book (~400 pages) | 2,000 | $6.60 | $0.016 |
 
-Initial handbook batch (10 books × 500 paragraphs avg):
+Initial batch (10 books × 500 paragraphs avg):
 ```
 10 × $1.65 = ~$16.50 one-time
 ```
@@ -94,9 +94,8 @@ Initial handbook batch (10 books × 500 paragraphs avg):
 ## Levers
 
 **Reduce cost:**
-- Increase dedup aggressiveness — more articles caught before Claude is called
+- Increase dedup aggressiveness — more articles caught before z.ai is called
 - Combine scoring + classification into one call — cuts per-article tokens by ~40% (currently 2 calls → 1 structured output call)
-- Use Gemini Flash as fallback (cheaper) or as primary for classification
 
 **Increase cost:**
 - More active sources in `data_sources`
@@ -109,9 +108,9 @@ Initial handbook batch (10 books × 500 paragraphs avg):
 
 | Job | LLM calls | When billed |
 | --- | --------- | ----------- |
-| `news-ingestion.ts` | 2× Claude per unique article (score + classify) | Daily, ongoing |
-| `notion-backup.ts` | None | — |
-| `weekly-publish.ts` | None | — |
-| Books evidence ingestion | 1× Claude per paragraph chunk | One-time batch |
-| Embeddings | 1× OpenAI per paragraph chunk | One-time batch |
+| `news_ingestion` Celery task | 2× z.ai per unique article (score + classify) | Daily, ongoing |
+| `notion_backup` Celery task | None | — |
+| `weekly_publish` Celery task | None | — |
+| Books evidence ingestion | 1× z.ai per paragraph chunk | One-time batch |
+| Embeddings | 1× sentence-transformers per paragraph chunk | One-time batch (local) |
 | Writer Agent (Epic 4) | TBD — synthesis per concept page | On-demand |

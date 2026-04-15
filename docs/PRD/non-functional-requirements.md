@@ -229,7 +229,7 @@ These quality attributes ensure Cherry delivers on its promise of being the **mo
 
 **NFR-A2: Responsive Design**
 
-- Mobile-friendly layout (Jupyter Book default)
+- Mobile-friendly layout 
 - Touch targets minimum 44x44 pixels
 - Text reflows without horizontal scrolling
 - Font size user-adjustable via browser settings
@@ -330,7 +330,6 @@ These quality attributes ensure Cherry delivers on its promise of being the **mo
 - Unit tests for core logic (deduplication, scoring algorithms)
 - Integration tests for pipeline stages
 - End-to-end smoke tests for full pipeline
-- Manual testing checklist for Jupyter Book deployments
 - Test data fixtures for reproducible testing
 
 ## Data Quality & Freshness

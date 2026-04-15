@@ -49,11 +49,6 @@ Stage 9: Newsletter Studio (Enterprise)
   - Email distribution
 ```
 
-**Key Technical Shifts:**
-
-- **From:** Static Jupyter Book → **To:** Full-stack web application with database, auth, real-time UI
-- **From:** GitHub Pages (static hosting) → **To:** Cloud-hosted SaaS platform
-- **From:** No user data → **To:** User accounts, preferences, drafts, reading history, custom content
 
 **Knowledge Infrastructure: Concept-Centric Graph Database**
 

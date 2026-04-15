@@ -1,0 +1,135 @@
+# Source Discovery Profile
+# Focused on Substack newsletter discovery
+# Topics aligned with PRD "Newly Discovered" section categories
+
+topics:
+  # === 1. Research & Models (연구·모델) ===
+  - name: "Model Releases & API Updates"
+    category: "Research & Models"
+    subcategory: "1a. Model Releases & API Updates"
+    keywords: ["AI models", "LLM releases", "GPT", "Claude", "LLaMA", "model benchmarks", "AI evaluation", "model architecture", "token limits", "inference speed", "API updates", "pricing changes"]
+    priority: high
+
+  - name: "Research & Papers"
+    category: "Research & Models"
+    subcategory: "1b. Research & Papers"
+    keywords: ["arxiv", "NeurIPS", "ICML", "ACL", "paperswithcode", "research breakthrough", "novel techniques", "conference papers", "spotlight sessions", "workshop topics", "academic research"]
+    priority: high
+
+  - name: "Benchmarks & Datasets"
+    category: "Research & Models"
+    subcategory: "1c. Benchmarks & Datasets"
+    keywords: ["MMLU", "HELM", "BIG-Bench", "AI datasets", "ML benchmarks", "training data", "evaluation benchmarks", "leaderboard", "annotation", "labeling", "evaluation tools"]
+    priority: high
+
+  # === 2. Engineering & Tooling (엔지니어링·툴링) ===
+  - name: "Frameworks & SDKs"
+    category: "Engineering & Tooling"
+    subcategory: "2a. Frameworks & SDKs"
+    keywords: ["AI frameworks", "LangChain", "LlamaIndex", "AI SDK", "AI development tools", "RAG", "Accelerate", "PEFT", "SDK releases", "ecosystem"]
+    priority: high
+
+  - name: "Developer Tools & Services"
+    category: "Engineering & Tooling"
+    subcategory: "2b. Developer Tools & Services"
+    keywords: ["AI developer tools", "AI productivity", "prompt engineering", "AI coding", "AI assistants", "developer tools", "monitoring", "debugging", "testing services"]
+    priority: high
+
+  - name: "Patterns & Implementations"
+    category: "Engineering & Tooling"
+    subcategory: "2c. Patterns & Implementations"
+    keywords: ["AI prompts", "prompt", "AI templates", "MCP", "Model Context Protocol", "AI agents", "agent", "AI workflows", "workflow", "AI orchestration", "code snippets", "reference implementations", "agent architectures"]
+    priority: medium
+
+  # === 3. Industry & Business (산업·비즈니스) ⭐ Priority ===
+  - name: "Case Studies & Implementations"
+    category: "Industry & Business"
+    subcategory: "3a. Case Studies & Implementations"
+    keywords: ["AI case study", "AI implementation", "AI ROI", "AI adoption", "enterprise AI", "AI business", "production deployment", "architecture details", "productivity research"]
+    priority: high
+
+  # === 4. Discourse (담론) ===
+  - name: "Regulation & Governance"
+    category: "Discourse"
+    subcategory: "4a. Regulation & Governance"
+    keywords: ["AI regulation", "AI policy", "AI governance", "EU AI Act", "AI safety", "AI alignment", "FTC guidelines", "ISO/IEC", "audit reports", "risk assessment", "compliance"]
+    priority: high
+
+  - name: "Community"
+    category: "Discourse"
+    subcategory: "4b. Community"
+    keywords: ["AI community", "AI conference", "meetup", "open source community", "AI contributor", "community initiative", "best practices", "lessons learned"]
+    priority: medium
+
+  - name: "Insights & Opinions"
+    category: "Discourse"
+    subcategory: "4c. Insights & Opinions"
+    keywords: ["big tech", "OpenAI", "Anthropic", "Google AI", "Meta AI", "strategic direction", "platform bets", "open source strategy", "thought leadership", "emerging patterns", "AI trends", "predictions", "opinion"]
+    priority: medium
+
+  - name: "Technical Deep Dives"
+    category: "Discourse"
+    subcategory: "4d. Technical Deep Dives"
+    keywords: ["technical deep dive", "system design", "architecture breakdown", "performance analysis", "optimization study", "comparative evaluation", "benchmarking deep dive", "long-form technical"]
+    priority: medium
+
+# Only Substack is enabled for now
+source_types:
+  SUBSTACK:
+    enabled: true
+    discovery_method: "substack_search"
+    min_subscribers: 100
+    max_subscribers: 500000
+    min_frequency: "monthly"
+    require_newsletter: true
+    validation:
+      - "has substack domain"
+      - "has RSS feed"
+      - "recent posts exist"
+    rss_feed_pattern: "https://{author}.substack.com/feed"
+
+  RSS:
+    enabled: false
+
+  YOUTUBE:
+    enabled: false
+
+  TWITTER:
+    enabled: false
+
+  REDDIT:
+    enabled: false
+
+  BLOG:
+    enabled: false
+
+# Substack-specific discovery settings
+substack:
+  search_url: "https://substack.com/search"
+  use_substack_api: false  # Use web scraping for now
+  rate_limit_per_hour: 10
+  max_results_per_search: 20
+
+# Exclusions
+exclusions:
+  domains:
+    - "*.medium.com"  # Medium posts
+    - "substack.com/@*"  # Profile pages, not newsletters
+
+  patterns:
+    - "*-news.substack.com"  # Generic news aggregators
+
+# Search configuration
+search_sources:
+  web_search: true  # Search for "topic + substack"
+  substack_direct: true  # Direct Substack search
+
+# Notion database IDs
+notion:
+  candidates_database_id: "33bf199e-df7c-8144-ad6c-000bbc2e9ecd"
+  sources_database_id: "1a2f199e-df7c-813d-8853-000b81df6c4b"
+
+# Rate limiting
+rate_limits:
+  web_search_per_hour: 20
+  substack_requests_per_hour: 10

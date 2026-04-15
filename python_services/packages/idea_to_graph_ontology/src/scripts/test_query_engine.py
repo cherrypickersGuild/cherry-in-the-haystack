@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from storage.graph_query_engine import GraphQueryEngine, NodeFilter
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine, NodeFilter
 
 
 def test_get_related_nodes(engine: GraphQueryEngine):

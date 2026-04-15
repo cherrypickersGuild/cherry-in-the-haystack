@@ -13,7 +13,7 @@ This workflow will:
 
 **Subsequent Steps:**
 
-2. **UX Design** (if needed for custom Jupyter Book styling)
+2. **UX Design** 
    - Run: `/bmad:bmm:workflows:create-ux-design`
    - Focus on card layouts, collapsible sections, branding
 

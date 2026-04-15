@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from storage.graph_query_engine import GraphQueryEngine
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
 
 
 def list_backups(project_root: Path) -> list:

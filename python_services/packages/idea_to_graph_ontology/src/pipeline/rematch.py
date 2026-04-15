@@ -5,10 +5,10 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
-from storage.graph_query_engine import GraphQueryEngine
-from storage.vector_store import VectorStore
-from pipeline.concept_matcher import ConceptMatcher
-from pipeline.ontology_graph_manager import OntologyGraphManager
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
+from packages.ontology.src.storage.vector_store import VectorStore
+from packages.ontology.src.pipeline.concept_matcher import ConceptMatcher
+from packages.ontology.src.pipeline.ontology_graph_manager import OntologyGraphManager
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from pydantic import BaseModel, Field

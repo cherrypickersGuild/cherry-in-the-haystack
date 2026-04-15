@@ -8,10 +8,10 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from utils import load_all_concepts, update_ttl_descriptions
-from storage.vector_store import VectorStore
-from storage.graph_query_engine import GraphQueryEngine
-from pipeline.ontology_updater import OntologyUpdater
+from packages.ontology.src.utils import load_all_concepts, update_ttl_descriptions
+from packages.ontology.src.storage.vector_store import VectorStore
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
+from packages.ontology.src.pipeline.ontology_updater import OntologyUpdater
 from langchain_openai import ChatOpenAI
 
 

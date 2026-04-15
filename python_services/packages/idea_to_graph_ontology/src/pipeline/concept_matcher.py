@@ -4,7 +4,7 @@ from typing import Dict, List, Any, Optional
 
 from pydantic import BaseModel, Field
 
-from storage.vector_store import VectorStore
+from packages.ontology.src.storage.vector_store import VectorStore
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 import os

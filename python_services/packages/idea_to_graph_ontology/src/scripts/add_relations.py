@@ -21,7 +21,7 @@ from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from storage.graph_query_engine import GraphQueryEngine
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
 
 
 LLM_PREFIX = "http://example.org/llm-ontology#"

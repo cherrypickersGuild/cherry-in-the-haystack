@@ -8,10 +8,10 @@ from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
-from storage.graph_query_engine import GraphQueryEngine
-from storage.vector_store import VectorStore
-from pipeline.ontology_graph_manager import OntologyGraphManager
-from pipeline.staging_manager import StagingManager
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
+from packages.ontology.src.storage.vector_store import VectorStore
+from packages.ontology.src.pipeline.ontology_graph_manager import OntologyGraphManager
+from packages.ontology.src.pipeline.staging_manager import StagingManager
 
 
 class ParentCandidate(BaseModel):

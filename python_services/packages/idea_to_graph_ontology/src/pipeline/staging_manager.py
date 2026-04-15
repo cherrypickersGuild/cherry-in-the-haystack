@@ -5,9 +5,9 @@ import os
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional
-from pipeline.ontology_graph_manager import OntologyGraphManager
-from storage.graph_query_engine import GraphQueryEngine
-from storage.vector_store import VectorStore
+from packages.ontology.src.pipeline.ontology_graph_manager import OntologyGraphManager
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
+from packages.ontology.src.storage.vector_store import VectorStore
 
 
 class StagingManager:

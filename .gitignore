@@ -30,6 +30,9 @@ build/
 *.log
 logs/
 
+# Discovery checkpoints
+.discovery_checkpoint.json
+
 # env
 .env
 

@@ -14,16 +14,16 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 if sys.stdout.isatty() is False:
     sys.stdout.reconfigure(line_buffering=True)
 
-from storage.graph_query_engine import GraphQueryEngine
-from storage.vector_store import VectorStore
-from storage.new_concept_manager import NewConceptManager
-from pipeline.concept_matcher import ConceptMatcher
-from pipeline.ontology_updater import OntologyUpdater
-from pipeline.document_ontology_mapper import DocumentOntologyMapper
-from pipeline.ontology_graph_manager import OntologyGraphManager
-from pipeline.staging_manager import StagingManager
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
+from packages.ontology.src.storage.vector_store import VectorStore
+from packages.ontology.src.storage.new_concept_manager import NewConceptManager
+from packages.ontology.src.pipeline.concept_matcher import ConceptMatcher
+from packages.ontology.src.pipeline.ontology_updater import OntologyUpdater
+from packages.ontology.src.pipeline.document_ontology_mapper import DocumentOntologyMapper
+from packages.ontology.src.pipeline.ontology_graph_manager import OntologyGraphManager
+from packages.ontology.src.pipeline.staging_manager import StagingManager
 
-from pipeline.rematch import rematch_all
+from packages.ontology.src.pipeline.rematch import rematch_all
 
 
 def load_jsonl(file_path: str) -> List[Dict[str, Any]]:

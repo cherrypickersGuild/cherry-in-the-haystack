@@ -11,11 +11,11 @@ from langgraph.graph import StateGraph, END
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
-from storage.graph_query_engine import GraphQueryEngine
-from storage.vector_store import VectorStore
-from storage.new_concept_manager import NewConceptManager
-from pipeline.concept_matcher import ConceptMatcher
-from pipeline.ontology_updater import OntologyUpdater
+from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
+from packages.ontology.src.storage.vector_store import VectorStore
+from packages.ontology.src.storage.new_concept_manager import NewConceptManager
+from packages.ontology.src.pipeline.concept_matcher import ConceptMatcher
+from packages.ontology.src.pipeline.ontology_updater import OntologyUpdater
 
 
 class KoreanDescriptionResult(BaseModel):

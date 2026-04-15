@@ -91,7 +91,7 @@ Curated Text Sources → Evidence Layer Storage → Ontology Building → Writer
 
 Tracks foundational research, model releases, and evaluation resources.
 
-**1a. Model Updates**
+**1a. Model Releases & API Updates**
 
 - New model releases and architectures (GPT-4.5, LLaMA3, Claude 4, etc.)
 - Performance improvements and benchmarking results
@@ -99,26 +99,28 @@ Tracks foundational research, model releases, and evaluation resources.
 - API updates: features, pricing, endpoints (function calling, embeddings)
 - Protocol/auth changes (one-liner + external link)
 
-**1b. Datasets / Papers / Benchmarks** (Curated links - not direct implementation)
+**1b. Research & Papers** (External service connections — link out, don't directly curate)
 
-- **Datasets:**
-  - New public datasets (web crawling, domain-specific): name, scale, license
-  - Dataset updates (e.g., latest Wikipedia dumps)
-  - High-quality annotation/labeling service launches
-- **Benchmarks:**
-  - BIG-Bench, HELM, MMLU, and other benchmark latest results
-  - Paper-based leaderboards (paperswithcode.com) major ranking changes
-  - Open-source evaluation tools updates (Guardrails, LM-eval-harness)
-- **Papers:** (External service connections - link out, don't directly curate)
-  - NeurIPS, ICML, ACL, and other major conference papers
-  - Spotlight sessions, workshop topics, presentation materials
-  - Tutorial and panel discussion trends
+- NeurIPS, ICML, ACL, and other major conference papers
+- Research breakthroughs and novel techniques from academia
+- Spotlight sessions, workshop topics, presentation materials
+- Tutorial and panel discussion trends
+- Academic-industry collaboration results
 
-**2. Service & System Building (서비스·시스템 구축)**
+**1c. Benchmarks & Datasets** (Curated links — not direct implementation)
 
-Tools and resources for building AI applications and systems.
+- BIG-Bench, HELM, MMLU, and other benchmark latest results
+- Paper-based leaderboards (paperswithcode.com) major ranking changes
+- Open-source evaluation tools updates (Guardrails, LM-eval-harness)
+- New public datasets (web crawling, domain-specific): name, scale, license
+- Dataset updates (e.g., latest Wikipedia dumps)
+- High-quality annotation/labeling service launches
 
-**2a. Frameworks** (AI Development Programs)
+**2. Engineering & Tooling (엔지니어링·툴링)**
+
+Tools, frameworks, and patterns for building and shipping AI applications.
+
+**2a. Frameworks & SDKs** (AI Development Programs)
 
 - Development frameworks, SDKs, APIs
 - Ecosystem landscape map (4-6 key tools, digest format)
@@ -127,40 +129,40 @@ Tools and resources for building AI applications and systems.
 - Stable/Beta releases and deprecation notices
 - Major dependency updates (Accelerate, PEFT, etc.)
 
-**2b. Tools** (Programs that make AI developers' lives easier)
+**2b. Developer Tools & Services** (Programs that make AI developers' lives easier)
 
 - Newly emerged developer tools
 - Productivity enhancements for AI engineering
-- "Our Mini Product Hunt" - curated tool directory
+- Monitoring, debugging, and testing services
+- "Our Mini Product Hunt" — curated tool directory
 - **Hall of Fame:** Proven tools that enhance AI development
 
-**2c. Shared Resources** (Community contributions)
+**2c. Patterns & Implementations** (Community contributions)
 
 - Shared prompts, templates, and prompt engineering patterns
-- Code snippets and implementations
+- Code snippets and reference implementations
 - Workflows and orchestration patterns
 - MCP (Model Context Protocol) implementations
 - Agent configurations and architectures
 
-**3. Industry & Business Applications (산업·비즈니스 적용)** ⭐ (Priority)
+**3. Industry & Business (산업·비즈니스)** ⭐ (Priority)
 
-Real-world implementations and business value.
+Real-world applications and market landscape.
 
-**3a. Case Studies**
+**3a. Case Studies & Implementations**
 
 - Domain-specific use cases with architecture details
-- Company product launches (chatbots, document automation, etc.)
 - Conference presentations (e.g., Baemin's text-to-SQL implementation)
+- Company product launches (chatbots, document automation, etc.)
 - ROI analysis and adoption strategies
 - Success and failure stories with lessons learned
-- VC funding & M&A trends in LLM space
 - Productivity research results (3-line summary + references)
 
-**4. Ecosystem, Governance, Knowledge Dissemination (생태계, 거버넌스, 지식 확산)**
+**4. Discourse (담론)**
 
-AI community, policy, regulation, and thought leadership.
+AI governance, community, and thought leadership.
 
-**4a. Regulations + Technical Reports** (Policy, regulation, and governance)
+**4a. Regulation & Governance** (Policy, regulation, and compliance)
 
 - EU AI Act, US FTC guidelines, domestic privacy law amendments
 - Industry-specific AI regulations (healthcare, finance, etc.)
@@ -168,18 +170,26 @@ AI community, policy, regulation, and thought leadership.
 - Standardization organization (ISO/IEC) publications
 - Major court cases and legal precedents
 
-**4b. Big Tech Trends**
+**4b. Community** (People, events, and shared resources)
 
-- Major announcements from tech companies
-- Strategic shifts and industry positioning
-- Partnership and collaboration news
-
-**4c. This Week's Posts** (AI development insights)
-
-- Insightful articles on AI development practices
-- Technical deep dives and architectural discussions
 - Community best practices and lessons learned
+- Conference and meetup highlights
+- Open-source community milestones
+- Contributor spotlights and community initiatives
+
+**4c. Insights & Opinions** (Big Tech direction & thought leadership)
+
+- Major tech company strategic moves and direction (beyond model releases — org changes, pivots, platform bets, open-source strategy)
+- Thought leadership and opinion pieces shaping the field
 - Emerging patterns and trends in AI engineering
+- Predictions and forward-looking analysis
+
+**4d. Technical Deep Dives** (In-depth engineering analysis)
+
+- Long-form technical articles on AI development practices
+- Architectural discussions and system design breakdowns
+- Performance analysis and optimization studies
+- Comparative evaluations and benchmarking deep dives
 
 **Content Pipeline:**
 
@@ -227,9 +237,9 @@ Content Ingestion Pipeline → Deduplication → AI Agent Scoring (1-5) → Know
   - User authentication & authorization (email/password, OAuth)
   - User database (accounts, preferences, reading history)
   - RESTful API for content delivery
-  - Cloud-hosted application (replaces GitHub Pages)
+  - Cloud-hosted application 
 - **🆕 Frontend Web Application:**
-  - Dynamic, responsive web app (replaces static Jupyter Book)
+  - Dynamic, responsive web app 
   - User dashboards (personalized vs unpersonalized views)
   - Content browsing and navigation
   - Search functionality
@@ -243,7 +253,7 @@ Content Ingestion Pipeline → Deduplication → AI Agent Scoring (1-5) → Know
   - Topics extracted from Curated Books and Lectures
   - All pages use new four-section format
 - **Newly Discovered:**
-  - All 4 main categories established with initial content (Research & Models, Service & System Building, Industry & Business Applications, Ecosystem/Governance)
+  - All 4 main categories established with initial content (Research & Models, Engineering & Tooling, Industry & Business, Discourse)
   - Minimum 10 entries per category from first month of curation
 
 **User Tiers (MVP Launch):**

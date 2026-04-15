@@ -7,18 +7,15 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-1.1: Multi-Source Content Collection**
 
 - **Description:** Automatically aggregate LLM-related content from diverse sources (Twitter, Discord, GitHub, papers, blogs, RSS feeds)
-- **User Value:** Users get comprehensive coverage without manually monitoring dozens of channels
 - **Acceptance Criteria:**
   - Content Ingestion Pipeline pulls from at least 10 configured sources
   - New content discovered within 24 hours of publication
   - Source metadata preserved (URL, date, author, platform)
   - Configurable source priorities and categories
-- **Magic Thread:** 🌟 This is the foundation - comprehensive coverage enables the "wow" moment of discovering everything in one place
 
 **FR-1.2: Intelligent Deduplication**
 
 - **Description:** Identify and filter duplicate or redundant content before processing
-- **User Value:** Users see unique insights, not the same news repeated 10 times
 - **Acceptance Criteria:**
   - Content-level deduplication before scoring (exact matches, near-duplicates)
   - Chunk-level deduplication for Basics/Advanced synthesis (paragraph similarity)
@@ -31,18 +28,15 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-2.1: AI-Powered Content Scoring**
 
 - **Description:** Automatically evaluate content relevance and quality on 1-5 scale
-- **User Value:** Only high-quality, relevant content reaches users - the 80% noise is filtered out
 - **Acceptance Criteria:**
   - AI agent scores content based on defined criteria (relevance, depth, novelty, practicality)
   - Score 5 = top-tier content worthy of inclusion
   - Scoring completes within 5 minutes of ingestion
   - Pattern-based learning improves scoring accuracy over time
-- **Magic Thread:** 🌟 This delivers the "speed" promise - users trust the curation quality
 
 **FR-2.2: Knowledge Team Review Workflow**
 
 - **Description:** Structured weekly review and approval process managed by Knowledge Team in Notion
-- **User Value:** Community wisdom and domain expertise ensures quality, not just AI judgment
 - **Acceptance Criteria:**
   - Score-5 items auto-assigned to Knowledge Team members in Notion
   - Team members can validate summaries, adjust scores, and request edits
@@ -55,7 +49,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-2.3: Content Value Assessment**
 
 - **Description:** AI identifies unique, value-adding information vs repetitive noise
-- **User Value:** Users encounter fresh insights, not rehashed content
 - **Acceptance Criteria:**
   - Chunk-level (paragraph) analysis for novelty
   - Comparison against vector database of existing content
@@ -67,7 +60,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-3.1: Graph Database Two-Layer Architecture**
 
 - **Description:** Concept-centric knowledge system with stable ontology and dynamic evidence
-- **User Value:** Structured knowledge enables intelligent synthesis, relationship discovery, and evidence traceability
 - **Acceptance Criteria:**
 
   **Concept Layer (Stable):**
@@ -94,12 +86,9 @@ Organized by user-facing capabilities, each requirement connects to the core pro
   - Coexists with Vector DB (used only for deduplication)
   - Graph view shows concepts only (no evidence nodes cluttering visualization)
 
-- **Magic Thread:** 🌟 The concept-centric graph makes knowledge reusable and evidence traceable
-
 **FR-3.2: Ontology Extraction & Concept Discovery**
 
 - **Description:** Monthly extraction of new concept noun phrases from evidence layer
-- **User Value:** Cherry stays current with emerging LLM concepts and techniques
 - **Acceptance Criteria:**
   - Monthly batch job (2nd Saturday) extracts new concept candidates from evidence layer
   - Word count and frequency metrics filter noise vs meaningful concepts
@@ -111,7 +100,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-3.3: Evidence Collection & Study Sessions**
 
 - **Description:** Knowledge Team study sessions populate Evidence Layer with curated texts
-- **User Value:** High-quality source materials ensure accuracy and depth
 - **Acceptance Criteria:**
   - Wednesday study sessions review texts (books, papers, documentation)
   - Reviewed texts stored in Evidence Layer with metadata (source, date, topic, quality)
@@ -124,19 +112,16 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-4.1: MECE Knowledge Organization**
 
 - **Description:** Structure content into Mutually Exclusive, Collectively Exhaustive taxonomy
-- **User Value:** Users can navigate logically without gaps or overlaps - delivers the "clarity" promise
 - **Acceptance Criteria:**
   - 3 main sections: Basics, Advanced, Newly Discovered
   - 2-level hierarchy: parent concepts → child implementations
   - No concept should fit in multiple categories
   - All LLM engineering topics covered (95% coverage target)
   - Taxonomy evolves based on emerging topics
-- **Magic Thread:** 🌟 This is the "orientation in chaos" - the structured map that makes users say "now I understand"
 
 **FR-4.2: Writer Agent for Page Generation**
 
 - **Description:** AI agent generates Basics/Advanced pages from knowledge graph using structured schemas
-- **User Value:** Users get distilled, well-structured knowledge from multiple evidence sources with full traceability
 - **Acceptance Criteria:**
   - **Input:** Concept node from Ontology Layer (triggered monthly after concept review)
   - **Step 1:** Query CONCEPT schema from Graph DB
@@ -160,12 +145,10 @@ Organized by user-facing capabilities, each requirement connects to the core pro
   - Page generation completes within 10 minutes per concept
   - Output: Markdown file conforming to Concept Page Structure
 - **Domain Constraint:** EdTech quality standards - must be accurate and pedagogically sound
-- **Magic Thread:** 🌟 Writer agent transforms fragmented evidence into coherent, traceable knowledge
 
 **FR-4.3: Concept Promotion Flow (Advanced → Basics)**
 
 - **Description:** Promote concepts from Advanced to Basics based on sustained importance
-- **User Value:** Basics section reflects truly foundational concepts, not just trendy topics
 - **Acceptance Criteria:**
   - New concepts default to Advanced section
   - Metric-based evaluation tracks concept importance over time (mentions, usage, stability)
@@ -176,7 +159,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-4.4: Evolving Taxonomy Management**
 
 - **Description:** Continuously update content categories as LLM field evolves
-- **User Value:** Cherry stays current with emerging topics and techniques
 - **Acceptance Criteria:**
   - New categories can be added without restructuring
   - Content can be reassigned when taxonomy changes
@@ -188,17 +170,14 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-5.1: Automated Publication Pipeline**
 
 - **Description:** Approved content automatically flows from Notion → Public site
-- **User Value:** Fresh content reaches users within hours, not days - delivers the "speed" promise
 - **Acceptance Criteria:**
   - Weekly batch: Notion → Cherry app update (markdown files)
   - Zero-downtime deployments
   - Rollback capability for broken builds
-- **Magic Thread:** 🌟 Weekly updates keep Cherry feeling "alive"
 
 **FR-5.2: Structured Content Display**
 
 - **Description:** Cherry renders content with professional layout and navigation
-- **User Value:** Users can read, navigate, and search efficiently
 - **Acceptance Criteria:**
   - 3-section navigation (Basics, Advanced, Newly Discovered)
   - 2-level TOC with parent-child hierarchy
@@ -213,9 +192,8 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-6.1: URL Submission for Sources**
 
 - **Description:** Community submits URLs for Content Ingestion Pipeline to monitor
-- **User Value:** Crowdsourced source discovery expands coverage
 - **Acceptance Criteria:**
-  - Simple form/interface for URL submission
+  - Form/interface for URL submission
   - Validation: URL format, domain reachability
   - Queue for maintainer review
   - Approved URLs added to Content Ingestion Pipeline source list
@@ -226,7 +204,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-7.1: Content Source Configuration**
 
 - **Description:** Manage which sources Content Ingestion Pipeline monitors for "Newly Discovered"
-- **User Value:** Focused on LLM-specific sources, not generic tech news
 - **Acceptance Criteria:**
   - Configuration file lists: source URL, category mapping, polling frequency
   - Sources include: Twitter accounts, Discord channels, GitHub orgs, RSS feeds, blogs
@@ -236,7 +213,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-7.2: Curated Text Management for Basics/Advanced**
 
 - **Description:** Manage library of curated sources (books, papers, canonical posts)
-- **User Value:** Authoritative, high-quality foundation content
 - **Acceptance Criteria:**
   - Document registry: source metadata (title, author, URL, PDF, publication date)
   - Extraction pipeline: PDF → text, web → markdown
@@ -248,10 +224,9 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-8.1: Content Correction & Updates**
 
 - **Description:** Fix errors, update outdated information, improve clarity
-- **User Value:** Cherry remains accurate and trustworthy over time
 - **Acceptance Criteria:**
   - Error reporting mechanism (GitHub issues)
-  - Fast-track corrections for critical errors
+  - Critical corrections deployed within 4 hours of discovery
   - "Last updated" dates show freshness
   - Changelog for major page updates
   - Deprecated content marked clearly with alternatives
@@ -261,7 +236,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-9.1: Vector Storage for Deduplication**
 
 - **Description:** Store embeddings of all unique content chunks
-- **User Value:** Enables intelligent deduplication and similarity detection
 - **Acceptance Criteria:**
   - Embeddings generated for all approved content
   - Vector database indexes: source, category, date, topic
@@ -273,7 +247,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-10.1: User Registration & Login**
 
 - **Description:** Secure user account creation and authentication system
-- **User Value:** Access to personalized features and tier-based capabilities
 - **Acceptance Criteria:**
   - Email/password registration with email verification
   - OAuth login (Google, GitHub)
@@ -285,7 +258,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-10.2: User Tier Management**
 
 - **Description:** Support Free, Paid, and Enterprise tiers with appropriate feature access
-- **User Value:** Clear value differentiation and upgrade paths
 - **Acceptance Criteria:**
   - Free tier: Access to all community content (no account required for read-only)
   - Paid tier: Personalization, custom sources, adaptive KB
@@ -297,7 +269,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-10.3: User Profile Management**
 
 - **Description:** Users can manage their account settings and preferences
-- **User Value:** Control over personal information and experience
 - **Acceptance Criteria:**
   - Profile page: name, email, tier, join date
   - Preference management (separate from personalization settings)
@@ -310,7 +281,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-11.1: Custom Source Management**
 
 - **Description:** Users can add private sources beyond community-curated content
-- **User Value:** "My feed includes sources unique to my work and interests"
 - **Acceptance Criteria:**
   - Add/remove custom source URLs (RSS, Twitter, blogs, etc.)
   - Toggle which community sources to follow
@@ -318,12 +288,10 @@ Organized by user-facing capabilities, each requirement connects to the core pro
   - Content Ingestion Pipeline ingests user's custom sources
   - Content from custom sources only visible to that user
   - Source management UI with active/inactive status
-- **Magic Thread:** 🌟 Custom sources enable truly personalized intelligence
 
 **FR-11.2: Natural Language Scoring Criteria (Paid Tier)**
 
 - **Description:** Users define scoring preferences in natural language, AI interprets into weights
-- **User Value:** "I care more about business cases than theory, and Cherry knows that"
 - **Acceptance Criteria:**
   - Input field for natural language criteria (e.g., "I care more about business cases than model updates")
   - AI parses criteria and generates scoring weights
@@ -331,12 +299,10 @@ Organized by user-facing capabilities, each requirement connects to the core pro
   - User can refine and iterate
   - Scoring applies to feed ranking and content prioritization
   - Default community scoring for users who don't customize
-- **Magic Thread:** 🌟 Natural language configuration makes personalization accessible
 
 **FR-11.3: Content Filtering & Feed Personalization (Paid Tier)**
 
 - **Description:** Paid users personalize "Newly Discovered" through two complementary controls: (1) entity-level follows from the registry and (2) category-level filtering. Together these determine which articles surface and in what order.
-- **User Value:** "My Newly Discovered only shows the models and frameworks I care about, ranked by what matters to me"
 - **Acceptance Criteria:**
   - **Entity Follow (Registry-level):**
     - Follow or unfollow specific tracked entities (models, frameworks, tools, benchmarks, etc.) from the registry
@@ -358,7 +324,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-11.4: Adaptive Content Scoring**
 
 - **Description:** Apply user's custom scoring criteria to content ranking
-- **User Value:** "Content scored exactly how I want - practicality over theory"
 - **Acceptance Criteria:**
   - User-defined scoring weights applied to all content
   - Re-ranking of "Newly Discovered" feed based on user criteria
@@ -370,7 +335,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-12.1: User-Controlled Topic Addition**
 
 - **Description:** Paid users can add custom topics with reference articles
-- **User Value:** "I added my company's internal RAG approach, and Cherry created a page for it"
 - **Acceptance Criteria:**
   - UI for adding new topics (not in community KB)
   - Upload or link reference articles/evidence
@@ -382,7 +346,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-12.2: Writer Agent Regeneration for Custom Topics**
 
 - **Description:** Users command Writer Agent to generate pages for their custom topics
-- **User Value:** "My knowledge base adapts to my context on-demand"
 - **Acceptance Criteria:**
   - User clicks "Generate Page" for custom topic
   - Writer Agent loads user's custom evidence
@@ -390,12 +353,10 @@ Organized by user-facing capabilities, each requirement connects to the core pro
   - Page saved in user's personal knowledge base
   - Regeneration takes under 10 minutes
   - User can iterate: add more evidence → regenerate
-- **Magic Thread:** 🌟 Adaptive knowledge base rewrites itself based on user's needs
 
 **FR-12.3: User Knowledge Base Management**
 
 - **Description:** Manage custom topics and personal knowledge base
-- **User Value:** "Control what's in my personalized knowledge base"
 - **Acceptance Criteria:**
   - View all custom topics (list view)
   - Edit/delete custom topics
@@ -409,7 +370,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-13.1: Multi-Language UI**
 
 - **Description:** Platform interface available in multiple languages for global accessibility
-- **User Value:** "I can use Cherry in my native language, making it more accessible and comfortable"
 - **Acceptance Criteria:**
   - **Initial Languages:** English (primary), Korean
   - Language selector in user settings and header
@@ -417,13 +377,12 @@ Organized by user-facing capabilities, each requirement connects to the core pro
   - User language preference saved (logged-in users)
   - Browser language detection for non-logged-in users (fallback to English)
   - RTL (Right-to-Left) layout support for future languages (Arabic, Hebrew)
-  - Translation files: JSON-based i18n format (e.g., i18next)
+  - Translation files: JSON-based i18n format
   - Easy addition of new languages (modular translation files)
 
 **FR-13.2: Content Language Handling**
 
 - **Description:** Clear distinction between UI language and content language
-- **User Value:** "I can use the interface in Korean while reading English content"
 - **Acceptance Criteria:**
   - **MVP:** Content remains in original language (community-curated in English by default)
   - Language indicator on content pages (e.g., "Content in English")
@@ -434,9 +393,8 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-13.3: Internationalization Infrastructure**
 
 - **Description:** Technical foundation for multi-language support
-- **User Value:** Scalable i18n system that supports adding new languages easily
 - **Acceptance Criteria:**
-  - i18n library integrated (e.g., i18next, react-intl, vue-i18n)
+  - i18n library integrated with standard JSON-based format support
   - Pluralization rules for different languages
   - Date/time formatting per locale (e.g., MM/DD/YYYY vs DD/MM/YYYY)
   - Number formatting per locale (e.g., 1,000.50 vs 1.000,50)
@@ -449,7 +407,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-14.1: Newsletter Agent Configuration**
 
 - **Description:** Enterprise users configure newsletter generation agent with custom parameters
-- **User Value:** "Our newsletter always matches our brand voice and target audience"
 - **Acceptance Criteria:**
   - **Prompt Configuration Panel:**
     - Tone selection: Professional, Casual, Technical, Friendly, etc.
@@ -463,7 +420,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-14.2: Content Selection Interface**
 
 - **Description:** Select evidence and sources for newsletter generation
-- **User Value:** "I pick the best stories from 100 sources, agent writes the newsletter"
 - **Acceptance Criteria:**
   - **"Highly Rated News for This Week" View:**
     - Show community-curated content (score 5)
@@ -481,7 +437,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-14.3: Newsletter Draft Generation**
 
 - **Description:** One-click newsletter generation from configuration + selected evidence
-- **User Value:** "15 minutes from curation to polished draft"
 - **Acceptance Criteria:**
   - **One-Click Generation:**
     - Click "Generate Draft" button
@@ -502,7 +457,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-14.4: Version History & A/B Testing**
 
 - **Description:** Track draft versions for iterative refinement and A/B testing
-- **User Value:** "Test different angles and see what resonates"
 - **Acceptance Criteria:**
   - Automatic versioning on each regeneration or manual save
   - Version history panel showing all previous drafts
@@ -514,7 +468,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-14.5: Email Distribution**
 
 - **Description:** Send finished newsletters to email lists
-- **User Value:** "From curation to inbox in one workflow"
 - **Acceptance Criteria:**
   - Email list management (import, add, remove subscribers)
   - Send preview to test emails
@@ -527,7 +480,6 @@ Organized by user-facing capabilities, each requirement connects to the core pro
 **FR-14.6: Team Collaboration (Growth Phase)**
 
 - **Description:** Multi-user editing and approval workflows for Enterprise teams
-- **User Value:** "Writers draft, editors refine, managers approve - all in one place"
 - **Acceptance Criteria:**
   - Role-based access: Writer, Editor, Approver
   - Comment threads on drafts
