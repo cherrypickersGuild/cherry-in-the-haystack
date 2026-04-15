@@ -214,14 +214,18 @@ function ConceptCard({
   onSelect,
   compareStatus,
   owned,
+  onSale,
 }: {
   concept: Concept
   isSelected: boolean
   onSelect: () => void
   compareStatus: CompareStatus | null
   owned?: boolean
+  onSale?: boolean
 }) {
   const badge = getBadge(concept.category)
+  // 세일 카드는 우상단 모서리만 기본 rounded-xl(12px)의 절반인 6px로 — SALE 탭이 시각적으로 더 날카롭게 눈에 띔
+  const saleCornerRadius = 6
   return (
     <button
       onClick={onSelect}
@@ -232,16 +236,33 @@ function ConceptCard({
           ? "border-[var(--cherry)] shadow-sm ring-1 ring-[var(--cherry)]/20"
           : "border-[#E4E1EE] hover:border-[#C7B8E8]"
       )}
+      style={onSale ? { borderTopRightRadius: saleCornerRadius } : undefined}
     >
-      {/* Owned badge (ownership-based, always visible) or Compare status badge */}
+      {/* SALE 코너 탭 — 카드 우상단 모서리에 딱 붙음. 카드의 우상단을 6px로 줄였으므로 탭도 같은 값으로 매칭 */}
+      {onSale && (
+        <span
+          className="absolute top-0 right-0 text-[9px] font-extrabold uppercase bg-[#C94B6E] text-white z-[2]"
+          style={{
+            padding: "3px 9px",
+            borderTopRightRadius: saleCornerRadius,
+            borderBottomLeftRadius: saleCornerRadius,
+            letterSpacing: "0.1em",
+          }}
+          title="On sale"
+        >
+          SALE
+        </span>
+      )}
+
+      {/* 지식 비교 / 소유 뱃지 — 우하단 */}
       {owned ? (
-        <span className="absolute top-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide flex items-center gap-1 bg-[#EFF7F3] text-[#2D7A5E] border border-[#A8D4C0]">
+        <span className="absolute bottom-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide flex items-center gap-1 bg-[#EFF7F3] text-[#2D7A5E] border border-[#A8D4C0] z-[2]">
           ✓ Owned
         </span>
-      ) : compareStatus && (
+      ) : compareStatus ? (
         <span
           className={cn(
-            "absolute top-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide flex items-center gap-1",
+            "absolute bottom-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide flex items-center gap-1 z-[2]",
             compareStatus === "up-to-date"
               ? "bg-[#EFF7F3] text-[#2D7A5E] border border-[#A8D4C0]"
               : compareStatus === "outdated"
@@ -253,7 +274,7 @@ function ConceptCard({
           {compareStatus === "outdated" && <><RefreshCw size={9} /> Update available</>}
           {compareStatus === "gap" && "Gap"}
         </span>
-      )}
+      ) : null}
 
       {/* Quality + Category */}
       <div className="flex items-center gap-2 mb-2.5">
@@ -299,6 +320,7 @@ function DetailModal({
   disabled,
   owned,
   agentConnected,
+  onSale,
 }: {
   concept: Concept
   onClose: () => void
@@ -310,7 +332,14 @@ function DetailModal({
   disabled?: boolean
   owned?: boolean
   agentConnected?: boolean
+  onSale?: boolean
 }) {
+  // 세일 카드면 20% 할인 — 20cr → 16cr, 25cr → 20cr
+  const SALE_DISCOUNT = 0.2
+  const purchaseBase = 20
+  const followBase = 25
+  const purchasePrice = onSale ? Math.round(purchaseBase * (1 - SALE_DISCOUNT)) : purchaseBase
+  const followPrice = onSale ? Math.round(followBase * (1 - SALE_DISCOUNT)) : followBase
   // Block reason priority: already owned > agent not connected
   const blocked = owned || !agentConnected
   const blockReason = owned
@@ -450,6 +479,12 @@ function DetailModal({
               {blockReason}
             </div>
           )}
+          {onSale && !blocked && (
+            <div className="mb-2 flex items-center gap-1.5 text-[11px] text-[var(--cherry)] font-semibold">
+              <span className="inline-block px-1.5 py-0.5 rounded bg-[#C94B6E] text-white text-[9px] font-extrabold tracking-[0.08em]">SALE</span>
+              <span>20% off applied at checkout</span>
+            </div>
+          )}
           <div className="flex items-center justify-end gap-2">
             <button
               disabled={blocked}
@@ -461,7 +496,18 @@ function DetailModal({
                   : "border-[#E4E1EE] text-[#3D3652] hover:border-[var(--cherry)] hover:text-[var(--cherry)] cursor-pointer",
               )}
             >
-              {blocked ? blockLabel : <>Purchase <span className="font-normal">20 cr</span></>}
+              {blocked ? blockLabel : (
+                <>Purchase{" "}
+                  {onSale ? (
+                    <>
+                      <span className="font-normal line-through text-[#B5AECB] mr-1">{purchaseBase} cr</span>
+                      <span className="font-semibold text-[var(--cherry)]">{purchasePrice} cr</span>
+                    </>
+                  ) : (
+                    <span className="font-normal">{purchaseBase} cr</span>
+                  )}
+                </>
+              )}
             </button>
             <button
               disabled={blocked}
@@ -473,7 +519,18 @@ function DetailModal({
                   : "bg-[var(--cherry)] text-white hover:opacity-90 cursor-pointer",
               )}
             >
-              {blocked ? blockLabel : <>Follow <span className="font-normal opacity-80">25 cr</span></>}
+              {blocked ? blockLabel : (
+                <>Follow{" "}
+                  {onSale ? (
+                    <>
+                      <span className="font-normal line-through opacity-60 mr-1">{followBase} cr</span>
+                      <span className="font-normal opacity-95">{followPrice} cr</span>
+                    </>
+                  ) : (
+                    <span className="font-normal opacity-80">{followBase} cr</span>
+                  )}
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -698,6 +755,20 @@ export function KaasCatalogPage({ onQuery, onCompareResult }: {
 
   const isOwned = (conceptId: string) => ownedConceptIds.has(conceptId)
 
+  // 카테고리별 대표 SALE 1개씩 (Basics / Advanced / Technique).
+  // 각 카테고리에서 qualityScore 최고인 컨셉을 선정 → deterministic.
+  const onSaleIds = useMemo(() => {
+    const ids = new Set<string>()
+    const categories = Array.from(new Set(concepts.map((c) => c.category)))
+    for (const cat of categories) {
+      const top = concepts
+        .filter((c) => c.category === cat)
+        .sort((a, b) => (b.qualityScore ?? 0) - (a.qualityScore ?? 0))[0]
+      if (top) ids.add(top.id)
+    }
+    return ids
+  }, [concepts])
+
   const categories = ["All", ...Array.from(new Set(concepts.map((c) => c.category)))]
 
   const filtered = concepts.filter((c) => {
@@ -721,7 +792,7 @@ export function KaasCatalogPage({ onQuery, onCompareResult }: {
               className="font-extrabold text-[#1A1626] leading-none text-[20px] lg:text-[28px]"
               style={{ letterSpacing: "-0.5px" }}
             >
-              Knowledge Catalog
+              Knowledge Market
             </h1>
             <a
               href="https://market.near.ai/agents/cherry_kaas_agent"
@@ -860,6 +931,7 @@ export function KaasCatalogPage({ onQuery, onCompareResult }: {
             onSelect={() => setSelectedId(selectedId === c.id ? null : c.id)}
             compareStatus={getCompareStatus(c.id)}
             owned={submitted && isOwned(c.id)}
+            onSale={onSaleIds.has(c.id)}
           />
         ))}
       </div>
@@ -889,6 +961,7 @@ export function KaasCatalogPage({ onQuery, onCompareResult }: {
           disabled={false}
           owned={submitted && isOwned(selected.id)}
           agentConnected={!!(selectedAgent && (selectedAgent as any).is_active !== false && (selectedAgent as any).api_key)}
+          onSale={onSaleIds.has(selected.id)}
           onQuery={(title, depth, conceptId) => {
             onQuery?.(title, depth, conceptId)
           }}

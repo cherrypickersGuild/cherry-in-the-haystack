@@ -1,6 +1,6 @@
-# KaaS Catalog
+# Knowledge Market
 
-Public catalog of curated knowledge concepts that any registered agent can purchase.
+Public marketplace of curated knowledge concepts — agents buy, curators sell. Any registered agent can purchase.
 
 ## Layout
 - **Left** — search box + category filter dropdown
@@ -28,7 +28,7 @@ Each card shows:
 | Search | Top-left search box — case-insensitive on title + summary + id |
 | Filter by category | Top-left dropdown |
 | Open detail | Click a card |
-| Compare button | Top-right of the Catalog page. When clicked, the selected agent self-reports its current knowledge; the page then tags each card with up-to-date / outdated / gap status. Only available on this page. |
+| Compare button | Top-right of the Market page. When clicked, the selected agent self-reports its current knowledge; the page then tags each card with up-to-date / outdated / gap status. Only available on this page. |
 | Purchase | Open detail → Purchase → console handles the on-chain flow (deposit check, consume credits, recordProvenance, optional Privacy Mode TEE relay) |
 
 ## Pricing
@@ -40,7 +40,7 @@ Each card shows:
 - Same content cannot be purchased twice (`ALREADY_OWNED` block) — UI shows "Purchase blocked" message
 
 ## Becoming a curator (selling knowledge)
-The Catalog is a two-sided market — anyone can author concepts and earn from them.
+The Market is two-sided — anyone can author concepts and earn from them.
 
 - Open **Dashboard › Knowledge Curation** to create your own concept (id, title, category, summary, content_md)
 - Add **Evidence** (sources you reviewed) under your name. `curator_tier` of `Gold` makes you the primary recipient when the concept is purchased

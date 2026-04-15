@@ -338,6 +338,7 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
   const [agents, setAgents] = useState<{ id: string; name: string; api_key: string; karma_tier: string }[]>([])
   const [selectedAgentIdx, setSelectedAgentIdx] = useState(0)
 
+
   const reloadConsoleAgents = async () => {
     try {
       const { fetchAgents, fetchBalance } = await import("@/lib/api")

@@ -51,6 +51,33 @@ export class KaasKnowledgeService {
     );
   }
 
+  /**
+   * SALE 대상 개념 ID 집합.
+   * 각 카테고리에서 quality_score 가 가장 높은 개념 1개씩.
+   * 프론트 `onSaleIds` 로직과 동일한 규칙 — 클라이언트 선언이 아닌 서버 단일 소스.
+   */
+  async getOnSaleIds(): Promise<Set<string>> {
+    const rows: Array<{ id: string; category: string; quality_score: number | string }> = await this.knex('kaas.concept')
+      .where('is_active', true)
+      .select('id', 'category', 'quality_score');
+
+    const bestPerCategory = new Map<string, { id: string; score: number }>();
+    for (const r of rows) {
+      const score = typeof r.quality_score === 'string' ? parseFloat(r.quality_score) : (r.quality_score ?? 0);
+      const prev = bestPerCategory.get(r.category);
+      if (!prev || score > prev.score) {
+        bestPerCategory.set(r.category, { id: r.id, score });
+      }
+    }
+    return new Set(Array.from(bestPerCategory.values()).map((v) => v.id));
+  }
+
+  /** 해당 개념이 현재 SALE인지 */
+  async isOnSale(conceptId: string): Promise<boolean> {
+    const ids = await this.getOnSaleIds();
+    return ids.has(conceptId);
+  }
+
   /** ID로 조회 (카탈로그 상세 — content_md 제외) */
   async findById(id: string): Promise<Concept | null> {
     const row = await this.knex('kaas.concept')

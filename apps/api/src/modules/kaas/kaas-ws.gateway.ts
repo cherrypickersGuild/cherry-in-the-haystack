@@ -89,13 +89,17 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.emit('knowledge_saved', { count: topics.length });
   }
 
-  /** 에이전트가 self-report 제출 (tool call 또는 request 응답) → 모든 웹 클라이언트에 broadcast */
+  /** 에이전트가 self-report 제출.
+   *  - `triggered_by === 'request'` (HTTP가 요청해서 응답으로 온 것): `requestSelfReport()`의 `socket.once`가 받아 HTTP로 반환. 브로드캐스트 X.
+   *  - 그 외(자발적/autonomous): 모든 웹 클라이언트에 브로드캐스트.
+   *  이렇게 해야 HTTP 경로와 WS 경로가 같은 payload를 중복 전송하지 않는다. */
   @SubscribeMessage('submit_self_report')
   handleAgentReport(@ConnectedSocket() socket: Socket, @MessageBody() report: any) {
     const agentId = socket.data?.agentId;
     if (!agentId) return;
-    this.logger.log(`Self-report pushed from agent=${agentId} (${report?.reporter ?? 'unknown'}, triggered_by=${report?.triggered_by ?? 'request'})`);
-    // 네임스페이스 전체에 broadcast. 웹은 agentId 일치 확인 후 수신.
+    const triggeredBy = report?.triggered_by ?? 'request';
+    this.logger.log(`Self-report from agent=${agentId} (${report?.reporter ?? 'unknown'}, triggered_by=${triggeredBy})`);
+    if (triggeredBy === 'request') return; // HTTP 경로에서 socket.once로 처리하므로 여기서는 skip
     this.server?.emit('agent_report_pushed', { agentId, report });
   }
 

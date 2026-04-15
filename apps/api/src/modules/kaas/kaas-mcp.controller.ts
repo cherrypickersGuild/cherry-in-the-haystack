@@ -97,8 +97,10 @@ export class KaasMcpController implements OnModuleInit {
           const concept = await this.knowledge.findByIdWithContent(concept_id);
           if (!concept) return { content: [{ type: 'text' as const, text: `Concept "${concept_id}" not found.` }], isError: true };
 
+          const onSale = await this.knowledge.isOnSale(concept_id);
           const { consumed, remaining } = await this.credit.consume(
             agent.id, ACTION_PRICE.purchase, agent.karma_tier as KarmaTierName, concept_id, 'purchase',
+            { saleDiscount: onSale ? 0.2 : 0 },
           );
 
           const responseData = { answer: concept.summary, content_md: concept.contentMd, concepts: [concept.title], evidence: concept.evidence, quality_score: concept.qualityScore };
@@ -129,8 +131,10 @@ export class KaasMcpController implements OnModuleInit {
           const concept = await this.knowledge.findById(concept_id);
           if (!concept) return { content: [{ type: 'text' as const, text: `Concept "${concept_id}" not found.` }], isError: true };
 
+          const onSaleFollow = await this.knowledge.isOnSale(concept_id);
           const { consumed, remaining } = await this.credit.consume(
             agent.id, ACTION_PRICE.follow, agent.karma_tier as KarmaTierName, concept_id, 'follow',
+            { saleDiscount: onSaleFollow ? 0.2 : 0 },
           );
 
           const responseData = { answer: concept.summary, concepts: [concept.title], subscription: { concept_id, updates_included: true }, quality_score: concept.qualityScore };

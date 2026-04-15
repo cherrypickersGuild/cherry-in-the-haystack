@@ -75,8 +75,11 @@ export class KaasQueryController {
         });
       }
 
+      // SALE 대상이면 20% 할인 추가 (Karma 할인과 곱연산으로 스택)
+      const onSale = await this.knowledge.isOnSale(dto.concept_id);
       const { consumed, remaining } = await this.credit.consume(
         agent.id, ACTION_PRICE.purchase, agent.karma_tier as KarmaTierName, dto.concept_id, 'purchase',
+        { saleDiscount: onSale ? 0.2 : 0 },
       );
 
       const responseData = {
@@ -140,8 +143,10 @@ export class KaasQueryController {
       });
     }
 
+    const onSaleFollow = await this.knowledge.isOnSale(dto.concept_id);
     const { consumed, remaining } = await this.credit.consume(
       agent.id, ACTION_PRICE.follow, agent.karma_tier as KarmaTierName, dto.concept_id, 'follow',
+      { saleDiscount: onSaleFollow ? 0.2 : 0 },
     );
 
     const responseData = {

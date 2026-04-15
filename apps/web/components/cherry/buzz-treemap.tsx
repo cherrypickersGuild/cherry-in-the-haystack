@@ -230,7 +230,7 @@ function TreemapTile({ tile }: { tile: TileRect }) {
     <button
       className={cn(
         "group absolute flex flex-col justify-between text-left",
-        "rounded-[14px] border transition-all duration-200 cursor-pointer overflow-hidden",
+        "rounded-[14px] border transition-all duration-200 cursor-pointer",
         "border-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.62),0_5px_18px_rgba(34,26,63,0.14)]",
         "hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
         "p-3",
@@ -246,11 +246,13 @@ function TreemapTile({ tile }: { tile: TileRect }) {
       }}
       aria-label={`${tile.label}: ${tile.percent}%`}
     >
+      {/* Hover gradient — self-clipped via own border-radius so parent can stay unclipped (overflow-visible) */}
       <span
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         style={{
           background:
             "linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.02) 48%, rgba(0,0,0,0.05))",
+          borderRadius: 14,
         }}
       />
 
@@ -272,8 +274,11 @@ function TreemapTile({ tile }: { tile: TileRect }) {
 
       {showBadge && (
         <span
-          className="relative ml-auto rounded-full px-2 py-1"
+          className="absolute rounded-full px-2 py-1"
           style={{
+            // 레이블의 flex 흐름에서 빼서 고정 위치 — 글자가 커져도 배지를 밀어내지 않음
+            right: 12,
+            bottom: 12,
             color: tile.color,
             fontSize: pctSize * 0.68,
             fontWeight: 700,
@@ -281,9 +286,10 @@ function TreemapTile({ tile }: { tile: TileRect }) {
             fontFamily: TREEMAP_FONT_STACK,
             letterSpacing: "0.04em",
             fontVariantNumeric: "tabular-nums",
-            backgroundColor: "rgba(255,255,255,0.78)",
-            border: "1px solid rgba(255,255,255,0.92)",
-            boxShadow: "0 2px 8px rgba(22,16,42,0.12)",
+            backgroundColor: "#ffffff",
+            border: "1px solid #ffffff",
+            boxShadow: "0 2px 8px rgba(22,16,42,0.14)",
+            zIndex: 2,
           }}
         >
           {tile.percent}%

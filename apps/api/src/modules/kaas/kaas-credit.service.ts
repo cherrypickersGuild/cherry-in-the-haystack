@@ -20,16 +20,19 @@ export class KaasCreditService {
     return { balance: deposited - consumed, totalDeposited: deposited, totalConsumed: consumed };
   }
 
-  /** 크레딧 차감 (Karma 할인 적용) */
+  /** 크레딧 차감 (Karma 할인 + SALE 할인 적용 — 곱연산으로 스택) */
   async consume(
     agentId: string,
     baseAmount: number,
     karmaTier: KarmaTierName,
     conceptId: string,
     actionType: string,
+    opts?: { saleDiscount?: number },
   ): Promise<{ consumed: number; remaining: number }> {
-    const discount = KARMA_DISCOUNT[karmaTier] ?? 0;
-    const finalAmount = Math.round(baseAmount * (1 - discount));
+    const karmaDiscount = KARMA_DISCOUNT[karmaTier] ?? 0;
+    const saleDiscount = opts?.saleDiscount ?? 0;
+    // 할인 중첩 — 예: Karma 15% + SALE 20% → 0.85 × 0.80 = 0.68, 32% off
+    const finalAmount = Math.round(baseAmount * (1 - karmaDiscount) * (1 - saleDiscount));
 
     const { balance } = await this.getBalance(agentId);
     if (balance < finalAmount) {

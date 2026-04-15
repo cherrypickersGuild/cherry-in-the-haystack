@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import {
   Home,
@@ -10,6 +10,7 @@ import {
   Lightbulb,
   BookOpen,
   ChevronRight,
+  ChevronDown,
   GraduationCap,
   Zap,
   ShoppingBag,
@@ -55,13 +56,16 @@ function TreeStemList({
   items,
   active,
   onSelect,
+  onCollapse,
 }: {
   items: NavItem[]
   active: string
   onSelect: (id: string) => void
+  onCollapse?: () => void
 }) {
   const count  = items.length
   const totalH = count * ITEM_H
+  const [stemHovered, setStemHovered] = useState(false)
 
   // midpoint Y of each row
   const midY = (idx: number) => idx * ITEM_H + ITEM_H / 2
@@ -69,6 +73,8 @@ function TreeStemList({
   const arcStartY = (idx: number) => midY(idx) - ARC_ABOVE
   // last item arc start = vertical line end
   const stemEndY = arcStartY(count - 1)
+
+  const stemColor = stemHovered ? "#8F879E" : "#D5D0E0"
 
   return (
     <div className="relative ml-5" style={{ height: totalH }}>
@@ -83,8 +89,9 @@ function TreeStemList({
         <line
           x1={VERT_X} y1={0}
           x2={VERT_X} y2={stemEndY}
-          stroke="#D5D0E0"
-          strokeWidth={1}
+          stroke={stemColor}
+          strokeWidth={stemHovered ? 1.5 : 1}
+          style={{ transition: "stroke 120ms, stroke-width 120ms" }}
         />
 
         {/* Only last item gets the curved branch */}
@@ -99,12 +106,34 @@ function TreeStemList({
                 `L ${VERT_X + CURVE_R + HORIZ_TAIL} ${cy + CURVE_R}`,
               ].join(" ")}
               fill="none"
-              stroke="#D5D0E0"
-              strokeWidth={1}
+              stroke={stemColor}
+              strokeWidth={stemHovered ? 1.5 : 1}
+              style={{ transition: "stroke 120ms, stroke-width 120ms" }}
             />
           )
         })()}
       </svg>
+
+      {/* Transparent hitbox for the vertical stem — wider than the visible line so it's easy to click (YouTube-style). */}
+      {onCollapse && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onCollapse() }}
+          onMouseEnter={() => setStemHovered(true)}
+          onMouseLeave={() => setStemHovered(false)}
+          aria-label="Collapse section"
+          title="Collapse"
+          className="absolute top-0 cursor-pointer"
+          style={{
+            left: VERT_X - 5,
+            width: 11,
+            height: stemEndY,
+            background: "transparent",
+            border: "none",
+            padding: 0,
+          }}
+        />
+      )}
 
       {/* Buttons — each centered exactly at row midpoint */}
       {items.map((item, idx) => {
@@ -178,7 +207,7 @@ const SECTIONS: SectionDef[] = [
     label: "AGENT SHOPPING",
     highlight: true,
     items: [
-      { id: "kaas-catalog", icon: <ShoppingBag size={16} />, label: "Knowledge Catalog" },
+      { id: "kaas-catalog", icon: <ShoppingBag size={16} />, label: "Knowledge Market" },
     ],
   },
   {
@@ -275,6 +304,46 @@ function NavButton({
 }
 
 /* ─────────────────────────────────────────────
+   Group Header Button — clickable header for sections with children (Basics, Advanced)
+───────────────────────────────────────────── */
+function GroupHeaderButton({
+  item,
+  isCollapsed,
+  onToggle,
+}: {
+  item: NavItem
+  isCollapsed: boolean
+  onToggle: () => void
+}) {
+  const [hovered, setHovered] = useState(false)
+  const color = hovered ? "#3D3652" : "#6B727E"
+  const bg    = hovered ? "#F9F7F5" : "transparent"
+
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="w-full flex items-center gap-2.5 rounded-lg text-left transition-all duration-150 cursor-pointer pl-5 pr-3 text-[13.5px] font-medium"
+      style={{ color, backgroundColor: bg, height: ITEM_H }}
+      aria-expanded={!isCollapsed}
+    >
+      <span className="flex-shrink-0" style={{ color }}>{item.icon}</span>
+      <span className="flex-1 truncate">{item.label}</span>
+      <ChevronDown
+        size={13}
+        className="flex-shrink-0 transition-transform duration-150"
+        style={{
+          color,
+          transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+        }}
+      />
+    </button>
+  )
+}
+
+/* ─────────────────────────────────────────────
    Main Sidebar
 ───────────────────────────────────────────── */
 export function Sidebar({
@@ -288,6 +357,20 @@ export function Sidebar({
   className?: string
   hideLogo?: boolean
 }) {
+  // YouTube 스타일 접기: 헤더 클릭 또는 stem 클릭 → 토글. localStorage에 저장.
+  const COLLAPSE_KEY = "cherry_sidebar_collapsed"
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {}
+    try {
+      const raw = localStorage.getItem(COLLAPSE_KEY)
+      return raw ? JSON.parse(raw) : {}
+    } catch { return {} }
+  })
+  useEffect(() => {
+    try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(collapsed)) } catch {}
+  }, [collapsed])
+  const toggle = (id: string) => setCollapsed((c) => ({ ...c, [id]: !c[id] }))
+
   return (
     <aside
       className={cn("flex flex-col w-[240px] min-h-screen bg-sidebar border-r border-sidebar-border flex-shrink-0", className)}
@@ -330,22 +413,23 @@ export function Sidebar({
               {section.items.map((item) => (
                 <div key={item.id}>
                   {item.children && item.children.length > 0 ? (
-                    /* Non-clickable group header — same height/padding as NavButton */
+                    /* Collapsible group — header is a toggle button, stem also clickable to collapse */
                     <>
-                      <div
-                        className="w-full flex items-center gap-2.5 pl-5 pr-3 text-[13.5px] font-medium"
-                        style={{ color: "#6B727E", height: ITEM_H }}
-                      >
-                        <span className="flex-shrink-0" style={{ color: "#6B727E" }}>{item.icon}</span>
-                        <span className="flex-1 truncate">{item.label}</span>
-                      </div>
-                      <div className="ml-4">
-                        <TreeStemList
-                          items={item.children.map(c => ({ id: c.id, icon: null, label: c.label }))}
-                          active={active}
-                          onSelect={onSelect}
-                        />
-                      </div>
+                      <GroupHeaderButton
+                        item={item}
+                        isCollapsed={!!collapsed[item.id]}
+                        onToggle={() => toggle(item.id)}
+                      />
+                      {!collapsed[item.id] && (
+                        <div className="ml-4">
+                          <TreeStemList
+                            items={item.children.map(c => ({ id: c.id, icon: null, label: c.label }))}
+                            active={active}
+                            onSelect={onSelect}
+                            onCollapse={() => toggle(item.id)}
+                          />
+                        </div>
+                      )}
                     </>
                   ) : (
                     <NavButton item={item} isActive={active === item.id} onSelect={onSelect} />
