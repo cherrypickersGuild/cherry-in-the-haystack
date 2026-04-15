@@ -126,7 +126,7 @@ function RankCard({ item, size = "sm", loading }: { item: ModelUpdatesRankItem; 
 
   return (
     <div
-      className={`rounded-[10px] border ${padding} transition-shadow hover:shadow-md h-full flex flex-col relative`}
+      className={`rounded-[10px] border ${padding} transition-colors hover:!border-[#7B5EA7] h-full flex flex-col relative`}
       style={{ backgroundColor: size === "lg" ? style.bg : "#FFFFFF", borderColor: size === "lg" ? style.border : "#E4E1EE", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
     >
       {badge && <div className="absolute top-3 right-3 flex flex-col items-end gap-1">{badge}</div>}

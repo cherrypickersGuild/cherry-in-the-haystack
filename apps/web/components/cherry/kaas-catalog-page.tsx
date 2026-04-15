@@ -327,7 +327,7 @@ function DetailModal({
 
       {/* Modal */}
       <div
-        className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto animate-in zoom-in-95 duration-200"
+        className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header bar — title + close */}
