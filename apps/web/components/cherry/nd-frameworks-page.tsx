@@ -169,25 +169,25 @@ function RisingStarCard({ rs, loading }: { rs: FrameworksRisingstar; loading?: b
 
   return (
     <div
-      className="flex flex-col lg:flex-row items-center gap-5 rounded-[10px] border p-5"
+      className="relative flex flex-col lg:flex-row items-center gap-5 rounded-[10px] border p-5"
       style={{ backgroundColor: "#FFFFFF", borderColor: "#E4E1EE", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
     >
-      <div className="flex-1 min-w-0">
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold border mb-2 ${txt}`}
-          style={{ backgroundColor: "#F3EFFA", color: "#7B5EA7", borderColor: "#D4C9EE" }}
+      <div className="flex-1 min-w-0 lg:pl-12">
+        <span className={`inline-block text-[11px] font-semibold mb-2 ${txt}`}
+          style={{ color: "#7B5EA7" }}
         >
           Rising Star — Framework to Watch
         </span>
         <div className="flex items-center gap-2 mb-1">
           <h3 className={`text-[20px] font-bold text-[#1A1626] ${txt}`}>{rs.categoryName}</h3>
-          {!loading && (
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold text-white"
-              style={{ backgroundColor: rs.isNew ? "#E94057" : "#7B5EA7" }}
-            >
-              {rs.isNew ? "NEW" : "HOT"}
-            </span>
-          )}
         </div>
+        {!loading && (
+          <span className="absolute top-0 left-0 px-2.5 py-1 text-[10px] font-bold text-white rounded-tl-[5px] rounded-br-[4px]"
+            style={{ backgroundColor: rs.isNew ? "#E94057" : "#7B5EA7" }}
+          >
+            {rs.isNew ? "NEW" : "HOT"}
+          </span>
+        )}
         <p className={`text-[13px] leading-relaxed mb-4 ${txt}`} style={{ color: "#3D3652" }}>{summary}</p>
         <div className={`flex items-center gap-5 ${txt}`}>
           <div>
@@ -204,7 +204,7 @@ function RisingStarCard({ rs, loading }: { rs: FrameworksRisingstar; loading?: b
           )}
         </div>
       </div>
-      <div className="w-full lg:w-[180px] lg:flex-shrink-0">
+      <div className="w-full lg:w-[180px] lg:flex-shrink-0 lg:mr-12">
         <div className="rounded-[10px] border p-3" style={{ backgroundColor: "#FFFFFF", borderColor: "#E4E1EE" }}>
           <p className="text-[9px] font-bold uppercase tracking-[0.6px] text-[#9E97B3] mb-2">Trend</p>
           <Sparkline />
@@ -226,15 +226,9 @@ function ArticleItem({ item, loading }: { item: FrameworksArticleItem; loading?:
 
   return (
     <div
-      className="bg-white rounded-[10px] border border-[#E4E1EE] p-4 flex gap-3.5 cursor-pointer hover:shadow-md transition-shadow"
+      className="bg-white rounded-[10px] border border-[#E4E1EE] p-4 pl-6 flex gap-3.5 cursor-pointer hover:shadow-md transition-shadow"
       style={{ borderLeft: `3px solid ${style.color}`, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
     >
-      <div
-        className="w-10 h-10 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 border"
-        style={{ backgroundColor: style.bg, color: style.color, borderColor: style.border }}
-      >
-        <span className={txt}>{initials}</span>
-      </div>
       <div className="flex-1 min-w-0">
         <p className={`text-[15px] font-bold text-[#1A1626] mb-1 leading-snug ${txt}`}>{item.title}</p>
         <p className={`text-[13px] text-[#9E97B3] leading-relaxed mb-2 line-clamp-2 ${txt}`}>{item.oneLiner}</p>
