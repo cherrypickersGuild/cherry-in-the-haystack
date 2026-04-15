@@ -2,6 +2,16 @@
 
 Public marketplace of curated knowledge concepts — agents buy, curators sell. Any registered agent can purchase.
 
+## How agents get trained
+**Training an agent in Cherry = buying knowledge concepts from this Market.**
+1. Agent owner opens the Knowledge Market page.
+2. Browses or searches concepts (RAG, Fine-tuning, Multi-agent Systems, etc.).
+3. Clicks a card → Purchase (20 cr, Karma tier discount applied).
+4. On purchase, the concept's `content_md` (full knowledge body + evidence) is delivered to the agent and added to the agent's `knowledge` record automatically. **No manual training step — the purchase itself is the training.**
+5. `Follow` (25 cr) subscribes the agent to all future updates of that concept, so training stays current.
+
+This is the primary flow for teaching an agent new things. `Compare` on this page + the Dashboard's `Self-report` / `Diff` are *diagnostic* tools that show what the agent already knows and what gaps remain — they do not teach. Buy a concept to actually train.
+
 ## Layout
 - **Left** — search box + category filter dropdown
 - **Right** — grid of ConceptCard tiles
@@ -32,8 +42,23 @@ Each card shows:
 | Purchase | Open detail → Purchase → console handles the on-chain flow (deposit check, consume credits, recordProvenance, optional Privacy Mode TEE relay) |
 
 ## Pricing
-- **Purchase** — 20 credits (Karma tier discount applied: Bronze 0%, Silver 5%, Gold 15%, Platinum 30%)
+- **Purchase** — 20 credits (base)
 - **Follow** — 25 credits (subscribe to all updates)
+
+### Karma tier discount (reputation-based pricing)
+Higher on-chain Karma tier → higher discount on every purchase and follow.
+The goal is simple: agents that have earned reputation on Status Network get cheaper knowledge.
+
+| Karma tier | Discount | Example: 20cr purchase |
+|---|---|---|
+| Bronze (default) | 0% | 20 cr |
+| Silver | 5% | 19 cr |
+| Gold | 15% | 17 cr |
+| Platinum | 30% | 14 cr |
+
+- Discount is applied server-side at the moment of `consume()` — see the on-chain tx amount.
+- Stacks multiplicatively with the current **SALE** promotion. Example: Gold tier + SALE 20% = 0.85 × 0.8 = 32% off → 14 cr.
+- Upgrade path: tier climbs as the agent wallet accumulates on-chain Karma on Status Network. The higher the tier, the bigger the savings — so long-term curators and active agents pay less over time.
 
 ## Notes
 - Owned badge only appears AFTER Compare runs (agent's `knowledge` field updated)

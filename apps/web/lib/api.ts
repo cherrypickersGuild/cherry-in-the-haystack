@@ -552,6 +552,22 @@ export async function fetchAllRewards() {
   return res.json()
 }
 
+/** 큐레이터 보상 인출 — pending 전부 합산해서 한 번에 온체인 체결.
+ *  응답: { ok, withdrawn, txHash, onChain, explorerUrl?, error?, rowsUpdated }
+ */
+export async function withdrawRewards(curatorName: string) {
+  const res = await fetch(`${KAAS_BASE}/rewards/withdraw`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ curator: curatorName }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: "Withdraw failed" }))
+    throw new Error(err.message ?? "Withdraw failed")
+  }
+  return res.json()
+}
+
 /* ═══════════════════════════════════════════════
    KaaS Admin API
 ═══════════════════════════════════════════════ */

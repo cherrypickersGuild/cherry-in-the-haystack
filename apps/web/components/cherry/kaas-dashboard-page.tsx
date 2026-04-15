@@ -1066,35 +1066,83 @@ function RegisterForm({ onComplete, onCancel }: { onComplete: (agent: Agent) => 
 /* ═══════════════════════════════════════════════
    Deposit / Withdraw Buttons
 ═══════════════════════════════════════════════ */
-function DepositWithdrawButtons({ agent, onDeposited, pendingAmount }: { agent: Agent; onDeposited: () => void; pendingAmount: number }) {
+function DepositWithdrawButtons({ agent, onDeposited, pendingAmount, curatorName, onWithdrawn }: { agent: Agent; onDeposited: () => void; pendingAmount: number; curatorName?: string; onWithdrawn?: () => void }) {
   const [showDeposit, setShowDeposit] = useState(false)
   const [amount, setAmount] = useState(100)
   const [depositing, setDepositing] = useState(false)
-  const [result, setResult] = useState("")
+  const [withdrawing, setWithdrawing] = useState(false)
+  const [result, setResult] = useState<{ msg: string; ok: boolean; tx?: string; explorer?: string } | null>(null)
 
   const handleDeposit = async () => {
     const key = agent.apiKey
     if (!key) { alert("API Key missing. Please re-register the agent."); return }
     if (amount <= 0) { alert("Enter an amount"); return }
     setDepositing(true)
-    setResult("")
+    setResult(null)
     try {
       const { depositCredits } = await import("@/lib/api")
       const res = await depositCredits(key, amount)
-      setResult(`Deposit complete! Balance: ${res.balance}cr`)
+      setResult({
+        msg: res.onChain
+          ? `Deposit complete! +${amount}cr · on-chain tx`
+          : `Deposit complete! +${amount}cr · on-chain failed (DB only)`,
+        ok: true,
+        tx: res.txHash,
+        explorer: res.explorerUrl,
+      })
       setShowDeposit(false)
       onDeposited()
     } catch (err: any) {
-      setResult(`Deposit failed: ${err.message}`)
-      alert(`Deposit failed: ${err.message}`)
+      setResult({ msg: `Deposit failed: ${err.message}`, ok: false })
     } finally {
       setDepositing(false)
     }
   }
 
+  const handleWithdraw = async () => {
+    if (!curatorName) { alert("No curator name — cannot withdraw"); return }
+    if (pendingAmount <= 0) { alert("No pending rewards to withdraw"); return }
+    if (!confirm(`Withdraw ${pendingAmount}cr to curator wallet?\nThis will execute an on-chain transaction on Status Network (gasless).`)) return
+    setWithdrawing(true)
+    setResult(null)
+    try {
+      const { withdrawRewards } = await import("@/lib/api")
+      const res = await withdrawRewards(curatorName)
+      if (res.ok) {
+        setResult({
+          msg: `Withdrawn ${res.withdrawn}cr · ${res.rowsUpdated} rewards settled`,
+          ok: true,
+          tx: res.txHash,
+          explorer: res.explorerUrl,
+        })
+        onWithdrawn?.()
+      } else {
+        setResult({ msg: `Withdraw failed: ${res.error ?? "unknown"}`, ok: false })
+      }
+    } catch (err: any) {
+      setResult({ msg: `Withdraw failed: ${err.message}`, ok: false })
+    } finally {
+      setWithdrawing(false)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2">
-      {result && <p className={cn("text-[11px] px-3 py-1.5 rounded-lg", result.includes("complete") ? "text-[#2D7A5E] bg-[#EFF7F3]" : "text-red-500 bg-red-50")}>{result}</p>}
+      {result && (
+        <div className={cn("text-[11px] px-3 py-1.5 rounded-lg flex items-center gap-2 flex-wrap", result.ok ? "text-[#2D7A5E] bg-[#EFF7F3]" : "text-red-500 bg-red-50")}>
+          <span>{result.msg}</span>
+          {result.tx && (
+            <a
+              href={result.explorer ?? `https://sepoliascan.status.network/tx/${result.tx}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-[10px] underline inline-flex items-center gap-0.5"
+            >
+              {result.tx.slice(0, 10)}...<ExternalLink size={9} />
+            </a>
+          )}
+        </div>
+      )}
       {showDeposit && (
         <div className="flex items-center gap-2">
           <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} min={1} className="w-24 px-2 py-1 text-[12px] rounded-lg border border-[#E4E1EE] outline-none focus:border-[#D4854A]" />
@@ -1106,6 +1154,20 @@ function DepositWithdrawButtons({ agent, onDeposited, pendingAmount }: { agent: 
       <div className="flex items-center gap-2">
         <button onClick={() => setShowDeposit(!showDeposit)} className="text-[12px] font-semibold px-3.5 py-1.5 rounded-lg border border-[#D4854A] text-[#D4854A] hover:bg-[#FDF6EE] cursor-pointer flex items-center gap-1.5">
           <Wallet size={13} /> Deposit
+        </button>
+        <button
+          onClick={handleWithdraw}
+          disabled={withdrawing || pendingAmount <= 0 || !curatorName}
+          title={!curatorName ? "No curator profile" : pendingAmount <= 0 ? "No pending rewards" : `Withdraw ${pendingAmount}cr`}
+          className={cn(
+            "text-[12px] font-semibold px-3.5 py-1.5 rounded-lg border flex items-center gap-1.5 transition-colors",
+            pendingAmount > 0 && curatorName && !withdrawing
+              ? "border-[#2D7A5E] text-[#2D7A5E] hover:bg-[#EFF7F3] cursor-pointer"
+              : "border-[#E4E1EE] text-[#B5AECB] bg-[#F9F7F5] cursor-not-allowed"
+          )}
+        >
+          <ArrowUpRight size={13} />
+          {withdrawing ? "..." : `Withdraw${pendingAmount > 0 ? ` ${pendingAmount}cr` : ""}`}
         </button>
         <span className="text-[10px] text-[#6B727E] ml-auto">Gasless on Status Network</span>
       </div>
@@ -1120,7 +1182,7 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
   const [activeTab, setActiveTab] = useState<"queries" | "ledger" | "rewards">("queries")
   const [queries, setQueries] = useState<any[]>([])
   const [ledger, setLedger] = useState<any[]>([])
-  const [rewardData, setRewardData] = useState<{ pending: number; withdrawn: number; total: number; rewards: any[] }>({ pending: 0, withdrawn: 0, total: 0, rewards: [] })
+  const [rewardData, setRewardData] = useState<{ pending: number; withdrawn: number; total: number; rewards: any[]; curatorName: string | null; chosenPending: number }>({ pending: 0, withdrawn: 0, total: 0, rewards: [], curatorName: null, chosenPending: 0 })
 
   const loadLedger = () => {
     if (!agent.apiKey) return
@@ -1144,18 +1206,20 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
     if (!agent.name) return
     import("@/lib/api").then(({ fetchAllRewards }) =>
       fetchAllRewards().then((data: any[]) => {
-        // 에이전트 이름으로 필터링하거나 전체 합계 표시
         const total = data.reduce((s: number, r: any) => s + (r.total ?? 0), 0)
         const pending = data.reduce((s: number, r: any) => s + (r.pending ?? 0), 0)
-        // 전체 rewards 상세는 개별 큐레이터 조회
         import("@/lib/api").then(({ fetchCuratorRewards }) => {
-          // 첫 번째 큐레이터 이름으로 시도 (임시)
           if (data.length > 0) {
-            fetchCuratorRewards(data[0].curator_name).then((d: any) => {
-              setRewardData({ pending, withdrawn: total - pending, total, rewards: d.rewards ?? [] })
-            }).catch(() => setRewardData({ pending, withdrawn: total - pending, total, rewards: [] }))
+            // pending 있는 큐레이터 우선. 없으면 total 많은 순(data[0]).
+            const withPending = data.find((r: any) => (r.pending ?? 0) > 0)
+            const chosen = withPending ?? data[0]
+            const chosenName = chosen.curator_name
+            const chosenPending = chosen.pending ?? 0
+            fetchCuratorRewards(chosenName).then((d: any) => {
+              setRewardData({ pending, withdrawn: total - pending, total, rewards: d.rewards ?? [], curatorName: chosenName, chosenPending })
+            }).catch(() => setRewardData({ pending, withdrawn: total - pending, total, rewards: [], curatorName: chosenName, chosenPending }))
           } else {
-            setRewardData({ pending: 0, withdrawn: 0, total: 0, rewards: [] })
+            setRewardData({ pending: 0, withdrawn: 0, total: 0, rewards: [], curatorName: null, chosenPending: 0 })
           }
         })
       }).catch(() => {})
@@ -1218,7 +1282,13 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
       </div>
 
       {/* Buttons */}
-      <DepositWithdrawButtons agent={agent} onDeposited={onRefresh} pendingAmount={pendingAmount} />
+      <DepositWithdrawButtons
+        agent={agent}
+        onDeposited={() => { onRefresh(); loadLedger() }}
+        pendingAmount={rewardData.chosenPending}
+        curatorName={rewardData.curatorName ?? undefined}
+        onWithdrawn={() => { loadRewards(); onRefresh() }}
+      />
 
       {/* Tabs */}
       <div className="flex items-center border-b border-[#E4E1EE]">
@@ -1318,9 +1388,9 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
                       <a href={explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B727E] font-mono text-[10px] hover:underline flex-shrink-0 flex items-center gap-0.5">
                         {hash.slice(0, 10)}...<ExternalLink size={9} />
                       </a>
-                    ) : isDeposit ? (
-                      <span className="text-[10px] text-[#9E97B3] flex-shrink-0">off-chain</span>
-                    ) : null}
+                    ) : (
+                      <span className="text-[10px] text-[#D4854A] flex-shrink-0" title="On-chain recording failed — DB only">⚠ on-chain failed</span>
+                    )}
                   </div>
                 )
               })}
@@ -1352,15 +1422,15 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[#6B727E] font-mono text-[10px] hover:underline flex-shrink-0 flex items-center gap-0.5"
-                      title={txHash}
+                      title={r.withdrawn ? `Withdrawn · ${txHash}` : txHash}
                     >
                       {txHash.slice(0, 10)}...<ExternalLink size={9} />
                     </a>
                   ) : (
-                    <span className="text-[10px] text-[#D4854A] flex-shrink-0" title="On-chain recording failed or pending">⚠ on-chain failed</span>
+                    <span className="text-[10px] text-[#9E97B3] flex-shrink-0" title="Reward accrued. Click Withdraw to settle on-chain in one transaction.">accrued (awaits withdraw)</span>
                   )}
                   {r.withdrawn
-                    ? <span className="text-[10px] text-[#6B727E]">Withdrawn</span>
+                    ? <span className="text-[10px] text-[#2D7A5E] font-semibold">Withdrawn</span>
                     : <span className="text-[10px] text-[#D4854A] font-semibold">Pending</span>}
                 </div>
               )

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from "react"
 import { cn } from "@/lib/utils"
-import { Send, ExternalLink, ChevronDown, Shield, Bot, Cherry, Minus, X } from "lucide-react"
+import { Send, ExternalLink, ChevronDown, Shield, Bot, Cherry, Minus, X, Trash2 } from "lucide-react"
 import { purchaseConcept, followConcept } from "@/lib/api"
 import { SelfReportLog } from "./kaas-dashboard-page"
 
@@ -291,6 +291,29 @@ function AgentDoneMsg({ hash, blocked }: { hash: string; blocked?: boolean }) {
 }
 
 /* ═══════════════════════════════════════════════
+   Example Q&A — LLM 안 쓰고 바로 답변. 토큰 절약.
+   이후 추가 질문엔 이 Q&A도 대화 히스토리로 전달돼 맥락 유지됨.
+═══════════════════════════════════════════════ */
+const EXAMPLE_ANSWERS: Record<string, string> = {
+  "How do I train my agent?":
+    "Open the Knowledge Market (sidebar → AGENT SHOP), pick a concept, and Purchase. " +
+    "The concept's content is delivered to your agent automatically — no manual training step. " +
+    "Use the Dashboard's 📚 Diff to see gaps and decide what to buy next.",
+  "How do I sell knowledge?":
+    "Open Dashboard → Knowledge Curation. Author a concept (id, title, summary, content_md) and add " +
+    "Evidence sources. Every purchase of your concept sends 40% to your wallet. Withdraw from the " +
+    "Rewards tab — it settles on-chain in one transaction.",
+  "How much discount does Karma tier give?":
+    "Higher on-chain Karma tier = bigger discount on every purchase. Bronze (default) 0%, Silver 5%, " +
+    "Gold 15%, Platinum 30%. A 20cr concept costs just 14cr for Platinum. Discounts stack with SALE " +
+    "promos — Gold + SALE = 32% off.",
+  "Where can I see on-chain transactions?":
+    "On the Dashboard: Wallet Panel → Ledger tab (deposits & consumes), Rewards tab (withdrawals), " +
+    "and the 📚 Diff report Timeline. Each Cherry Console message also has a tx hash link inline. " +
+    "Direct explorer: sepoliascan.status.network for Status, testnet.nearblocks.io for NEAR.",
+}
+
+/* ═══════════════════════════════════════════════
    Floating Console
 ═══════════════════════════════════════════════ */
 export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(function KaasConsole({ currentPage }, ref) {
@@ -300,12 +323,73 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
 
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
+  // 최신 messages를 closure 밖에서 참조 (LLM 호출 시 대화 히스토리 전달용)
+  const messagesRef = useRef<Message[]>([])
+  useEffect(() => { messagesRef.current = messages }, [messages])
   const [input, setInput] = useState("")
   const [actionType, setActionType] = useState<Action>("purchase")
   const [credits, setCredits] = useState(0)
   const [loading, setLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const consoleRef = useRef<HTMLDivElement>(null)
+
+  // 체리 말풍선 문장 풀 — 3종류
+  //  1. CASUAL: 단독으로 뜨는 추임새 (후속 없음, 랜덤으로 나옴)
+  //  2. TRIGGER: 다음 이벤트로 INFO를 부르는 신호 ("Listen", "Watch this" 등)
+  //  3. INFO: TRIGGER 뒤에만 나타남. 랜덤 단독으로는 절대 안 나옴
+  //  + Tease 싸이클은 따로 "..." 점만 찍힘 (트리거 없음)
+  const CASUAL_PHRASES = [
+    // 인사 / 추임새
+    "Hey",
+    "Hey 👋",
+    "Hi there",
+    "Miss me? 🍒",
+    "Interesting...",
+    "Hmm...",
+    "Oh?",
+    "Yo",
+    "Pssst 🤫",
+    "Bored?",
+    "Eh?",
+    "Still here",
+    "Not bad, right?",
+    "Sooo...",
+    "Wanna chat?",
+    "👀",
+    "Nice.",
+    "Okay okay",
+    // 농담 (3개) — 가끔 튀어나오면 귀여움
+    "Actually, I'm a strawberry 🍓",
+    "Actually, forget it",
+    "Actually, I've got a cold",  // ← 이게 뜨면 콘솔이 부르르 떨림
+  ]
+  // 이 문장이 나올 때 콘솔을 shake 애니메이션으로 흔듦
+  const SHAKE_PHRASE = "Actually, I've got a cold"
+  const TRIGGER_PHRASES = [
+    "Listen 👂",
+    "Between us",
+    "Watch this 👀",
+    "One sec",
+    "Hot tip 🔥",
+    "Heads up",
+    "FYI",
+    "Quick one",
+  ]
+  const INFO_PHRASES = [
+    "How do agents buy knowledge?",
+    "How much can curators earn?",
+    "Want to see what your agent learned?",
+    "Karma tier = real discount ⚡",
+    "Check the on-chain ledger",
+  ]
+  // 표시는 현재 typedText 로만 — bubbleIdx 는 legacy 참조용으로 남겨둠
+  const [bubbleIdx, setBubbleIdx] = useState(0)
+  const [bubbleVisible, setBubbleVisible] = useState(false)
+  const [typedText, setTypedText] = useState("")
+  // Cherry Console 버튼 / 패널 shake — "I've got a cold" 농담 나올 때 부르르
+  const [consoleShake, setConsoleShake] = useState(false)
+  // 대화 삭제 확인 팝오버
+  const [showClearConfirm, setShowClearConfirm] = useState(false)
 
   // CLI-style input history (bash readline 스타일: ↑ 과거, ↓ 최근/draft, 중복 생략)
   const HISTORY_KEY = "kaas_console_history"
@@ -440,6 +524,127 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
   const currentApiKey = currentAgent?.api_key ?? ""
   const apiKeyRef = useRef(currentApiKey)
   apiKeyRef.current = currentApiKey
+
+  // 말풍선 싸이클 — "..." 과 문장은 절대 같은 등장에 나오지 않음. 완전히 분리된 이벤트.
+  //   Tease 싸이클: 점 찍히다가 그냥 사라짐 (Cherry가 말 꺼낼 듯 말다)
+  //   Message 싸이클: 문장만 등장 (점 없이)
+  //   둘은 번갈아가며 랜덤 섞여서 나옴
+  useEffect(() => {
+    if (open) {
+      setBubbleVisible(false)
+      setTypedText("")
+      return
+    }
+    // 이벤트 종류:
+    //   1. DOTS  — "..." 만. 후속 없음. (tease)
+    //   2. CASUAL — 단문 한 개. 후속 없음.
+    //   3. TRIGGER→INFO — 트리거 → 잠깐 쉼 → INFO 문장. 이 둘은 의도적으로 연결됨.
+    // 이벤트 간 10초 간격. 이벤트 안에서는 자유.
+    const FIRST_DELAY     = 20_000
+    const DOT_MS          = 250       // "." 하나당 등장 간격
+    const DOTS_HOLD_MS    = 800       // "..." 찍힌 뒤 유지
+    const TRIGGER_HOLD_MS = 2_200     // 트리거 문구 유지
+    const TRIGGER_GAP_MS  = 1_800     // 트리거 → info 사이 간격 (한 이벤트 내부)
+    const MSG_MAX_MS      = 5_000     // 문장 최대 유지
+    const MSG_MIN_MS      = 3_000     // 문장 최소 유지
+    const GAP_MS          = 60_000    // 이벤트 종료 후 다음 이벤트까지 (1분)
+
+    // 이벤트 타입 확률
+    const P_DOTS    = 0.30
+    const P_CASUAL  = 0.50
+    // P_TRIGGER   = 0.20 (나머지)
+
+    let t1: any, t2: any, t3: any, t4: any
+    const clearAll = () => [t1, t2, t3, t4].forEach(clearTimeout)
+
+    // 카테고리별 직전 인덱스 — 연속 중복 방지
+    let lastCasualIdx = -1
+    let lastTriggerIdx = -1
+    let lastInfoIdx = -1
+    /** 직전 인덱스와 다른 걸 O(1)로 뽑기. */
+    const pickDifferent = <T,>(arr: T[], lastIdx: number): [T, number] => {
+      if (arr.length <= 1) return [arr[0], 0]
+      const offset = 1 + Math.floor(Math.random() * (arr.length - 1))
+      const idx = ((lastIdx < 0 ? 0 : lastIdx) + offset) % arr.length
+      return [arr[idx], idx]
+    }
+    const holdFor = (text: string) =>
+      Math.min(MSG_MAX_MS, Math.max(MSG_MIN_MS, text.length * 180))
+
+    const runDots = () => {
+      setTypedText("")
+      setBubbleVisible(true)
+      let dotCount = 0
+      const typeDot = () => {
+        dotCount += 1
+        setTypedText(".".repeat(dotCount))
+        if (dotCount < 3) {
+          t1 = setTimeout(typeDot, DOT_MS)
+        } else {
+          t2 = setTimeout(() => {
+            setBubbleVisible(false)
+            setTypedText("")
+            t3 = setTimeout(startCycle, GAP_MS)
+          }, DOTS_HOLD_MS)
+        }
+      }
+      t1 = setTimeout(typeDot, DOT_MS)
+    }
+
+    const runCasual = () => {
+      const [text, idx] = pickDifferent(CASUAL_PHRASES, lastCasualIdx)
+      lastCasualIdx = idx
+      setTypedText(text)
+      setBubbleVisible(true)
+      // 감기 농담 → 콘솔 부르르 떨림 (애니메이션 0.7s 보다 살짝 여유)
+      if (text === SHAKE_PHRASE) {
+        setConsoleShake(false)          // 직전 잔여 상태 초기화 (연속 트리거 대비)
+        requestAnimationFrame(() => setConsoleShake(true))
+        setTimeout(() => setConsoleShake(false), 750)
+      }
+      t1 = setTimeout(() => {
+        setBubbleVisible(false)
+        setTypedText("")
+        t2 = setTimeout(startCycle, GAP_MS)
+      }, holdFor(text))
+    }
+
+    const runTriggerInfo = () => {
+      const [trigger, tIdx] = pickDifferent(TRIGGER_PHRASES, lastTriggerIdx)
+      const [info, iIdx] = pickDifferent(INFO_PHRASES, lastInfoIdx)
+      lastTriggerIdx = tIdx
+      lastInfoIdx = iIdx
+      // 1. 트리거 등장
+      setTypedText(trigger)
+      setBubbleVisible(true)
+      t1 = setTimeout(() => {
+        // 2. 말풍선 한 번 사라짐
+        setBubbleVisible(false)
+        setTypedText("")
+        // 3. 짧은 쉼 뒤 info 등장
+        t2 = setTimeout(() => {
+          setTypedText(info)
+          setBubbleVisible(true)
+          // 4. info 유지 뒤 사라짐 → 다음 이벤트까지 GAP
+          t3 = setTimeout(() => {
+            setBubbleVisible(false)
+            setTypedText("")
+            t4 = setTimeout(startCycle, GAP_MS)
+          }, holdFor(info))
+        }, TRIGGER_GAP_MS)
+      }, TRIGGER_HOLD_MS)
+    }
+
+    const startCycle = () => {
+      const r = Math.random()
+      if (r < P_DOTS) runDots()
+      else if (r < P_DOTS + P_CASUAL) runCasual()
+      else runTriggerInfo()
+    }
+
+    t1 = setTimeout(startCycle, FIRST_DELAY)
+    return clearAll
+  }, [open])
 
   const scrollToBottom = () => {
     setTimeout(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }), 50)
@@ -708,9 +913,10 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
     }, 300)
   }, [loading, currentApiKey, credits])
 
-  const handleSend = useCallback(() => {
-    if (!input.trim() || loading) return
-    const text = input.trim()
+  // 실제 전송 로직 — 어디서 호출되든 동일. handleSend / 예시 질문 클릭 모두 이걸 사용.
+  const sendText = useCallback((rawText: string) => {
+    if (!rawText.trim() || loading) return
+    const text = rawText.trim()
     pushHistory(text)
     draftRef.current = ""
     setInput("")
@@ -728,37 +934,80 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
         if (!apiKey) throw new Error("no key")
         const privacy = getPrivacyMode()
 
-        // Prepend page-context metadata + the page's manual (if available) so the LLM
-        // can answer page-specific questions. Manuals live in /public/cherry-manuals/.
-        // No vector search — straight page→file lookup via _index.json.
+        // 매뉴얼 로딩:
+        //   (1) 현재 페이지 매뉴얼을 항상 기본으로 포함
+        //   (2) 질문 키워드가 market/curation/agent/prompt 관련이면 그 매뉴얼도 추가 로드
+        //   → 다른 페이지 기능에 대한 질문도 맥락 안에서 답변 가능
         const page = currentPageRef.current
-        let manual = ""
-        if (page) {
-          try {
-            const idxRes = await fetch("/cherry-manuals/_index.json", { cache: "force-cache" })
-            const idx = await idxRes.json() as Record<string, string>
-            const file = idx[page] ?? idx._default
-            if (file) {
-              const mdRes = await fetch(`/cherry-manuals/${file}`, { cache: "force-cache" })
-              if (mdRes.ok) manual = await mdRes.text()
-            }
-          } catch { /* manual fetch best-effort — never block chat */ }
-        }
-        const questionWithCtx = page
+        const manualsByFile = new Map<string, string>()
+        try {
+          const idxRes = await fetch("/cherry-manuals/_index.json", { cache: "force-cache" })
+          const idx = await idxRes.json() as Record<string, string>
+          const loadFile = async (f: string) => {
+            if (manualsByFile.has(f)) return
+            try {
+              const res = await fetch(`/cherry-manuals/${f}`, { cache: "force-cache" })
+              if (res.ok) manualsByFile.set(f, await res.text())
+            } catch {}
+          }
+          // (1) 현재 페이지
+          const pageFile = (page && idx[page]) || idx._default
+          if (pageFile) await loadFile(pageFile)
+          // (2) 주제 키워드 매칭 — 다른 페이지 매뉴얼도 상황에 따라 추가
+          // 토픽 매칭은 중복 OK — 하나의 질문이 여러 매뉴얼을 끌어올 수 있음
+          const TOPIC_MAP: Array<[RegExp, string]> = [
+            // 마켓/구매/가격/할인/Karma 티어 가격 효과 → 가격 테이블이 있는 catalog 매뉴얼
+            [/market|catalog|buy|purchase|sell|concept|sale|price|pricing|cost|discount|cheaper|마켓|구매|판매|카탈로그|가격|할인|싸|비싸/i, "kaas-catalog.md"],
+            // 큐레이션/수익
+            [/curator|curation|author|revenue|earn|reward|withdraw|큐레이터|큐레이션|수익|저자|보상|인출/i, "kaas-knowledge-curation.md"],
+            // 에이전트/MCP/지갑/Karma 티어/온체인 tx 조회
+            [/agent|train|register|MCP|wallet|dashboard|karma|tier|deposit|ledger|transaction|tx|explorer|on[-\s]?chain|blockscout|on[-\s]?chain\s*record|receipt|에이전트|학습|훈련|등록|지갑|대시보드|카르마|충전|티어|트랜잭션|원장|온체인|거래\s*내역/i, "kaas-dashboard.md"],
+            // Karma 언급은 catalog(가격 영향) + dashboard(Karma 설명) 양쪽 다 로드
+            [/karma|카르마/i, "kaas-catalog.md"],
+            [/prompt|template|프롬프트|템플릿/i, "kaas-prompt-templates.md"],
+          ]
+          for (const [pattern, mdFile] of TOPIC_MAP) {
+            if (pattern.test(text)) await loadFile(mdFile)
+          }
+        } catch { /* manual fetch best-effort — never block chat */ }
+
+        const manualBlocks = Array.from(manualsByFile.entries()).map(
+          ([file, content]) => `### Manual: ${file}\n\n${content.trim()}`
+        ).join("\n\n---\n\n")
+        // 최근 대화 히스토리 (하드코딩 예시 Q&A 포함) — 맥락 유지용. 최대 6개 메시지.
+        const HISTORY_LIMIT = 6
+        const historyMsgs = messagesRef.current.slice(-HISTORY_LIMIT - 1, -1) // 방금 추가된 현재 user 메시지 제외
+        const historyBlock = historyMsgs
+          .map((m) => {
+            if (m.role === "user") return `User: ${(m as any).text}`
+            if (m.role === "kaas-chat") return `Cherry: ${(m as any).reply}`
+            if (m.role === "agent-chat") return `Agent: ${(m as any).reply}`
+            return ""
+          })
+          .filter(Boolean)
+          .join("\n")
+
+        const questionWithCtx = manualBlocks
           ? [
-              `[Page Manual — STRICT RULES]`,
-              `1. Only describe features that are documented in the manual below — these are the features available on the user's CURRENT page.`,
-              `2. Do NOT mention or recommend features that exist on other pages of the app (e.g. do not suggest "use Compare on the Catalog page" unless the user is on the Catalog page).`,
-              `3. Do NOT tell the user to navigate to another page to do something.`,
-              `4. No promotional language, no sales pitches, no "try X" suggestions.`,
-              `5. If the question is about something not in this manual, answer factually with general knowledge — do not redirect to other Cherry pages.`,
+              `[Cherry Help — RULES]`,
+              `1. Answer based on the manuals below. They describe the features of this app.`,
+              `2. The user is currently on the "${page ?? "overview"}" page, but they can ask about any feature — if another manual is included below, it's relevant to their question.`,
+              `3. If the feature lives on another page, tell them which page/tab to go to (e.g., "open the Dashboard → Knowledge Curation tab"). This is helpful, not promotional.`,
+              `4. No sales language — state facts, not pitches. Do not say "try it now" or "it's amazing".`,
+              `5. Keep answers short and concrete. Prefer steps over paragraphs when possible.`,
+              `6. Domain-specific meaning:`,
+              `   - "Train / teach / learn" an agent = buying knowledge concepts from the Knowledge Market. Purchase auto-delivers content_md to the agent. Self-report / Diff is NOT training — it is diagnostic (shows gaps).`,
+              `   - "Sell knowledge / monetize" = becoming a curator via Dashboard → Knowledge Curation. Earn 40% of each purchase.`,
+              `   - "Karma tier / discount": higher on-chain Karma tier on Status Network → bigger discount on every Market purchase. Bronze 0% / Silver 5% / Gold 15% / Platinum 30%. Stacks with SALE promo multiplicatively. Default tier is Bronze until the wallet earns Karma on-chain.`,
+              `7. If the question is outside these manuals, answer factually with general knowledge.`,
+              `8. The user and Cherry may have exchanged earlier messages. If a "[Previous conversation]" block is below, use it for context (e.g., follow-up questions referring to earlier topics).`,
               "",
-              manual ? manual.trim() : "(no manual available)",
+              manualBlocks,
               "",
-              `[Context: user is currently viewing the "${page}" page in the Cherry app]`,
-              "",
+              historyBlock ? `[Previous conversation]\n${historyBlock}\n` : "",
+              `[New user question]`,
               text,
-            ].join("\n")
+            ].filter(Boolean).join("\n")
           : text
         const BUSY_MSG = "지금은 체리가 중요한 업무를 처리중입니다. 차후에 응대해 드리겠습니다."
         const result = await chatWithAgent(apiKey, "", questionWithCtx, privacy)
@@ -780,7 +1029,12 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
         scrollToBottom()
       }
     }, 300)
-  }, [input, loading])
+  }, [loading, pushHistory])
+
+  // input 값으로 전송 (Enter / 전송 버튼)
+  const handleSend = useCallback(() => {
+    sendText(input)
+  }, [input, sendText])
 
   // Expose query method to parent
   useImperativeHandle(ref, () => ({
@@ -821,18 +1075,49 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
     <>
       {/* Collapsed button — 콘솔 닫혀있을 때 */}
       {!open && (
-        <button
-          onClick={() => { setOpen(true); scrollToBottom() }}
-          className="fixed bottom-5 right-5 z-[60] flex items-center gap-2 px-3 py-2 rounded-xl bg-[#1A1520] text-white shadow-lg hover:shadow-xl transition-all cursor-pointer border border-[#333]"
-        >
-          <Cherry size={16} className="text-[#C94B6E]" />
-          <span className="text-[12px] font-semibold">Cherry Console</span>
-          <span className="text-[11px] text-[#888]">{credits}cr</span>
-        </button>
+        <>
+          {/* 체리가 살짝 말 거는 말풍선
+              - 꼬리는 말풍선 가로 정중앙
+              - "cr" 제거 후 버튼 폭이 ~150px → Cherry 아이콘 가로 중앙 = 화면 오른쪽 기준 ~150px
+              - translateX(50%) 로 오른쪽 앵커를 말풍선의 중앙으로 사용 */}
+          <div
+            className="fixed z-[60] pointer-events-none transition-all duration-300 ease-out"
+            style={{
+              bottom: 65,
+              right: 150,
+              opacity: bubbleVisible ? 1 : 0,
+              transform: `translate(50%, ${bubbleVisible ? 0 : 8}px)`,
+            }}
+            aria-hidden={!bubbleVisible}
+          >
+            <div className="relative bg-white border border-[#E4E1EE] rounded-2xl shadow-sm px-3.5 py-1 max-w-[260px]">
+              <span className="text-[12px] text-[#1A1626] leading-snug whitespace-nowrap">
+                {typedText}
+              </span>
+              {/* 꼬리 — 말풍선 가로 정중앙 */}
+              <span
+                aria-hidden
+                className="absolute -bottom-[6px] w-3 h-3 bg-white border-r border-b border-[#E4E1EE]"
+                style={{ left: "50%", transform: "translate(-50%, 0) rotate(45deg)" }}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={() => { setOpen(true); scrollToBottom() }}
+            className={cn(
+              "fixed bottom-5 right-5 z-[60] flex items-center gap-2 px-3 py-2 rounded-xl bg-[#1A1520] text-white shadow-lg hover:shadow-xl transition-all cursor-pointer border border-[#333]",
+              consoleShake && "cherry-shake"
+            )}
+          >
+            <Cherry size={16} className="text-[#C94B6E]" />
+            <span className="text-[12px] font-semibold">Cherry Console</span>
+          </button>
+        </>
       )}
 
     {/* 콘솔 패널 — DOM에 유지해서 스크롤 위치 보존 */}
-    <div ref={consoleRef} className={cn("fixed bottom-5 right-5 z-[60] w-[420px] h-[520px] flex flex-col rounded-2xl bg-[#0D0D12] border border-[#333] shadow-2xl", !open && "hidden")}>
+    <div ref={consoleRef} className={cn("fixed bottom-5 right-5 z-[60] w-[420px] h-[520px] flex flex-col rounded-2xl bg-[#0D0D12] border border-[#333] shadow-2xl", !open && "hidden", consoleShake && "cherry-shake")}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#222] flex-shrink-0">
         <div className="flex items-center gap-2">
@@ -857,10 +1142,42 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-[#888]">{credits}cr</span>
-          <button onClick={() => setOpen(false)} className="p-0.5 hover:bg-[#222] rounded cursor-pointer">
+          {messages.length > 0 && (
+            <div className="relative">
+              <button
+                onClick={() => { if (!loading) setShowClearConfirm((v) => !v) }}
+                className="p-0.5 hover:bg-[#222] rounded cursor-pointer disabled:opacity-40"
+                title="Clear conversation"
+                disabled={loading}
+              >
+                <Trash2 size={12} className="text-[#666] hover:text-[#C94B6E]" />
+              </button>
+              {showClearConfirm && (
+                <div
+                  className="absolute right-0 top-full mt-1.5 z-[70] bg-[#1A1520] border border-[#333] rounded-lg shadow-xl px-3 py-2 flex items-center gap-2 whitespace-nowrap"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="text-[11px] text-[#E0E0E0]">Clear all?</span>
+                  <button
+                    onClick={() => { setMessages([]); setShowClearConfirm(false) }}
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded bg-[#C94B6E] text-white hover:opacity-90 cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    onClick={() => setShowClearConfirm(false)}
+                    className="text-[10px] text-[#888] hover:text-[#E0E0E0] cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          <button onClick={() => setOpen(false)} className="p-0.5 hover:bg-[#222] rounded cursor-pointer" title="Minimize">
             <Minus size={12} className="text-[#666]" />
           </button>
-          <button onClick={() => setOpen(false)} className="p-0.5 hover:bg-[#222] rounded cursor-pointer">
+          <button onClick={() => setOpen(false)} className="p-0.5 hover:bg-[#222] rounded cursor-pointer" title="Close">
             <X size={12} className="text-[#666]" />
           </button>
         </div>
@@ -869,9 +1186,33 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center">
+          <div className="flex flex-col items-center justify-center h-full text-center px-2">
             <Cherry size={28} className="text-[#C94B6E] mb-2" />
-            <p className="text-[12px] text-[#888]">Purchase knowledge from the catalog to see conversations here</p>
+            <p className="text-[11px] text-[#888] mb-3">Try one of these</p>
+            <div className="flex flex-col gap-1.5 w-full max-w-[300px]">
+              {Object.keys(EXAMPLE_ANSWERS).map((q) => (
+                <button
+                  key={q}
+                  onClick={() => {
+                    // 하드코딩 답변 — LLM 토큰 낭비 방지.
+                    // 다만 LLM 느낌 살리려고 2초 "생각 중" 로딩 표시 후 답변 출력.
+                    setOpen(true)
+                    setMessages((m) => [...m, { role: "user", text: q }])
+                    setLoading(true)
+                    scrollToBottom()
+                    setTimeout(() => {
+                      setMessages((m) => [...m, { role: "kaas-chat", reply: EXAMPLE_ANSWERS[q] }])
+                      setLoading(false)
+                      scrollToBottom()
+                    }, 2000)
+                  }}
+                  disabled={loading}
+                  className="text-[11.5px] text-left px-3 py-2 rounded-lg bg-[#1A1520] border border-[#333] text-[#E0E0E0] hover:bg-[#241B2C] hover:border-[#444] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -952,12 +1293,19 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
           }
         })}
 
-        {loading && messages[messages.length - 1]?.role === "user" && (
-          <div className="flex items-center gap-1.5 text-[11px] text-[#555] py-2">
-            <div className="w-3 h-3 border-[1.5px] border-[#C94B6E] border-t-transparent rounded-full animate-spin" />
-            Agent is working...
-          </div>
-        )}
+        {loading && (() => {
+          // Cherry 응답이 아직 안 온 동안 계속 스피너 표시.
+          // user 메시지 직후 / agent action 메시지 직후 모두 대응.
+          const lastRole = messages[messages.length - 1]?.role
+          const waitingForCherry = lastRole === "user" || lastRole === "agent"
+          if (!waitingForCherry) return null
+          return (
+            <div className="flex items-center gap-1.5 text-[11px] text-[#555] py-2">
+              <div className="w-3 h-3 border-[1.5px] border-[#C94B6E] border-t-transparent rounded-full animate-spin" />
+              {lastRole === "agent" ? "Waiting for Cherry KaaS..." : "Agent is working..."}
+            </div>
+          )
+        })()}
       </div>
 
       {/* Input */}

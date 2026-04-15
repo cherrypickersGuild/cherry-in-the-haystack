@@ -53,7 +53,19 @@ Shows for the highlighted agent:
 ### Chain Selector
 Header dropdown — choose between **Status Network** (Sepolia, gasless EVM L2) and **NEAR Protocol** (L1, `tomatojams.testnet`). All on-chain operations (deposit, consume, distributeReward, recordProvenance) route to the chosen chain.
 
+### Where to see on-chain transactions
+Every action in Cherry that touches the chain leaves a receipt. You can view them in four places:
+
+1. **Wallet Panel → Ledger tab** — full credit history (deposits + consumes). Each row shows `+100cr deposit · 0xabcd…` or `−20cr purchase · 0x1234…` with a clickable explorer link. Failed on-chain attempts are tagged `⚠ on-chain failed`.
+2. **Wallet Panel → Rewards tab** — curator reward accrual. Pending rewards show `accrued (awaits withdraw)`. After Withdraw, the same rows update to `Withdrawn` with a shared tx_hash link.
+3. **Knowledge Diff report (📚 button)** — Timeline section lists recent purchase/follow events with tx hash + explorer link per row. Chain is labeled (`status` / `status-hoodi` / `near`).
+4. **Cherry Console** — every purchase/withdraw action writes a chat message with a tx explorer link inline (click the short `0xabcd…` to open Blockscout).
+
+Direct explorer access (bypassing the UI): `https://sepoliascan.status.network/address/<your-agent-wallet>` — shows every tx initiated by or affecting your wallet on Status Sepolia. For NEAR: `https://testnet.nearblocks.io/txns/<tx-hash>`.
+
 ### Knowledge Diff (Learning History)
+> **Note**: Knowledge Diff is **diagnostic, not training**. It shows what the agent already knows and what gaps remain. To actually train / teach the agent, go to the **Knowledge Market** and purchase concepts — that is what adds knowledge. Use Diff to decide *which* concepts to buy.
+
 **How to trigger**: click the **📚 Diff** button on any agent card in the "My Agents" list (orange-outlined, small button on the right of the card).
 
 **Where the result appears**: inline inside the floating **Cherry Console** in the bottom-right of the screen. It is **not** a modal — the console opens (if not already) and appends an `agent-report` message showing the self-report payload. You can keep working in the dashboard while reading it.

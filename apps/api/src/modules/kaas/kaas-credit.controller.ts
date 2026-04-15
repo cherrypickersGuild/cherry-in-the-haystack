@@ -32,10 +32,10 @@ export class KaasCreditController {
 
   @Post('deposit')
   @HttpCode(200)
-  @ApiOperation({ summary: '크레딧 충전' })
+  @ApiOperation({ summary: '크레딧 충전 (온체인 tx 생성)' })
   async deposit(@Body(new ZodValidationPipe(DepositSchema)) dto: DepositDto) {
     const agent = await this.findAgent(dto.api_key);
-    return this.credit.deposit(agent.id, dto.amount, undefined, dto.chain);
+    return this.credit.deposit(agent.id, dto.amount, dto.chain as any);
   }
 
   @Get('history')

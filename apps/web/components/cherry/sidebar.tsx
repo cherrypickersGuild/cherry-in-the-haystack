@@ -204,7 +204,7 @@ const SECTIONS: SectionDef[] = [
   },
   {
     id: "agent-shopping",
-    label: "AGENT SHOPPING",
+    label: "AGENT SHOP",
     highlight: true,
     items: [
       { id: "kaas-catalog", icon: <ShoppingBag size={16} />, label: "Knowledge Market" },
@@ -358,13 +358,15 @@ export function Sidebar({
   hideLogo?: boolean
 }) {
   // YouTube 스타일 접기: 헤더 클릭 또는 stem 클릭 → 토글. localStorage에 저장.
+  // 기본값은 Basics / Advanced 모두 접힌 상태 — 메뉴가 간결하게 시작.
   const COLLAPSE_KEY = "cherry_sidebar_collapsed"
+  const DEFAULT_COLLAPSED: Record<string, boolean> = { basics: true, advanced: true }
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
-    if (typeof window === "undefined") return {}
+    if (typeof window === "undefined") return DEFAULT_COLLAPSED
     try {
       const raw = localStorage.getItem(COLLAPSE_KEY)
-      return raw ? JSON.parse(raw) : {}
-    } catch { return {} }
+      return raw ? JSON.parse(raw) : DEFAULT_COLLAPSED
+    } catch { return DEFAULT_COLLAPSED }
   })
   useEffect(() => {
     try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(collapsed)) } catch {}
@@ -393,14 +395,7 @@ export function Sidebar({
       <nav className="flex-1 overflow-y-auto px-2 py-4 pb-6 flex flex-col gap-0.5">
         {SECTIONS.map((section, si) => (
           <div key={section.id} className={si > 0 ? "mt-3" : ""}>
-            <p
-              className={cn(
-                "text-[10px] font-bold uppercase tracking-[0.8px] px-2 mb-1",
-                section.highlight
-                  ? "text-[var(--cherry)]"
-                  : "text-text-muted"
-              )}
-            >
+            <p className="text-[10px] font-bold uppercase tracking-[0.8px] px-2 mb-1 text-text-muted">
               {section.label}
               {section.highlight && (
                 <span className="ml-1.5 text-[9px] font-semibold tracking-normal bg-[var(--cherry)] text-white rounded px-1 py-[1px] align-middle">
