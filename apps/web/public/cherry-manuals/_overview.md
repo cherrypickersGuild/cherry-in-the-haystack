@@ -6,4 +6,4 @@ The app has two surfaces:
 - **Reader pages** (left sidebar) — daily/weekly views of new articles by topic
 - **KaaS** (Knowledge-as-a-Service) — programmatic access for AI agents (catalog, dashboard, curation tools)
 
-The floating **Agent Console** (bottom-right) is page-aware. Each page has its own help; ask there for specifics.
+The floating **Cherry Console** (bottom-right) is page-aware. Each page has its own help; ask there for specifics.

@@ -294,7 +294,7 @@ export default function CherryApp() {
         </main>
       </div>
 
-      {/* Floating Agent Console — visible on all pages.
+      {/* Floating Cherry Console — visible on all pages.
           When the Dashboard modal is open, surface the active sub-tab so the LLM
           can answer page-specific questions (Dashboard / Knowledge Curation / Prompt Templates). */}
       <KaasConsole

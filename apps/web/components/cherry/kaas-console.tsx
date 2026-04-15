@@ -307,6 +307,33 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
   const scrollRef = useRef<HTMLDivElement>(null)
   const consoleRef = useRef<HTMLDivElement>(null)
 
+  // CLI-style input history (bash readline 스타일: ↑ 과거, ↓ 최근/draft, 중복 생략)
+  const HISTORY_KEY = "kaas_console_history"
+  const HISTORY_MAX = 100
+  const [history, setHistory] = useState<string[]>(() => {
+    if (typeof window === "undefined") return []
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY)
+      return raw ? JSON.parse(raw) : []
+    } catch { return [] }
+  })
+  // historyIdx === history.length → 편집 중 (draftRef 사용)
+  // historyIdx < history.length → 과거 항목 표시
+  const [historyIdx, setHistoryIdx] = useState<number>(history.length)
+  const draftRef = useRef<string>("")
+  useEffect(() => { setHistoryIdx(history.length) }, [history.length])
+  const pushHistory = useCallback((text: string) => {
+    setHistory((prev) => {
+      const trimmed = text.trim()
+      if (!trimmed) return prev
+      // 직전 항목과 중복이면 생략 (bash ignoredups)
+      if (prev[prev.length - 1] === trimmed) return prev
+      const next = [...prev, trimmed].slice(-HISTORY_MAX)
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(next)) } catch {}
+      return next
+    })
+  }, [])
+
   // 에이전트 목록 로드
   const [agents, setAgents] = useState<{ id: string; name: string; api_key: string; karma_tier: string }[]>([])
   const [selectedAgentIdx, setSelectedAgentIdx] = useState(0)
@@ -683,6 +710,8 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
   const handleSend = useCallback(() => {
     if (!input.trim() || loading) return
     const text = input.trim()
+    pushHistory(text)
+    draftRef.current = ""
     setInput("")
     setOpen(true)
 
@@ -796,7 +825,7 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
           className="fixed bottom-5 right-5 z-[60] flex items-center gap-2 px-3 py-2 rounded-xl bg-[#1A1520] text-white shadow-lg hover:shadow-xl transition-all cursor-pointer border border-[#333]"
         >
           <Cherry size={16} className="text-[#C94B6E]" />
-          <span className="text-[12px] font-semibold">Agent Console</span>
+          <span className="text-[12px] font-semibold">Cherry Console</span>
           <span className="text-[11px] text-[#888]">{credits}cr</span>
         </button>
       )}
@@ -821,7 +850,7 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
               {agents.map((a, i) => <option key={a.id} value={i} className="bg-[#1A1520] text-white">{a.name}</option>)}
             </select>
           ) : (
-            <span className="text-[12px] font-semibold text-[#E0E0E0]">{currentAgent?.name ?? "Agent Console"}</span>
+            <span className="text-[12px] font-semibold text-[#E0E0E0]">{currentAgent?.name ?? "Cherry Console"}</span>
           )}
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#2A2040] text-[#B8A0D0]">{currentAgent?.karma_tier ?? ""}</span>
         </div>
@@ -936,8 +965,44 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Cherry에게 메시지..."
+            onChange={(e) => {
+              setInput(e.target.value)
+              // 사용자가 직접 편집하면 draft로 간주 — 히스토리 모드 해제
+              if (historyIdx !== history.length) {
+                setHistoryIdx(history.length)
+              }
+              draftRef.current = e.target.value
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowUp") {
+                if (history.length === 0) return
+                e.preventDefault()
+                // 편집 중이었으면 draft 저장
+                if (historyIdx === history.length) draftRef.current = input
+                const nextIdx = Math.max(0, historyIdx - 1)
+                setHistoryIdx(nextIdx)
+                setInput(history[nextIdx])
+                // 커서를 끝으로
+                requestAnimationFrame(() => {
+                  const el = e.currentTarget as HTMLInputElement
+                  if (el) el.setSelectionRange(el.value.length, el.value.length)
+                })
+              } else if (e.key === "ArrowDown") {
+                if (historyIdx >= history.length) return
+                e.preventDefault()
+                const nextIdx = historyIdx + 1
+                setHistoryIdx(nextIdx)
+                setInput(nextIdx === history.length ? draftRef.current : history[nextIdx])
+                requestAnimationFrame(() => {
+                  const el = e.currentTarget as HTMLInputElement
+                  if (el) el.setSelectionRange(el.value.length, el.value.length)
+                })
+              } else if (e.key === "Enter") {
+                // Enter로 submit 시 draft 정리됨(handleSend에서 처리)
+                handleSend()
+              }
+            }}
+            placeholder="Cherry에게 메시지... (↑/↓ for history)"
             disabled={loading}
             className="flex-1 px-2.5 py-1.5 text-[12px] rounded-lg bg-[#1A1520] border border-[#333] text-[#E0E0E0] placeholder:text-[#555] focus:outline-none focus:border-[#D4854A] disabled:opacity-50"
           />

@@ -466,6 +466,13 @@ export async function fetchHistory(apiKey: string) {
   return res.json()
 }
 
+/** 크레딧 Ledger (deposit + consume 원장) */
+export async function fetchLedger(apiKey: string, limit = 50) {
+  const res = await fetch(`${KAAS_BASE}/credits/ledger?api_key=${apiKey}&limit=${limit}`)
+  if (!res.ok) throw new Error("Failed to fetch ledger")
+  return res.json()
+}
+
 /** 에이전트 Self-Report (대시보드 모달용) — 에이전트가 WebSocket으로 보낸 리포트 JSON 수신 */
 export async function fetchAgentSelfReport(agentId: string) {
   const res = await fetch(`${KAAS_BASE}/agents/${agentId}/self-report`)

@@ -53,6 +53,15 @@ export class KaasCreditService {
     return { consumed: finalAmount, remaining };
   }
 
+  /** Ledger 내역 조회 (deposit + consume 모두) */
+  async getLedger(agentId: string, limit = 50): Promise<any[]> {
+    return this.knex('kaas.credit_ledger')
+      .where({ agent_id: agentId })
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .select('id', 'amount', 'type', 'description', 'tx_hash', 'chain', 'created_at');
+  }
+
   /** 크레딧 충전 */
   async deposit(
     agentId: string,

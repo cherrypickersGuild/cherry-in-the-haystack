@@ -598,17 +598,51 @@ function AgentPanel({
   const [onchainKarma, setOnchainKarma] = useState<import("@/lib/api").OnchainKarma | null>(null)
   const [karmaLoading, setKarmaLoading] = useState(false)
   const [karmaError, setKarmaError] = useState<string | null>(null)
+  const [karmaCachedAt, setKarmaCachedAt] = useState<number | null>(null)
+
+  // Karma 캐시 (sessionStorage) — TTL 5분.
+  // Karma는 faucet mint / 에포크 갱신 시에만 바뀜 → 매번 RPC 부담 줄이기.
+  // "Refresh onchain" 버튼은 이 캐시를 무시하고 강제 재조회.
+  const KARMA_CACHE_TTL = 5 * 60 * 1000
+  const karmaCacheKey = (id: string) => `kaas_karma_cache:${id}`
+  const readKarmaCache = (id: string): { data: import("@/lib/api").OnchainKarma; at: number } | null => {
+    if (typeof window === "undefined") return null
+    try {
+      const raw = sessionStorage.getItem(karmaCacheKey(id))
+      if (!raw) return null
+      const parsed = JSON.parse(raw) as { data: import("@/lib/api").OnchainKarma; at: number }
+      if (!parsed.at || Date.now() - parsed.at > KARMA_CACHE_TTL) return null
+      return parsed
+    } catch { return null }
+  }
+  const writeKarmaCache = (id: string, data: import("@/lib/api").OnchainKarma) => {
+    if (typeof window === "undefined") return
+    try { sessionStorage.setItem(karmaCacheKey(id), JSON.stringify({ data, at: Date.now() })) } catch {}
+  }
 
   // Auto-load onchain Karma when selecting an agent (cancels stale requests on switch)
   useEffect(() => {
-    if (!selected?.id) { setOnchainKarma(null); setKarmaError(null); return }
-    setOnchainKarma(null); setKarmaError(null); setKarmaLoading(true)
+    if (!selected?.id) { setOnchainKarma(null); setKarmaError(null); setKarmaCachedAt(null); return }
+    setOnchainKarma(null); setKarmaError(null)
+    // 1. 캐시 HIT이면 즉시 표시 (RPC 안 때림)
+    const cached = readKarmaCache(selected.id)
+    if (cached) {
+      setOnchainKarma(cached.data)
+      setKarmaCachedAt(cached.at)
+      return
+    }
+    // 2. 캐시 MISS → RPC 조회
+    setKarmaLoading(true); setKarmaCachedAt(null)
     let cancelled = false
     ;(async () => {
       try {
         const { fetchAgentKarma } = await import("@/lib/api")
         const r = await fetchAgentKarma(selected.id)
-        if (!cancelled) setOnchainKarma(r)
+        if (!cancelled) {
+          setOnchainKarma(r)
+          writeKarmaCache(selected.id, r)
+          setKarmaCachedAt(Date.now())
+        }
       } catch (e: any) {
         if (!cancelled) setKarmaError(e?.message ?? "Onchain read failed")
       } finally {
@@ -618,6 +652,7 @@ function AgentPanel({
     return () => { cancelled = true }
   }, [selected?.id])
 
+  // 수동 Refresh — 캐시 무시하고 강제 재조회
   const refreshOnchainKarma = async () => {
     if (!selected?.id) return
     setKarmaLoading(true); setKarmaError(null)
@@ -625,6 +660,8 @@ function AgentPanel({
       const { fetchAgentKarma } = await import("@/lib/api")
       const r = await fetchAgentKarma(selected.id)
       setOnchainKarma(r)
+      writeKarmaCache(selected.id, r)
+      setKarmaCachedAt(Date.now())
     } catch (e: any) {
       setKarmaError(e?.message ?? "Onchain read failed")
     } finally {
@@ -784,7 +821,9 @@ function AgentPanel({
                 </div>
               )}
               <p className="text-[9px] text-[#9E97B3] pt-0.5 border-t border-[#E4E1EE]">
-                Live read from {onchainKarma.chain}
+                {karmaCachedAt
+                  ? `Cached ${relDate(new Date(karmaCachedAt).toISOString())} · click Refresh to re-read`
+                  : `Live read from ${onchainKarma.chain}`}
               </p>
             </div>
           )}
@@ -1080,7 +1119,17 @@ function DepositWithdrawButtons({ agent, onDeposited, pendingAmount }: { agent: 
 function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void }) {
   const [activeTab, setActiveTab] = useState<"queries" | "ledger" | "rewards">("queries")
   const [queries, setQueries] = useState<any[]>([])
+  const [ledger, setLedger] = useState<any[]>([])
   const [rewardData, setRewardData] = useState<{ pending: number; withdrawn: number; total: number; rewards: any[] }>({ pending: 0, withdrawn: 0, total: 0, rewards: [] })
+
+  const loadLedger = () => {
+    if (!agent.apiKey) return
+    import("@/lib/api").then(({ fetchLedger }) =>
+      fetchLedger(agent.apiKey).then((data: any[]) => {
+        if (Array.isArray(data)) setLedger(data)
+      }).catch(() => {})
+    )
+  }
 
   const loadHistory = () => {
     if (!agent.apiKey) return
@@ -1115,9 +1164,11 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
 
   useEffect(() => {
     loadHistory()
+    loadLedger()
     loadRewards()
-    window.addEventListener("kaas-agents-changed", loadHistory)
-    return () => window.removeEventListener("kaas-agents-changed", loadHistory)
+    const onChange = () => { loadHistory(); loadLedger() }
+    window.addEventListener("kaas-agents-changed", onChange)
+    return () => window.removeEventListener("kaas-agents-changed", onChange)
   }, [agent.apiKey, agent.name])
 
   const totalEarned = rewardData.total
@@ -1227,11 +1278,58 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
         )}
 
         {activeTab === "ledger" && (
-          <div className="text-center py-8 text-[12px] text-[#9E97B3]">
-            {agent.totalDeposited > 0
-              ? `${agent.totalDeposited}cr deposited · ${agent.totalConsumed}cr consumed`
-              : "No transactions yet. Deposit credits to start."}
-          </div>
+          ledger.length > 0 ? (
+            <div>
+              {ledger.map((e) => {
+                const isDeposit = e.type === "deposit"
+                const amount = Math.abs(e.amount)
+                const hash = e.tx_hash ?? ""
+                const chain = e.chain ?? ""
+                const explorerUrl = hash
+                  ? chain === "near"
+                    ? `https://testnet.nearblocks.io/txns/${hash}`
+                    : `https://sepoliascan.status.network/tx/${hash}`
+                  : ""
+                return (
+                  <div key={e.id} className="flex items-center gap-3 py-2.5 border-b border-[#F2F0F7] last:border-0">
+                    <span className={cn(
+                      "flex items-center justify-center w-6 h-6 rounded-full flex-shrink-0",
+                      isDeposit ? "bg-[#E8F5EF]" : "bg-[#FDEEE3]"
+                    )}>
+                      {isDeposit
+                        ? <ArrowDownRight size={12} className="text-[#2D7A5E]" />
+                        : <ArrowUpRight size={12} className="text-[#D4854A]" />
+                      }
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] text-[#1A1626] font-semibold truncate">
+                        {isDeposit ? "Deposit" : "Consume"}
+                        <span className="ml-1.5 text-[10px] text-[#6B727E] font-normal">{e.description}</span>
+                      </p>
+                      <p className="text-[10px] text-[#6B727E] mt-0.5">{relDate(e.created_at)}</p>
+                    </div>
+                    <span className={cn(
+                      "text-[12px] font-bold flex-shrink-0",
+                      isDeposit ? "text-[#2D7A5E]" : "text-[#D4854A]"
+                    )}>
+                      {isDeposit ? "+" : "−"}{amount}cr
+                    </span>
+                    {hash ? (
+                      <a href={explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B727E] font-mono text-[10px] hover:underline flex-shrink-0 flex items-center gap-0.5">
+                        {hash.slice(0, 10)}...<ExternalLink size={9} />
+                      </a>
+                    ) : isDeposit ? (
+                      <span className="text-[10px] text-[#9E97B3] flex-shrink-0">off-chain</span>
+                    ) : null}
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-[12px] text-[#9E97B3]">
+              No transactions yet. Deposit credits to start.
+            </div>
+          )
         )}
 
         {activeTab === "rewards" && (
@@ -1292,7 +1390,7 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
   const [showRegister, setShowRegister] = useState(false)
   const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "template">("dashboard")
 
-  // Notify parent when the active sub-tab changes (so the floating Agent Console can show the right context)
+  // Notify parent when the active sub-tab changes (so the floating Cherry Console can show the right context)
   useEffect(() => { onTabChange?.(activeTab) }, [activeTab, onTabChange])
 
   const loadAgents = async () => {

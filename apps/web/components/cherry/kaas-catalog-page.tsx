@@ -716,7 +716,7 @@ export function KaasCatalogPage({ onQuery, onCompareResult }: {
       {/* Header + Compare button */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="flex flex-col lg:flex-row lg:items-center gap-1.5 lg:gap-3 mb-2">
+          <div className="flex flex-col lg:flex-row lg:items-start gap-2 lg:gap-3 mb-2">
             <h1
               className="font-extrabold text-[#1A1626] leading-none text-[20px] lg:text-[28px]"
               style={{ letterSpacing: "-0.5px" }}
@@ -728,10 +728,22 @@ export function KaasCatalogPage({ onQuery, onCompareResult }: {
               target="_blank"
               rel="noopener noreferrer"
               title="Registered as a worker on NEAR Agent Market — click to view public profile (cherry_kaas_agent)."
-              className="self-start lg:self-center inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-[#C7B8E8] text-[#5B3D87] bg-[#F3EFFA] hover:bg-[#EDE4FA] hover:border-[#7B5EA7] cursor-pointer transition-colors"
+              className="group self-start inline-flex items-center gap-2 px-2.5 py-1 rounded-md border border-[#E4E1EE] bg-white hover:border-[#1A1626] hover:bg-[#FAFAFB] transition-all cursor-pointer"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2D7A5E]" />
-              NEAR Agent Market
+              <span className="flex flex-col leading-tight">
+                <span className="text-[9px] uppercase tracking-[0.08em] text-[#6B727E] font-semibold">
+                  Listed on
+                </span>
+                <span className="text-[11px] font-bold text-[#1A1626]">
+                  NEAR Agent Market
+                </span>
+              </span>
+              <svg
+                width="10" height="10" viewBox="0 0 10 10" fill="none"
+                className="text-[#6B727E] group-hover:text-[#1A1626] transition-colors ml-0.5"
+              >
+                <path d="M2 8L8 2M8 2H3.5M8 2V6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </a>
           </div>
           <p className="text-[13px] text-text-muted">

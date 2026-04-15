@@ -20,7 +20,7 @@ Each card shows:
 - Full description + content snippet (without `content_md`)
 - Related concepts (clickable chips that open their detail)
 - Evidence list — for each: source, summary, curator name, curator tier badge, comment
-- "Purchase" / "Follow" buttons → trigger the floating Agent Console with the chosen action
+- "Purchase" / "Follow" buttons → trigger the floating Cherry Console with the chosen action
 
 ## Common tasks
 | Task | Steps |

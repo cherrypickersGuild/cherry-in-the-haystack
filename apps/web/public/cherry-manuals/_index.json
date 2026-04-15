@@ -1,5 +1,5 @@
 {
-  "_comment": "currentPage value (from Sidebar nav id or Dashboard sub-tab) → manual filename. The KaaS Agent Console fetches the matching .md and adds it to the LLM context for page-specific answers.",
+  "_comment": "currentPage value (from Sidebar nav id or Dashboard sub-tab) → manual filename. The Cherry Console fetches the matching .md and adds it to the LLM context for page-specific answers.",
   "_default": "_overview.md",
   "highlight": "highlight.md",
   "patch-notes": "patch-notes.md",

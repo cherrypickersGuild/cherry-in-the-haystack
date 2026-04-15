@@ -44,4 +44,11 @@ export class KaasCreditController {
     const agent = await this.findAgent(apiKey);
     return this.provenance.getQueryHistory(agent.id);
   }
+
+  @Get('ledger')
+  @ApiOperation({ summary: '크레딧 원장 내역 (deposit + consume)' })
+  async getLedger(@Query('api_key') apiKey?: string, @Query('limit') limit?: string) {
+    const agent = await this.findAgent(apiKey);
+    return this.credit.getLedger(agent.id, limit ? parseInt(limit, 10) : 50);
+  }
 }
