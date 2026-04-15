@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { cn } from "@/lib/utils"
-import { Search, X, GitCompare, CheckCircle2, AlertCircle, ArrowRight, RefreshCw, ChevronDown } from "lucide-react"
+import { Search, X, GitCompare, CheckCircle2, AlertCircle, ArrowRight, RefreshCw, ChevronDown, ExternalLink } from "lucide-react"
 import { MOCK_AGENTS } from "./kaas-dashboard-page"
 import { fetchCatalog, fetchAgents, compareKnowledge, elicitKnowledge } from "@/lib/api"
 
@@ -716,12 +716,24 @@ export function KaasCatalogPage({ onQuery, onCompareResult }: {
       {/* Header + Compare button */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1
-            className="font-extrabold text-[#1A1626] leading-none mb-2 text-[20px] lg:text-[28px]"
-            style={{ letterSpacing: "-0.5px" }}
-          >
-            Knowledge Catalog
-          </h1>
+          <div className="flex flex-col lg:flex-row lg:items-center gap-1.5 lg:gap-3 mb-2">
+            <h1
+              className="font-extrabold text-[#1A1626] leading-none text-[20px] lg:text-[28px]"
+              style={{ letterSpacing: "-0.5px" }}
+            >
+              Knowledge Catalog
+            </h1>
+            <a
+              href="https://market.near.ai/agents/cherry_kaas_agent"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Registered as a worker on NEAR Agent Market — click to view public profile (cherry_kaas_agent)."
+              className="self-start lg:self-center inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-[#C7B8E8] text-[#5B3D87] bg-[#F3EFFA] hover:bg-[#EDE4FA] hover:border-[#7B5EA7] cursor-pointer transition-colors"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2D7A5E]" />
+              NEAR Agent Market
+            </a>
+          </div>
           <p className="text-[13px] text-text-muted">
             Browse curated AI concepts · {filtered.length} concept{filtered.length !== 1 ? "s" : ""}
             {gapResult && (

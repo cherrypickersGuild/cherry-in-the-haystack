@@ -114,11 +114,19 @@ function RankCard({ item, size = "sm", loading }: { item: ModelUpdatesRankItem; 
   const entityGap = size === "lg" ? "gap-2.5" : "gap-1.5"
   const padding = size === "lg" ? "pt-10 px-6 pb-3" : size === "md" ? "pt-10 px-4 pb-2" : "pt-4 px-4 pb-2"
 
+  // 1위(lg) 카드는 보라 테마 — 상승 뱃지도 보라 계열로. 하락은 그대로 체리(시각 경고 유지).
   const badge = !loading && item.prev_rank === null ? (
     <span className="px-1.5 py-0.5 rounded-full text-[8px] font-bold" style={{ backgroundColor: "#C94B6E", color: "#FFF" }}>NEW</span>
   ) : !loading && pct !== null && pct !== 0 ? (
     <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold ${txt}`}
-      style={{ backgroundColor: pct > 0 ? "#EFF7F3" : "#FDF0F3", color: pct > 0 ? "#2D7A5E" : "#C94B6E" }}
+      style={{
+        backgroundColor: pct > 0
+          ? (size === "lg" ? "#F3EFFA" : "#EFF7F3")
+          : "#FDF0F3",
+        color: pct > 0
+          ? (size === "lg" ? "#5B3D87" : "#2D7A5E")
+          : "#C94B6E",
+      }}
     >
       {pct > 0 ? "↑" : "↓"} {Math.abs(pct)}%
     </span>
@@ -127,7 +135,7 @@ function RankCard({ item, size = "sm", loading }: { item: ModelUpdatesRankItem; 
   return (
     <div
       className={`rounded-[10px] border ${padding} transition-colors hover:!border-[#7B5EA7] h-full flex flex-col relative`}
-      style={{ backgroundColor: size === "lg" ? style.bg : "#FFFFFF", borderColor: size === "lg" ? style.border : "#E4E1EE", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
+      style={{ backgroundColor: size === "lg" ? "#F3EFFA" : "#FFFFFF", borderColor: size === "lg" ? "#C7B8E8" : "#E4E1EE", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
     >
       {badge && <div className="absolute top-3 right-3 flex flex-col items-end gap-1">{badge}</div>}
       <span className={`absolute bottom-3 right-3 ${size === "sm" ? "text-[9px]" : "text-[11px]"} font-bold text-[#9E97B3] ${txt}`}>#{item.rank}</span>
@@ -135,9 +143,9 @@ function RankCard({ item, size = "sm", loading }: { item: ModelUpdatesRankItem; 
         <>
           <div className="flex flex-col items-center justify-center gap-1.5 flex-1">
             {logo && (
-              <img src={logo} alt="" className={`${logoSize} flex-shrink-0`} style={{ color: style.color }} />
+              <img src={logo} alt="" className={`${logoSize} flex-shrink-0`} style={{ color: "#7B5EA7" }} />
             )}
-            <p className={`font-bold text-[#1A1626] ${titleSize} ${txt}`}>
+            <p className={`font-bold ${titleSize} ${txt}`} style={{ color: "#5B3D87" }}>
               {item.category_name.replace(" Family", "")}
             </p>
           </div>
@@ -145,7 +153,7 @@ function RankCard({ item, size = "sm", loading }: { item: ModelUpdatesRankItem; 
             {!loading && topEntities.length > 0 ? (
               topEntities.map((entity, idx) => (
                 <div key={entity.id}>
-                  <span className={`truncate ${idx === 0 ? "font-bold" : "font-medium"} ${entitySize}`} style={{ color: idx === 0 ? style.color : "#3D3652" }}>
+                  <span className={`truncate ${idx === 0 ? "font-bold" : "font-medium"} ${entitySize}`} style={{ color: idx === 0 ? "#7B5EA7" : "#5B3D87" }}>
                     {entity.name}
                   </span>
                 </div>
@@ -169,7 +177,7 @@ function RankCard({ item, size = "sm", loading }: { item: ModelUpdatesRankItem; 
             {!loading && topEntities.length > 0 ? (
               topEntities.map((entity, idx) => (
                 <div key={entity.id}>
-                  <span className={`truncate ${idx === 0 ? "font-medium" : "font-normal"} ${entitySize}`} style={{ color: idx === 0 ? style.color : "#9E97B3" }}>
+                  <span className={`truncate ${idx === 0 ? "font-medium" : "font-normal"} ${entitySize}`} style={{ color: idx === 0 ? "#7B5EA7" : "#5B3D87" }}>
                     {entity.name}
                   </span>
                 </div>
@@ -193,7 +201,7 @@ function RankCard({ item, size = "sm", loading }: { item: ModelUpdatesRankItem; 
             {!loading && topEntities.length > 0 ? (
               topEntities.map((entity, idx) => (
                 <div key={entity.id}>
-                  <span className={`truncate ${idx === 0 ? "font-medium" : "font-normal"} ${entitySize}`} style={{ color: idx === 0 ? style.color : "#9E97B3" }}>
+                  <span className={`truncate ${idx === 0 ? "font-medium" : "font-normal"} ${entitySize}`} style={{ color: idx === 0 ? "#7B5EA7" : "#5B3D87" }}>
                     {entity.name}
                   </span>
                 </div>
@@ -227,7 +235,7 @@ function RisingStarCard({ star, loading }: { star: ModelUpdatesRisingstar; loadi
     >
       <div className="flex-1 min-w-0 lg:pl-12">
         <span className={`inline-block text-[11px] font-semibold mb-2 ${txt}`}
-          style={{ color: "#D4854A" }}
+          style={{ color: "#7B5EA7" }}
         >
           Rising Star — Model to Watch
         </span>
@@ -236,7 +244,7 @@ function RisingStarCard({ star, loading }: { star: ModelUpdatesRisingstar; loadi
         </div>
         {!loading && (
           <span className="absolute top-0 left-0 px-2.5 py-1 text-[10px] font-bold text-white rounded-tl-[5px] rounded-br-[4px]"
-            style={{ backgroundColor: "#D4854A" }}
+            style={{ backgroundColor: "#7B5EA7" }}
           >
             {star.isNew ? "NEW" : "HOT"}
           </span>
@@ -249,7 +257,7 @@ function RisingStarCard({ star, loading }: { star: ModelUpdatesRisingstar; loadi
           </div>
           {pct !== null && (
             <div>
-              <p className="text-[14px] font-bold" style={{ color: pct >= 0 ? "#10B981" : "#D4854A" }}>
+              <p className="text-[14px] font-bold" style={{ color: pct >= 0 ? "#10B981" : "#C94B6E" }}>
                 {pct >= 0 ? "+" : ""}{pct}%
               </p>
               <p className="text-[11px] text-[#9E97B3]">vs last week</p>
@@ -258,7 +266,7 @@ function RisingStarCard({ star, loading }: { star: ModelUpdatesRisingstar; loadi
         </div>
       </div>
       <div className="w-full lg:w-[180px] lg:flex-shrink-0 lg:mr-12">
-        <Sparkline color="#D4854A" />
+        <Sparkline color="#7B5EA7" />
       </div>
     </div>
   )
