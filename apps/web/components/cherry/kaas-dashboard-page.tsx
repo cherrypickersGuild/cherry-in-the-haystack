@@ -1028,6 +1028,20 @@ function RegisterForm({ onComplete, onCancel }: { onComplete: (agent: Agent) => 
 
       {error && <p className="text-[11px] text-red-500 bg-red-50 rounded-lg px-3 py-1.5">{error}</p>}
 
+      <div className="bg-[#F9F7F5] rounded-lg px-3 py-2 border border-[#E4E1EE]">
+        <p className="text-[9px] text-[#6B727E] mb-1">If you have a previous agent registered, remove it first:</p>
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-mono text-[#1A1626]">claude mcp remove cherry-kaas</p>
+          <button
+            onClick={() => { navigator.clipboard.writeText("claude mcp remove cherry-kaas") }}
+            className="p-0.5 hover:bg-white rounded cursor-pointer flex-shrink-0"
+            title="Copy"
+          >
+            <Copy size={11} className="text-[#6B727E]" />
+          </button>
+        </div>
+      </div>
+
       <div>
         <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1.5">Agent Name</p>
         <input
