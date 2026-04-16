@@ -691,7 +691,8 @@ function AgentPanel({
 
   if (!selected) return null
 
-  const mcpCommand = `claude mcp add cherry-kaas /Users/soma/IdeaProjects/cherry-in-the-haystack/apps/api/start-mcp.sh --env KAAS_AGENT_API_KEY=${selected.apiKey} --env ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY`
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://solteti.site'
+  const mcpCommand = `claude mcp add cherry-kaas /path/to/cherry-kaas/apps/api/start-mcp.sh --env KAAS_AGENT_API_KEY=${selected.apiKey} --env KAAS_WS_URL=${siteUrl}`
   const removeCommand = `claude mcp remove cherry-kaas`
 
   const handleCmdCopy = () => {

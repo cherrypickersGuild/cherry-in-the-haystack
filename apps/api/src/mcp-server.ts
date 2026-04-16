@@ -5,6 +5,10 @@
  * AI 에이전트(Claude Desktop 등)가 MCP tool로 지식 카탈로그를 조회/구매/비교할 수 있는 서버.
  * NestJS와 별도 프로세스로 실행되며, stdio로 통신.
  *
+ * KAAS_WS_URL: WebSocket 접속 대상.
+ *   - Claude Code --env로 전달하면 dotenv가 덮어쓰지 않음 (dotenv 기본 동작).
+ *   - 대시보드 명령어에 포함됨: --env KAAS_WS_URL=https://solteti.site
+ *
  * 실행: npx ts-node src/mcp-server.ts
  */
 
