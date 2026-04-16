@@ -312,7 +312,7 @@ function KnowledgeDiffModal({ agentId, agentName, onClose }: { agentId: string; 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
       <div
-        className="relative bg-[#0D1017] text-[#D0D7E0] rounded-xl shadow-2xl w-full max-w-3xl max-h-[88vh] flex flex-col font-mono"
+        className="relative bg-[#0D1017] text-[#D0D7E0] rounded-xl shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col font-mono"
         onClick={(e) => e.stopPropagation()}
         style={{ fontFamily: "'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace" }}
       >
@@ -595,80 +595,6 @@ function AgentPanel({
   const [cmdCopied, setCmdCopied] = useState(false)
   const [removeCopied, setRemoveCopied] = useState(false)
   const [mcpConnected, setMcpConnected] = useState(false)
-  const [onchainKarma, setOnchainKarma] = useState<import("@/lib/api").OnchainKarma | null>(null)
-  const [karmaLoading, setKarmaLoading] = useState(false)
-  const [karmaError, setKarmaError] = useState<string | null>(null)
-  const [karmaCachedAt, setKarmaCachedAt] = useState<number | null>(null)
-
-  // Karma 캐시 (sessionStorage) — TTL 5분.
-  // Karma는 faucet mint / 에포크 갱신 시에만 바뀜 → 매번 RPC 부담 줄이기.
-  // "Refresh onchain" 버튼은 이 캐시를 무시하고 강제 재조회.
-  const KARMA_CACHE_TTL = 5 * 60 * 1000
-  const karmaCacheKey = (id: string) => `kaas_karma_cache:${id}`
-  const readKarmaCache = (id: string): { data: import("@/lib/api").OnchainKarma; at: number } | null => {
-    if (typeof window === "undefined") return null
-    try {
-      const raw = sessionStorage.getItem(karmaCacheKey(id))
-      if (!raw) return null
-      const parsed = JSON.parse(raw) as { data: import("@/lib/api").OnchainKarma; at: number }
-      if (!parsed.at || Date.now() - parsed.at > KARMA_CACHE_TTL) return null
-      return parsed
-    } catch { return null }
-  }
-  const writeKarmaCache = (id: string, data: import("@/lib/api").OnchainKarma) => {
-    if (typeof window === "undefined") return
-    try { sessionStorage.setItem(karmaCacheKey(id), JSON.stringify({ data, at: Date.now() })) } catch {}
-  }
-
-  // Auto-load onchain Karma when selecting an agent (cancels stale requests on switch)
-  useEffect(() => {
-    if (!selected?.id) { setOnchainKarma(null); setKarmaError(null); setKarmaCachedAt(null); return }
-    setOnchainKarma(null); setKarmaError(null)
-    // 1. 캐시 HIT이면 즉시 표시 (RPC 안 때림)
-    const cached = readKarmaCache(selected.id)
-    if (cached) {
-      setOnchainKarma(cached.data)
-      setKarmaCachedAt(cached.at)
-      return
-    }
-    // 2. 캐시 MISS → RPC 조회
-    setKarmaLoading(true); setKarmaCachedAt(null)
-    let cancelled = false
-    ;(async () => {
-      try {
-        const { fetchAgentKarma } = await import("@/lib/api")
-        const r = await fetchAgentKarma(selected.id)
-        if (!cancelled) {
-          setOnchainKarma(r)
-          writeKarmaCache(selected.id, r)
-          setKarmaCachedAt(Date.now())
-        }
-      } catch (e: any) {
-        if (!cancelled) setKarmaError(e?.message ?? "Onchain read failed")
-      } finally {
-        if (!cancelled) setKarmaLoading(false)
-      }
-    })()
-    return () => { cancelled = true }
-  }, [selected?.id])
-
-  // 수동 Refresh — 캐시 무시하고 강제 재조회
-  const refreshOnchainKarma = async () => {
-    if (!selected?.id) return
-    setKarmaLoading(true); setKarmaError(null)
-    try {
-      const { fetchAgentKarma } = await import("@/lib/api")
-      const r = await fetchAgentKarma(selected.id)
-      setOnchainKarma(r)
-      writeKarmaCache(selected.id, r)
-      setKarmaCachedAt(Date.now())
-    } catch (e: any) {
-      setKarmaError(e?.message ?? "Onchain read failed")
-    } finally {
-      setKarmaLoading(false)
-    }
-  }
-
   // MCP 서버 가동 상태 실시간 폴링 (10초마다)
   // — /mcp/sessions 엔드포인트 도달 가능 여부로 서버 alive 체크
   // (Claude Code는 stdio 방식이라 HTTP 세션 목록엔 안 뜨지만, endpoint가 살아있으면 stdio도 가능)
@@ -775,60 +701,13 @@ function AgentPanel({
 
       {/* Selected agent detail — 고정 하단 */}
       <div className="shrink-0 border-t border-[#E4E1EE] pt-3 mt-3 space-y-3">
-        {/* Wallet block — address + its Karma (Karma is a wallet-level property on Status Network, not an agent-level one) */}
+        {/* Wallet address (Karma는 우측 패널로 이동) */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E]">Wallet</p>
-            <button
-              onClick={refreshOnchainKarma}
-              disabled={karmaLoading}
-              className="text-[9px] font-semibold px-1.5 py-0.5 rounded border border-[#E4E1EE] hover:border-[#7B5EA7] text-[#7B5EA7] disabled:opacity-50 cursor-pointer transition-colors flex items-center gap-1"
-              title="Read live from Status Network Karma contract"
-            >
-              {karmaLoading ? "…" : "🔗"} Refresh onchain
-            </button>
-          </div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Wallet</p>
           <div className="flex items-center gap-2">
             <Wallet size={13} className="text-[#7B5EA7]" />
             <span className="text-[12px] font-mono font-semibold text-[#1A1626]">{selected.walletAddress && selected.walletAddress.length > 12 ? `${selected.walletAddress.slice(0, 6)}...${selected.walletAddress.slice(-4)}` : selected.walletAddress || "—"}</span>
           </div>
-          {karmaError && (
-            <p className="text-[10px] text-[#C94B6E] mt-1">⚠ {karmaError}</p>
-          )}
-          {onchainKarma && !karmaError && (
-            <div className="mt-1.5 rounded-md border border-[#E4E1EE] bg-[#FAF8FF] px-2 py-1.5 space-y-1">
-              <div className="flex items-center justify-between text-[10px]">
-                <span className="text-[#6B727E]">Wallet Karma (Status Hoodi)</span>
-                <span className="font-mono text-[#1A1626]">
-                  {onchainKarma.balance.toFixed(2)} KARMA · tier {onchainKarma.onchainTierId} ({onchainKarma.onchainTierName})
-                </span>
-              </div>
-              {typeof onchainKarma.txPerEpoch === "number" && (
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="text-[#6B727E]">Gasless allowance</span>
-                  <span className="font-mono text-[#2D7A5E] font-semibold">{onchainKarma.txPerEpoch.toLocaleString()} tx / epoch</span>
-                </div>
-              )}
-              {onchainKarma.karmaContract && (
-                <div className="flex items-center justify-between text-[9px]">
-                  <span className="text-[#9E97B3]">Karma contract</span>
-                  <a
-                    href={`https://hoodiscan.status.network/address/${onchainKarma.karmaContract}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-[#7B5EA7] hover:underline"
-                  >
-                    {onchainKarma.karmaContract.slice(0, 8)}…{onchainKarma.karmaContract.slice(-4)}
-                  </a>
-                </div>
-              )}
-              <p className="text-[9px] text-[#9E97B3] pt-0.5 border-t border-[#E4E1EE]">
-                {karmaCachedAt
-                  ? `Cached ${relDate(new Date(karmaCachedAt).toISOString())} · click Refresh to re-read`
-                  : `Live read from ${onchainKarma.chain}`}
-              </p>
-            </div>
-          )}
         </div>
 
 
@@ -877,6 +756,25 @@ function AgentPanel({
             </button>
           </div>
           <p className="text-[9px] text-[#9E97B3] mt-1">Run when disconnecting</p>
+        </div>
+
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Connection Test</p>
+          <p className="text-[9px] text-[#9E97B3] mb-1">Paste in Claude Code to verify agent connection:</p>
+          <div className="bg-[#F9F7F5] rounded-lg px-3 py-2 border border-[#E4E1EE] relative">
+            <p className="text-[10px] font-mono text-[#1A1626] pr-6">Submit a self-report of your knowledge to Cherry KaaS server.</p>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText("Submit a self-report of your knowledge to Cherry KaaS server.")
+                setCmdCopied(true)
+                setTimeout(() => setCmdCopied(false), 2000)
+              }}
+              className="absolute top-2 right-2 p-0.5 hover:bg-white rounded cursor-pointer flex-shrink-0"
+              title="Copy test prompt"
+            >
+              {cmdCopied ? <Check size={12} className="text-[#2D7A5E]" /> : <Copy size={12} className="text-[#6B727E]" />}
+            </button>
+          </div>
         </div>
 
         <button
@@ -1201,7 +1099,10 @@ function DepositWithdrawButtons({ agent, onDeposited, pendingAmount, curatorName
 /* ═══════════════════════════════════════════════
    Right Panel — Wallet & Rewards
 ═══════════════════════════════════════════════ */
-function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void }) {
+function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefreshKarma }: {
+  agent: Agent; onRefresh: () => void;
+  karma: import("@/lib/api").OnchainKarma | null; karmaLoading: boolean; karmaError: string | null; onRefreshKarma: () => void;
+}) {
   const [activeTab, setActiveTab] = useState<"queries" | "ledger" | "rewards">("queries")
   const [queries, setQueries] = useState<any[]>([])
   const [ledger, setLedger] = useState<any[]>([])
@@ -1266,7 +1167,7 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
       <h3 className="text-[15px] font-bold text-[#1A1626]">Wallet & Rewards</h3>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-4 gap-2.5">
         <div className="rounded-lg border border-[#E4E1EE] bg-white p-3">
           <div className="flex items-center gap-1.5 mb-1.5">
             <Coins size={13} className="text-[#D4854A]" />
@@ -1290,6 +1191,36 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
           </div>
           <p className="text-[20px] font-extrabold text-[#1A1626]">{pendingAmount} <span className="text-[12px] font-semibold text-[#6B727E]">cr</span></p>
           <p className="text-[11px] text-[#6B727E] mt-0.5">{rewardData.rewards.filter((r: any) => !r.withdrawn).length} to withdraw</p>
+        </div>
+        <div className="rounded-lg border border-[#E4E1EE] bg-white p-3 relative">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Shield size={13} className="text-[#7B5EA7]" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.5px] text-[#7B5EA7]">Karma</span>
+            <button onClick={onRefreshKarma} disabled={karmaLoading} className="ml-auto text-[8px] text-[#7B5EA7] hover:underline cursor-pointer disabled:opacity-50" title="Refresh onchain">
+              {karmaLoading ? "…" : "↻"}
+            </button>
+          </div>
+          {karmaError ? (
+            <p className="text-[10px] text-[#C94B6E]">⚠ {karmaError}</p>
+          ) : karma ? (
+            <>
+              <p className="text-[18px] font-extrabold text-[#1A1626]">{karma.balance.toFixed(1)} <span className="text-[11px] font-semibold text-[#6B727E]">KARMA</span></p>
+              <p className="text-[10px] text-[#6B727E] mt-0.5">tier {karma.onchainTierId} ({karma.onchainTierName})</p>
+              {typeof karma.txPerEpoch === "number" && (
+                <p className="text-[10px] text-[#2D7A5E] font-semibold">{karma.txPerEpoch} tx/epoch</p>
+              )}
+              {karma.karmaContract && (
+                <a href={`https://hoodiscan.status.network/address/${karma.karmaContract}`} target="_blank" rel="noopener noreferrer" className="text-[9px] font-mono text-[#7B5EA7] hover:underline">
+                  {karma.karmaContract.slice(0, 8)}…{karma.karmaContract.slice(-4)}
+                </a>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="text-[18px] font-extrabold text-[#1A1626]">— <span className="text-[11px] font-semibold text-[#6B727E]">KARMA</span></p>
+              <p className="text-[10px] text-[#6B727E] mt-0.5">{karmaLoading ? "loading..." : "click ↻"}</p>
+            </>
+          )}
         </div>
       </div>
 
@@ -1485,6 +1416,62 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
   const [showRegister, setShowRegister] = useState(false)
   const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "template">("dashboard")
 
+  // Karma state — 상위에서 관리하여 좌측(AgentPanel) + 우측(WalletPanel) 양쪽 접근 가능
+  const [onchainKarma, setOnchainKarma] = useState<import("@/lib/api").OnchainKarma | null>(null)
+  const [karmaLoading, setKarmaLoading] = useState(false)
+  const [karmaError, setKarmaError] = useState<string | null>(null)
+
+  const KARMA_CACHE_TTL = 5 * 60 * 1000
+  const karmaCacheKey = (id: string) => `kaas_karma_cache:${id}`
+  const readKarmaCache = (id: string): { data: import("@/lib/api").OnchainKarma; at: number } | null => {
+    if (typeof window === "undefined") return null
+    try {
+      const raw = sessionStorage.getItem(karmaCacheKey(id))
+      if (!raw) return null
+      const parsed = JSON.parse(raw)
+      if (!parsed.at || Date.now() - parsed.at > KARMA_CACHE_TTL) return null
+      return parsed
+    } catch { return null }
+  }
+  const writeKarmaCache = (id: string, data: import("@/lib/api").OnchainKarma) => {
+    if (typeof window === "undefined") return
+    try { sessionStorage.setItem(karmaCacheKey(id), JSON.stringify({ data, at: Date.now() })) } catch {}
+  }
+
+  useEffect(() => {
+    if (!selectedAgentId) { setOnchainKarma(null); setKarmaError(null); return }
+    const cached = readKarmaCache(selectedAgentId)
+    if (cached) { setOnchainKarma(cached.data); return }
+    setKarmaLoading(true); setOnchainKarma(null); setKarmaError(null)
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { fetchAgentKarma } = await import("@/lib/api")
+        const r = await fetchAgentKarma(selectedAgentId)
+        if (!cancelled) { setOnchainKarma(r); writeKarmaCache(selectedAgentId, r) }
+      } catch (e: any) {
+        if (!cancelled) setKarmaError(e?.message ?? "Onchain read failed")
+      } finally {
+        if (!cancelled) setKarmaLoading(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [selectedAgentId])
+
+  const refreshOnchainKarma = async () => {
+    if (!selectedAgentId) return
+    setKarmaLoading(true); setKarmaError(null)
+    try {
+      const { fetchAgentKarma } = await import("@/lib/api")
+      const r = await fetchAgentKarma(selectedAgentId)
+      setOnchainKarma(r); writeKarmaCache(selectedAgentId, r)
+    } catch (e: any) {
+      setKarmaError(e?.message ?? "Onchain read failed")
+    } finally {
+      setKarmaLoading(false)
+    }
+  }
+
   // Notify parent when the active sub-tab changes (so the floating Cherry Console can show the right context)
   useEffect(() => { onTabChange?.(activeTab) }, [activeTab, onTabChange])
 
@@ -1605,7 +1592,7 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
               </div>
               {/* Right — Wallet & Rewards */}
               <div className="flex-1 rounded-xl border border-[#E4E1EE] bg-white p-4 lg:p-5 min-w-0 overflow-y-auto">
-                {selectedAgent ? <WalletPanel agent={selectedAgent} onRefresh={loadAgents} /> : (
+                {selectedAgent ? <WalletPanel agent={selectedAgent} onRefresh={loadAgents} karma={onchainKarma} karmaLoading={karmaLoading} karmaError={karmaError} onRefreshKarma={refreshOnchainKarma} /> : (
                   <div className="flex items-center justify-center h-full text-[13px] text-[#999]">Register an agent</div>
                 )}
               </div>
