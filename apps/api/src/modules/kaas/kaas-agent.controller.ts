@@ -2,14 +2,19 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@ne
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodValidationPipe } from 'src/middleware/zod-validation.pipe';
 import { KaasAgentService } from './kaas-agent.service';
+import { KaasCreditService } from './kaas-credit.service';
 import { RegisterAgentDto } from './input-dto/register-agent.dto';
 
 const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000';
+const WELCOME_CREDITS = 200;
 
 @Controller('v1/kaas/agents')
 @ApiTags('KaaS — Agent')
 export class KaasAgentController {
-  constructor(private readonly agentService: KaasAgentService) {}
+  constructor(
+    private readonly agentService: KaasAgentService,
+    private readonly credit: KaasCreditService,
+  ) {}
 
   @Post('register')
   @HttpCode(201)
@@ -19,6 +24,10 @@ export class KaasAgentController {
   ) {
     // TODO: JWT에서 userId 추출. 현재는 시스템 유저로 대체
     const agent = await this.agentService.register(SYSTEM_USER_ID, dto);
+
+    // 가입 축하 크레딧 자동 지급
+    await this.credit.deposit(agent.id, WELCOME_CREDITS).catch(() => {});
+
     return {
       id: agent.id,
       name: agent.name,
@@ -26,6 +35,7 @@ export class KaasAgentController {
       wallet_address: agent.wallet_address,
       llm_provider: agent.llm_provider,
       karma_tier: agent.karma_tier,
+      credits: WELCOME_CREDITS,
       created_at: agent.created_at,
     };
   }
