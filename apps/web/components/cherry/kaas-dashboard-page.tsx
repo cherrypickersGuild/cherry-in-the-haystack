@@ -1574,9 +1574,10 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
                 {showRegister || showRegisterAuto ? (
                   <RegisterForm
                     onComplete={(newAgent) => {
-                      setAgents((prev) => [...prev, newAgent])
                       setSelectedAgentId(newAgent.id)
                       setShowRegister(false)
+                      // 에이전트 목록 + 잔고 새로 불러오기 (welcome 200cr 반영)
+                      loadAgents()
                       window.dispatchEvent(new Event("kaas-agents-changed"))
                     }}
                     onCancel={() => setShowRegister(false)}
