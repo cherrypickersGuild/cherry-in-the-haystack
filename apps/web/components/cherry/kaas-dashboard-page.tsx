@@ -692,7 +692,7 @@ function AgentPanel({
   if (!selected) return null
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://solteti.site'
-  const apiUrl = siteUrl.includes('localhost:3000') ? siteUrl.replace(':3000', ':4000') : siteUrl
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? (siteUrl.includes('localhost:3000') ? 'http://localhost:4000' : 'https://api.solteti.site')
   const mcpCommand = `curl -so ~/cherry-agent.js ${siteUrl}/cherry-agent.js && curl -so ~/cherry-kaas.sh ${siteUrl}/cherry-kaas.sh && chmod +x ~/cherry-kaas.sh && claude mcp add cherry-kaas ~/cherry-kaas.sh --env KAAS_AGENT_API_KEY=${selected.apiKey} --env KAAS_WS_URL=${apiUrl}`
   const removeCommand = `claude mcp remove cherry-kaas`
 
