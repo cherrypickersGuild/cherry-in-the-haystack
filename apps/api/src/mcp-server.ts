@@ -564,6 +564,7 @@ async function submitKnowledgeViaWs(apiKey: string) {
 
 function connectWebSocket(apiKey: string) {
   const KAAS_WS_URL = process.env.KAAS_WS_URL ?? 'http://localhost:4000';
+  console.error(`[WS] Connecting to ${KAAS_WS_URL}/kaas ...`);
 
   wsSocket = ioClient(`${KAAS_WS_URL}/kaas`, {
     path: '/socket.io',
@@ -575,6 +576,14 @@ function connectWebSocket(apiKey: string) {
 
   wsSocket.on('connect', () => {
     console.error(`[WS] Connected to Cherry KaaS (sid=${wsSocket!.id})`);
+  });
+
+  wsSocket.on('connect_error', (err) => {
+    console.error(`[WS] Connection failed: ${err.message}`);
+  });
+
+  wsSocket.on('disconnect', (reason) => {
+    console.error(`[WS] Disconnected: ${reason}`);
   });
 
   wsSocket.on('connected', (data: any) => {
