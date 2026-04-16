@@ -621,7 +621,7 @@ function AgentPanel({
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? (siteUrl.includes('localhost:3000') ? 'http://localhost:4000' : 'https://api.solteti.site')
   const [osTab, setOsTab] = useState<"mac" | "win">("mac")
   const mcpCommandMac = `curl -so ~/cherry-agent.js ${siteUrl}/cherry-agent.js && curl -so ~/cherry-kaas.sh ${siteUrl}/cherry-kaas.sh && chmod +x ~/cherry-kaas.sh && claude mcp add cherry-kaas ~/cherry-kaas.sh --env KAAS_AGENT_API_KEY=${selected.apiKey} --env KAAS_WS_URL=${apiUrl}`
-  const mcpCommandWin = `powershell -Command "Invoke-WebRequest -Uri ${siteUrl}/cherry-agent.js -OutFile $env:USERPROFILE\\cherry-agent.js; Invoke-WebRequest -Uri ${siteUrl}/cherry-kaas.bat -OutFile $env:USERPROFILE\\cherry-kaas.bat; claude mcp add cherry-kaas \\"$env:USERPROFILE\\cherry-kaas.bat\\" --env KAAS_AGENT_API_KEY=${selected.apiKey} --env KAAS_WS_URL=${apiUrl}"`
+  const mcpCommandWin = `curl.exe -so "$env:USERPROFILE\\cherry-agent.js" ${siteUrl}/cherry-agent.js; curl.exe -so "$env:USERPROFILE\\cherry-kaas.bat" ${siteUrl}/cherry-kaas.bat; claude mcp add cherry-kaas "$env:USERPROFILE\\cherry-kaas.bat" --env KAAS_AGENT_API_KEY=${selected.apiKey} --env KAAS_WS_URL=${apiUrl}`
   const mcpCommand = osTab === "mac" ? mcpCommandMac : mcpCommandWin
   const removeCommand = `claude mcp remove cherry-kaas`
 
