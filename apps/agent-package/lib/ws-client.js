@@ -133,4 +133,4 @@ function connectWebSocket(apiKey, baseUrl) {
   return socket;
 }
 
-module.exports = { connectWebSocket };
+module.exports = { connectWebSocket, fetchAgentData, parseKnowledge };

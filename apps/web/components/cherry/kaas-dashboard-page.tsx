@@ -1411,6 +1411,8 @@ function WalletPanel({ agent, onRefresh }: { agent: Agent; onRefresh: () => void
                       <a href={explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B727E] font-mono text-[10px] hover:underline flex-shrink-0 flex items-center gap-0.5">
                         {hash.slice(0, 10)}...<ExternalLink size={9} />
                       </a>
+                    ) : e.description === "Welcome bonus" ? (
+                      <span className="text-[10px] text-[#9E97B3] flex-shrink-0">🎁 welcome</span>
                     ) : (
                       <span className="text-[10px] text-[#D4854A] flex-shrink-0" title="On-chain recording failed — DB only">⚠ on-chain failed</span>
                     )}

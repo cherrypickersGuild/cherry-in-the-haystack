@@ -35102,118 +35102,6 @@ var require_stdio2 = __commonJS({
   }
 });
 
-// lib/mcp-tools.js
-var require_mcp_tools = __commonJS({
-  "lib/mcp-tools.js"(exports2, module2) {
-    var { z: z2 } = require_zod();
-    async function api(baseUrl, method, path, apiKey, body) {
-      const url = `${baseUrl}/api${path}`;
-      const opts = {
-        method,
-        headers: { "Content-Type": "application/json" }
-      };
-      if (method === "GET") {
-        const sep = url.includes("?") ? "&" : "?";
-        const fullUrl = apiKey ? `${url}${sep}api_key=${apiKey}` : url;
-        const res2 = await fetch(fullUrl, opts);
-        if (!res2.ok) throw new Error(`API ${res2.status}: ${await res2.text()}`);
-        return res2.json();
-      }
-      opts.body = JSON.stringify({ ...body, api_key: apiKey });
-      const res = await fetch(url, opts);
-      if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
-      return res.json();
-    }
-    function txt(content) {
-      return { content: [{ type: "text", text: typeof content === "string" ? content : JSON.stringify(content, null, 2) }] };
-    }
-    function registerTools2(server, apiKey, baseUrl) {
-      server.tool(
-        "search_catalog",
-        "Search the Cherry KaaS knowledge catalog. Returns curated AI/ML concepts with quality scores.",
-        { query: z2.string().optional().describe("Search keyword (optional)"), category: z2.string().optional().describe("Filter by category") },
-        async ({ query, category }) => {
-          try {
-            let path = "/v1/kaas/catalog";
-            const params = [];
-            if (query) params.push(`q=${encodeURIComponent(query)}`);
-            if (category) params.push(`category=${encodeURIComponent(category)}`);
-            if (params.length) path += "?" + params.join("&");
-            const data = await api(baseUrl, "GET", path, null);
-            const concepts = Array.isArray(data) ? data : [];
-            const summary = concepts.map(
-              (c) => `- ${c.id} (\u2605${c.qualityScore ?? c.quality_score ?? 0}) \u2014 ${c.title}: ${c.summary?.slice(0, 80)}...`
-            ).join("\n");
-            return txt(summary || "No concepts found.");
-          } catch (err) {
-            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
-          }
-        }
-      );
-      server.tool(
-        "get_concept",
-        "Get detailed information about a specific concept including evidence from curators.",
-        { concept_id: z2.string().describe('Concept ID (e.g. "rag", "chain-of-thought")') },
-        async ({ concept_id }) => {
-          try {
-            const data = await api(baseUrl, "GET", `/v1/kaas/catalog/${encodeURIComponent(concept_id)}`, null);
-            return txt(data);
-          } catch (err) {
-            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
-          }
-        }
-      );
-      server.tool(
-        "purchase_concept",
-        "Purchase a concept (20 credits base, Karma tier discount applied). Returns full knowledge content, evidence, and provenance.",
-        { concept_id: z2.string().describe("Concept ID to purchase") },
-        async ({ concept_id }) => {
-          try {
-            const data = await api(baseUrl, "POST", "/v1/kaas/purchase", apiKey, { concept_id });
-            return txt(data);
-          } catch (err) {
-            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
-          }
-        }
-      );
-      server.tool(
-        "follow_concept",
-        "Follow a concept (25 credits). Includes future updates. Returns summary and provenance.",
-        { concept_id: z2.string().describe("Concept ID to follow") },
-        async ({ concept_id }) => {
-          try {
-            const data = await api(baseUrl, "POST", "/v1/kaas/follow", apiKey, { concept_id });
-            return txt(data);
-          } catch (err) {
-            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
-          }
-        }
-      );
-      server.tool(
-        "compare_knowledge",
-        "Compare your knowledge against the Cherry catalog. Identifies gaps, outdated knowledge, and recommendations.",
-        {
-          known_topics: z2.array(z2.object({
-            topic: z2.string(),
-            lastUpdated: z2.string().optional()
-          })).describe("List of topics you already know")
-        },
-        async ({ known_topics }) => {
-          try {
-            const data = await api(baseUrl, "POST", "/v1/kaas/catalog/compare", apiKey, { known_topics });
-            return txt(data);
-          } catch (err) {
-            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
-          }
-        }
-      );
-      process.stderr.write(`[cherry-kaas-agent] ${5} MCP tools registered
-`);
-    }
-    module2.exports = { registerTools: registerTools2 };
-  }
-});
-
 // node_modules/xmlhttprequest-ssl/lib/XMLHttpRequest.js
 var require_XMLHttpRequest = __commonJS({
   "node_modules/xmlhttprequest-ssl/lib/XMLHttpRequest.js"(exports2, module2) {
@@ -44112,7 +44000,168 @@ var require_ws_client = __commonJS({
       });
       return socket;
     }
-    module2.exports = { connectWebSocket: connectWebSocket2 };
+    module2.exports = { connectWebSocket: connectWebSocket2, fetchAgentData, parseKnowledge };
+  }
+});
+
+// lib/mcp-tools.js
+var require_mcp_tools = __commonJS({
+  "lib/mcp-tools.js"(exports2, module2) {
+    var { z: z2 } = require_zod();
+    async function api(baseUrl, method, path, apiKey, body) {
+      const url = `${baseUrl}/api${path}`;
+      const opts = {
+        method,
+        headers: { "Content-Type": "application/json" }
+      };
+      if (method === "GET") {
+        const sep = url.includes("?") ? "&" : "?";
+        const fullUrl = apiKey ? `${url}${sep}api_key=${apiKey}` : url;
+        const res2 = await fetch(fullUrl, opts);
+        if (!res2.ok) throw new Error(`API ${res2.status}: ${await res2.text()}`);
+        return res2.json();
+      }
+      opts.body = JSON.stringify({ ...body, api_key: apiKey });
+      const res = await fetch(url, opts);
+      if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
+      return res.json();
+    }
+    function txt(content) {
+      return { content: [{ type: "text", text: typeof content === "string" ? content : JSON.stringify(content, null, 2) }] };
+    }
+    function registerTools2(server, apiKey, baseUrl) {
+      server.tool(
+        "search_catalog",
+        "Search the Cherry KaaS knowledge catalog. Returns curated AI/ML concepts with quality scores.",
+        { query: z2.string().optional().describe("Search keyword (optional)"), category: z2.string().optional().describe("Filter by category") },
+        async ({ query, category }) => {
+          try {
+            let path = "/v1/kaas/catalog";
+            const params = [];
+            if (query) params.push(`q=${encodeURIComponent(query)}`);
+            if (category) params.push(`category=${encodeURIComponent(category)}`);
+            if (params.length) path += "?" + params.join("&");
+            const data = await api(baseUrl, "GET", path, null);
+            const concepts = Array.isArray(data) ? data : [];
+            const summary = concepts.map(
+              (c) => `- ${c.id} (\u2605${c.qualityScore ?? c.quality_score ?? 0}) \u2014 ${c.title}: ${c.summary?.slice(0, 80)}...`
+            ).join("\n");
+            return txt(summary || "No concepts found.");
+          } catch (err) {
+            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+          }
+        }
+      );
+      server.tool(
+        "get_concept",
+        "Get detailed information about a specific concept including evidence from curators.",
+        { concept_id: z2.string().describe('Concept ID (e.g. "rag", "chain-of-thought")') },
+        async ({ concept_id }) => {
+          try {
+            const data = await api(baseUrl, "GET", `/v1/kaas/catalog/${encodeURIComponent(concept_id)}`, null);
+            return txt(data);
+          } catch (err) {
+            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+          }
+        }
+      );
+      server.tool(
+        "purchase_concept",
+        "Purchase a concept (20 credits base, Karma tier discount applied). Returns full knowledge content, evidence, and provenance.",
+        { concept_id: z2.string().describe("Concept ID to purchase") },
+        async ({ concept_id }) => {
+          try {
+            const data = await api(baseUrl, "POST", "/v1/kaas/purchase", apiKey, { concept_id });
+            return txt(data);
+          } catch (err) {
+            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+          }
+        }
+      );
+      server.tool(
+        "follow_concept",
+        "Follow a concept (25 credits). Includes future updates. Returns summary and provenance.",
+        { concept_id: z2.string().describe("Concept ID to follow") },
+        async ({ concept_id }) => {
+          try {
+            const data = await api(baseUrl, "POST", "/v1/kaas/follow", apiKey, { concept_id });
+            return txt(data);
+          } catch (err) {
+            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+          }
+        }
+      );
+      server.tool(
+        "compare_knowledge",
+        "Compare your knowledge against the Cherry catalog. Identifies gaps, outdated knowledge, and recommendations.",
+        {
+          known_topics: z2.array(z2.object({
+            topic: z2.string(),
+            lastUpdated: z2.string().optional()
+          })).describe("List of topics you already know")
+        },
+        async ({ known_topics }) => {
+          try {
+            const data = await api(baseUrl, "POST", "/v1/kaas/catalog/compare", apiKey, { known_topics });
+            return txt(data);
+          } catch (err) {
+            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+          }
+        }
+      );
+      server.tool(
+        "generate_self_report",
+        "Generate a self-report of your current knowledge state and push it to the Cherry KaaS server.",
+        {},
+        async () => {
+          try {
+            if (!_socket || !_socket.connected) {
+              return { content: [{ type: "text", text: "WebSocket not connected. Cannot submit self-report." }], isError: true };
+            }
+            const { fetchAgentData, parseKnowledge } = require_ws_client();
+            const { agents, history } = await fetchAgentData(baseUrl, apiKey);
+            const agent = agents[0];
+            const knowledge = agent ? parseKnowledge(agent.knowledge) : [];
+            const recentEvents = history.slice(0, 10).map((log) => ({
+              at: log.created_at ?? log.timestamp,
+              action: log.action_type ?? log.actionType ?? "purchase",
+              conceptId: log.concept_id ?? log.conceptId,
+              conceptTitle: log.concept_id ?? log.conceptId,
+              creditsConsumed: log.credits_consumed ?? log.creditsConsumed ?? 0,
+              qualityScore: 0,
+              chain: log.chain ?? "status",
+              txHash: log.provenance_hash ?? log.provenanceHash ?? "",
+              onChain: !!(log.provenance_hash ?? log.provenanceHash)
+            }));
+            const totalSpent = recentEvents.reduce((s, e) => s + (e.creditsConsumed ?? 0), 0);
+            const report = {
+              reporter: "cherry-kaas-agent",
+              reported_at: (/* @__PURE__ */ new Date()).toISOString(),
+              triggered_by: "agent",
+              current_knowledge: knowledge,
+              recent_events: recentEvents,
+              summary: {
+                total_events: recentEvents.length,
+                credits_spent: totalSpent
+              },
+              session_pid: process.pid,
+              uptime_seconds: Math.floor(process.uptime())
+            };
+            _socket.emit("submit_self_report", report);
+            return txt(`Self-report submitted: ${knowledge.length} topics, ${recentEvents.length} recent events, ${totalSpent}cr spent.`);
+          } catch (err) {
+            return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+          }
+        }
+      );
+      process.stderr.write(`[cherry-kaas-agent] ${6} MCP tools registered
+`);
+    }
+    var _socket = null;
+    function setSocket2(socket) {
+      _socket = socket;
+    }
+    module2.exports = { registerTools: registerTools2, setSocket: setSocket2 };
   }
 });
 
@@ -44120,7 +44169,7 @@ var require_ws_client = __commonJS({
 var { McpServer } = require_mcp();
 var { StdioServerTransport } = require_stdio2();
 var { z } = require_mcp().z || require_zod();
-var { registerTools } = require_mcp_tools();
+var { registerTools, setSocket } = require_mcp_tools();
 var { connectWebSocket } = require_ws_client();
 var API_KEY = process.env.KAAS_AGENT_API_KEY;
 var BASE_URL = process.env.KAAS_WS_URL ?? "https://solteti.site";
@@ -44137,7 +44186,8 @@ async function main() {
     version: "1.0.0"
   });
   registerTools(server, API_KEY, BASE_URL);
-  connectWebSocket(API_KEY, BASE_URL);
+  const socket = connectWebSocket(API_KEY, BASE_URL);
+  setSocket(socket);
   const transport = new StdioServerTransport();
   await server.connect(transport);
   process.stderr.write("[cherry-kaas-agent] MCP server ready (stdio)\n");

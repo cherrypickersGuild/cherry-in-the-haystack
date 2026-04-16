@@ -125,7 +125,64 @@ function registerTools(server, apiKey, baseUrl) {
     }
   );
 
-  process.stderr.write(`[cherry-kaas-agent] ${5} MCP tools registered\n`);
+  // ── generate_self_report ──
+  server.tool(
+    'generate_self_report',
+    'Generate a self-report of your current knowledge state and push it to the Cherry KaaS server.',
+    {},
+    async () => {
+      try {
+        if (!_socket || !_socket.connected) {
+          return { content: [{ type: 'text', text: 'WebSocket not connected. Cannot submit self-report.' }], isError: true };
+        }
+
+        const { fetchAgentData, parseKnowledge } = require('./ws-client.js');
+        const { agents, history } = await fetchAgentData(baseUrl, apiKey);
+        const agent = agents[0];
+        const knowledge = agent ? parseKnowledge(agent.knowledge) : [];
+
+        const recentEvents = history.slice(0, 10).map(log => ({
+          at: log.created_at ?? log.timestamp,
+          action: log.action_type ?? log.actionType ?? 'purchase',
+          conceptId: log.concept_id ?? log.conceptId,
+          conceptTitle: log.concept_id ?? log.conceptId,
+          creditsConsumed: log.credits_consumed ?? log.creditsConsumed ?? 0,
+          qualityScore: 0,
+          chain: log.chain ?? 'status',
+          txHash: log.provenance_hash ?? log.provenanceHash ?? '',
+          onChain: !!(log.provenance_hash ?? log.provenanceHash),
+        }));
+
+        const totalSpent = recentEvents.reduce((s, e) => s + (e.creditsConsumed ?? 0), 0);
+
+        const report = {
+          reporter: 'cherry-kaas-agent',
+          reported_at: new Date().toISOString(),
+          triggered_by: 'agent',
+          current_knowledge: knowledge,
+          recent_events: recentEvents,
+          summary: {
+            total_events: recentEvents.length,
+            credits_spent: totalSpent,
+          },
+          session_pid: process.pid,
+          uptime_seconds: Math.floor(process.uptime()),
+        };
+
+        _socket.emit('submit_self_report', report);
+
+        return txt(`Self-report submitted: ${knowledge.length} topics, ${recentEvents.length} recent events, ${totalSpent}cr spent.`);
+      } catch (err) {
+        return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  process.stderr.write(`[cherry-kaas-agent] ${6} MCP tools registered\n`);
 }
 
-module.exports = { registerTools };
+/** WebSocket 인스턴스 주입 — agent.js에서 연결 후 호출 */
+let _socket = null;
+function setSocket(socket) { _socket = socket; }
+
+module.exports = { registerTools, setSocket };

@@ -13,7 +13,7 @@
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const { z } = require('@modelcontextprotocol/sdk/server/mcp.js').z || require('zod');
-const { registerTools } = require('../lib/mcp-tools.js');
+const { registerTools, setSocket } = require('../lib/mcp-tools.js');
 const { connectWebSocket } = require('../lib/ws-client.js');
 
 const API_KEY = process.env.KAAS_AGENT_API_KEY;
@@ -37,7 +37,8 @@ async function main() {
   registerTools(server, API_KEY, BASE_URL);
 
   // WebSocket 연결 (self-report, compare, 3자 대화)
-  connectWebSocket(API_KEY, BASE_URL);
+  const socket = connectWebSocket(API_KEY, BASE_URL);
+  setSocket(socket);
 
   // stdio 전송 시작
   const transport = new StdioServerTransport();
