@@ -1112,9 +1112,10 @@ function DepositWithdrawButtons({ agent, onDeposited, pendingAmount, curatorName
 /* ═══════════════════════════════════════════════
    Right Panel — Wallet & Rewards
 ═══════════════════════════════════════════════ */
-function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefreshKarma }: {
+function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefreshKarma, isAdmin = false }: {
   agent: Agent; onRefresh: () => void;
   karma: import("@/lib/api").OnchainKarma | null; karmaLoading: boolean; karmaError: string | null; onRefreshKarma: () => void;
+  isAdmin?: boolean;
 }) {
   const [activeTab, setActiveTab] = useState<"queries" | "ledger" | "rewards">("queries")
   const [queries, setQueries] = useState<any[]>([])
@@ -1141,13 +1142,13 @@ function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefr
 
   const loadRewards = () => {
     if (!agent.name) return
-    import("@/lib/api").then(({ fetchAllRewards }) =>
-      fetchAllRewards().then((data: any[]) => {
-        const total = data.reduce((s: number, r: any) => s + (r.total ?? 0), 0)
-        const pending = data.reduce((s: number, r: any) => s + (r.pending ?? 0), 0)
-        import("@/lib/api").then(({ fetchCuratorRewards }) => {
+    if (isAdmin) {
+      // 관리자: 전체 큐레이터 보상 현황
+      import("@/lib/api").then(({ fetchAllRewards, fetchCuratorRewards }) =>
+        fetchAllRewards().then((data: any[]) => {
+          const total = data.reduce((s: number, r: any) => s + (r.total ?? 0), 0)
+          const pending = data.reduce((s: number, r: any) => s + (r.pending ?? 0), 0)
           if (data.length > 0) {
-            // pending 있는 큐레이터 우선. 없으면 total 많은 순(data[0]).
             const withPending = data.find((r: any) => (r.pending ?? 0) > 0)
             const chosen = withPending ?? data[0]
             const chosenName = chosen.curator_name
@@ -1158,9 +1159,23 @@ function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefr
           } else {
             setRewardData({ pending: 0, withdrawn: 0, total: 0, rewards: [], curatorName: null, chosenPending: 0 })
           }
-        })
-      }).catch(() => {})
-    )
+        }).catch(() => {})
+      )
+    } else {
+      // 일반 유저: 자기 에이전트 이름으로만 조회
+      import("@/lib/api").then(({ fetchCuratorRewards }) =>
+        fetchCuratorRewards(agent.name).then((d: any) => {
+          setRewardData({
+            pending: d.pending ?? 0,
+            withdrawn: d.withdrawn ?? 0,
+            total: d.total ?? 0,
+            rewards: d.rewards ?? [],
+            curatorName: agent.name,
+            chosenPending: d.pending ?? 0,
+          })
+        }).catch(() => setRewardData({ pending: 0, withdrawn: 0, total: 0, rewards: [], curatorName: agent.name, chosenPending: 0 }))
+      )
+    }
   }
 
   useEffect(() => {
@@ -1605,7 +1620,7 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
               </div>
               {/* Right — Wallet & Rewards */}
               <div className="flex-1 rounded-xl border border-[#E4E1EE] bg-white p-4 lg:p-5 min-w-0 overflow-y-auto">
-                {selectedAgent ? <WalletPanel agent={selectedAgent} onRefresh={loadAgents} karma={onchainKarma} karmaLoading={karmaLoading} karmaError={karmaError} onRefreshKarma={refreshOnchainKarma} /> : (
+                {selectedAgent ? <WalletPanel agent={selectedAgent} onRefresh={loadAgents} karma={onchainKarma} karmaLoading={karmaLoading} karmaError={karmaError} onRefreshKarma={refreshOnchainKarma} isAdmin={isAdmin} /> : (
                   <div className="flex items-center justify-center h-full text-[13px] text-[#999]">Register an agent</div>
                 )}
               </div>
