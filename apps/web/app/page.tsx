@@ -135,9 +135,9 @@ export default function CherryApp() {
             <PageHeader />
 
             {/* Category treemap + Side panel row */}
-            <div className="flex flex-col lg:flex-row lg:items-stretch gap-4 mb-6">
+            <div className="flex flex-col lg:flex-row gap-4 mb-6">
               {/* Treemap */}
-              <div className="flex-1 flex flex-col">
+              <div className="flex-1">
                 <CategoryTreemap items={landing?.treemap} />
               </div>
 

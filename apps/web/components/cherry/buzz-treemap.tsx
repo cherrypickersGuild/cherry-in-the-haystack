@@ -182,7 +182,7 @@ export function CategoryTreemap({ items }: { items?: LandingTreemapItem[] }) {
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
 
   const data = items && items.length > 0 ? toDisplayItems(items) : STATIC_BUZZ_DATA
-  const containerH = isMobile ? 420 : 340
+  const containerH = isMobile ? 420 : 310
 
   // percent 내림차순 정렬된 순서로 rank 부여 (1위=0, 나머지=1+)
   const sortedByPct = [...data].sort((a, b) => b.percent - a.percent)
@@ -199,7 +199,7 @@ export function CategoryTreemap({ items }: { items?: LandingTreemapItem[] }) {
   }))
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col">
       <div className="mb-3 flex items-end justify-between">
         <p
           className="text-[12px] font-semibold uppercase tracking-[0.14em] text-text-secondary"
@@ -216,10 +216,10 @@ export function CategoryTreemap({ items }: { items?: LandingTreemapItem[] }) {
       </div>
 
       <div
-        className="rounded-2xl border border-border/80 overflow-hidden p-[6px] shadow-card flex-1"
+        className="rounded-2xl border border-border/80 overflow-hidden p-[6px] shadow-card"
         style={{
           background: "linear-gradient(145deg, rgba(255,255,255,0.98), rgba(238,233,248,0.98))",
-          minHeight: containerH,
+          height: containerH,
         }}
       >
         <ResponsiveContainer width="100%" height="100%">
