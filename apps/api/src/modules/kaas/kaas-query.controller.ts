@@ -26,10 +26,8 @@ export class KaasQueryController {
   ) {}
 
   private async findAgent(apiKey?: string) {
-    if (apiKey) return this.agentService.authenticate(apiKey);
-    const agents = await this.agentService.findByUserId('00000000-0000-0000-0000-000000000000');
-    if (agents.length === 0) throw new NotFoundException('No agent registered');
-    return agents[0];
+    if (!apiKey) throw new NotFoundException('API Key required');
+    return this.agentService.authenticate(apiKey);
   }
 
   /** 에이전트가 이미 해당 concept을 보유하고 있는지 확인 (topic ↔ concept_id 퍼지 매칭) */

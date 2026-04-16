@@ -1,5 +1,11 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
 
+/** JWT 인증 헤더 — localStorage에서 토큰 읽어서 Bearer 헤더 생성 */
+function authHeaders(): Record<string, string> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+  return token ? { 'Authorization': `Bearer ${token}` } : {}
+}
+
 export interface PatchNoteItem {
   id: string
   articleStateId: string
@@ -371,25 +377,26 @@ export async function fetchConcept(conceptId: string) {
   return res.json()
 }
 
-/** 에이전트 등록 */
+/** 에이전트 등록 (JWT 인증 필요) */
 export async function registerAgent(data: { name: string; wallet_address?: string; llm_provider?: string; llm_model?: string; llm_api_key?: string; domain_interests: string[] }) {
   const res = await fetch(`${KAAS_BASE}/agents/register`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(data),
   })
   if (!res.ok) throw new Error("Failed to register agent")
   return res.json()
 }
 
+/** 에이전트 삭제 (JWT 인증 필요) */
 export async function deleteAgent(agentId: string) {
-  const res = await fetch(`${KAAS_BASE}/agents/${agentId}`, { method: "DELETE" })
+  const res = await fetch(`${KAAS_BASE}/agents/${agentId}`, { method: "DELETE", headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to delete agent")
 }
 
-/** 에이전트 목록 */
+/** 에이전트 목록 (JWT 인증 필요 — 로그인 유저의 에이전트만) */
 export async function fetchAgents() {
-  const res = await fetch(`${KAAS_BASE}/agents`)
+  const res = await fetch(`${KAAS_BASE}/agents`, { headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to fetch agents")
   return res.json()
 }
@@ -408,7 +415,7 @@ export interface OnchainKarma {
 }
 
 export async function fetchAgentKarma(agentId: string): Promise<OnchainKarma> {
-  const res = await fetch(`${KAAS_BASE}/agents/${agentId}/karma`, { cache: "no-store" })
+  const res = await fetch(`${KAAS_BASE}/agents/${agentId}/karma`, { cache: "no-store", headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to fetch onchain karma")
   return res.json()
 }

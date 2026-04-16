@@ -16,11 +16,8 @@ export class KaasCreditController {
   ) {}
 
   private async findAgent(apiKey?: string) {
-    if (apiKey) return this.agentService.authenticate(apiKey);
-    // api_key 없으면 첫 번째 에이전트 사용
-    const agents = await this.agentService.findByUserId('00000000-0000-0000-0000-000000000000');
-    if (agents.length === 0) throw new Error('No agent registered');
-    return agents[0];
+    if (!apiKey) throw new Error('API Key required');
+    return this.agentService.authenticate(apiKey);
   }
 
   @Get('balance')
