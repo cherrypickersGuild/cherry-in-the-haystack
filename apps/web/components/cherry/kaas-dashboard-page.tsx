@@ -619,7 +619,10 @@ function AgentPanel({
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://solteti.site'
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? (siteUrl.includes('localhost:3000') ? 'http://localhost:4000' : 'https://api.solteti.site')
-  const mcpCommand = `curl -so ~/cherry-agent.js ${siteUrl}/cherry-agent.js && curl -so ~/cherry-kaas.sh ${siteUrl}/cherry-kaas.sh && chmod +x ~/cherry-kaas.sh && claude mcp add cherry-kaas ~/cherry-kaas.sh --env KAAS_AGENT_API_KEY=${selected.apiKey} --env KAAS_WS_URL=${apiUrl}`
+  const [osTab, setOsTab] = useState<"mac" | "win">("mac")
+  const mcpCommandMac = `curl -so ~/cherry-agent.js ${siteUrl}/cherry-agent.js && curl -so ~/cherry-kaas.sh ${siteUrl}/cherry-kaas.sh && chmod +x ~/cherry-kaas.sh && claude mcp add cherry-kaas ~/cherry-kaas.sh --env KAAS_AGENT_API_KEY=${selected.apiKey} --env KAAS_WS_URL=${apiUrl}`
+  const mcpCommandWin = `Invoke-WebRequest -Uri ${siteUrl}/cherry-agent.js -OutFile $env:USERPROFILE\\cherry-agent.js; Invoke-WebRequest -Uri ${siteUrl}/cherry-kaas.bat -OutFile $env:USERPROFILE\\cherry-kaas.bat; claude mcp add cherry-kaas %USERPROFILE%\\cherry-kaas.bat --env KAAS_AGENT_API_KEY=${selected.apiKey} --env KAAS_WS_URL=${apiUrl}`
+  const mcpCommand = osTab === "mac" ? mcpCommandMac : mcpCommandWin
   const removeCommand = `claude mcp remove cherry-kaas`
 
   const handleCmdCopy = () => {
@@ -731,7 +734,23 @@ function AgentPanel({
         </div>
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Claude Code Connection</p>
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E]">Claude Code Connection</p>
+            <div className="flex items-center gap-0.5 bg-[#F3F1F7] rounded-md p-0.5">
+              <button
+                onClick={() => setOsTab("mac")}
+                className={cn("text-[9px] font-semibold px-2 py-0.5 rounded cursor-pointer transition-colors", osTab === "mac" ? "bg-white text-[#1A1626] shadow-sm" : "text-[#9E97B3] hover:text-[#6B727E]")}
+              >
+                Mac / Linux
+              </button>
+              <button
+                onClick={() => setOsTab("win")}
+                className={cn("text-[9px] font-semibold px-2 py-0.5 rounded cursor-pointer transition-colors", osTab === "win" ? "bg-white text-[#1A1626] shadow-sm" : "text-[#9E97B3] hover:text-[#6B727E]")}
+              >
+                Windows
+              </button>
+            </div>
+          </div>
           <div className="bg-[#F9F7F5] rounded-lg px-3 py-2 border border-[#E4E1EE] relative">
             <p className="text-[10px] font-mono text-[#1A1626] break-all leading-relaxed pr-6">{mcpCommand}</p>
             <button
