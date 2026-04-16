@@ -16,6 +16,7 @@ import { KaasKnowledgeService } from './kaas-knowledge.service';
 import { KaasCreditService } from './kaas-credit.service';
 import { KaasProvenanceService } from './kaas-provenance.service';
 import { KaasCuratorRewardService } from './kaas-curator-reward.service';
+import { KaasAgentDaemonService } from './kaas-agent-daemon.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -36,6 +37,7 @@ import { KaasCuratorRewardService } from './kaas-curator-reward.service';
     KaasProvenanceService,
     KaasCuratorRewardService,
     KaasWsGateway,
+    KaasAgentDaemonService,
   ],
   exports: [
     KaasAgentService,
