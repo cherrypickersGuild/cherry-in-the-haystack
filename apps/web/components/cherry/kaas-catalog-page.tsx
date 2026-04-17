@@ -715,16 +715,20 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
             if (folder.startsWith("cherry-")) ownedIds.add(folder.slice(7))
           }
           if (items.length > 0) source = "local-skills"
-          // 대시보드/콘솔도 같은 보고서를 공유
+          // 대시보드/콘솔도 같은 보고서를 공유 (이벤트 리스너가 캐시도 갱신)
           window.dispatchEvent(new CustomEvent("kaas-self-report", {
             detail: { report: r.report, agentId: (selectedAgent as any).id, agentName: (selectedAgent as any).name },
           }))
         }
-      } catch { /* 연결 없음 → DB fallback */ }
+      } catch { /* 연결 없음 → 캐시/DB fallback */ }
     }
 
-    // 2) 캐시된 localSkillIds도 합침 (privacy 모드 / 대시보드에서 받은 이전 보고서)
+    // 2) 캐시된 localSkillIds도 합침 (fetch 실패 / privacy 모드 / 네비게이션 복원)
+    //    캐시에서 온 ids가 있으면 source도 local-skills로 상향 (DB 보다 신뢰)
+    const cached = selectedAgent ? readCachedSkillIds((selectedAgent as any).id) : new Set<string>()
     for (const id of localSkillIds) ownedIds.add(id)
+    for (const id of cached) ownedIds.add(id)
+    if (source === "db" && (localSkillIds.size > 0 || cached.size > 0)) source = "local-skills"
 
     // 3) DB agent.knowledge 토픽 매칭은 보조 — web 구매(파일 없는 경우) 커버
     const rawKnowledge = (selectedAgent as any).knowledge
@@ -817,12 +821,38 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
   // 자기 보고서(self-report)의 로컬 스킬 파일을 truth로 사용 — 재연결 등으로 DB knowledge가
   // 실제 ~/.claude/skills/ 파일과 어긋나도 로컬이 맞기 때문에.
   // kaas-self-report 이벤트는 대시보드/콘솔에서 dispatch됨.
+  // 페이지 네비게이션으로 React state가 리셋돼도 마지막 스냅샷을 즉시 복원하기 위해
+  // 에이전트별로 localStorage에 캐시.
+  const localSkillsKey = (agentId: string) => `kaas-local-skills-${agentId}`
+  const readCachedSkillIds = (agentId: string): Set<string> => {
+    if (typeof window === "undefined" || !agentId) return new Set()
+    try {
+      const raw = window.localStorage.getItem(localSkillsKey(agentId))
+      if (!raw) return new Set()
+      const arr = JSON.parse(raw)
+      return new Set(Array.isArray(arr) ? arr : [])
+    } catch { return new Set() }
+  }
+  const writeCachedSkillIds = (agentId: string, ids: Set<string>) => {
+    if (typeof window === "undefined" || !agentId) return
+    try {
+      window.localStorage.setItem(localSkillsKey(agentId), JSON.stringify([...ids]))
+    } catch { /* quota */ }
+  }
+
   const [localSkillIds, setLocalSkillIds] = useState<Set<string>>(new Set())
+
+  // 에이전트 변경 시 캐시된 스냅샷 복원
+  useEffect(() => {
+    if (!selectedAgent) return
+    setLocalSkillIds(readCachedSkillIds((selectedAgent as any).id))
+  }, [selectedAgent?.id])
 
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail
       const items = detail?.report?.local_skills?.items ?? []
+      const agentId = detail?.agentId ?? ""
       const ids = new Set<string>()
       for (const s of items) {
         if (!s?.hasSkillMd) continue
@@ -830,6 +860,7 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
         if (folder.startsWith("cherry-")) ids.add(folder.slice(7))
       }
       setLocalSkillIds(ids)
+      if (agentId) writeCachedSkillIds(agentId, ids)
     }
     window.addEventListener("kaas-self-report", handler)
     return () => window.removeEventListener("kaas-self-report", handler)
