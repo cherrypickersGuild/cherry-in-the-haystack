@@ -430,7 +430,7 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
   }, [])
 
   // 에이전트 목록 로드
-  const [agents, setAgents] = useState<{ id: string; name: string; api_key: string; karma_tier: string }[]>([])
+  const [agents, setAgents] = useState<{ id: string; name: string; api_key: string; karma_tier: string; wallet_type: "evm" | "near"; wallet_address: string }[]>([])
   const [selectedAgentIdx, setSelectedAgentIdx] = useState(0)
 
 
@@ -439,12 +439,21 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
       const { fetchAgents, fetchBalance } = await import("@/lib/api")
       const raw: any[] = await fetchAgents()
       if (Array.isArray(raw) && raw.length > 0) {
-        const mapped = raw.map((a: any) => ({
-          id: a.id,
-          name: a.name,
-          api_key: a.api_key ?? "",
-          karma_tier: a.karma_tier ?? "Bronze",
-        }))
+        const mapped = raw.map((a: any) => {
+          const walletAddr: string = a.wallet_address ?? a.walletAddress ?? ""
+          // wallet_type 없으면 주소 prefix로 추정 (0x → evm, 그 외 비어있지 않으면 near)
+          const walletType: "evm" | "near" =
+            a.wallet_type ?? a.walletType ??
+            (walletAddr.startsWith("0x") ? "evm" : (walletAddr ? "near" : "evm"))
+          return {
+            id: a.id,
+            name: a.name,
+            api_key: a.api_key ?? "",
+            karma_tier: a.karma_tier ?? "Bronze",
+            wallet_type: walletType,
+            wallet_address: walletAddr,
+          }
+        })
         setAgents(mapped)
         // 현재 선택된 에이전트 또는 첫 번째 에이전트의 잔액
         const key = mapped[selectedAgentIdx]?.api_key || mapped[0]?.api_key
@@ -818,9 +827,23 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
             selectedChain = mod.getSelectedChain()
           } catch { /* 기본값 status */ }
 
+          // NEAR + NEAR 지갑 에이전트 → 사용자 지갑이 직접 서명 (provenance self-transfer 1 yoctoNEAR)
+          const currentAgent = agents[selectedAgentIdx]
+          const agentWalletType = currentAgent?.wallet_type ?? "evm"
+          let preSignedTx: string | undefined
+          if (selectedChain === "near" && agentWalletType === "near") {
+            try {
+              const { signAndSendNearProvenance } = await import("@/lib/near-connector")
+              const { txHash } = await signAndSendNearProvenance(`${act}:${conceptId}`)
+              preSignedTx = txHash
+            } catch (e) {
+              console.warn("[NEAR sign] direct signing failed, falling back to server path:", e)
+            }
+          }
+
           const apiResult = act === "purchase"
-            ? await purchaseConcept(apiKey, conceptId, selectedChain)
-            : await followConcept(apiKey, conceptId, selectedChain)
+            ? await purchaseConcept(apiKey, conceptId, selectedChain, preSignedTx ? { preSignedTx } : undefined)
+            : await followConcept(apiKey, conceptId, selectedChain, preSignedTx ? { preSignedTx } : undefined)
 
           clearInterval(phaseTimer)
 

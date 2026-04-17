@@ -337,6 +337,7 @@ function DetailModal({
   disabled,
   owned,
   agentConnected,
+  agentWalletType,
   onSale,
 }: {
   concept: Concept
@@ -349,8 +350,33 @@ function DetailModal({
   disabled?: boolean
   owned?: boolean
   agentConnected?: boolean
+  agentWalletType?: "evm" | "near"
   onSale?: boolean
 }) {
+  // 체인 선택 추적 (Dashboard의 CHAIN_EVENT — dashboard 페이지에서 정의됨)
+  const [selectedChainUi, setSelectedChainUi] = useState<"status" | "near">("status")
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const CHAIN_KEY = "kaas-selected-chain"
+    const CHAIN_EVENT = "kaas-selected-chain-changed"
+    const read = () => {
+      const v = (window.localStorage.getItem(CHAIN_KEY) as "status" | "near") || "status"
+      setSelectedChainUi(v)
+    }
+    read()
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail
+      if (detail === "status" || detail === "near") setSelectedChainUi(detail)
+    }
+    window.addEventListener(CHAIN_EVENT, handler)
+    return () => window.removeEventListener(CHAIN_EVENT, handler)
+  }, [])
+
+  // NEAR chain ↔ EVM wallet (또는 반대) 조합은 실패 경고
+  const chainWalletMismatch =
+    !!agentWalletType &&
+    ((selectedChainUi === "near" && agentWalletType === "evm") ||
+      (selectedChainUi === "status" && agentWalletType === "near"))
   // 세일 할인율은 DB에서 가져옴 (concept.saleDiscount %)
   const saleRate = (concept.saleDiscount ?? 20) / 100
   const purchaseBase = 20
@@ -509,6 +535,15 @@ function DetailModal({
                 owned ? "bg-[#2D7A5E]" : "bg-[#D4854A]",
               )} />
               {blockReason}
+            </div>
+          )}
+          {!blocked && chainWalletMismatch && (
+            <div className="mb-2 text-[11px] flex items-start gap-1.5 text-[#C97B1A] bg-[#FFF8F0] rounded-lg px-2.5 py-1.5 border border-[#F3D7AB]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C97B1A] mt-1 flex-shrink-0" />
+              <span>
+                Selected chain is <b>{selectedChainUi === "near" ? "NEAR" : "Status"}</b> but the agent uses a{" "}
+                <b>{agentWalletType === "evm" ? "MetaMask" : "NEAR"}</b> wallet. Switch chain (top-right) or use an agent with the matching wallet type.
+              </span>
             </div>
           )}
           {onSale && !blocked && (
@@ -959,6 +994,12 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
           disabled={false}
           owned={submitted && isOwned(selected.id)}
           agentConnected={!!(selectedAgent && (selectedAgent as any).is_active !== false && (selectedAgent as any).api_key)}
+          agentWalletType={(() => {
+            const w: string = (selectedAgent as any)?.wallet_type ?? (selectedAgent as any)?.walletType ?? ""
+            if (w === "evm" || w === "near") return w
+            const addr: string = (selectedAgent as any)?.wallet_address ?? (selectedAgent as any)?.walletAddress ?? ""
+            return addr.startsWith("0x") ? "evm" : addr ? "near" : undefined
+          })()}
           onSale={!!selected.onSale}
           onQuery={(title, depth, conceptId) => {
             onQuery?.(title, depth, conceptId)

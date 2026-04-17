@@ -75,10 +75,20 @@ export class KaasQueryController {
 
       // SALE: DB에서 할인율 조회 (0이면 세일 아님)
       const saleDiscountPct = await this.knowledge.getSaleDiscount(dto.concept_id);
-      const { consumed, remaining } = await this.credit.consume(
-        agent.id, ACTION_PRICE.purchase, agent.karma_tier as KarmaTierName, dto.concept_id, 'purchase',
-        { saleDiscount: saleDiscountPct / 100 },
-      );
+
+      // NEAR 등 유저-직접-서명 체인: 클라이언트가 pre_signed_tx 제공 → 서버는 DB만 차감
+      const preSignedTx = (dto as any).pre_signed_tx as string | undefined;
+      const chainOverride = (dto as any).chain as 'status' | 'near' | 'mock' | undefined;
+
+      const { consumed, remaining } = preSignedTx && chainOverride
+        ? await this.credit.consumeDbOnly(
+            agent.id, ACTION_PRICE.purchase, agent.karma_tier as KarmaTierName, dto.concept_id, 'purchase',
+            { saleDiscount: saleDiscountPct / 100, preSignedTxHash: preSignedTx, chain: chainOverride },
+          )
+        : await this.credit.consume(
+            agent.id, ACTION_PRICE.purchase, agent.karma_tier as KarmaTierName, dto.concept_id, 'purchase',
+            { saleDiscount: saleDiscountPct / 100 },
+          );
 
       const responseData = {
         answer: concept.summary,
@@ -90,7 +100,8 @@ export class KaasQueryController {
 
       const prov = await this.provenance.recordQuery(
         agent.id, dto.concept_id, 'purchase', consumed, responseData,
-        (dto as any).chain, // chain override (status | near | mock)
+        chainOverride, // chain override (status | near | mock)
+        preSignedTx && chainOverride ? { txHash: preSignedTx, chain: chainOverride } : undefined,
       );
 
       // 큐레이터 보상 40% 자동 지급 (비동기)
@@ -142,10 +153,20 @@ export class KaasQueryController {
     }
 
     const saleDiscountPct = await this.knowledge.getSaleDiscount(dto.concept_id);
-    const { consumed, remaining } = await this.credit.consume(
-      agent.id, ACTION_PRICE.follow, agent.karma_tier as KarmaTierName, dto.concept_id, 'follow',
-      { saleDiscount: saleDiscountPct / 100 },
-    );
+
+    // NEAR 등 유저-직접-서명 체인: 클라이언트가 pre_signed_tx 제공 → 서버는 DB만 차감
+    const preSignedTx = (dto as any).pre_signed_tx as string | undefined;
+    const chainOverride = (dto as any).chain as 'status' | 'near' | 'mock' | undefined;
+
+    const { consumed, remaining } = preSignedTx && chainOverride
+      ? await this.credit.consumeDbOnly(
+          agent.id, ACTION_PRICE.follow, agent.karma_tier as KarmaTierName, dto.concept_id, 'follow',
+          { saleDiscount: saleDiscountPct / 100, preSignedTxHash: preSignedTx, chain: chainOverride },
+        )
+      : await this.credit.consume(
+          agent.id, ACTION_PRICE.follow, agent.karma_tier as KarmaTierName, dto.concept_id, 'follow',
+          { saleDiscount: saleDiscountPct / 100 },
+        );
 
     const responseData = {
       answer: concept.summary,
@@ -157,7 +178,8 @@ export class KaasQueryController {
 
     const prov = await this.provenance.recordQuery(
       agent.id, dto.concept_id, 'follow', consumed, responseData,
-      (dto as any).chain,
+      chainOverride,
+      preSignedTx && chainOverride ? { txHash: preSignedTx, chain: chainOverride } : undefined,
     );
 
     // 큐레이터 보상 40% 자동 지급 (비동기)

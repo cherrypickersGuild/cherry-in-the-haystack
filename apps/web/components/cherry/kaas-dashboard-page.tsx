@@ -498,6 +498,7 @@ type Agent = {
   name: string
   icon: string
   walletAddress: string
+  walletType: "evm" | "near"
   karmaTier: string
   karmaBalance: number
   credits: number
@@ -524,7 +525,7 @@ const MOCK_AGENTS: Agent[] = [
     walletAddress: "0x742d...F4a8", karmaTier: "Silver", karmaBalance: 1250,
     credits: 230, totalDeposited: 500, totalConsumed: 270,
     domainInterests: ["AI Engineering", "LLM Frameworks", "Embeddings"],
-    apiKey: "ck_live_a1b2c3d4e5f6g7h8i9j0", registeredAt: "2026-04-10",
+    walletType: "evm" as const, apiKey: "ck_live_a1b2c3d4e5f6g7h8i9j0", registeredAt: "2026-04-10",
     llmProvider: "claude", llmModel: "claude-opus-4-6",
     knowledge: [
       { topic: "RAG", lastUpdated: "2025-11-15" },
@@ -537,7 +538,7 @@ const MOCK_AGENTS: Agent[] = [
     walletAddress: "0x892a...B3c1", karmaTier: "Bronze", karmaBalance: 320,
     credits: 150, totalDeposited: 200, totalConsumed: 50,
     domainInterests: ["Embeddings", "RAG Pipelines", "Semantic Search"],
-    apiKey: "ck_live_k9l8m7n6o5p4q3r2s1t0", registeredAt: "2026-04-12",
+    walletType: "evm" as const, apiKey: "ck_live_k9l8m7n6o5p4q3r2s1t0", registeredAt: "2026-04-12",
     llmProvider: "openai", llmModel: "gpt-4o",
     knowledge: [
       { topic: "Embeddings", lastUpdated: "2026-04-10" },
@@ -549,7 +550,7 @@ const MOCK_AGENTS: Agent[] = [
     walletAddress: "0x553f...D7e2", karmaTier: "Bronze", karmaBalance: 180,
     credits: 80, totalDeposited: 100, totalConsumed: 20,
     domainInterests: ["Prompt Engineering", "Evaluation"],
-    apiKey: "ck_live_u1v2w3x4y5z6a7b8c9d0", registeredAt: "2026-04-13",
+    walletType: "evm" as const, apiKey: "ck_live_u1v2w3x4y5z6a7b8c9d0", registeredAt: "2026-04-13",
     llmProvider: "claude", llmModel: "claude-sonnet-4-5",
     knowledge: [
       { topic: "Prompt Engineering", lastUpdated: "2026-04-01" },
@@ -808,6 +809,7 @@ function AgentPanel({
 ═══════════════════════════════════════════════ */
 function RegisterForm({ onComplete, onCancel }: { onComplete: (agent: Agent) => void; onCancel: () => void }) {
   const [name, setName] = useState("")
+  const [walletType, setWalletType] = useState<"evm" | "near">("evm")
   const [walletAddress, setWalletAddress] = useState("")
   const [walletConnected, setWalletConnected] = useState(false)
   const [registering, setRegistering] = useState(false)
@@ -815,6 +817,27 @@ function RegisterForm({ onComplete, onCancel }: { onComplete: (agent: Agent) => 
   const [registeredKey, setRegisteredKey] = useState("")
   const [copied, setCopied] = useState(false)
   const [removeHintCopied, setRemoveHintCopied] = useState(false)
+
+  // NEAR 선택 시 기존 연결된 세션 자동 감지 (새로 연결 필요 없으면 버튼 누를 필요 X)
+  useEffect(() => {
+    if (walletType !== "near") return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { getConnectedNearAccount } = await import("@/lib/near-connector")
+        const acct = await getConnectedNearAccount()
+        if (!cancelled && acct) {
+          setWalletAddress(acct)
+          setWalletConnected(true)
+        }
+      } catch {
+        /* ignore */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [walletType])
 
   const connectMetaMask = async () => {
     try {
@@ -831,6 +854,34 @@ function RegisterForm({ onComplete, onCancel }: { onComplete: (agent: Agent) => 
     }
   }
 
+  const connectNear = async () => {
+    try {
+      const { connectNearWallet } = await import("@/lib/near-connector")
+      const accountId = await connectNearWallet()
+      setWalletAddress(accountId)
+      setWalletConnected(true)
+      setError("")
+    } catch (e: any) {
+      console.error("[connectNear] failed:", e)
+      setError(`NEAR wallet connection failed: ${e?.message ?? e}`)
+    }
+  }
+
+  /** NEAR 저장된 세션을 초기화하고 다시 선택 가능하게 */
+  const changeWallet = async () => {
+    if (walletType === "near") {
+      try {
+        const { disconnectNearWallet } = await import("@/lib/near-connector")
+        await disconnectNearWallet()
+      } catch {
+        /* ignore */
+      }
+    }
+    setWalletAddress("")
+    setWalletConnected(false)
+    setError("")
+  }
+
   const handleRegister = async () => {
     if (!name.trim() || !walletAddress) return
     setRegistering(true)
@@ -840,11 +891,13 @@ function RegisterForm({ onComplete, onCancel }: { onComplete: (agent: Agent) => 
       const raw: any = await registerAgent({
         name: name.trim(),
         wallet_address: walletAddress,
+        wallet_type: walletType,
         domain_interests: [],
       })
       const newAgent: Agent = {
         id: raw.id, name: raw.name, icon: "🤖",
         walletAddress: raw.wallet_address ?? walletAddress,
+        walletType: (raw.wallet_type ?? walletType) as "evm" | "near",
         karmaTier: raw.karma_tier ?? "Bronze", karmaBalance: 0,
         credits: 0, totalDeposited: 0, totalConsumed: 0,
         domainInterests: [], llmProvider: "", llmModel: "",
@@ -970,15 +1023,58 @@ function RegisterForm({ onComplete, onCancel }: { onComplete: (agent: Agent) => 
       </div>
 
       <div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1.5">Wallet Type</p>
+        <div className="inline-flex p-0.5 bg-[#F9F7F5] rounded-lg border border-[#E4E1EE] mb-2">
+          <button
+            type="button"
+            onClick={() => { if (!walletConnected) setWalletType("evm") }}
+            disabled={walletConnected}
+            className={cn(
+              "text-[11px] font-semibold px-3 py-1 rounded-md transition-colors",
+              walletType === "evm" ? "bg-white text-[#D4854A] shadow-sm" : "text-[#6B727E]",
+              walletConnected && "opacity-60 cursor-not-allowed",
+            )}
+          >
+            Ethereum
+          </button>
+          <button
+            type="button"
+            onClick={() => { if (!walletConnected) setWalletType("near") }}
+            disabled={walletConnected}
+            className={cn(
+              "text-[11px] font-semibold px-3 py-1 rounded-md transition-colors",
+              walletType === "near" ? "bg-white text-[#7B5EA7] shadow-sm" : "text-[#6B727E]",
+              walletConnected && "opacity-60 cursor-not-allowed",
+            )}
+          >
+            NEAR
+          </button>
+        </div>
+
         <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1.5">Connect Wallet</p>
         {walletConnected ? (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#2D7A5E] bg-[#EFF7F3]">
             <Check size={14} className="text-[#2D7A5E]" />
-            <span className="text-[11px] font-mono text-[#1A1626]">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+            <span className="text-[11px] font-mono text-[#1A1626] flex-1 truncate">
+              {walletType === "evm"
+                ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                : walletAddress}
+            </span>
+            <button
+              type="button"
+              onClick={changeWallet}
+              className="text-[10px] text-[#6B727E] hover:text-[var(--cherry)] underline cursor-pointer flex-shrink-0"
+            >
+              Change
+            </button>
           </div>
-        ) : (
+        ) : walletType === "evm" ? (
           <button onClick={connectMetaMask} className="w-full text-[12px] font-semibold py-2 rounded-lg border border-[#D4854A] text-[#D4854A] hover:bg-[#FFF8F0] cursor-pointer flex items-center justify-center gap-2">
             <Wallet size={14} /> Connect MetaMask
+          </button>
+        ) : (
+          <button onClick={connectNear} className="w-full text-[12px] font-semibold py-2 rounded-lg border border-[#7B5EA7] text-[#7B5EA7] hover:bg-[#F3EFFA] cursor-pointer flex items-center justify-center gap-2">
+            <Wallet size={14} /> Connect NEAR Wallet
           </button>
         )}
       </div>
@@ -1006,6 +1102,7 @@ function DepositWithdrawButtons({ agent, onDeposited, pendingAmount, curatorName
   const [showDeposit, setShowDeposit] = useState(false)
   const [amount, setAmount] = useState(100)
   const [depositing, setDepositing] = useState(false)
+  const [withdrawing, setWithdrawing] = useState(false)
   const [withdrawMsg, setWithdrawMsg] = useState(false)
   const [result, setResult] = useState<{ msg: string; ok: boolean; tx?: string; explorer?: string } | null>(null)
 
@@ -1520,9 +1617,15 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
           if (key) {
             try { balance = await fetchBalance(key) } catch { /* ignore */ }
           }
+          const walletAddr = a.wallet_address ?? a.walletAddress ?? ""
+          // DB의 wallet_type이 비어있으면 주소 prefix로 추정 (0x → evm, 그 외 비어있지 않으면 near)
+          const walletTypeGuess: "evm" | "near" =
+            a.wallet_type ?? a.walletType ??
+            (walletAddr.startsWith("0x") ? "evm" : (walletAddr ? "near" : "evm"))
           return {
             id: a.id, name: a.name, icon: a.icon ?? "🤖",
-            walletAddress: a.wallet_address ?? a.walletAddress ?? "",
+            walletAddress: walletAddr,
+            walletType: walletTypeGuess,
             karmaTier: a.karma_tier ?? a.karmaTier ?? "Bronze",
             karmaBalance: a.karma_balance ?? a.karmaBalance ?? 0,
             credits: balance.balance, totalDeposited: balance.totalDeposited, totalConsumed: balance.totalConsumed,

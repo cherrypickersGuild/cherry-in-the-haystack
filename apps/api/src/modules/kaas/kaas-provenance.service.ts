@@ -27,8 +27,21 @@ export class KaasProvenanceService {
     return '0x' + createHash('sha256').update(JSON.stringify(data)).digest('hex');
   }
 
+  /** 체인별 explorer URL 구성 (pre-signed tx 링크 생성용) */
+  private buildExplorerUrl(chain: ChainName, txHash: string): string {
+    switch (chain) {
+      case 'near':
+        return `https://testnet.nearblocks.io/txns/${txHash}`;
+      case 'status':
+        return `https://sepoliascan.status.network/tx/${txHash}`;
+      default:
+        return '';
+    }
+  }
+
   /** 쿼리 로그 기록 + 온체인 프로비넌스 기록 (동기)
-   *  chainOverride: 요청별로 체인 지정 ('status' | 'near' | 'mock'). 미지정 시 env 기본값 */
+   *  chainOverride: 요청별로 체인 지정 ('status' | 'near' | 'mock'). 미지정 시 env 기본값
+   *  preSigned: 유저 지갑이 직접 서명한 tx hash가 있으면 온체인 호출을 건너뛰고 그 hash를 그대로 저장. */
   async recordQuery(
     agentId: string,
     conceptId: string,
@@ -36,6 +49,7 @@ export class KaasProvenanceService {
     creditsConsumed: number,
     responseData: Record<string, unknown>,
     chainOverride?: ChainName,
+    preSigned?: { txHash: string; chain: ChainName; explorerUrl?: string },
   ): Promise<{ queryLogId: string; provenanceHash: string | null; explorerUrl: string | null; onChain: boolean; chain: string; error?: string }> {
     // 매 구매마다 고유한 hash 생성
     const uniqueData = {
@@ -45,7 +59,7 @@ export class KaasProvenanceService {
       _nonce: Math.random().toString(36).slice(2),
     };
     const localHash = this.generateHash(uniqueData);
-    const chain = chainOverride ?? (process.env.CHAIN_ADAPTER as ChainName) ?? 'mock';
+    const chain = preSigned?.chain ?? chainOverride ?? (process.env.CHAIN_ADAPTER as ChainName) ?? 'mock';
 
     // 1차: 로컬 해시로 DB 선저장
     const [log] = await this.knex('kaas.query_log')
@@ -59,6 +73,23 @@ export class KaasProvenanceService {
         response_snapshot: JSON.stringify(responseData),
       })
       .returning('*');
+
+    // 유저가 이미 서명한 tx가 있으면 서버 서명 skip, 해당 tx hash 그대로 기록
+    if (preSigned?.txHash) {
+      const explorerUrl = preSigned.explorerUrl ?? this.buildExplorerUrl(preSigned.chain, preSigned.txHash);
+      await this.knex('kaas.query_log').where({ id: log.id }).update({
+        provenance_hash: preSigned.txHash,
+        chain: preSigned.chain,
+      });
+      this.logger.log(`On-chain provenance [${preSigned.chain}] (pre-signed): ${preSigned.txHash}`);
+      return {
+        queryLogId: log.id,
+        provenanceHash: preSigned.txHash,
+        explorerUrl,
+        onChain: true,
+        chain: preSigned.chain,
+      };
+    }
 
     // 체인별 어댑터 선택 (runtime override 지원)
     const adapter = chainOverride ? getChainAdapter(chainOverride) : this.chainAdapter;

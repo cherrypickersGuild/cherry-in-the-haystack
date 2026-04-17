@@ -300,6 +300,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.9.1
         version: 3.10.0(react-hook-form@7.72.0(react@19.2.4))
+      '@hot-labs/near-connect':
+        specifier: ^0.11.1
+        version: 0.11.1
       '@radix-ui/react-accordion':
         specifier: 1.2.12
         version: 1.2.12(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1373,6 +1376,9 @@ packages:
     resolution: {integrity: sha512-79Dv+3mDF7i+2ajj7SkypSKHhl1cbln1OGavqrsF7p6mbUv11xpqpacPsGDCTRvCSjEEIez2ef1NveSVL3b0Ag==}
     peerDependencies:
       react-hook-form: ^7.0.0
+
+  '@hot-labs/near-connect@0.11.1':
+    resolution: {integrity: sha512-pREyFIGuC5CapWD0p1FkAJSB32AS5qM/7h4OtgRm6K2lZnUZtT6w8dnvs7Tn8vHmi4IASGRdTdpoYvQZ3nstUA==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -9506,6 +9512,8 @@ snapshots:
   '@hookform/resolvers@3.10.0(react-hook-form@7.72.0(react@19.2.4))':
     dependencies:
       react-hook-form: 7.72.0(react@19.2.4)
+
+  '@hot-labs/near-connect@0.11.1': {}
 
   '@humanfs/core@0.19.1': {}
 

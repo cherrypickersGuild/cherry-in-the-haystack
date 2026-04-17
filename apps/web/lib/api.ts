@@ -378,7 +378,7 @@ export async function fetchConcept(conceptId: string) {
 }
 
 /** 에이전트 등록 (JWT 인증 필요) */
-export async function registerAgent(data: { name: string; wallet_address?: string; llm_provider?: string; llm_model?: string; llm_api_key?: string; domain_interests: string[] }) {
+export async function registerAgent(data: { name: string; wallet_address?: string; wallet_type?: "evm" | "near"; llm_provider?: string; llm_model?: string; llm_api_key?: string; domain_interests: string[] }) {
   const res = await fetch(`${KAAS_BASE}/agents/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...authHeaders() },
@@ -438,12 +438,25 @@ export async function depositCredits(apiKey: string, amount: number, chain?: str
   return res.json()
 }
 
-/** 구매 — chain 지정 시 해당 체인에 온체인 기록 (status | near) */
-export async function purchaseConcept(apiKey: string, conceptId: string, chain?: "status" | "near" | "mock") {
+/**
+ * 구매 — chain 지정 시 해당 체인에 온체인 기록 (status | near)
+ * opts.preSignedTx 제공 시 서버는 온체인 서명을 생략하고 해당 hash를 그대로 저장 (NEAR 유저-직접-서명용).
+ */
+export async function purchaseConcept(
+  apiKey: string,
+  conceptId: string,
+  chain?: "status" | "near" | "mock",
+  opts?: { preSignedTx?: string },
+) {
   const res = await fetch(`${KAAS_BASE}/purchase`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ concept_id: conceptId, api_key: apiKey, ...(chain ? { chain } : {}) }),
+    body: JSON.stringify({
+      concept_id: conceptId,
+      api_key: apiKey,
+      ...(chain ? { chain } : {}),
+      ...(opts?.preSignedTx ? { pre_signed_tx: opts.preSignedTx } : {}),
+    }),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
@@ -452,12 +465,25 @@ export async function purchaseConcept(apiKey: string, conceptId: string, chain?:
   return res.json()
 }
 
-/** 팔로우 — chain 지정 시 해당 체인에 온체인 기록 */
-export async function followConcept(apiKey: string, conceptId: string, chain?: "status" | "near" | "mock") {
+/**
+ * 팔로우 — chain 지정 시 해당 체인에 온체인 기록
+ * opts.preSignedTx 제공 시 서버는 온체인 서명을 생략하고 해당 hash를 그대로 저장 (NEAR 유저-직접-서명용).
+ */
+export async function followConcept(
+  apiKey: string,
+  conceptId: string,
+  chain?: "status" | "near" | "mock",
+  opts?: { preSignedTx?: string },
+) {
   const res = await fetch(`${KAAS_BASE}/follow`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ concept_id: conceptId, api_key: apiKey, ...(chain ? { chain } : {}) }),
+    body: JSON.stringify({
+      concept_id: conceptId,
+      api_key: apiKey,
+      ...(chain ? { chain } : {}),
+      ...(opts?.preSignedTx ? { pre_signed_tx: opts.preSignedTx } : {}),
+    }),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
