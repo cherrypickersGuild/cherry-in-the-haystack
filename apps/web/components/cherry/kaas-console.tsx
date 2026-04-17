@@ -206,7 +206,7 @@ function CherryMsg({ msg }: { msg: Message & { role: "cherry" } }) {
             <ExternalLink size={8} />
           </a>
         ) : msg.privacy && msg.teeProvenance === undefined ? (
-          <div className="w-3 h-3 border-[1.5px] border-[#7B5EA7] border-t-transparent rounded-full animate-spin" />
+          <span className="inline-block w-3 h-3 border-[1.5px] border-[#7B5EA7] border-t-transparent rounded-full animate-spin" />
         ) : null}
       </p>
       <div className={cn(

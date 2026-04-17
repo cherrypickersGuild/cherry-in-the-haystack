@@ -120,7 +120,9 @@ export async function connectNearWallet(): Promise<string> {
   if (!c) throw new Error("NEAR connector unavailable (SSR)")
   let wallet: NearWalletBase
   try {
-    wallet = await c.connect()
+    // walletId 지정 → 지갑 선택 셀렉터 팝업 스킵, 바로 MyNearWallet 로그인 페이지로 리다이렉트
+    // (검증된 지갑만 노출해서 데모 안정성 확보)
+    wallet = await c.connect({ walletId: "mynearwallet" })
   } catch (e: any) {
     console.error("[near-connector] c.connect() failed:", e)
     throw new Error(

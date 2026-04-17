@@ -46,52 +46,35 @@ function setSelectedChain(value: SelectedChain) {
   window.dispatchEvent(new CustomEvent(CHAIN_EVENT, { detail: value }))
 }
 
-function ChainSelector() {
-  const [chain, setChain] = useState<SelectedChain>("status")
+/**
+ * ChainBadge — 읽기 전용 상태 표시
+ * 에이전트 walletType에서 결정된 payment chain을 그대로 보여준다.
+ * walletType 변경 시 localStorage(selectedChain)도 자동 동기화하여
+ * catalog/console(CHAIN_EVENT 구독자)이 연쇄 반영되도록 한다.
+ * 교차 선택을 원천 차단 — MetaMask → Status, NEAR → NEAR 고정.
+ */
+function ChainBadge({ walletType }: { walletType: "evm" | "near" }) {
   useEffect(() => {
-    setChain(getSelectedChain())
-    const handler = (e: Event) => setChain((e as CustomEvent).detail)
-    window.addEventListener(CHAIN_EVENT, handler)
-    return () => window.removeEventListener(CHAIN_EVENT, handler)
-  }, [])
-  const toggle = (next: SelectedChain) => {
-    setChain(next)
-    setSelectedChain(next)
-  }
+    const next: SelectedChain = walletType === "near" ? "near" : "status"
+    if (getSelectedChain() !== next) setSelectedChain(next)
+  }, [walletType])
+
+  const isNear = walletType === "near"
   return (
-    <div className="flex items-center gap-1 p-1 rounded-lg border border-[#E4E1EE] bg-[#FAFAFA] flex-shrink-0">
-      <button
-        onClick={() => toggle("status")}
-        title="Status Network Sepolia — gasless L2, zero fees"
-        className={cn(
-          "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] font-semibold transition-colors cursor-pointer leading-tight",
-          chain === "status"
-            ? "bg-[#EFF7F3] text-[#2D7A5E]"
-            : "text-[#6B727E] hover:text-[#3D3652]",
-        )}
-      >
-        <span className="w-1.5 h-1.5 rounded-full bg-[#2D7A5E] flex-shrink-0" />
-        <span className="flex flex-col items-start">
-          <span>Status Network</span>
-          <span className="text-[9px] font-medium opacity-70">Gasless L2</span>
-        </span>
-      </button>
-      <button
-        onClick={() => toggle("near")}
-        title="NEAR Protocol Testnet — L1, small NEAR fees"
-        className={cn(
-          "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] font-semibold transition-colors cursor-pointer leading-tight",
-          chain === "near"
-            ? "bg-[#F3EFFA] text-[#5B3D87]"
-            : "text-[#6B727E] hover:text-[#3D3652]",
-        )}
-      >
-        <span className="w-1.5 h-1.5 rounded-full bg-[#7B5EA7] flex-shrink-0" />
-        <span className="flex flex-col items-start">
-          <span>NEAR Protocol</span>
-          <span className="text-[9px] font-medium opacity-70">L1 Testnet</span>
-        </span>
-      </button>
+    <div
+      title={isNear ? "NEAR Protocol Testnet — L1" : "Status Network Sepolia — gasless L2"}
+      className={cn(
+        "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold leading-tight flex-shrink-0",
+        isNear
+          ? "bg-[#F3EFFA] text-[#5B3D87] border-[#7B5EA7]/30"
+          : "bg-[#EFF7F3] text-[#2D7A5E] border-[#2D7A5E]/30",
+      )}
+    >
+      <span className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", isNear ? "bg-[#7B5EA7]" : "bg-[#2D7A5E]")} />
+      <span className="flex flex-col items-start">
+        <span>{isNear ? "NEAR Protocol" : "Status Network"}</span>
+        <span className="text-[9px] font-medium opacity-70">{isNear ? "L1 Testnet" : "Gasless L2 (Sepolia)"}</span>
+      </span>
     </div>
   )
 }
@@ -1035,7 +1018,7 @@ function RegisterForm({ onComplete, onCancel }: { onComplete: (agent: Agent) => 
               walletConnected && "opacity-60 cursor-not-allowed",
             )}
           >
-            Ethereum
+            MetaMask
           </button>
           <button
             type="button"
@@ -1355,14 +1338,14 @@ function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefr
         </div>
       </div>
 
-      {/* 결제 체인 선택 */}
+      {/* 결제 체인 — 에이전트 지갑 타입에서 자동 결정 (교차 선택 불가) */}
       <div className="rounded-lg border border-[#E4E1EE] bg-white p-3">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between lg:gap-3">
           <div className="min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-[0.6px] text-[#6B727E]">Payment Chain</p>
-            <p className="text-[10px] text-[#9E97B3] mt-0.5">Select the chain where on-chain receipts will be recorded</p>
+            <p className="text-[10px] text-[#9E97B3] mt-0.5">Determined by this agent&rsquo;s wallet — MetaMask → Status, NEAR → NEAR</p>
           </div>
-          <ChainSelector />
+          <ChainBadge walletType={agent.walletType} />
         </div>
       </div>
 
