@@ -250,11 +250,29 @@ export async function signAndSendNearProvenance(memo?: string): Promise<{
   })
 
   if (memo) console.log(`[NEAR provenance] memo=${memo}`)
+  // outcome shape가 지갑마다 달라서 (MNW redirect / popup / FinalExecutionOutcome) 모두 시도
+  console.log("[NEAR provenance] outcome:", outcome)
 
-  const txHash =
+  const firstArr = Array.isArray(outcome) ? outcome[0] : null
+  const txHash: string =
     outcome?.transaction?.hash ??
     outcome?.transaction_outcome?.id ??
+    outcome?.transactionHashes?.[0] ??
+    outcome?.hash ??
+    outcome?.id ??
+    firstArr?.transaction?.hash ??
+    firstArr?.transaction_outcome?.id ??
     ""
-  const explorerUrl = txHash ? `https://testnet.nearblocks.io/txns/${txHash}` : ""
+
+  if (!txHash) {
+    // 유저가 분명 서명했는데 hash를 못 뽑는 경우 — 폴백으로 서버 서명하면 double-sign이 된다.
+    // 명시적으로 실패시켜 상위에서 깨닫도록.
+    console.error("[NEAR provenance] Could not extract tx hash from outcome:", outcome)
+    throw new Error(
+      "NEAR tx signed but hash not found in outcome. Check console for outcome shape.",
+    )
+  }
+
+  const explorerUrl = `https://testnet.nearblocks.io/txns/${txHash}`
   return { txHash, explorerUrl, signerId }
 }

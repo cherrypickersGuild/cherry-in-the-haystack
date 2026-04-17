@@ -832,13 +832,13 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
           const agentWalletType = currentAgent?.wallet_type ?? "evm"
           let preSignedTx: string | undefined
           if (selectedChain === "near" && agentWalletType === "near") {
-            try {
-              const { signAndSendNearProvenance } = await import("@/lib/near-connector")
-              const { txHash } = await signAndSendNearProvenance(`${act}:${conceptId}`)
-              preSignedTx = txHash
-            } catch (e) {
-              console.warn("[NEAR sign] direct signing failed, falling back to server path:", e)
+            // NEAR 경로는 유저 서명이 필수 — 실패하면 서버 서명 폴백 금지 (double-sign 방지)
+            const { signAndSendNearProvenance } = await import("@/lib/near-connector")
+            const { txHash } = await signAndSendNearProvenance(`${act}:${conceptId}`)
+            if (!txHash) {
+              throw new Error("NEAR wallet signature required but hash not found")
             }
+            preSignedTx = txHash
           }
 
           const apiResult = act === "purchase"
