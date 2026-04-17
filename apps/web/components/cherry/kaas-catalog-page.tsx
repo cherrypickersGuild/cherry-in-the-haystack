@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { Search, X, GitCompare, CheckCircle2, AlertCircle, ArrowRight, RefreshCw, ChevronDown, ExternalLink } from "lucide-react"
 import { MOCK_AGENTS } from "./kaas-dashboard-page"
-import { fetchCatalog, fetchAgents, compareKnowledge, elicitKnowledge } from "@/lib/api"
+import { fetchCatalog, fetchAgents } from "@/lib/api"
 
 /* ─────────────────────────────────────────────
    Mock data — seed-data.json 스펙 기준 3개 개념
@@ -604,11 +604,9 @@ function DetailModal({
 }
 
 /* ─────────────────────────────────────────────
-   Compare — gap analysis logic (mock)
+   Compare types
 ───────────────────────────────────────────── */
 type CompareStatus = "up-to-date" | "outdated" | "gap"
-
-type AgentKnowledge = { topic: string; lastUpdated: string }
 
 type GapResult = {
   upToDate: { conceptId: string; title: string; qualityScore: number }[]
@@ -617,70 +615,6 @@ type GapResult = {
   recommendations: { conceptId: string; suggestedDepth: string; estimatedCredits: number; reason: string }[]
 }
 
-function analyzeGaps(agentKnowledge: AgentKnowledge[], conceptList: Concept[]): GapResult {
-  const upToDate: GapResult["upToDate"] = []
-  const outdated: GapResult["outdated"] = []
-  const gaps: GapResult["gaps"] = []
-
-  for (const concept of conceptList) {
-    const titleLower = concept.title.toLowerCase()
-    const idLower = concept.id.toLowerCase()
-    const match = agentKnowledge.find(
-      (k) =>
-        titleLower.includes(k.topic.toLowerCase()) ||
-        idLower.includes(k.topic.toLowerCase()) ||
-        k.topic.toLowerCase().includes(idLower) ||
-        k.topic.toLowerCase().includes(titleLower.split(" ")[0])
-    )
-
-    if (match) {
-      const agentTime = new Date(match.lastUpdated).getTime()
-      const catalogTime = new Date(concept.updatedAt).getTime()
-
-      if (agentTime >= catalogTime) {
-        upToDate.push({ conceptId: concept.id, title: concept.title, qualityScore: concept.qualityScore })
-      } else {
-        const daysBehind = Math.floor((catalogTime - agentTime) / 86400000)
-        outdated.push({
-          conceptId: concept.id,
-          title: concept.title,
-          agentDate: match.lastUpdated,
-          catalogDate: concept.updatedAt,
-          newEvidence: Math.min(concept.evidence.length, Math.max(1, Math.ceil(daysBehind / 30))),
-        })
-      }
-    } else {
-      gaps.push({
-        conceptId: concept.id,
-        title: concept.title,
-        qualityScore: concept.qualityScore,
-      })
-    }
-  }
-
-  gaps.sort((a, b) => b.qualityScore - a.qualityScore)
-
-  const recommendations: GapResult["recommendations"] = [
-    ...outdated.map((o) => ({
-      conceptId: o.conceptId,
-      suggestedDepth: "summary" as const,
-      estimatedCredits: 5,
-      reason: `${o.newEvidence} new evidence since your last update`,
-    })),
-    ...gaps.map((g) => ({
-      conceptId: g.conceptId,
-      suggestedDepth: g.qualityScore >= 4.5 ? "evidence" : "concept",
-      estimatedCredits: g.qualityScore >= 4.5 ? 20 : 10,
-      reason: "Not in agent's knowledge base",
-    })),
-  ]
-
-  return { upToDate, outdated, gaps, recommendations }
-}
-
-/* ─────────────────────────────────────────────
-   Compare Panel
-───────────────────────────────────────────── */
 /* ─────────────────────────────────────────────
    Main: KaaS Catalog Page
 ───────────────────────────────────────────── */
@@ -755,37 +689,86 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
   const [gapResult, setGapResult] = useState<GapResult | null>(null)
   const submitted = armed
 
-  const runCompare = (silent: boolean) => {
+  // Compare는 이제 server-side `elicitKnowledge`/`compareKnowledge`(DB agent.knowledge 기반, 재연결 후 stale)
+  // 대신, 에이전트 self-report의 local_skills (파일시스템 실제 상태)을 ground truth로 사용.
+  //   cherry-{uuid} 폴더명 → conceptId → catalog와 매칭해 owned/gap 판정.
+  // DB knowledge는 web 구매(파일 없는 경우)만 보조적으로 merge.
+  const runCompare = async (silent: boolean) => {
     if (!selectedAgent) return
+
+    const { getPrivacyMode } = await import("@/components/cherry/kaas-dashboard-page")
+    const privacy = getPrivacyMode()
+
+    const ownedIds = new Set<string>()
+    let source: "local-skills" | "db" = "db"
+
+    // 1) 우선 self-report로 로컬 파일 목록 가져옴 (privacy 모드에선 서버 왕복 차단)
+    if (!privacy) {
+      try {
+        const { fetchAgentSelfReport } = await import("@/lib/api")
+        const r: any = await fetchAgentSelfReport((selectedAgent as any).id)
+        if (r?.ok && r?.report) {
+          const items = r.report?.local_skills?.items ?? []
+          for (const s of items) {
+            if (!s?.hasSkillMd) continue
+            const folder = (s.dir ?? "").split("/").filter(Boolean).pop() ?? ""
+            if (folder.startsWith("cherry-")) ownedIds.add(folder.slice(7))
+          }
+          if (items.length > 0) source = "local-skills"
+          // 대시보드/콘솔도 같은 보고서를 공유
+          window.dispatchEvent(new CustomEvent("kaas-self-report", {
+            detail: { report: r.report, agentId: (selectedAgent as any).id, agentName: (selectedAgent as any).name },
+          }))
+        }
+      } catch { /* 연결 없음 → DB fallback */ }
+    }
+
+    // 2) 캐시된 localSkillIds도 합침 (privacy 모드 / 대시보드에서 받은 이전 보고서)
+    for (const id of localSkillIds) ownedIds.add(id)
+
+    // 3) DB agent.knowledge 토픽 매칭은 보조 — web 구매(파일 없는 경우) 커버
     const rawKnowledge = (selectedAgent as any).knowledge
     const knowledge: any[] = (() => {
       try { return typeof rawKnowledge === 'string' ? JSON.parse(rawKnowledge) : (Array.isArray(rawKnowledge) ? rawKnowledge : []) } catch { return [] }
     })()
-    const handleResult = (result: any, privacy = false) => {
-      setGapResult(result)
-      if (!silent) onCompareResult?.(privacy ? { ...result, privacy: true } : result)
+    for (const c of concepts) {
+      if (ownedIds.has(c.id)) continue
+      const titleLower = c.title.toLowerCase()
+      const idLower = c.id.toLowerCase()
+      const match = knowledge.find((k: any) => {
+        const topic = (k?.topic ?? "").toLowerCase()
+        if (!topic) return false
+        return titleLower.includes(topic) || idLower.includes(topic) || topic.includes(idLower) || topic.includes(titleLower.split(" ")[0])
+      })
+      if (match) ownedIds.add(c.id)
     }
 
-    ;(async () => {
-      const { getPrivacyMode } = await import("@/components/cherry/kaas-dashboard-page")
-      const privacy = getPrivacyMode()
+    // 4) catalog를 ownedIds와 비교해 up-to-date / gap 나눔
+    const upToDate: Array<{ conceptId: string; title: string; qualityScore: number }> = []
+    const gaps: Array<{ conceptId: string; title: string; qualityScore: number }> = []
+    for (const c of concepts) {
+      const entry = { conceptId: c.id, title: c.title, qualityScore: c.qualityScore }
+      if (ownedIds.has(c.id)) upToDate.push(entry)
+      else gaps.push(entry)
+    }
+    gaps.sort((a, b) => b.qualityScore - a.qualityScore)
 
-      if (privacy) {
-        // 🔒 Privacy Mode: 서버 경유 완전 차단 — 클라이언트에서 로컬 분석만 수행
-        const localResult = analyzeGaps(knowledge.map((k: any) => ({ topic: k.topic, lastUpdated: k.lastUpdated })), concepts)
-        handleResult({ ...localResult, agentName: (selectedAgent as any).name, source: "local" }, false)
-        return
-      }
+    const result: any = {
+      upToDate,
+      outdated: [],
+      gaps,
+      recommendations: gaps.map((g) => ({
+        conceptId: g.conceptId,
+        suggestedDepth: g.qualityScore >= 4.5 ? "evidence" : "concept",
+        estimatedCredits: g.qualityScore >= 4.5 ? 20 : 10,
+        reason: source === "local-skills" ? "Not in agent's local skills" : "Not in agent's knowledge base",
+      })),
+      agentName: (selectedAgent as any).name,
+      source,
+    }
 
-      // 일반 모드: 기존 서버 경로 (WebSocket → DB → 로컬 fallback)
-      elicitKnowledge((selectedAgent as any).id)
-        .then((r) => handleResult(r, false))
-        .catch(() =>
-          compareKnowledge(knowledge.map((k: any) => ({ topic: k.topic, lastUpdated: k.lastUpdated })))
-            .then((r) => handleResult(r, false))
-            .catch(() => handleResult(analyzeGaps(knowledge.map((k: any) => ({ topic: k.topic, lastUpdated: k.lastUpdated })), concepts), false))
-        )
-    })()
+    setGapResult(result)
+    if (!silent) onCompareResult?.(privacy ? { ...result, privacy: true } : result)
   }
 
   // loud 실행 직후 useEffect의 자동 silent 재실행을 한 번 건너뛰기 위한 플래그
@@ -831,6 +814,27 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
     return null
   }
 
+  // 자기 보고서(self-report)의 로컬 스킬 파일을 truth로 사용 — 재연결 등으로 DB knowledge가
+  // 실제 ~/.claude/skills/ 파일과 어긋나도 로컬이 맞기 때문에.
+  // kaas-self-report 이벤트는 대시보드/콘솔에서 dispatch됨.
+  const [localSkillIds, setLocalSkillIds] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail
+      const items = detail?.report?.local_skills?.items ?? []
+      const ids = new Set<string>()
+      for (const s of items) {
+        if (!s?.hasSkillMd) continue
+        const folder = (s.dir ?? "").split("/").filter(Boolean).pop() ?? ""
+        if (folder.startsWith("cherry-")) ids.add(folder.slice(7))
+      }
+      setLocalSkillIds(ids)
+    }
+    window.addEventListener("kaas-self-report", handler)
+    return () => window.removeEventListener("kaas-self-report", handler)
+  }, [])
+
   // 선택된 에이전트가 이미 보유한 지식인지 확인 (Compare 실행 여부와 무관하게 동작)
   const ownedConceptIds = useMemo(() => {
     const knowledge: Array<{ topic: string }> = (() => {
@@ -849,8 +853,10 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
       )
       if (match) owned.add(c.id)
     }
+    // 로컬 스킬 파일이 실제로 존재하면 DB knowledge와 무관하게 owned 처리
+    for (const id of localSkillIds) owned.add(id)
     return owned
-  }, [selectedAgent, concepts])
+  }, [selectedAgent, concepts, localSkillIds])
 
   const isOwned = (conceptId: string) => ownedConceptIds.has(conceptId)
 
@@ -936,19 +942,20 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
           )}
 
           <button
-            disabled={false}
+            disabled={!hasAgent}
             onClick={armed ? handleReset : handleSubmit}
-            title={armed ? "Auto-compare on — click to turn off" : "Click to compare and keep auto-refreshing"}
+            title={!hasAgent ? "Register an agent first" : armed ? "Auto-compare on — click to turn off" : "Click to compare and keep auto-refreshing"}
             className={cn(
-              "text-[12px] font-semibold px-3 py-1.5 rounded-lg border transition-all cursor-pointer flex-shrink-0 flex items-center gap-1.5",
-              armed
-                ? "bg-[var(--cherry)] text-white border-[var(--cherry)] hover:opacity-90"
-                : "border-[var(--cherry)] text-[var(--cherry)] hover:bg-[#FDF0F3]"
+              "text-[12px] font-semibold px-3 py-1.5 rounded-lg border transition-all flex-shrink-0 flex items-center gap-1.5",
+              !hasAgent
+                ? "border-[#E4E1EE] text-[#B5AECB] bg-[#F9F7F5] cursor-not-allowed"
+                : armed
+                  ? "bg-[var(--cherry)] text-white border-[var(--cherry)] hover:opacity-90 cursor-pointer"
+                  : "border-[var(--cherry)] text-[var(--cherry)] hover:bg-[#FDF0F3] cursor-pointer"
             )}
           >
-            <GitCompare size={13} className={cn("transition-transform duration-500", armed && "animate-spin")} style={armed ? { animation: "spin 2s linear infinite" } : undefined} />
+            <GitCompare size={13} className={cn("transition-transform duration-500", armed && hasAgent && "animate-spin")} style={armed && hasAgent ? { animation: "spin 2s linear infinite" } : undefined} />
             Compare
-            {armed && <span className="w-1.5 h-1.5 rounded-full bg-white/90 animate-pulse ml-0.5" />}
           </button>
         </div>
       </div>
