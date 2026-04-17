@@ -690,17 +690,15 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
   const submitted = armed
 
   // Compare = diff와 동일하게 fetchAgentSelfReport 1회 호출 → local_skills 폴더명(cherry-{uuid})을
-  // conceptId로 파싱 → catalog와 교차해 owned/gap 분류. 재시도/캐시 등 안전장치 없음.
+  // conceptId로 파싱 → catalog와 교차해 owned/gap 분류.
+  // NOTE: diff와 달리 `kaas-self-report` 이벤트는 dispatch 하지 않음 — 콘솔에 보고서 원문이 뜨면 안 됨.
+  //       대신 localSkillIds state를 직접 세팅해 카드 OWNED 뱃지만 갱신.
   const runCompare = async (silent: boolean) => {
     if (!selectedAgent) return
     const { fetchAgentSelfReport } = await import("@/lib/api")
     const agentId = (selectedAgent as any).id
     const r: any = await fetchAgentSelfReport(agentId)
     if (!r?.ok || !r?.report) return
-    // diff와 같은 이벤트 dispatch — SelfReportLog/대시보드도 함께 동기화
-    window.dispatchEvent(new CustomEvent("kaas-self-report", {
-      detail: { report: r.report, agentId, agentName: (selectedAgent as any).name },
-    }))
 
     const ownedIds = new Set<string>()
     for (const s of r.report?.local_skills?.items ?? []) {
@@ -708,6 +706,7 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
       const folder = (s.dir ?? "").split("/").filter(Boolean).pop() ?? ""
       if (folder.startsWith("cherry-")) ownedIds.add(folder.slice(7))
     }
+    writeOwned(agentId, ownedIds)
 
     const upToDate: Array<{ conceptId: string; title: string; qualityScore: number }> = []
     const gaps: Array<{ conceptId: string; title: string; qualityScore: number }> = []
@@ -778,20 +777,47 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
     return null
   }
 
-  // self-report의 local_skills 폴더명(cherry-{uuid}) → conceptId Set.
-  // Dashboard diff 버튼이나 runCompare가 dispatch한 이벤트로 채워짐. 카드 OWNED 뱃지에 사용.
-  const [localSkillIds, setLocalSkillIds] = useState<Set<string>>(new Set())
+  // 에이전트별 OWNED conceptId 영구 저장소 — localStorage가 single source of truth.
+  // 키: `kaas-owned-{agentId}`, 값: conceptId 배열 JSON.
+  // React state는 리렌더 트리거용 버전 카운터. 읽기는 항상 localStorage에서.
+  const ownedStorageKey = (agentId: string) => `kaas-owned-${agentId}`
+  const [ownedVersion, setOwnedVersion] = useState(0) // 변경 시 증가 → useMemo 리컴퓨트
+
+  const readOwned = (agentId: string): Set<string> => {
+    if (typeof window === "undefined" || !agentId) return new Set()
+    try {
+      const raw = window.localStorage.getItem(ownedStorageKey(agentId))
+      const arr = raw ? JSON.parse(raw) : []
+      return new Set(Array.isArray(arr) ? arr : [])
+    } catch { return new Set() }
+  }
+  const writeOwned = (agentId: string, ids: Set<string>) => {
+    if (typeof window === "undefined" || !agentId) return
+    try {
+      window.localStorage.setItem(ownedStorageKey(agentId), JSON.stringify([...ids]))
+      setOwnedVersion((v) => v + 1)
+    } catch {}
+  }
+
+  const localSkillIds: Set<string> = selectedAgent
+    ? readOwned((selectedAgent as any).id)
+    : new Set<string>()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _ = ownedVersion // 렌더 dep — ownedVersion 변경 시 localSkillIds 재계산
 
   useEffect(() => {
     const handler = (e: Event) => {
-      const items = (e as CustomEvent).detail?.report?.local_skills?.items ?? []
+      const detail = (e as CustomEvent).detail
+      const eventAgentId = detail?.agentId
+      if (!eventAgentId) return
+      const items = detail?.report?.local_skills?.items ?? []
       const ids = new Set<string>()
       for (const s of items) {
         if (!s?.hasSkillMd) continue
         const folder = (s.dir ?? "").split("/").filter(Boolean).pop() ?? ""
         if (folder.startsWith("cherry-")) ids.add(folder.slice(7))
       }
-      setLocalSkillIds(ids)
+      writeOwned(eventAgentId, ids)
     }
     window.addEventListener("kaas-self-report", handler)
     return () => window.removeEventListener("kaas-self-report", handler)
