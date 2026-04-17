@@ -136,7 +136,7 @@ function registerTools(server, apiKey, baseUrl) {
           return { content: [{ type: 'text', text: 'WebSocket not connected. Cannot submit self-report.' }], isError: true };
         }
 
-        const { fetchAgentData, parseKnowledge } = require('./ws-client.js');
+        const { fetchAgentData, parseKnowledge, scanLocalSkills } = require('./ws-client.js');
         const { agents, history } = await fetchAgentData(baseUrl, apiKey);
         const agent = agents[0];
         const knowledge = agent ? parseKnowledge(agent.knowledge) : [];
@@ -154,6 +154,7 @@ function registerTools(server, apiKey, baseUrl) {
         }));
 
         const totalSpent = recentEvents.reduce((s, e) => s + (e.creditsConsumed ?? 0), 0);
+        const localSkills = scanLocalSkills();
 
         const report = {
           reporter: 'cherry-kaas-agent',
@@ -161,6 +162,7 @@ function registerTools(server, apiKey, baseUrl) {
           triggered_by: 'agent',
           current_knowledge: knowledge,
           recent_events: recentEvents,
+          local_skills: localSkills,
           summary: {
             total_events: recentEvents.length,
             credits_spent: totalSpent,
@@ -171,7 +173,7 @@ function registerTools(server, apiKey, baseUrl) {
 
         _socket.emit('submit_self_report', report);
 
-        return txt(`Self-report submitted: ${knowledge.length} topics, ${recentEvents.length} recent events, ${totalSpent}cr spent.`);
+        return txt(`Self-report submitted: ${knowledge.length} topics, ${recentEvents.length} recent events, ${totalSpent}cr spent, ${localSkills.count} local skills.`);
       } catch (err) {
         return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
       }

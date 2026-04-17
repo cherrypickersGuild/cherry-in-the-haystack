@@ -1,7 +1,8 @@
-import { Controller, Post, Get, Delete, Req, Res, Logger, OnModuleInit } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Req, Res, Logger, OnModuleInit, Inject } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
+import { Knex } from 'knex';
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
@@ -33,7 +34,24 @@ export class KaasMcpController implements OnModuleInit {
     private readonly credit: KaasCreditService,
     private readonly provenance: KaasProvenanceService,
     private readonly wsGateway: KaasWsGateway,
+    @Inject('KNEX_CONNECTION') private readonly knex: Knex,
   ) {}
+
+  /** agent가 이미 이 concept을 소유했는지 (topic ↔ concept_id 퍼지 매칭) */
+  private agentOwnsConcept(agent: any, conceptId: string, conceptTitle?: string): boolean {
+    const raw = agent?.knowledge;
+    let knowledge: Array<{ topic: string }> = [];
+    try {
+      knowledge = typeof raw === 'string' ? JSON.parse(raw) : Array.isArray(raw) ? raw : [];
+    } catch { knowledge = []; }
+    const idLower = conceptId.toLowerCase();
+    const titleLower = (conceptTitle ?? '').toLowerCase();
+    return knowledge.some((k) => {
+      const t = k.topic.toLowerCase();
+      return t === idLower || idLower.includes(t) || t.includes(idLower) ||
+        (titleLower && (titleLower.includes(t) || t.includes(titleLower.split(' ')[0])));
+    });
+  }
 
   onModuleInit() {
     this.logger.log('MCP Streamable HTTP endpoint ready at /api/v1/kaas/mcp');
@@ -85,9 +103,11 @@ export class KaasMcpController implements OnModuleInit {
     );
 
     // --- Tool: purchase_concept ---
+    // 3-phase 플로우: Preflight → Reserve → Deliver(웹소켓) → Finalize
+    // ALREADY_OWNED 재요청은 크레딧 차감 없이 파일만 재발송 (복구용)
     server.tool(
       'purchase_concept',
-      'Purchase a concept (20 credits). Returns full knowledge content (content_md), evidence, and blockchain provenance hash.',
+      'Purchase a concept (20 credits). Delivers content to your local agent via WebSocket and waits for save confirmation. Returns saved_path and provenance.',
       { concept_id: z.string().describe('Concept ID to purchase') },
       async ({ concept_id }) => {
         try {
@@ -97,19 +117,94 @@ export class KaasMcpController implements OnModuleInit {
           const concept = await this.knowledge.findByIdWithContent(concept_id);
           if (!concept) return { content: [{ type: 'text' as const, text: `Concept "${concept_id}" not found.` }], isError: true };
 
-          const saleDiscountPct = await this.knowledge.getSaleDiscount(concept_id);
-          const { consumed, remaining } = await this.credit.consume(
-            agent.id, ACTION_PRICE.purchase, agent.karma_tier as KarmaTierName, concept_id, 'purchase',
-            { saleDiscount: saleDiscountPct / 100 },
-          );
+          const isReowned = this.agentOwnsConcept(agent, concept_id, concept.title);
 
+          // [1] Preflight — 에이전트 웹소켓 연결 필수
+          if (!this.wsGateway.isAgentConnected(agent.id)) {
+            return {
+              content: [{ type: 'text' as const, text: 'Error: NO_AGENT_CONNECTED — agent process is not connected via WebSocket. Start mcp-server.ts or cherry-agent.js first.' }],
+              isError: true,
+            };
+          }
+
+          // [2] Reserve — purchase_delivery 레코드
+          const requestId = randomUUID();
+          const targetDir = `~/.claude/skills/cherry-${concept_id}`;
+          const targetFile = `${targetDir}/SKILL.md`;
+          const reservedCredit = isReowned ? 0 : ACTION_PRICE.purchase;
+
+          await this.knex('kaas.purchase_delivery').insert({
+            request_id: requestId,
+            agent_id: agent.id,
+            concept_id,
+            state: 'pending',
+            credit_reserved: reservedCredit,
+            is_reowned: isReowned,
+          });
+
+          // [3] Deliver — 웹소켓 save_skill_request → 30초 ack 대기
+          let ack;
+          try {
+            ack = await this.wsGateway.requestSaveSkill(agent.id, {
+              request_id: requestId,
+              concept_id,
+              title: concept.title,
+              summary: concept.summary,
+              content_md: concept.contentMd ?? '',
+              target_dir: targetDir,
+              target_file: targetFile,
+            });
+          } catch (err: any) {
+            await this.knex('kaas.purchase_delivery').where({ request_id: requestId }).update({
+              state: 'cancelled',
+              error_reason: err.message ?? String(err),
+              completed_at: new Date(),
+            });
+            return {
+              content: [{ type: 'text' as const, text: `Error: ${err.message === 'DELIVERY_TIMEOUT' ? 'DELIVERY_TIMEOUT — agent did not ack save within 30 seconds. No credits deducted.' : err.message}` }],
+              isError: true,
+            };
+          }
+
+          // [4] Finalize
           const responseData = { answer: concept.summary, content_md: concept.contentMd, concepts: [concept.title], evidence: concept.evidence, quality_score: concept.qualityScore };
-          const prov = await this.provenance.recordQuery(agent.id, concept_id, 'purchase', consumed, responseData);
+          let consumed = 0;
+          let remaining = 0;
+          let prov: any = null;
+
+          if (!isReowned) {
+            const saleDiscountPct = await this.knowledge.getSaleDiscount(concept_id);
+            const consumeResult = await this.credit.consume(
+              agent.id, ACTION_PRICE.purchase, agent.karma_tier as KarmaTierName, concept_id, 'purchase',
+              { saleDiscount: saleDiscountPct / 100 },
+            );
+            consumed = consumeResult.consumed;
+            remaining = consumeResult.remaining;
+            prov = await this.provenance.recordQuery(agent.id, concept_id, 'purchase', consumed, responseData);
+          } else {
+            const bal = await this.credit.getBalance(agent.id);
+            remaining = bal.balance;
+          }
+
+          await this.knex('kaas.purchase_delivery').where({ request_id: requestId }).update({
+            state: 'complete',
+            saved_path: ack.saved_path,
+            size_bytes: ack.size_bytes,
+            completed_at: new Date(),
+          });
 
           return {
             content: [{
               type: 'text' as const,
-              text: JSON.stringify({ ...responseData, credits_consumed: consumed, credits_remaining: remaining, provenance: { hash: prov.provenanceHash, chain: process.env.CHAIN_ADAPTER ?? 'mock', explorer_url: prov.explorerUrl } }, null, 2),
+              text: JSON.stringify({
+                ...responseData,
+                is_reowned: isReowned,
+                saved_path: ack.saved_path,
+                size_bytes: ack.size_bytes,
+                credits_consumed: consumed,
+                credits_remaining: remaining,
+                provenance: prov ? { hash: prov.provenanceHash, chain: process.env.CHAIN_ADAPTER ?? 'mock', explorer_url: prov.explorerUrl } : null,
+              }, null, 2),
             }],
           };
         } catch (err: any) {

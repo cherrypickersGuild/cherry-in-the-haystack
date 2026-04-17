@@ -17,6 +17,47 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import knexLib from 'knex';
 import config from './config';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
+
+/* ═══════════════════════════════════════════
+   Skills directory helpers
+   - stdio MCP는 유저 로컬 PC에서 실행 → ~/.claude/skills/ 접근 가능
+   - purchase 시 이 디렉터리 하위 폴더로 저장 지시 → self-report에서 목록 조회
+═══════════════════════════════════════════ */
+const SKILLS_DIR = path.join(os.homedir(), '.claude', 'skills');
+
+/** Skill 폴더 슬러그 — 컨셉당 고유 경로 */
+function skillDirFor(conceptId: string): string {
+  return `~/.claude/skills/cherry-${conceptId}`;
+}
+
+/** 실제 파일시스템의 ~/.claude/skills/ 하위 폴더 + SKILL.md 존재 여부 스캔 */
+function scanSavedSkills(): Array<{ dir: string; hasSkillMd: boolean; sizeBytes: number; mtime: string | null }> {
+  try {
+    if (!fs.existsSync(SKILLS_DIR)) return [];
+    const entries = fs.readdirSync(SKILLS_DIR, { withFileTypes: true });
+    return entries
+      .filter((e) => e.isDirectory())
+      .map((e) => {
+        const dirPath = path.join(SKILLS_DIR, e.name);
+        const skillMd = path.join(dirPath, 'SKILL.md');
+        let hasSkillMd = false;
+        let sizeBytes = 0;
+        let mtime: string | null = null;
+        try {
+          const st = fs.statSync(skillMd);
+          hasSkillMd = st.isFile();
+          sizeBytes = st.size;
+          mtime = st.mtime.toISOString();
+        } catch { /* 없으면 false */ }
+        return { dir: `~/.claude/skills/${e.name}`, hasSkillMd, sizeBytes, mtime };
+      });
+  } catch {
+    return [];
+  }
+}
 
 /* ═══════════════════════════════════════════
    DB 연결 (DatabaseModule과 동일 설정)
@@ -190,9 +231,13 @@ server.tool(
 );
 
 // --- Tool: purchase_concept ---
+// stdio MCP는 자기 자신이 웹소켓 연결을 보유하고 있으므로, 직접 로컬에서 파일 저장.
+// 서버 /purchase 엔드포인트를 호출해도 되지만 라운드트립 절약 위해 DB 직접 접근.
+// 단 동일 설계 원칙 유지: 반드시 파일 저장 성공 후에 크레딧 차감 & provenance 기록.
+// ALREADY_OWNED 재구매는 크레딧 차감 없이 파일만 재저장.
 server.tool(
   'purchase_concept',
-  'Purchase a concept (20 credits). Returns full knowledge content (content_md), evidence, and blockchain provenance hash.',
+  'Purchase a concept (20 credits). Saves the content to ~/.claude/skills/cherry-<id>/SKILL.md locally, then deducts credits and records provenance. Returns saved_path.',
   { api_key: z.string().optional().describe('Agent API key (생략 시 환경변수 사용)'), concept_id: z.string().describe('Concept ID to purchase') },
   async ({ api_key, concept_id }) => {
     try {
@@ -202,22 +247,111 @@ server.tool(
       const concept = await findConceptById(concept_id);
       if (!concept) return { content: [{ type: 'text', text: `Concept "${concept_id}" not found.` }], isError: true };
 
-      const { consumed, remaining } = await consumeCredits(agent.id, 20, agent.karma_tier, concept_id, 'purchase');
-      const responseData = { answer: concept.summary, content_md: concept.contentMd, concepts: [concept.title], evidence: concept.evidence, quality_score: concept.qualityScore };
-      const prov = await recordQuery(agent.id, concept_id, 'purchase', consumed, responseData);
+      // 재소유 여부 판단 (agent.knowledge 퍼지 매칭)
+      let knowledgeList: Array<{ topic: string }> = [];
+      try {
+        const raw = agent.knowledge;
+        knowledgeList = typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : []);
+      } catch { knowledgeList = []; }
+      const idLower = concept_id.toLowerCase();
+      const titleLower = concept.title.toLowerCase();
+      const isReowned = knowledgeList.some((k) => {
+        const t = k.topic.toLowerCase();
+        return t === idLower || idLower.includes(t) || t.includes(idLower) ||
+          titleLower.includes(t) || t.includes(titleLower.split(' ')[0]);
+      });
 
-      // 구매 후 agent.knowledge 자동 업데이트 + WebSocket 제출
-      await addToAgentKnowledge(agent.id, concept_id, concept.title);
-      await submitKnowledgeViaWs(key);
+      // [2] Reserve — purchase_delivery 레코드
+      const { randomUUID } = await import('crypto');
+      const requestId = randomUUID();
+      const targetDir = path.join(os.homedir(), '.claude', 'skills', `cherry-${concept_id}`);
+      const targetFile = path.join(targetDir, 'SKILL.md');
+
+      try {
+        await knex('kaas.purchase_delivery').insert({
+          request_id: requestId,
+          agent_id: agent.id,
+          concept_id,
+          state: 'pending',
+          credit_reserved: isReowned ? 0 : 20,
+          is_reowned: isReowned,
+        });
+      } catch (e: any) {
+        console.error(`[purchase] purchase_delivery insert failed: ${e.message}`);
+      }
+
+      // [3] Deliver — 로컬 파일 저장 (stdio는 같은 프로세스에서 직접 수행)
+      let savedPath: string;
+      let sizeBytes: number;
+      try {
+        fs.mkdirSync(targetDir, { recursive: true });
+        const body = [
+          '---',
+          `name: ${concept.title}`,
+          `description: ${(concept.summary ?? '').replace(/\n/g, ' ')}`,
+          '---',
+          '',
+          concept.contentMd ?? '',
+        ].join('\n');
+        fs.writeFileSync(targetFile, body, 'utf8');
+        const stat = fs.statSync(targetFile);
+        savedPath = targetFile;
+        sizeBytes = stat.size;
+      } catch (err: any) {
+        await knex('kaas.purchase_delivery').where({ request_id: requestId }).update({
+          state: 'cancelled',
+          error_reason: `Local save failed: ${err.message}`,
+          completed_at: new Date(),
+        }).catch(() => { /* ignore */ });
+        return { content: [{ type: 'text', text: `Error: Local file save failed — ${err.message}. No credits deducted.` }], isError: true };
+      }
+
+      // [4] Finalize — 파일 저장 성공 시에만 크레딧 차감 + provenance
+      const responseData = { answer: concept.summary, content_md: concept.contentMd, concepts: [concept.title], evidence: concept.evidence, quality_score: concept.qualityScore };
+      let consumed = 0;
+      let remaining = 0;
+      let prov: any = null;
+
+      if (!isReowned) {
+        try {
+          const creditResult = await consumeCredits(agent.id, 20, agent.karma_tier, concept_id, 'purchase');
+          consumed = creditResult.consumed;
+          remaining = creditResult.remaining;
+          prov = await recordQuery(agent.id, concept_id, 'purchase', consumed, responseData);
+          await addToAgentKnowledge(agent.id, concept_id, concept.title);
+          await submitKnowledgeViaWs(key);
+        } catch (err: any) {
+          // 크레딧 차감 실패(잔액 부족 등) — 파일은 이미 저장됐으므로 cancelled 로 막고 파일은 그대로 둠
+          await knex('kaas.purchase_delivery').where({ request_id: requestId }).update({
+            state: 'cancelled',
+            error_reason: `Finalize failed: ${err.message}`,
+            completed_at: new Date(),
+          }).catch(() => { /* ignore */ });
+          return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
+        }
+      } else {
+        const { balance } = await getBalance(agent.id);
+        remaining = balance;
+      }
+
+      await knex('kaas.purchase_delivery').where({ request_id: requestId }).update({
+        state: 'complete',
+        saved_path: savedPath,
+        size_bytes: sizeBytes,
+        completed_at: new Date(),
+      }).catch(() => { /* ignore */ });
 
       return {
         content: [{
           type: 'text',
           text: JSON.stringify({
             ...responseData,
+            is_reowned: isReowned,
+            saved_path: savedPath,
+            size_bytes: sizeBytes,
             credits_consumed: consumed,
             credits_remaining: remaining,
-            provenance: { hash: prov.provenanceHash, chain: process.env.CHAIN_ADAPTER ?? 'mock', explorer_url: prov.explorerUrl },
+            provenance: prov ? { hash: prov.provenanceHash, chain: process.env.CHAIN_ADAPTER ?? 'mock', explorer_url: prov.explorerUrl } : null,
           }, null, 2),
         }],
       };
@@ -446,6 +580,9 @@ server.tool(
       };
     }));
 
+    // 3. 로컬에 저장된 스킬 파일목록 (stdio 실행 환경의 ~/.claude/skills/ 스캔)
+    const savedSkills = scanSavedSkills();
+
     const report = {
       report_version: '1.0.0',
       reporter: 'cherry-kaas-mcp-stdio',
@@ -460,11 +597,17 @@ server.tool(
       },
       current_knowledge: knowledge,
       recent_events: timeline,
+      local_skills: {
+        base_dir: '~/.claude/skills',
+        count: savedSkills.length,
+        items: savedSkills,
+      },
       summary: {
         total_knowledge: knowledge.length,
         recent_events: timeline.length,
         credits_spent: timeline.reduce((s: number, e: any) => s + (e.creditsConsumed ?? 0), 0),
         chains_used: [...new Set(timeline.map((e: any) => e.chain).filter(Boolean))],
+        local_skills_saved: savedSkills.filter((s) => s.hasSkillMd).length,
       },
       signature: {
         type: 'agent-tool-invoked',
@@ -478,6 +621,14 @@ server.tool(
     }
 
     // Claude가 사용자에게 보여줄 요약
+    const skillLines = savedSkills.length === 0
+      ? ['  (no skills saved locally yet)']
+      : savedSkills.map((s) => {
+          const sizeKb = (s.sizeBytes / 1024).toFixed(1);
+          const flag = s.hasSkillMd ? '✓' : '✗';
+          return `  ${flag} ${s.dir}/SKILL.md${s.hasSkillMd ? ` (${sizeKb} KB)` : ' (missing)'}`;
+        });
+
     const summaryText = [
       `✅ Self-report generated and pushed to dashboard.`,
       ``,
@@ -488,6 +639,9 @@ server.tool(
       `- Recent events: ${timeline.length}`,
       `- Credits spent: ${report.summary.credits_spent}cr`,
       `- On-chain: ${report.summary.chains_used.join(', ') || 'none'}`,
+      ``,
+      `📁 Local skills (scanned from ~/.claude/skills/):`,
+      ...skillLines,
       ``,
       `The report is now visible on the Cherry KaaS dashboard (Knowledge Diff modal).`,
     ].join('\n');
@@ -598,6 +752,66 @@ function connectWebSocket(apiKey: string) {
   wsSocket.on('request_knowledge', () => {
     console.error('[WS] request_knowledge received');
     submitKnowledgeViaWs(apiKey);
+  });
+
+  /* ═══════════════════════════════════════════
+     save_skill_request — 서버가 구매된 content 전달
+     이 프로세스가 fs.writeFileSync로 ~/.claude/skills/<dir>/SKILL.md 저장
+     성공 시 save_skill_ack, 실패 시 save_skill_error 응답
+  ═══════════════════════════════════════════ */
+  wsSocket.on('save_skill_request', (req: {
+    request_id: string;
+    concept_id: string;
+    title: string;
+    summary: string;
+    content_md: string;
+    target_dir: string;   // "~/.claude/skills/cherry-<id>"
+    target_file: string;  // "~/.claude/skills/cherry-<id>/SKILL.md"
+  }) => {
+    console.error(`[WS] 📥 save_skill_request RECEIVED: request=${req.request_id} concept=${req.concept_id} title="${req.title}" bytes=${(req.content_md ?? '').length}`);
+    try {
+      // ~ 확장 (os.homedir()로 치환)
+      const expand = (p: string) => p.startsWith('~')
+        ? path.join(os.homedir(), p.slice(1).replace(/^\/+/, ''))
+        : p;
+      const absDir = expand(req.target_dir);
+      const absFile = expand(req.target_file);
+      console.error(`[WS]   target_dir=${absDir}`);
+      console.error(`[WS]   target_file=${absFile}`);
+
+      fs.mkdirSync(absDir, { recursive: true });
+      console.error(`[WS]   ✓ mkdir ok`);
+
+      // YAML frontmatter + content_md
+      const body = [
+        '---',
+        `name: ${req.title}`,
+        `description: ${(req.summary ?? '').replace(/\n/g, ' ')}`,
+        '---',
+        '',
+        req.content_md ?? '',
+      ].join('\n');
+
+      fs.writeFileSync(absFile, body, 'utf8');
+      const stat = fs.statSync(absFile);
+      console.error(`[WS]   ✓ wrote ${stat.size} bytes`);
+
+      wsSocket!.emit('save_skill_ack', {
+        request_id: req.request_id,
+        saved_path: absFile,
+        size_bytes: stat.size,
+      });
+      console.error(`[WS] 📤 save_skill_ack SENT: ${absFile} (${stat.size} bytes)`);
+    } catch (err: any) {
+      console.error(`[WS] ✗ save_skill FAILED: ${err.message}`);
+      console.error(err.stack);
+      try {
+        wsSocket!.emit('save_skill_error', {
+          request_id: req.request_id,
+          message: err.message ?? String(err),
+        });
+      } catch { /* ignore */ }
+    }
   });
 
   // 에이전트 self-report 요청 (심사용 학습 증명)

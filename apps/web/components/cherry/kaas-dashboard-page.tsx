@@ -212,12 +212,82 @@ export function SelfReportLog({
         </div>
       )}
 
+      {/* Local Skills — stdio MCP가 스캔한 ~/.claude/skills/ 실제 파일 목록 */}
+      <div className="mt-3">
+        <p className="text-[#6B9CE8]">
+          📁 LOCAL SKILLS ({data?.localSkills?.count ?? 0})
+          <span className="text-[#6B7280] text-[10px] ml-2">@ {data?.localSkills?.base_dir ?? "~/.claude/skills"}</span>
+        </p>
+        {!data?.localSkills ? (
+          <div className="pl-1 text-[11px] space-y-0.5">
+            <p className="text-[#FFBD2E]">⚠ local_skills not in report</p>
+            <p className="text-[#6B7280]">
+              Skills are saved to <span className="text-[#D0D7E0]">~/.claude/skills/</span> only when you
+              <span className="text-[#C7A7FF]"> purchase via Claude Code (stdio MCP)</span>.
+            </p>
+            <p className="text-[#6B7280]">
+              Web UI purchases (Status Network / NEAR Gasless) don't touch your filesystem — no skill files to report.
+            </p>
+            <p className="text-[#6B7280]">
+              If you <span className="text-[#D0D7E0]">did</span> use Claude Code and still see this, restart the stdio MCP server.
+            </p>
+          </div>
+        ) : (!data.localSkills.items || data.localSkills.items.length === 0) ? (
+          <p className="pl-1 text-[#6B7280] text-[11px]">(no skill directories found in ~/.claude/skills/)</p>
+        ) : (
+            data.localSkills.items.map((s: any) => {
+              // dir 끝의 폴더명을 기술명으로 사용 (예: cherry-rag → cherry-rag)
+              const folderName = (s.dir ?? "").split("/").filter(Boolean).pop() ?? "unknown"
+              const sizeKb = (Number(s.sizeBytes ?? 0) / 1024).toFixed(1)
+              const mtime = s.mtime ? fmtTime(s.mtime) : ""
+              return (
+                <div key={s.dir} className="mt-1 pl-1">
+                  <p className="text-[#D0D7E0]">
+                    <span className={s.hasSkillMd ? "text-[#27C93F]" : "text-[#FFBD2E]"}>
+                      {s.hasSkillMd ? "✓" : "✗"}
+                    </span>{" "}
+                    <span className="font-bold text-[#C7A7FF]">{folderName}</span>
+                  </p>
+                  <p className="pl-4 text-[11px] text-[#7C8490]">
+                    <span className="text-[#6B7280]">├─ dir:</span>{" "}
+                    <span className="text-[#6B9CE8] break-all">{s.dir}</span>
+                  </p>
+                  <p className="pl-4 text-[11px] text-[#7C8490]">
+                    <span className="text-[#6B7280]">├─ file:</span>{" "}
+                    <span className={s.hasSkillMd ? "text-[#D0D7E0]" : "text-[#FFBD2E]"}>
+                      SKILL.md
+                    </span>
+                    {s.hasSkillMd && (
+                      <>
+                        <span className="text-[#6B7280]"> · </span>
+                        <span className="text-[#F59E6A]">{sizeKb} KB</span>
+                      </>
+                    )}
+                  </p>
+                  {mtime && (
+                    <p className="pl-4 text-[11px] text-[#7C8490]">
+                      <span className="text-[#6B7280]">└─ mtime:</span>{" "}
+                      <span className="text-[#6B7280]">{mtime}</span>
+                    </p>
+                  )}
+                </div>
+              )
+            })
+          )}
+      </div>
+
       {/* Summary */}
       <div className="mt-3 pt-2 border-t border-[#2A2F3B] text-[#7C8490]">
         <span>total {allKnowledge.length} · </span>
         <span className="text-[#27C93F]">+{addedTopics.size}</span>
         <span> · spent </span>
         <span className="text-[#D4854A]">{data.summary?.totalSpent ?? 0}cr</span>
+        {data?.localSkills && (
+          <>
+            <span> · </span>
+            <span className="text-[#6B9CE8]">{data.localSkills.items?.filter((s: any) => s.hasSkillMd).length ?? 0} skills</span>
+          </>
+        )}
       </div>
     </>
   )
@@ -271,6 +341,8 @@ function KnowledgeDiffModal({ agentId, agentName, onClose }: { agentId: string; 
                 byAction: (rpt.recent_events ?? []).reduce((acc: any, e: any) => { acc[e.action] = (acc[e.action] ?? 0) + 1; return acc }, {}),
                 byChain: (rpt.recent_events ?? []).reduce((acc: any, e: any) => { acc[e.chain ?? "mock"] = (acc[e.chain ?? "mock"] ?? 0) + 1; return acc }, {}),
               },
+              // 로컬에 저장된 skill 파일 스캔 결과 (stdio MCP가 스캔한 ~/.claude/skills/)
+              localSkills: rpt.local_skills ?? null,
               _meta: {
                 reporter: rpt.reporter,
                 reportedAt: rpt.reported_at,

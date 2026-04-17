@@ -28,6 +28,54 @@ async function fetchAgentData(baseUrl, apiKey) {
   }
 }
 
+// Scan ~/.claude/skills/cherry-<id>/ — list of skills actually saved to disk.
+function scanLocalSkills() {
+  const fs = require('fs');
+  const path = require('path');
+  const os = require('os');
+
+  const baseDir = path.join(os.homedir(), '.claude', 'skills');
+  const result = {
+    count: 0,
+    base_dir: '~/.claude/skills',
+    items: [],
+  };
+
+  try {
+    if (!fs.existsSync(baseDir)) return result;
+    const entries = fs.readdirSync(baseDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      if (!entry.name.startsWith('cherry-')) continue;
+
+      const dir = path.join(baseDir, entry.name);
+      const skillFile = path.join(dir, 'SKILL.md');
+      let hasSkillMd = false;
+      let sizeBytes = 0;
+      let mtime = null;
+
+      try {
+        const st = fs.statSync(skillFile);
+        hasSkillMd = st.isFile();
+        sizeBytes = st.size;
+        mtime = st.mtime.toISOString();
+      } catch {
+        try {
+          const dstat = fs.statSync(dir);
+          mtime = dstat.mtime.toISOString();
+        } catch {}
+      }
+
+      result.items.push({ dir, hasSkillMd, sizeBytes, mtime });
+    }
+    result.count = result.items.length;
+  } catch (err) {
+    process.stderr.write(`[WS] scanLocalSkills error: ${err.message}\n`);
+  }
+
+  return result;
+}
+
 /** 에이전트의 knowledge 파싱 */
 function parseKnowledge(raw) {
   try {
@@ -105,12 +153,15 @@ function connectWebSocket(apiKey, baseUrl) {
 
       const totalSpent = recentEvents.reduce((s, e) => s + (e.creditsConsumed ?? 0), 0);
 
+      const localSkills = scanLocalSkills();
+
       const report = {
         reporter: 'cherry-kaas-agent',
         reported_at: new Date().toISOString(),
         triggered_by: 'request',
         current_knowledge: knowledge,
         recent_events: recentEvents,
+        local_skills: localSkills,
         summary: {
           total_events: recentEvents.length,
           credits_spent: totalSpent,
@@ -120,7 +171,9 @@ function connectWebSocket(apiKey, baseUrl) {
       };
 
       socket.emit('submit_self_report', report);
-      process.stderr.write(`[WS] Self-report submitted (${recentEvents.length} events, ${totalSpent}cr)\n`);
+      process.stderr.write(
+        `[WS] Self-report submitted (${recentEvents.length} events, ${totalSpent}cr, ${localSkills.count} local skills)\n`
+      );
     } catch (err) {
       process.stderr.write(`[WS] request_self_report error: ${err.message}\n`);
     }
@@ -131,7 +184,66 @@ function connectWebSocket(apiKey, baseUrl) {
     process.stderr.write(`[WS] Room message from ${msg.from}: ${msg.content?.slice(0, 50)}...\n`);
   });
 
+  // ── Purchase delivery: save skill to local filesystem and ack ──
+  socket.on('save_skill_request', (req) => {
+    const fs = require('fs');
+    const path = require('path');
+    const os = require('os');
+    process.stderr.write(
+      `[WS] 📥 save_skill_request RECEIVED: request=${req?.request_id} concept=${req?.concept_id} title=${req?.title}\n`
+    );
+    try {
+      const expand = (p) => {
+        if (!p) return p;
+        if (p.startsWith('~')) {
+          return path.join(os.homedir(), p.slice(1).replace(/^\/+/, ''));
+        }
+        return p;
+      };
+      const absDir = expand(req.target_dir);
+      const absFile = expand(req.target_file);
+
+      if (!absDir || !absFile) {
+        throw new Error(`Invalid target paths: dir=${absDir} file=${absFile}`);
+      }
+
+      fs.mkdirSync(absDir, { recursive: true });
+      process.stderr.write(`[WS]    mkdir ok: ${absDir}\n`);
+
+      const descLine = String(req.summary ?? '').replace(/\n/g, ' ').trim();
+      const body = [
+        '---',
+        `name: ${req.title ?? req.concept_id ?? 'skill'}`,
+        `description: ${descLine}`,
+        '---',
+        '',
+        req.content_md ?? '',
+      ].join('\n');
+
+      fs.writeFileSync(absFile, body, 'utf8');
+      const stat = fs.statSync(absFile);
+
+      socket.emit('save_skill_ack', {
+        request_id: req.request_id,
+        saved_path: absFile,
+        size_bytes: stat.size,
+      });
+      process.stderr.write(
+        `[WS] 📤 save_skill_ack SENT: ${absFile} (${stat.size} bytes)\n`
+      );
+    } catch (err) {
+      const msg = err && err.message ? err.message : String(err);
+      process.stderr.write(`[WS] ✗ save_skill FAILED: ${msg}\n`);
+      try {
+        socket.emit('save_skill_error', {
+          request_id: req && req.request_id,
+          message: msg,
+        });
+      } catch {}
+    }
+  });
+
   return socket;
 }
 
-module.exports = { connectWebSocket, fetchAgentData, parseKnowledge };
+module.exports = { connectWebSocket, fetchAgentData, parseKnowledge, scanLocalSkills };

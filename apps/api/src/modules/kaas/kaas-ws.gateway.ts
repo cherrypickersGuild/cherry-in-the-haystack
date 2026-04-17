@@ -23,6 +23,9 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // agentId → socket
   private agentSockets = new Map<string, Socket>();
 
+  // request_id → pending save_skill resolve/reject (웹소켓 save_skill_ack 대기)
+  private pendingSaveSkills = new Map<string, { resolve: (ack: SaveSkillAck) => void; reject: (err: Error) => void; timer: NodeJS.Timeout }>();
+
   constructor(
     private readonly agentService: KaasAgentService,
     private readonly knowledge: KaasKnowledgeService,
@@ -52,12 +55,12 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         // 동일 agent_id 기존 연결 있으면 해제 (중복 응답 방지)
         const existing = this.agentSockets.get(agent.id);
         if (existing && existing.id !== socket.id) {
-          this.logger.log(`Disconnecting stale agent socket for ${agent.id}`);
+          this.logger.warn(`[WS] Disconnecting stale agent socket for ${agent.name} (${agent.id}): old=${existing.id} → new=${socket.id}`);
           try { existing.disconnect(true); } catch { /* ignore */ }
         }
         this.agentSockets.set(agent.id, socket);
       }
-      this.logger.log(`WS connected: ${agent.name} (${agent.id}) as role=${role}`);
+      this.logger.log(`[WS] ✓ connected: ${agent.name} (${agent.id}) as role=${role} socket=${socket.id}. Total agents now: ${this.agentSockets.size}`);
       socket.emit('connected', { agentId: agent.id, agentName: agent.name, role });
     } catch {
       socket.emit('error', { message: 'Invalid API key' });
@@ -69,8 +72,12 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const agentId = socket.data?.agentId;
     const role = socket.data?.role;
     if (agentId) {
-      if (role === 'agent') this.agentSockets.delete(agentId);
-      this.logger.log(`WS disconnected: ${socket.data.agentName} (role=${role})`);
+      // 동일 agent_id의 최신 socket만 삭제 (새 socket으로 교체된 경우 삭제 안 함)
+      const current = this.agentSockets.get(agentId);
+      if (role === 'agent' && current?.id === socket.id) {
+        this.agentSockets.delete(agentId);
+      }
+      this.logger.log(`[WS] ✗ disconnected: ${socket.data.agentName} (role=${role}) socket=${socket.id}. Total agents now: ${this.agentSockets.size}`);
     }
   }
 
@@ -135,7 +142,7 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     upToDate: any[]; outdated: any[]; gaps: any[]; recommendations: any[]; agentName: string;
   }> {
     const socket = this.agentSockets.get(agentId);
-    if (!socket) throw new Error('에이전트가 WebSocket으로 연결되지 않았습니다.');
+    if (!socket) throw new Error('Agent is not connected via WebSocket.');
 
     // 에이전트에게 지식 요청 (10초 타임아웃)
     const topics: KnowledgeTopic[] = await new Promise((resolve, reject) => {
@@ -190,7 +197,7 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async requestSelfReport(agentId: string): Promise<any> {
     const socket = this.agentSockets.get(agentId);
     if (!socket) {
-      throw new Error('에이전트가 WebSocket으로 연결되지 않았습니다. (MCP stdio 클라이언트 실행 필요)');
+      throw new Error('Agent is not connected via WebSocket. (MCP stdio client required)');
     }
 
     const report = await new Promise<any>((resolve, reject) => {
@@ -214,7 +221,7 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /** 웹 채팅 → 에이전트에게 메시지 전달 → 응답 반환 (10초 타임아웃) */
   async chatWithAgent(agentId: string, message: string): Promise<{ reply: string; agentName: string }> {
     const socket = this.agentSockets.get(agentId);
-    if (!socket) throw new Error('에이전트가 WebSocket으로 연결되지 않았습니다.');
+    if (!socket) throw new Error('Agent is not connected via WebSocket.');
 
     const reply = await new Promise<string>((resolve, reject) => {
       const timeout = setTimeout(() => reject(new Error('Chat timed out (10s)')), 10000);
@@ -226,6 +233,69 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
 
     return { reply, agentName: socket.data.agentName };
+  }
+
+  /** 특정 agentId가 현재 웹소켓 접속 중인지 확인 (구매 Preflight용) */
+  isAgentConnected(agentId: string): boolean {
+    const has = this.agentSockets.has(agentId);
+    const allIds = Array.from(this.agentSockets.keys());
+    this.logger.log(`[save_skill] isAgentConnected(${agentId}) = ${has}. currently connected agents: [${allIds.join(', ')}]`);
+    return has;
+  }
+
+  /**
+   * Save-Skill 웹소켓 왕복.
+   * 서버 → 에이전트: save_skill_request 발송
+   * 에이전트 → 서버: save_skill_ack (fs.writeFileSync 성공 후) 또는 save_skill_error
+   * 30초 타임아웃.
+   */
+  async requestSaveSkill(agentId: string, payload: SaveSkillRequestPayload): Promise<SaveSkillAck> {
+    const socket = this.agentSockets.get(agentId);
+    if (!socket) {
+      this.logger.warn(`[save_skill] requestSaveSkill: no socket for agent=${agentId}`);
+      throw new Error('NO_AGENT_CONNECTED');
+    }
+    this.logger.log(`[save_skill] 📤 emitting save_skill_request → agent=${agentId} socket=${socket.id} request=${payload.request_id} concept=${payload.concept_id} content_bytes=${payload.content_md.length}`);
+
+    return new Promise<SaveSkillAck>((resolve, reject) => {
+      const startTime = Date.now();
+      const timer = setTimeout(() => {
+        this.pendingSaveSkills.delete(payload.request_id);
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        this.logger.warn(`[save_skill] ⏱ TIMEOUT after ${elapsed}s — agent=${agentId} never sent save_skill_ack for request=${payload.request_id}. Likely causes: (1) mcp-server.ts process wasn't restarted after code update, (2) agent process hung, (3) fs.writeFileSync error not propagated.`);
+        reject(new Error('DELIVERY_TIMEOUT'));
+      }, 30000);
+
+      this.pendingSaveSkills.set(payload.request_id, { resolve, reject, timer });
+      socket.emit('save_skill_request', payload);
+      this.logger.log(`[save_skill] ✓ emitted. waiting for ack (up to 30s)... pending count=${this.pendingSaveSkills.size}`);
+    });
+  }
+
+  /** 에이전트가 파일 저장 완료 후 ack 발송 */
+  @SubscribeMessage('save_skill_ack')
+  handleSaveSkillAck(@ConnectedSocket() socket: Socket, @MessageBody() ack: SaveSkillAck) {
+    this.logger.log(`[save_skill] 📥 received save_skill_ack from socket=${socket.id} request=${ack.request_id} saved_path=${ack.saved_path}`);
+    const pending = this.pendingSaveSkills.get(ack.request_id);
+    if (!pending) {
+      this.logger.warn(`[save_skill] stale ack ignored (no pending match): ${ack.request_id}. Known pending: [${Array.from(this.pendingSaveSkills.keys()).join(', ')}]`);
+      return;
+    }
+    clearTimeout(pending.timer);
+    this.pendingSaveSkills.delete(ack.request_id);
+    this.logger.log(`[save_skill] ✓ ack matched, resolving. saved=${ack.saved_path} size=${ack.size_bytes}`);
+    pending.resolve(ack);
+  }
+
+  /** 에이전트가 파일 저장 실패 시 error 발송 */
+  @SubscribeMessage('save_skill_error')
+  handleSaveSkillError(@ConnectedSocket() socket: Socket, @MessageBody() err: { request_id: string; message: string }) {
+    this.logger.warn(`[save_skill] 📥 received save_skill_error from socket=${socket.id} request=${err.request_id}: ${err.message}`);
+    const pending = this.pendingSaveSkills.get(err.request_id);
+    if (!pending) return;
+    clearTimeout(pending.timer);
+    this.pendingSaveSkills.delete(err.request_id);
+    pending.reject(new Error(`SAVE_FAILED: ${err.message}`));
   }
 
   /** 연결된 에이전트 목록 */
@@ -337,4 +407,22 @@ export type RoomMessage = {
   content: string;
   timestamp?: string;
   meta?: Record<string, any>;
+};
+
+/** 서버 → 에이전트: ~/.claude/skills/<target_dir>/SKILL.md 저장 요청 */
+export type SaveSkillRequestPayload = {
+  request_id: string;   // 응답 매칭용
+  concept_id: string;
+  title: string;        // YAML frontmatter name
+  summary: string;      // YAML frontmatter description
+  content_md: string;   // body
+  target_dir: string;   // e.g. "~/.claude/skills/cherry-<conceptId>"
+  target_file: string;  // e.g. "~/.claude/skills/cherry-<conceptId>/SKILL.md"
+};
+
+/** 에이전트 → 서버: 저장 성공 ack */
+export type SaveSkillAck = {
+  request_id: string;
+  saved_path: string;
+  size_bytes: number;
 };

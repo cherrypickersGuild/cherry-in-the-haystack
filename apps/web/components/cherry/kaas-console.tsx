@@ -509,6 +509,8 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
           totalSpent: r.summary?.credits_spent ?? 0,
           byChain: timeline.reduce((acc: any, t: any) => { acc[t.chain ?? "mock"] = (acc[t.chain ?? "mock"] ?? 0) + 1; return acc }, {}),
         },
+        // stdio MCP가 스캔한 ~/.claude/skills/ 실제 파일 목록
+        localSkills: r.local_skills ?? null,
         _meta: {
           reporter: r.reporter ?? "cherry-kaas-mcp-stdio",
           pid: r.session_pid ?? 0,
@@ -739,6 +741,8 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
               totalSpent: r.summary?.credits_spent ?? 0,
               byChain: timeline.reduce((acc: any, t: any) => { acc[t.chain ?? "mock"] = (acc[t.chain ?? "mock"] ?? 0) + 1; return acc }, {}),
             },
+            // stdio MCP가 스캔한 ~/.claude/skills/ 실제 파일 목록
+            localSkills: r.local_skills ?? null,
             _meta: {
               reporter: r.reporter ?? "cherry-kaas-mcp-stdio",
               pid: r.session_pid ?? 0,
@@ -900,11 +904,24 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
           }
         } catch (err: any) {
           clearInterval(phaseTimer)
-          // ALREADY_OWNED — 사용자가 Compare 안 하고 이미 보유한 지식을 사려고 한 경우
-          if (err?.code === 'ALREADY_OWNED' || /already.*owned|이미 보유/i.test(err?.message ?? '')) {
-            const friendly = `⚠ Purchase blocked — this knowledge is already in your agent's memory. Run Compare in the catalog to see what you already own.`
+          // NO_AGENT_CONNECTED — agent not connected via WebSocket (Preflight failed)
+          if (err?.code === 'NO_AGENT_CONNECTED' || /NO_AGENT_CONNECTED|no agent connected|not connected/i.test(err?.message ?? '')) {
+            const msg = `🔌 Agent not connected.\nStart Claude Code or \`cherry-agent.js\` locally first.\nPurchase cancelled — no credits deducted.`
+            res = { answer: msg, concepts: [], evidence: [], qualityScore: 0, creditsConsumed: 0 }
+            provData = { hash: "", chain: "blocked", explorerUrl: "", onChain: false, error: "NO_AGENT_CONNECTED" }
+            setMessages((m) => [...m, { role: "agent-chat", reply: `🔌 Agent not connected — purchase cancelled` }])
+          }
+          // DELIVERY_TIMEOUT — agent did not ack save within 30s
+          else if (err?.code === 'DELIVERY_TIMEOUT' || /DELIVERY_TIMEOUT|timeout/i.test(err?.message ?? '')) {
+            const msg = `⏱ Save timeout — agent did not respond within 30 seconds.\nNo credits deducted. Please try again.`
+            res = { answer: msg, concepts: [], evidence: [], qualityScore: 0, creditsConsumed: 0 }
+            provData = { hash: "", chain: "timeout", explorerUrl: "", onChain: false, error: "DELIVERY_TIMEOUT" }
+            setMessages((m) => [...m, { role: "agent-chat", reply: `⏱ Save timeout — purchase cancelled` }])
+          }
+          // ALREADY_OWNED — legacy fallback (server now auto re-sends without blocking)
+          else if (err?.code === 'ALREADY_OWNED' || /already.*owned/i.test(err?.message ?? '')) {
+            const friendly = `⚠ Already owned — re-purchase re-saves the file without deducting credits.`
             res = { answer: friendly, concepts: [], evidence: [], qualityScore: 0, creditsConsumed: 0 }
-            // 실패 상태 명시 → 스피너 안 돌고 "blocked" 표시
             provData = { hash: "", chain: "blocked", explorerUrl: "", onChain: false, error: "Already owned" }
             setMessages((m) => [...m, { role: "agent-chat", reply: `🛑 ${err.message ?? "Already owned"}` }])
           } else {

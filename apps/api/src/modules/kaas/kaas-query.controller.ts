@@ -1,5 +1,7 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, Logger, NotFoundException, Param, Post, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpException, HttpStatus, Inject, Logger, NotFoundException, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { randomUUID } from 'crypto';
+import { Knex } from 'knex';
 import OpenAI from 'openai';
 import { ZodValidationPipe } from 'src/middleware/zod-validation.pipe';
 import { KaasAgentService } from './kaas-agent.service';
@@ -23,6 +25,7 @@ export class KaasQueryController {
     private readonly provenance: KaasProvenanceService,
     private readonly curatorReward: KaasCuratorRewardService,
     private readonly wsGateway: KaasWsGateway,
+    @Inject('KNEX_CONNECTION') private readonly knex: Knex,
   ) {}
 
   private async findAgent(apiKey?: string) {
@@ -52,38 +55,109 @@ export class KaasQueryController {
     });
   }
 
+  /**
+   * 개념 구매 — 3-phase 아톰릭 트랜잭션
+   *   [1] Preflight  : 에이전트 웹소켓 연결 확인 (없으면 409)
+   *   [2] Reserve    : purchase_delivery state='pending' 레코드 생성
+   *   [3] Deliver    : 웹소켓으로 save_skill_request 발송, 30초 ack 대기
+   *   [4] Finalize   : ack 성공 시 크레딧 차감 + provenance 기록 + knowledge 업데이트
+   *                    ack 실패/타임아웃 시 state='cancelled', 크레딧 차감 없음
+   *   ALREADY_OWNED  : 에러 아님. 크레딧 차감 없이 save_skill_request만 재발송 (파일 복구)
+   */
   @Post('purchase')
   @HttpCode(200)
-  @ApiOperation({ summary: '개념 구매 (20cr, 일회성)' })
+  @ApiOperation({ summary: '개념 구매 (20cr, 일회성) — 에이전트 접속 필수, 웹소켓 왕복 확인' })
   async purchase(
     @Body(new ZodValidationPipe(PurchaseDto.schema)) dto: PurchaseDto,
   ) {
-    try {
-      const agent = await this.findAgent(dto.api_key);
-      this.logger.log(`Purchase: agent=${agent.id}, concept=${dto.concept_id}, tier=${agent.karma_tier}`);
+    const agent = await this.findAgent(dto.api_key);
+    this.logger.log(`[purchase] ▶ start: agent=${agent.id} (${agent.name}) concept=${dto.concept_id} tier=${agent.karma_tier}`);
 
-      const concept = await this.knowledge.findByIdWithContent(dto.concept_id);
-      if (!concept) throw new NotFoundException({ code: 'CONCEPT_NOT_FOUND', message: `Concept '${dto.concept_id}' not found` });
+    const concept = await this.knowledge.findByIdWithContent(dto.concept_id);
+    if (!concept) throw new NotFoundException({ code: 'CONCEPT_NOT_FOUND', message: `Concept '${dto.concept_id}' not found` });
 
-      // 중복 구매 차단: 이미 보유한 지식이면 크레딧 차감 전에 거절
-      if (this.agentOwnsConcept(agent, dto.concept_id, concept.title)) {
-        throw new BadRequestException({
-          code: 'ALREADY_OWNED',
-          message: `Already owned: ${concept.title}`,
-        });
-      }
+    const isReowned = this.agentOwnsConcept(agent, dto.concept_id, concept.title);
+    this.logger.log(`[purchase] concept found: ${concept.title}, content_md bytes=${(concept.contentMd ?? '').length}, isReowned=${isReowned}`);
 
-      // SALE: DB에서 할인율 조회 (0이면 세일 아님)
-      const saleDiscountPct = await this.knowledge.getSaleDiscount(dto.concept_id);
-
-      // NEAR 등 유저-직접-서명 체인: 클라이언트가 pre_signed_tx 제공 → 서버는 DB만 차감
-      const preSignedTx = (dto as any).pre_signed_tx as string | undefined;
-      const chainOverride = (dto as any).chain as 'status' | 'near' | 'mock' | undefined;
-      this.logger.log(
-        `[DIAG purchase] dto.chain=${chainOverride} pre_signed_tx=${preSignedTx ? preSignedTx.slice(0, 10) + '...' : 'MISSING'} → branch=${preSignedTx && chainOverride ? 'consumeDbOnly(preSigned)' : 'consume(serverSign)'}`,
+    // [1] Preflight: 에이전트 웹소켓 연결 확인
+    if (!this.wsGateway.isAgentConnected(agent.id)) {
+      this.logger.warn(`[purchase] ✗ Preflight failed: agent=${agent.id} not connected via WebSocket`);
+      throw new HttpException(
+        { code: 'NO_AGENT_CONNECTED', message: 'Agent is not connected via WebSocket. Start Claude Code or the local agent process first.' },
+        HttpStatus.CONFLICT,
       );
+    }
+    this.logger.log(`[purchase] ✓ Preflight passed: agent connected`);
 
-      const { consumed, remaining } = preSignedTx && chainOverride
+    const preSignedTx = (dto as any).pre_signed_tx as string | undefined;
+    const chainOverride = (dto as any).chain as 'status' | 'near' | 'mock' | undefined;
+    const saleDiscountPct = await this.knowledge.getSaleDiscount(dto.concept_id);
+
+    // [2] Reserve: purchase_delivery 레코드 생성
+    const requestId = randomUUID();
+    const targetDir = `~/.claude/skills/cherry-${dto.concept_id}`;
+    const targetFile = `${targetDir}/SKILL.md`;
+    const reservedCredit = isReowned ? 0 : ACTION_PRICE.purchase;
+
+    await this.knex('kaas.purchase_delivery').insert({
+      request_id: requestId,
+      agent_id: agent.id,
+      concept_id: dto.concept_id,
+      state: 'pending',
+      credit_reserved: reservedCredit,
+      is_reowned: isReowned,
+    });
+    this.logger.log(`[purchase] ✓ Reserved: request=${requestId} credit_reserved=${reservedCredit}. Delivering via WebSocket...`);
+
+    // [3] Deliver: 웹소켓으로 save_skill_request 발송 → 30초 ack 대기
+    let ack;
+    try {
+      ack = await this.wsGateway.requestSaveSkill(agent.id, {
+        request_id: requestId,
+        concept_id: dto.concept_id,
+        title: concept.title,
+        summary: concept.summary,
+        content_md: concept.contentMd ?? '',
+        target_dir: targetDir,
+        target_file: targetFile,
+      });
+    } catch (err: any) {
+      // 실패: cancelled로 마감, 크레딧 차감 없음
+      await this.knex('kaas.purchase_delivery').where({ request_id: requestId }).update({
+        state: 'cancelled',
+        error_reason: err.message ?? String(err),
+        completed_at: new Date(),
+      });
+      this.logger.warn(`Purchase delivery failed: request=${requestId} reason=${err.message}`);
+
+      if (err.message === 'DELIVERY_TIMEOUT') {
+        throw new HttpException(
+          { code: 'DELIVERY_TIMEOUT', message: 'Agent did not ack save within 30 seconds. Purchase cancelled — no credits deducted.' },
+          HttpStatus.REQUEST_TIMEOUT,
+        );
+      }
+      if (err.message === 'NO_AGENT_CONNECTED') {
+        throw new HttpException({ code: 'NO_AGENT_CONNECTED', message: 'Agent connection dropped.' }, HttpStatus.CONFLICT);
+      }
+      throw new HttpException({ code: 'DELIVERY_FAILED', message: err.message }, HttpStatus.BAD_GATEWAY);
+    }
+
+    // [4] Finalize: ack 받음 → 크레딧 차감 + provenance + knowledge 업데이트
+    const responseData = {
+      answer: concept.summary,
+      content_md: concept.contentMd,
+      concepts: [concept.title],
+      evidence: concept.evidence,
+      quality_score: concept.qualityScore,
+    };
+
+    let consumed = 0;
+    let remaining = 0;
+    let prov: any = null;
+
+    if (!isReowned) {
+      // 신규 구매만 크레딧 차감 + provenance 기록
+      const consumeResult = preSignedTx && chainOverride
         ? await this.credit.consumeDbOnly(
             agent.id, ACTION_PRICE.purchase, agent.karma_tier as KarmaTierName, dto.concept_id, 'purchase',
             { saleDiscount: saleDiscountPct / 100, preSignedTxHash: preSignedTx, chain: chainOverride },
@@ -92,48 +166,53 @@ export class KaasQueryController {
             agent.id, ACTION_PRICE.purchase, agent.karma_tier as KarmaTierName, dto.concept_id, 'purchase',
             { saleDiscount: saleDiscountPct / 100 },
           );
+      consumed = consumeResult.consumed;
+      remaining = consumeResult.remaining;
 
-      const responseData = {
-        answer: concept.summary,
-        content_md: concept.contentMd,
-        concepts: [concept.title],
-        evidence: concept.evidence,
-        quality_score: concept.qualityScore,
-      };
-
-      const prov = await this.provenance.recordQuery(
+      prov = await this.provenance.recordQuery(
         agent.id, dto.concept_id, 'purchase', consumed, responseData,
-        chainOverride, // chain override (status | near | mock)
+        chainOverride,
         preSignedTx && chainOverride ? { txHash: preSignedTx, chain: chainOverride } : undefined,
       );
 
       // 큐레이터 보상 40% 자동 지급 (비동기)
-      this.curatorReward.distributeReward(dto.concept_id, prov.queryLogId, consumed).catch((err) => {
-        this.logger.warn(`Curator reward failed: ${err.message}`);
+      this.curatorReward.distributeReward(dto.concept_id, prov.queryLogId, consumed).catch((e) => {
+        this.logger.warn(`Curator reward failed: ${e.message}`);
       });
 
-      // 구매 후 knowledge 자동 업데이트 + WebSocket 즉시 제출
       await this.agentService.addToKnowledge(agent.id, dto.concept_id);
       const updatedAgent = await this.agentService.findById(agent.id);
       const knowledge = (() => { try { const r = updatedAgent?.knowledge; return typeof r === 'string' ? JSON.parse(r) : (Array.isArray(r) ? r : []); } catch { return []; } })();
       await this.wsGateway.pushKnowledgeUpdate(agent.id, knowledge);
-
-      return {
-        ...responseData,
-        credits_consumed: consumed,
-        credits_remaining: remaining,
-        provenance: {
-          hash: prov.provenanceHash,
-          chain: prov.onChain ? (process.env.CHAIN_ADAPTER ?? 'mock') : 'failed',
-          explorer_url: prov.explorerUrl,
-          on_chain: prov.onChain,
-          error: prov.error,
-        },
-      };
-    } catch (err) {
-      this.logger.error(`Purchase error: ${err.message}`, err.stack);
-      throw err;
+    } else {
+      // 재소유 케이스: 잔액만 조회
+      const bal = await this.credit.getBalance(agent.id);
+      remaining = bal.balance;
     }
+
+    // purchase_delivery 완료 마킹
+    await this.knex('kaas.purchase_delivery').where({ request_id: requestId }).update({
+      state: 'complete',
+      saved_path: ack.saved_path,
+      size_bytes: ack.size_bytes,
+      completed_at: new Date(),
+    });
+
+    return {
+      ...responseData,
+      credits_consumed: consumed,
+      credits_remaining: remaining,
+      is_reowned: isReowned,
+      saved_path: ack.saved_path,
+      size_bytes: ack.size_bytes,
+      provenance: prov ? {
+        hash: prov.provenanceHash,
+        chain: prov.onChain ? (process.env.CHAIN_ADAPTER ?? 'mock') : 'failed',
+        explorer_url: prov.explorerUrl,
+        on_chain: prov.onChain,
+        error: prov.error,
+      } : null,
+    };
   }
 
   @Post('follow')
@@ -311,7 +390,7 @@ Rules (strict):
       return {
         ok: false,
         error: err.message,
-        hint: 'MCP stdio 클라이언트가 실행 중이어야 합니다. (Claude Code + cherry-kaas MCP 연결)',
+        hint: 'The MCP stdio client must be running (Claude Code + cherry-kaas MCP).',
       };
     }
   }

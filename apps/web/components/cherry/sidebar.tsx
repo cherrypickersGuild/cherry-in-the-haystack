@@ -390,18 +390,31 @@ export function Sidebar({
 }) {
   // YouTube 스타일 접기: 헤더 클릭 또는 stem 클릭 → 토글. localStorage에 저장.
   // 기본값은 Basics / Advanced 모두 접힌 상태 — 메뉴가 간결하게 시작.
+  // SSR 하이드레이션 일치를 위해:
+  //   · 첫 렌더는 서버·클라이언트 둘 다 DEFAULT_COLLAPSED로 동일하게 그림
+  //   · mount 후 useEffect에서 localStorage 값을 읽어 상태 갱신 (이 시점엔 paint 완료, mismatch 없음)
   const COLLAPSE_KEY = "cherry_sidebar_collapsed"
   const DEFAULT_COLLAPSED: Record<string, boolean> = { basics: true, advanced: true }
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
-    if (typeof window === "undefined") return DEFAULT_COLLAPSED
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(DEFAULT_COLLAPSED)
+  const [hydrated, setHydrated] = useState(false)
+
+  // mount 시 1회만 localStorage에서 복원
+  useEffect(() => {
     try {
       const raw = localStorage.getItem(COLLAPSE_KEY)
-      return raw ? JSON.parse(raw) : DEFAULT_COLLAPSED
-    } catch { return DEFAULT_COLLAPSED }
-  })
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (parsed && typeof parsed === "object") setCollapsed(parsed)
+      }
+    } catch { /* noop */ }
+    setHydrated(true)
+  }, [])
+
+  // hydrated 이후부터 localStorage 저장 (초기 DEFAULT 값으로 덮어쓰는 것 방지)
   useEffect(() => {
+    if (!hydrated) return
     try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(collapsed)) } catch {}
-  }, [collapsed])
+  }, [collapsed, hydrated])
   const toggle = (id: string) => setCollapsed((c) => ({ ...c, [id]: !c[id] }))
 
   return (

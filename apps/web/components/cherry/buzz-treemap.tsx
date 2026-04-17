@@ -230,7 +230,7 @@ export function CategoryTreemap({ items }: { items?: LandingTreemapItem[] }) {
             aspectRatio={4 / 3}
             stroke="transparent"
             fill="transparent"
-            // @ts-expect-error — recharts types don't expose content extra props
+            // @ts-ignore — recharts types don't expose content extra props
             content={<CustomizedContent hoveredLabel={hoveredLabel} setHoveredLabel={setHoveredLabel} />}
             isAnimationActive={false}
           />
