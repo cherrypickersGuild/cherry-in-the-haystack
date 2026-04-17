@@ -102,22 +102,8 @@ export function SelfReportLog({
   generatedAt: string
   source: "agent" | "none"
 }) {
-  const addedTopics = new Set<string>(
-    (data?.timeline ?? []).filter((t: any) => t.action === "purchase").map((t: any) => t.conceptId),
-  )
-  const modifiedTopics = new Set<string>(
-    (data?.timeline ?? []).filter((t: any) => t.action === "follow").map((t: any) => t.conceptId),
-  )
-  const allKnowledge: Array<{ topic: string; lastUpdated: string }> = data?.currentKnowledge ?? []
-  const unchanged = allKnowledge.filter(
-    (k) => !addedTopics.has(k.topic) && !modifiedTopics.has(k.topic),
-  )
-  const categoryOf = (id: string) => {
-    if (["rag", "embeddings", "chain-of-thought"].includes(id)) return "basics"
-    if (["multi-agent", "agent-architectures", "fine-tuning"].includes(id)) return "advanced"
-    if (["evaluation", "prompt-engineering"].includes(id)) return "core"
-    return "misc"
-  }
+  // 보고서는 에이전트의 실제 상태(= ~/.claude/skills/ 파일) 기반.
+  // DB 구매 이력(timeline/currentKnowledge)은 영수증이므로 보고서에 쓰지 않음 — Queries 탭 전용.
   const fmtTime = (iso: string) => {
     if (!iso) return ""
     return new Date(iso).toLocaleString("ko-KR", {
@@ -125,13 +111,8 @@ export function SelfReportLog({
       hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
     })
   }
-  const timelineByConcept = new Map<string, any>()
-  ;(data?.timeline ?? []).forEach((t: any) => {
-    if (!timelineByConcept.has(t.conceptId)) timelineByConcept.set(t.conceptId, t)
-  })
 
-  // 에이전트가 보내준 timeline의 conceptTitle이 UUID 그대로일 때(구버전 에이전트 호환)
-  // 카탈로그에서 id→title 맵을 가져와 fallback으로 사용
+  // concept id → title 맵 (catalog에서 1회 로드). 파일 폴더명(cherry-{uuid})의 uuid로 title 조회용.
   const [titleMap, setTitleMap] = useState<Map<string, string>>(new Map())
   useEffect(() => {
     import("@/lib/api").then(({ fetchCatalog }) =>
@@ -142,13 +123,6 @@ export function SelfReportLog({
       }).catch(() => {})
     )
   }, [])
-  const resolveTitle = (t: any) => {
-    const raw = t?.conceptTitle ?? ""
-    const id = t?.conceptId ?? ""
-    const looksLikeId = raw === id || /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(raw)
-    if (looksLikeId) return titleMap.get(id) ?? raw ?? id
-    return raw || titleMap.get(id) || id
-  }
 
   return (
     <>
@@ -164,75 +138,7 @@ export function SelfReportLog({
         <span className="text-[#6B7280]">· {fmtTime(generatedAt)}</span>
       </div>
 
-      {/* Added */}
-      {addedTopics.size > 0 && (
-        <div className="mt-3">
-          <p className="text-[#27C93F]">+ ADDED ({addedTopics.size})</p>
-          {[...addedTopics].map((topic) => {
-            const t = timelineByConcept.get(topic)
-            if (!t) return null
-            return (
-              <div key={topic} className="mt-1.5 pl-1">
-                <p className="text-[#27C93F]">+ <span className="font-bold" title={t.conceptId}>{resolveTitle(t)}</span></p>
-                <div className="pl-4 text-[11px]">
-                  <p><span className="text-[#6B7280]">★ </span>{t.qualityScore}<span className="text-[#6B7280]"> · {fmtTime(t.at)} · </span><span className="text-[#F59E6A]">{t.action}</span> ({t.creditsConsumed}cr)</p>
-                  {t.onChainFailed ? (
-                    <p className="text-[#FFBD2E]">⚠ on-chain failed</p>
-                  ) : (
-                    <p>
-                      <span className={cn(t.chain === "status" || t.chain === "status-hoodi" ? "text-[#27C93F]" : "text-[#C7A7FF]")}>{t.chain}</span>
-                      {" · "}
-                      <a href={t.explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B9CE8] underline break-all">
-                        {t.txHash.slice(0, 12)}...{t.txHash.slice(-6)}
-                      </a>
-                    </p>
-                  )}
-                  {t.evidence?.length > 0 && t.evidence.map((e: any, ei: number) => (
-                    <p key={ei} className="text-[10px]">
-                      <span className="text-[#6B7280]">├─ </span>
-                      <span className="text-[#C7A7FF]">{e.source}</span>
-                      {e.curator && <span className="text-[#6B7280]"> ({e.curator}/{e.curatorTier})</span>}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-      {/* Modified */}
-      {modifiedTopics.size > 0 && (
-        <div className="mt-3">
-          <p className="text-[#FFBD2E]">~ MODIFIED ({modifiedTopics.size})</p>
-          {[...modifiedTopics].map((topic) => {
-            const t = timelineByConcept.get(topic)
-            if (!t) return null
-            return (
-              <div key={topic} className="mt-1 pl-1">
-                <p className="text-[#FFBD2E]">~ <span className="font-bold" title={t.conceptId}>{resolveTitle(t)}</span> <span className="text-[#6B7280]">(follow)</span></p>
-                <p className="pl-4 text-[11px] text-[#6B7280]">{fmtTime(t.at)} · {t.creditsConsumed}cr
-                  {!t.onChainFailed && t.explorerUrl && (
-                    <> · <a href={t.explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B9CE8] underline break-all">{t.txHash.slice(0, 12)}...</a></>
-                  )}
-                </p>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-      {/* Unchanged */}
-      {unchanged.length > 0 && (
-        <div className="mt-3">
-          <p className="text-[#6B7280]">= UNCHANGED ({unchanged.length})</p>
-          {unchanged.map((k) => (
-            <p key={k.topic} className="text-[#6B7280] pl-1">= {k.topic} <span className="text-[#4A5160]">({k.lastUpdated})</span></p>
-          ))}
-        </div>
-      )}
-
-      {/* Local Skills — stdio MCP가 스캔한 ~/.claude/skills/ 실제 파일 목록 */}
+      {/* Local Skills — stdio MCP가 스캔한 ~/.claude/skills/ 실제 파일 목록 (보고서 본문) */}
       <div className="mt-3">
         <p className="text-[#6B9CE8]">
           📁 LOCAL SKILLS ({data?.localSkills?.count ?? 0})
@@ -299,18 +205,10 @@ export function SelfReportLog({
           )}
       </div>
 
-      {/* Summary */}
+      {/* Summary — 파일 수 기준 (영수증 아님) */}
       <div className="mt-3 pt-2 border-t border-[#2A2F3B] text-[#7C8490]">
-        <span>total {allKnowledge.length} · </span>
-        <span className="text-[#27C93F]">+{addedTopics.size}</span>
-        <span> · spent </span>
-        <span className="text-[#D4854A]">{data.summary?.totalSpent ?? 0}cr</span>
-        {data?.localSkills && (
-          <>
-            <span> · </span>
-            <span className="text-[#6B9CE8]">{data.localSkills.items?.filter((s: any) => s.hasSkillMd).length ?? 0} skills</span>
-          </>
-        )}
+        <span className="text-[#6B9CE8]">{data?.localSkills?.items?.filter((s: any) => s.hasSkillMd).length ?? 0} skills</span>
+        <span className="text-[#6B7280]"> @ {data?.localSkills?.base_dir ?? "~/.claude/skills"}</span>
       </div>
     </>
   )
@@ -386,7 +284,6 @@ function KnowledgeDiffModal({ agentId, agentName, onClose }: { agentId: string; 
 
   useEffect(() => { loadReport() }, [agentId])
 
-  // ─── 데이터 조합: added / modified / unchanged ───
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
       <div
