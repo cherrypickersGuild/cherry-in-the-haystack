@@ -161,28 +161,26 @@ const TOPIC_META: Record<string, { title: string; section: "BASICS" | "ADVANCED"
   },
 }
 
-/* 섹션별 카드 색상 팔레트 — BASICS는 블루, ADVANCED는 기존 보라 유지 */
+/* 섹션별 카드 색상 팔레트 — BASICS/ADVANCED 동일한 보라 톤 */
 const CARD_PALETTE = {
   BASICS: {
-    cardBg: "#EEF4FC",
-    cardBorder: "#C7D8EE",
-    iconBg: "#3E6FC0",
-    // 알림(badge/button)도 블루 톤으로
-    badgeBg: "#DCE8F7",
-    badgeBorder: "#C7D8EE",
-    badgeText: "#2A5699",
-    btnText: "#2A5699",
-    btnBorder: "#C7D8EE",
-    btnHoverBg: "#DCE8F7",
-    // 상단 section badge
-    sectionBadgeBg: "#DCE8F7",
-    sectionBadgeText: "#2A5699",
+    cardBg: "#F3EFFA",
+    cardBorder: "#C7B8E8",
+    iconBg: "#7B5EA7",
+    badgeBg: "#FDF0F3",
+    badgeBorder: "#F2C4CE",
+    badgeText: "#C94B6E",
+    btnText: "#7B5EA7",
+    btnBorder: "#C7B8E8",
+    btnHoverBg: "#E8E3F3",
+    // 상단 "BASICS" 섹션 배지만 초록 — Advanced와 구분
+    sectionBadgeBg: "#E3F1E1",
+    sectionBadgeText: "#2F7A3A",
   },
   ADVANCED: {
     cardBg: "#F3EFFA",
     cardBorder: "#C7B8E8",
     iconBg: "#7B5EA7",
-    // 기존 보라 유지
     badgeBg: "#FDF0F3",
     badgeBorder: "#F2C4CE",
     badgeText: "#C94B6E",
