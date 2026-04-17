@@ -408,8 +408,14 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
                     <div>
                       <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#C94B6E]">Sale</label>
                       <div className="mt-1 flex items-center gap-2">
-                        <button onClick={() => setEditOnSale(!editOnSale)} className={cn("relative w-10 h-5 rounded-full transition-colors", editOnSale ? "bg-[#C94B6E]" : "bg-[#E0E0E0]")}>
-                          <span className={cn("absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform", editOnSale ? "translate-x-5" : "translate-x-0.5")} />
+                        <button
+                          onClick={() => setEditOnSale(!editOnSale)}
+                          className={cn("relative w-10 h-5 rounded-full transition-colors", editOnSale ? "bg-[#C94B6E]" : "bg-[#E0E0E0]")}
+                        >
+                          <span
+                            className="absolute top-0.5 left-0 w-4 h-4 rounded-full bg-white shadow transition-transform"
+                            style={{ transform: `translateX(${editOnSale ? 22 : 2}px)` }}
+                          />
                         </button>
                         <span className="text-[12px] text-[#666]">{editOnSale ? "On Sale" : "Off"}</span>
                       </div>

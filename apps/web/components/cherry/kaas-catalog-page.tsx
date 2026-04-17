@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Search, X, GitCompare, CheckCircle2, AlertCircle, ArrowRight, RefreshCw, ChevronDown, ExternalLink } from "lucide-react"
 import { MOCK_AGENTS } from "./kaas-dashboard-page"
@@ -913,11 +912,7 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
             >
               {cat}
               {isActive && (
-                <motion.span
-                  layoutId="catalog-active-underline"
-                  className="absolute left-0 right-0 -bottom-px h-[2px] bg-[#1A1626]"
-                  transition={{ type: "spring", stiffness: 500, damping: 38 }}
-                />
+                <span className="absolute left-0 right-0 -bottom-px h-[2px] bg-[#1A1626]" />
               )}
             </button>
           )

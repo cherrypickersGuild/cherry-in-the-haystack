@@ -75,10 +75,10 @@ function CustomizedContent(props: any) {
   // 1위만 크게, 나머지는 순위에 따라 점점 작게
   const isTop = rank === 0
   const labelSize = isTop
-    ? Math.max(16, Math.min(26, minDim * 0.18))
+    ? Math.max(13, Math.min(20, minDim * 0.13))
     : Math.max(11, Math.min(17, minDim * 0.13))
   const pctSize = isTop
-    ? Math.max(16, Math.min(22, minDim * 0.16))
+    ? Math.max(13, Math.min(17, minDim * 0.12))
     : Math.max(11, Math.min(15, minDim * 0.12))
 
   const showLabel = width > 36 && height > 30
@@ -115,10 +115,11 @@ function CustomizedContent(props: any) {
       />
       {/* foreignObject로 HTML 텍스트 → word-break / 자동 줄바꿈 */}
       {(showLabel || showPct) && (() => {
-        // 패딩: 타일 크기 + 순위 기반. 상/하 여유 충분히 확보
-        const rankBoost = rank <= 4 ? 1.0 - rank * 0.05 : 0.75 // 1위 1.0 → 5위 0.8 → 하위 0.75
-        const padX = Math.max(12, Math.min(28, width * 0.1 * rankBoost))
-        const padY = Math.max(14, Math.min(28, height * 0.12 * rankBoost))
+        // 패딩: 타일 크기 + 순위 기반. 1위는 큰 타일이라 픽셀 패딩 상한을 2위급으로 캡
+        const rankBoost = rank <= 4 ? 1.0 - rank * 0.05 : 0.75
+        const maxPad = rank === 0 ? 20 : 28
+        const padX = Math.max(12, Math.min(maxPad, width * 0.1 * rankBoost))
+        const padY = Math.max(14, Math.min(maxPad, height * 0.12 * rankBoost))
         return (
         <foreignObject
           x={x + padX}

@@ -594,6 +594,7 @@ function AgentPanel({
   const selected = agents.find((a) => a.id === selectedId) ?? agents[0]
   const [cmdCopied, setCmdCopied] = useState(false)
   const [removeCopied, setRemoveCopied] = useState(false)
+  const [testCopied, setTestCopied] = useState(false)
   const [mcpConnected, setMcpConnected] = useState(false)
   // MCP 서버 가동 상태 실시간 폴링 (10초마다)
   // — /mcp/sessions 엔드포인트 도달 가능 여부로 서버 alive 체크
@@ -704,14 +705,6 @@ function AgentPanel({
 
       {/* Selected agent detail — 고정 하단 */}
       <div className="shrink-0 border-t border-[#E4E1EE] pt-3 mt-3 space-y-3">
-        {/* Wallet address (Karma는 우측 패널로 이동) */}
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Wallet</p>
-          <div className="flex items-center gap-2">
-            <Wallet size={13} className="text-[#7B5EA7]" />
-            <span className="text-[12px] font-mono font-semibold text-[#1A1626]">{selected.walletAddress && selected.walletAddress.length > 12 ? `${selected.walletAddress.slice(0, 6)}...${selected.walletAddress.slice(-4)}` : selected.walletAddress || "—"}</span>
-          </div>
-        </div>
 
 
         <div>
@@ -734,6 +727,9 @@ function AgentPanel({
         </div>
 
         <div>
+          <span className="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-[#EFF7F3] text-[#2D7A5E] border border-[#A8D4C0] mb-1.5">
+            ✓ Paste & run in terminal
+          </span>
           <div className="flex items-center justify-between mb-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E]">Claude Code Connection</p>
             <div className="flex items-center gap-0.5 bg-[#F3F1F7] rounded-md p-0.5">
@@ -761,11 +757,31 @@ function AgentPanel({
               {cmdCopied ? <Check size={12} className="text-[#2D7A5E]" /> : <Copy size={12} className="text-[#6B727E]" />}
             </button>
           </div>
-          <p className="text-[9px] text-[#9E97B3] mt-1">Paste & run in terminal</p>
 
-          {/* Disconnect */}
-          <div className="bg-[#F9F7F5] rounded-lg px-3 py-2 border border-[#E4E1EE] relative mt-1.5">
-            <p className="text-[10px] font-mono text-[#9E97B3] pr-6">{removeCommand}</p>
+        </div>
+
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Connection Test</p>
+          <div className="bg-[#F9F7F5] rounded-lg px-3 py-2 border border-[#E4E1EE] relative">
+            <p className="text-[10px] font-mono text-[#1A1626] pr-6">Submit a self-report of your knowledge to Cherry KaaS server.</p>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText("Submit a self-report of your knowledge to Cherry KaaS server.")
+                setTestCopied(true)
+                setTimeout(() => setTestCopied(false), 2000)
+              }}
+              className="absolute top-2 right-2 p-0.5 hover:bg-white rounded cursor-pointer flex-shrink-0"
+              title="Copy test prompt"
+            >
+              {testCopied ? <Check size={12} className="text-[#2D7A5E]" /> : <Copy size={12} className="text-[#6B727E]" />}
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Disconnect MCP</p>
+          <div className="bg-[#F9F7F5] rounded-lg px-3 py-2 border border-[#E4E1EE] relative">
+            <p className="text-[10px] font-mono text-[#1A1626] pr-6">{removeCommand}</p>
             <button
               onClick={handleRemoveCopy}
               className="absolute top-2 right-2 p-0.5 hover:bg-white rounded cursor-pointer flex-shrink-0"
@@ -774,31 +790,11 @@ function AgentPanel({
               {removeCopied ? <Check size={12} className="text-[#2D7A5E]" /> : <Copy size={12} className="text-[#6B727E]" />}
             </button>
           </div>
-          <p className="text-[9px] text-[#9E97B3] mt-1">Run when disconnecting</p>
-        </div>
-
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Connection Test</p>
-          <p className="text-[9px] text-[#9E97B3] mb-1">Paste in Claude Code to verify agent connection:</p>
-          <div className="bg-[#F9F7F5] rounded-lg px-3 py-2 border border-[#E4E1EE] relative">
-            <p className="text-[10px] font-mono text-[#1A1626] pr-6">Submit a self-report of your knowledge to Cherry KaaS server.</p>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText("Submit a self-report of your knowledge to Cherry KaaS server.")
-                setCmdCopied(true)
-                setTimeout(() => setCmdCopied(false), 2000)
-              }}
-              className="absolute top-2 right-2 p-0.5 hover:bg-white rounded cursor-pointer flex-shrink-0"
-              title="Copy test prompt"
-            >
-              {cmdCopied ? <Check size={12} className="text-[#2D7A5E]" /> : <Copy size={12} className="text-[#6B727E]" />}
-            </button>
-          </div>
         </div>
 
         <button
           onClick={() => { if (confirm(`Delete agent "${selected.name}"?`)) onDelete(selected.id) }}
-          className="w-full text-[10px] text-[#999] hover:text-red-400 py-0.5 cursor-pointer transition-colors"
+          className="w-full text-[12px] font-medium text-[#999] hover:text-red-400 py-0 -mt-2 cursor-pointer transition-colors leading-tight"
         >
           Delete Agent
         </button>
@@ -1192,7 +1188,17 @@ function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefr
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-[15px] font-bold text-[#1A1626]">Wallet & Rewards</h3>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <h3 className="text-[15px] font-bold text-[#1A1626]">Wallet & Rewards</h3>
+        <div className="flex items-center gap-1.5">
+          <Wallet size={13} className="text-[#7B5EA7]" />
+          <span className="text-[12px] font-mono font-semibold text-[#1A1626]">
+            {agent.walletAddress && agent.walletAddress.length > 12
+              ? `${agent.walletAddress.slice(0, 6)}...${agent.walletAddress.slice(-4)}`
+              : agent.walletAddress || "—"}
+          </span>
+        </div>
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-2.5">
