@@ -30,6 +30,13 @@ const btnSecondary =
 
 const TIER_OPTIONS = ["Bronze", "Silver", "Gold", "Platinum"]
 
+/** 카테고리 고정 enum — 자유 타이핑 금지, 목록 통일 */
+const CATEGORY_OPTIONS = ["Basic", "Advanced", "Technique"] as const
+type Category = typeof CATEGORY_OPTIONS[number]
+
+/** 신규 concept 기본 품질 점수 (마켓에서 별 4개로 노출) */
+const DEFAULT_QUALITY_SCORE = 4
+
 /** UUID v7 생성 (타임스탬프 기반, 정렬 가능) */
 function uuidv7(): string {
   const now = Date.now()
@@ -213,7 +220,14 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
     setSaving(true)
     const id = uuidv7()
     try {
-      await createConceptAdmin({ id, title: newTitle, category: newCategory, summary: newSummary, created_by: isAdmin ? '__SYSTEM__' : (userId ?? '__SYSTEM__') })
+      await createConceptAdmin({
+        id,
+        title: newTitle,
+        category: newCategory,
+        summary: newSummary,
+        quality_score: DEFAULT_QUALITY_SCORE, // 신규 concept는 마켓에서 별 4개 기본
+        created_by: isAdmin ? '__SYSTEM__' : (userId ?? '__SYSTEM__'),
+      })
       // 일부러 최소 0.5초 스피닝 — 사용자가 변화를 인지할 수 있도록
       await new Promise((r) => setTimeout(r, 500))
       setShowCreate(false)
@@ -340,10 +354,20 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
                 <div>
                   <label className={labelCls}>Category</label>
                   <div className="mt-1 flex flex-wrap gap-1.5">
-                    {categories.map((cat) => (
-                      <button key={cat} onClick={() => setNewCategory(cat)} className={cn("rounded-full px-3 py-1 text-[11px] border transition-colors", newCategory === cat ? "border-[#D4854A] bg-[#FFF8F0] text-[#D4854A]" : "border-[#E0E0E0] text-[#666] hover:border-[#D4854A]")}>{cat}</button>
+                    {CATEGORY_OPTIONS.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setNewCategory(cat)}
+                        className={cn(
+                          "rounded-full px-3 py-1 text-[11px] border transition-colors",
+                          newCategory === cat
+                            ? "border-[#D4854A] bg-[#FFF8F0] text-[#D4854A] font-semibold"
+                            : "border-[#E0E0E0] text-[#666] hover:border-[#D4854A]"
+                        )}
+                      >
+                        {cat}
+                      </button>
                     ))}
-                    <input value={categories.includes(newCategory) ? "" : newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="or new category" className={cn(inputBase, "w-40")} />
                   </div>
                 </div>
                 <div>
@@ -397,7 +421,25 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
               {subTab === "info" && (
                 <div className="space-y-4 max-w-lg">
                   <div><label className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#1A1626]">Title</label><input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className={cn(inputBase, "mt-1")} /></div>
-                  <div><label className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#7B5EA7]">Category</label><input value={editCategory} onChange={(e) => setEditCategory(e.target.value)} className={cn(inputBase, "mt-1")} /></div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#7B5EA7]">Category</label>
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      {CATEGORY_OPTIONS.map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => setEditCategory(cat)}
+                          className={cn(
+                            "rounded-full px-3 py-1 text-[11px] border transition-colors",
+                            editCategory === cat
+                              ? "border-[#D4854A] bg-[#FFF8F0] text-[#D4854A] font-semibold"
+                              : "border-[#E0E0E0] text-[#666] hover:border-[#D4854A]"
+                          )}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                   <div><label className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#666]">Summary</label><textarea value={editSummary} onChange={(e) => setEditSummary(e.target.value)} rows={3} className={cn(inputBase, "mt-1 resize-none")} /></div>
                   <div className="grid grid-cols-2 gap-4">
                     <div><label className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#D4854A]">Quality Score</label><input type="number" step="0.1" min="0" max="5" value={editQuality} onChange={(e) => setEditQuality(Number(e.target.value))} className={cn(inputBase, "mt-1")} /></div>
