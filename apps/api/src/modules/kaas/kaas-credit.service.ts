@@ -86,6 +86,53 @@ export class KaasCreditService {
     return { consumed: finalAmount, remaining, txHash, onChain };
   }
 
+  /**
+   * 유저 지갑이 이미 직접 서명한 경우 — 온체인 호출 생략, DB 차감만 수행.
+   * NEAR(또는 향후 다른 유저-직접-서명 체인)에서 사용.
+   *
+   * - Karma/Sale 할인 계산 로직은 consume()과 동일
+   * - 잔액 부족 시 402 예외
+   * - preSignedTxHash는 그대로 credit_ledger.tx_hash에 저장 (explorer 링크 구성용)
+   * - chain은 'near' 등 유저가 지정한 체인명 그대로
+   */
+  async consumeDbOnly(
+    agentId: string,
+    baseAmount: number,
+    karmaTier: KarmaTierName,
+    conceptId: string,
+    actionType: string,
+    opts: { saleDiscount?: number; preSignedTxHash: string; chain: ChainName },
+  ): Promise<{ consumed: number; remaining: number; txHash: string; onChain: true }> {
+    const karmaDiscount = KARMA_DISCOUNT[karmaTier] ?? 0;
+    const saleDiscount = opts.saleDiscount ?? 0;
+    const finalAmount = Math.round(baseAmount * (1 - karmaDiscount) * (1 - saleDiscount));
+
+    const { balance } = await this.getBalance(agentId);
+    if (balance < finalAmount) {
+      throw new HttpException({
+        code: 'INSUFFICIENT_CREDITS',
+        message: 'Insufficient credits',
+        credits_required: finalAmount,
+        credits_available: balance,
+      }, 402);
+    }
+
+    await this.knex('kaas.credit_ledger').insert({
+      agent_id: agentId,
+      amount: -finalAmount,
+      type: 'consume',
+      description: `${actionType}: ${conceptId}`,
+      tx_hash: opts.preSignedTxHash,
+      chain: opts.chain,
+    });
+
+    const remaining = balance - finalAmount;
+    this.logger.log(
+      `Credit consumed (pre-signed/${opts.chain}): agent=${agentId}, amount=${finalAmount}, remaining=${remaining}, tx=${opts.preSignedTxHash}`,
+    );
+    return { consumed: finalAmount, remaining, txHash: opts.preSignedTxHash, onChain: true };
+  }
+
   /** Ledger 내역 조회 (deposit + consume 모두) */
   async getLedger(agentId: string, limit = 50): Promise<any[]> {
     return this.knex('kaas.credit_ledger')

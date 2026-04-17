@@ -19,7 +19,7 @@ export class KaasAgentService {
   /** 에이전트 등록 */
   async register(
     userId: string,
-    dto: { name: string; wallet_address?: string; llm_provider?: string; llm_model?: string; llm_api_key?: string; domain_interests: string[] },
+    dto: { name: string; wallet_address?: string; wallet_type?: 'evm' | 'near'; llm_provider?: string; llm_model?: string; llm_api_key?: string; domain_interests: string[] },
   ): Promise<KaasAgentEntity> {
     const apiKey = this.generateApiKey();
 
@@ -29,6 +29,7 @@ export class KaasAgentService {
         name: dto.name,
         api_key: apiKey,
         wallet_address: dto.wallet_address ?? null,
+        wallet_type: dto.wallet_type ?? 'evm',
         llm_provider: dto.llm_provider ?? 'claude',
         llm_model: dto.llm_model ?? null,
         llm_api_key: dto.llm_api_key ?? null,

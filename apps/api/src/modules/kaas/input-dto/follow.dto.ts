@@ -5,6 +5,7 @@ export const FollowSchema = z.object({
   concept_id: z.string().min(1),
   api_key: z.string().optional(),
   chain: z.enum(['status', 'near', 'mock']).optional(),
+  pre_signed_tx: z.string().optional(),
 });
 
 export class FollowDto {
@@ -18,4 +19,7 @@ export class FollowDto {
 
   @ApiProperty({ example: 'status', enum: ['status', 'near', 'mock'], required: false })
   chain?: 'status' | 'near' | 'mock';
+
+  @ApiProperty({ required: false, description: '유저 지갑이 이미 서명한 tx hash (NEAR 등)' })
+  pre_signed_tx?: string;
 }
