@@ -999,30 +999,30 @@ function RegisterForm({ onComplete, onCancel }: { onComplete: (agent: Agent) => 
 
       <div>
         <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1.5">Wallet Type</p>
-        <div className="inline-flex p-0.5 bg-[#F9F7F5] rounded-lg border border-[#E4E1EE] mb-2">
-          <button
-            type="button"
-            onClick={() => { if (!walletConnected) setWalletType("evm") }}
-            disabled={walletConnected}
-            className={cn(
-              "text-[11px] font-semibold px-3 py-1 rounded-md transition-colors",
-              walletType === "evm" ? "bg-white text-[#D4854A] shadow-sm" : "text-[#6B727E]",
-              walletConnected && "opacity-60 cursor-not-allowed",
-            )}
-          >
-            MetaMask
-          </button>
+        <div className="flex w-full p-0.5 bg-[#F9F7F5] rounded-lg border border-[#E4E1EE] mb-2">
           <button
             type="button"
             onClick={() => { if (!walletConnected) setWalletType("near") }}
             disabled={walletConnected}
             className={cn(
-              "text-[11px] font-semibold px-3 py-1 rounded-md transition-colors",
-              walletType === "near" ? "bg-white text-[#7B5EA7] shadow-sm" : "text-[#6B727E]",
+              "flex-1 text-[12px] font-semibold px-3 py-1.5 rounded-md transition-all",
+              walletType === "near" ? "bg-white text-[#7B5EA7] shadow-sm" : "text-[#6B727E] hover:text-[#3D3652]",
               walletConnected && "opacity-60 cursor-not-allowed",
             )}
           >
             NEAR
+          </button>
+          <button
+            type="button"
+            onClick={() => { if (!walletConnected) setWalletType("evm") }}
+            disabled={walletConnected}
+            className={cn(
+              "flex-1 text-[12px] font-semibold px-3 py-1.5 rounded-md transition-all",
+              walletType === "evm" ? "bg-white text-[#D4854A] shadow-sm" : "text-[#6B727E] hover:text-[#3D3652]",
+              walletConnected && "opacity-60 cursor-not-allowed",
+            )}
+          >
+            MetaMask
           </button>
         </div>
 

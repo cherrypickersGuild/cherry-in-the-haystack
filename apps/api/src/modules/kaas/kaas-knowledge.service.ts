@@ -52,9 +52,17 @@ export class KaasKnowledgeService {
       })
     )];
     const users = creatorIds.length > 0
-      ? await this.knex('core.app_user').whereIn('id', creatorIds).select('id', 'name', 'karma_tier')
+      ? await this.knex('core.app_user').whereIn('id', creatorIds).select('id', 'name', 'email', 'karma_tier')
       : [];
-    const userMap = new Map(users.map((u: any) => [u.id, { name: u.name as string, karmaTier: (u.karma_tier ?? 'Bronze') as string }]));
+    // name이 비어있으면 email prefix로 fallback (Admin 리스트와 동일한 표시 규칙)
+    const userMap = new Map(users.map((u: any) => {
+      const trimmedName = (u.name as string | null)?.trim() || null;
+      const emailPrefix = u.email ? (u.email as string).split('@')[0] : null;
+      return [u.id, {
+        name: trimmedName || emailPrefix || 'user',
+        karmaTier: (u.karma_tier ?? 'Bronze') as string,
+      }];
+    }));
     // __SYSTEM__ 키로도 조회 가능하게
     const sysUser = userMap.get(SYSTEM_UUID);
     if (sysUser) userMap.set('__SYSTEM__', sysUser);
