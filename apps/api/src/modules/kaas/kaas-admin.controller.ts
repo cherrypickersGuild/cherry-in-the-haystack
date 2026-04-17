@@ -46,11 +46,25 @@ export class KaasAdminController {
     return this.knowledge.updateConcept(id, dto as Record<string, unknown>);
   }
 
+  @Delete('concepts/:id/hide')
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Admin — 개념 숨김 (is_active=false, 복구 가능)' })
+  async hideConcept(@Param('id') id: string) {
+    await this.knowledge.hideConcept(id);
+  }
+
+  @Post('concepts/:id/show')
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Admin — 개념 숨김 해제 (is_active=true)' })
+  async showConcept(@Param('id') id: string) {
+    await this.knowledge.unhideConcept(id);
+  }
+
   @Delete('concepts/:id')
   @HttpCode(204)
-  @ApiOperation({ summary: 'Admin — 개념 소프트 삭제' })
+  @ApiOperation({ summary: 'Admin — 개념 소프트 딜리트 (revoked_at 기록)' })
   async deleteConcept(@Param('id') id: string) {
-    await this.knowledge.softDeleteConcept(id);
+    await this.knowledge.revokeConcept(id);
   }
 
   /* ───── Evidence CRUD ───── */

@@ -616,6 +616,11 @@ export interface AdminConcept {
   updatedAt: string
   relatedConcepts: string[]
   isActive: boolean
+  isOnSale?: boolean
+  saleDiscount?: number
+  createdBy: string
+  createdByLabel: string
+  revokedAt: string | null
   evidence: AdminEvidence[]
 }
 
@@ -669,6 +674,16 @@ export async function updateConceptAdmin(id: string, body: Record<string, unknow
   })
   if (!res.ok) throw new Error("Failed to update concept")
   return res.json()
+}
+
+export async function hideConceptAdmin(id: string) {
+  const res = await fetch(`${KAAS_BASE}/admin/concepts/${id}/hide`, { method: "DELETE" })
+  if (!res.ok) throw new Error("Failed to hide concept")
+}
+
+export async function unhideConceptAdmin(id: string) {
+  const res = await fetch(`${KAAS_BASE}/admin/concepts/${id}/show`, { method: "POST" })
+  if (!res.ok) throw new Error("Failed to unhide concept")
 }
 
 export async function deleteConceptAdmin(id: string) {

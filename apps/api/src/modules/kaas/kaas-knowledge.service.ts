@@ -179,13 +179,33 @@ export class KaasKnowledgeService {
     const evidence = await this.knex('kaas.evidence')
       .whereIn('concept_id', rows.map((r: Record<string, unknown>) => r.id) as string[]);
 
-    return rows.map((r: Record<string, unknown>) => ({
-      ...this.mapConcept(r, evidence.filter((e: Record<string, unknown>) => e.concept_id === r.id)),
-      contentMd: (r.content_md as string) ?? null,
-      isActive: r.is_active as boolean,
-      isOnSale: !!(r.is_on_sale),
-      saleDiscount: (r.sale_discount as number) ?? 20,
-    }));
+    // 유저 이메일 조회 — __SYSTEM__ 제외한 실 유저만
+    const userIds = [...new Set(
+      rows
+        .map((r: Record<string, unknown>) => r.created_by as string)
+        .filter((id) => id && id !== '__SYSTEM__'),
+    )];
+    const users = userIds.length > 0
+      ? await this.knex('core.app_user').whereIn('id', userIds).select('id', 'email', 'name')
+      : [];
+    const userMap = new Map(users.map((u: any) => [u.id as string, { email: u.email as string, name: u.name as string }]));
+
+    return rows.map((r: Record<string, unknown>) => {
+      const cb = (r.created_by as string) ?? '__SYSTEM__';
+      const user = userMap.get(cb);
+      const emailPrefix = user?.email ? user.email.split('@')[0] : null;
+      const createdByLabel = cb === '__SYSTEM__' ? '__SYSTEM__' : (user?.name || emailPrefix || cb.slice(0, 8));
+      return {
+        ...this.mapConcept(r, evidence.filter((e: Record<string, unknown>) => e.concept_id === r.id)),
+        contentMd: (r.content_md as string) ?? null,
+        isActive: r.is_active as boolean,
+        isOnSale: !!(r.is_on_sale),
+        saleDiscount: (r.sale_discount as number) ?? 20,
+        createdBy: cb,
+        createdByLabel,
+        revokedAt: r.revoked_at ? new Date(r.revoked_at as string).toISOString() : null,
+      };
+    });
   }
 
   /** Admin — 상세 조회 (비활성 포함, content_md + evidence) */
@@ -250,9 +270,20 @@ export class KaasKnowledgeService {
     return row;
   }
 
-  /** Admin — Concept 소프트 삭제 */
-  async softDeleteConcept(id: string) {
+  /** Admin — Hide: 마켓에서 숨김 (is_active=false, 복구 가능) */
+  async hideConcept(id: string) {
     await this.knex('kaas.concept').where({ id }).update({ is_active: false, updated_at: new Date() });
+  }
+
+  /** Admin — Unhide: 숨김 해제 (is_active=true) */
+  async unhideConcept(id: string) {
+    await this.knex('kaas.concept').where({ id }).update({ is_active: true, updated_at: new Date() });
+  }
+
+  /** Admin — Revoke: 소프트 딜리트 (revoked_at 기록, 복구 불가 의도) */
+  async revokeConcept(id: string) {
+    const now = new Date();
+    await this.knex('kaas.concept').where({ id }).update({ is_active: false, revoked_at: now, updated_at: now });
   }
 
   /** Admin — Evidence 추가 */

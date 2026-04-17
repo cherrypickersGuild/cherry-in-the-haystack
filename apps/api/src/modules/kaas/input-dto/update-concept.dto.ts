@@ -9,6 +9,8 @@ export const UpdateConceptSchema = z.object({
   quality_score: z.number().min(0).max(5).optional(),
   source_count: z.number().int().min(0).optional(),
   related_concepts: z.array(z.string()).optional(),
+  is_on_sale: z.boolean().optional(),
+  sale_discount: z.number().min(0).max(100).optional(),
 });
 
 export class UpdateConceptDto {
@@ -21,4 +23,6 @@ export class UpdateConceptDto {
   @ApiProperty({ required: false }) quality_score?: number;
   @ApiProperty({ required: false }) source_count?: number;
   @ApiProperty({ required: false }) related_concepts?: string[];
+  @ApiProperty({ required: false }) is_on_sale?: boolean;
+  @ApiProperty({ required: false }) sale_discount?: number;
 }

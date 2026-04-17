@@ -2,13 +2,15 @@
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { cn } from "@/lib/utils"
-import { Search, Plus, Trash2, Upload, Eye, Edit3, FileText, BookOpen, Loader2 } from "lucide-react"
+import { Search, Plus, Trash2, Upload, Eye, Edit3, FileText, BookOpen, Loader2, EyeOff } from "lucide-react"
 import {
   fetchConceptsAdmin,
   fetchConceptAdmin,
   createConceptAdmin,
   updateConceptAdmin,
   deleteConceptAdmin,
+  hideConceptAdmin,
+  unhideConceptAdmin,
   addEvidenceAdmin,
   updateEvidenceAdmin,
   deleteEvidenceAdmin,
@@ -102,12 +104,14 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [search, setSearch] = useState("")
+  const [listTab, setListTab] = useState<"market" | "user">("market")
+  const [categoryFilter, setCategoryFilter] = useState<"All" | Category>("All")
   const [subTab, setSubTab] = useState<"info" | "content" | "evidence">("info")
 
   // Create mode
   const [showCreate, setShowCreate] = useState(false)
   const [newTitle, setNewTitle] = useState("")
-  const [newCategory, setNewCategory] = useState("")
+  const [newCategory, setNewCategory] = useState<Category>("Basic")
   const [newSummary, setNewSummary] = useState("")
 
   // Edit state
@@ -181,11 +185,30 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
     setAddingEvidence(false)
   }, [selectedId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const filtered = concepts.filter((c) =>
-    search === "" || c.title.toLowerCase().includes(search.toLowerCase()) || c.id.toLowerCase().includes(search.toLowerCase()),
-  )
+  // 삭제(revoked_at IS NOT NULL)는 항상 제외, hidden은 뒤에
+  const nonDeleted = concepts.filter((c) => !c.revokedAt)
+  const sortedNonDeleted = [
+    ...nonDeleted.filter((c) => c.isActive),
+    ...nonDeleted.filter((c) => !c.isActive),
+  ]
 
-  const categories = [...new Set(concepts.map((c) => c.category))]
+  const listConcepts = isAdmin
+    ? listTab === "market"
+      ? sortedNonDeleted.filter((c) => c.createdBy === '__SYSTEM__')
+      : sortedNonDeleted.filter((c) => c.createdBy !== '__SYSTEM__')
+    : nonDeleted.filter((c) => c.isActive)
+
+  const CATEGORY_FILTERS = ["All", ...CATEGORY_OPTIONS] as const
+
+  const filtered = listConcepts.filter((c) => {
+    const matchCat = categoryFilter === "All" || c.category === categoryFilter
+    const matchSearch = search === "" ||
+      c.title.toLowerCase().includes(search.toLowerCase()) ||
+      c.id.toLowerCase().includes(search.toLowerCase()) ||
+      (c.createdBy ?? "").toLowerCase().includes(search.toLowerCase()) ||
+    (c.createdByLabel ?? "").toLowerCase().includes(search.toLowerCase())
+    return matchCat && matchSearch
+  })
 
   async function handleSaveInfo() {
     if (!selectedId) return
@@ -237,10 +260,20 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
     } finally { setSaving(false) }
   }
 
+  async function handleToggleHide(id: string, currentlyActive: boolean) {
+    if (currentlyActive) {
+      await hideConceptAdmin(id)
+      setConcepts((prev) => prev.map((c) => c.id === id ? { ...c, isActive: false } : c))
+    } else {
+      await unhideConceptAdmin(id)
+      setConcepts((prev) => prev.map((c) => c.id === id ? { ...c, isActive: true } : c))
+    }
+  }
+
   async function handleDelete(id: string) {
     await deleteConceptAdmin(id)
     setSelectedId(null)
-    await loadConcepts()
+    setConcepts((prev) => prev.filter((c) => c.id !== id))
   }
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -297,11 +330,43 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
             <Plus className="h-4 w-4" />
           </button>
         </div>
-        <div className="px-3 pb-2">
+        {isAdmin && (
+          <div className="flex border-b border-[#F0F0F0] px-3 pb-0">
+            {(["market", "user"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => { setListTab(tab); setSelectedId(null); setSearch("") }}
+                className={cn(
+                  "border-b-2 px-3 py-1.5 text-[11px] font-semibold capitalize transition-colors",
+                  listTab === tab ? "border-[#D4854A] text-[#1A1626]" : "border-transparent text-[#888] hover:text-[#333]"
+                )}
+              >
+                {tab === "market" ? "Market" : "User"}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="px-3 pt-2 pb-1">
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#888]" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search" className="w-full rounded-lg border border-[#E0E0E0] bg-[#FBFAF8] py-1.5 pl-8 pr-3 text-[12px] outline-none placeholder:text-[#888] focus:border-[#1A1626] focus:bg-white" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={isAdmin && listTab === "user" ? "Search title, user ID…" : "Search"} className="w-full rounded-lg border border-[#E0E0E0] bg-[#FBFAF8] py-1.5 pl-8 pr-3 text-[12px] outline-none placeholder:text-[#888] focus:border-[#1A1626] focus:bg-white" />
           </div>
+        </div>
+        <div className="flex gap-1 px-3 pb-2 flex-wrap">
+          {CATEGORY_FILTERS.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setCategoryFilter(cat as typeof categoryFilter)}
+              className={cn(
+                "rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition-colors border",
+                categoryFilter === cat
+                  ? "bg-[#1A1626] text-white border-[#1A1626]"
+                  : "border-[#E0E0E0] text-[#888] hover:border-[#999] hover:text-[#555]"
+              )}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
         <div className="flex-1 overflow-y-auto px-2">
@@ -322,11 +387,17 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
                   : "border border-transparent hover:bg-[#FAFAFA]",
               )}
             >
-              <p className={cn("text-[12px] font-semibold leading-snug truncate", selectedId === c.id && !showCreate ? "text-[#1A1626]" : "text-[#1A1626]")}>{c.title}</p>
-              <div className="mt-0.5 flex items-center gap-2 text-[10px]">
-                <span className="text-[#7B5EA7]">{c.category}</span>
-                <span className="text-[#D4854A] font-medium">Q{c.qualityScore}</span>
-                {!c.isActive && <span className="text-[#E57373]">Inactive</span>}
+              <p className={cn(
+                "text-[12px] font-semibold leading-snug truncate",
+                !c.isActive ? "text-[#BBB]" : (selectedId === c.id && !showCreate ? "text-[#1A1626]" : "text-[#1A1626]")
+              )}>{c.title}</p>
+              <div className="mt-0.5 flex items-center gap-2 text-[10px] flex-wrap">
+                <span className={cn(c.isActive ? "text-[#7B5EA7]" : "text-[#CCC]")}>{c.category}</span>
+                <span className={cn("font-medium", c.isActive ? "text-[#D4854A]" : "text-[#CCC]")}>Q{c.qualityScore}</span>
+                {!c.isActive && <span className="text-[#CCC]">Hidden</span>}
+                {isAdmin && listTab === "user" && c.createdBy && c.createdBy !== '__SYSTEM__' && (
+                  <span className="text-[#999] truncate max-w-[100px]">{c.createdByLabel ?? c.createdBy.slice(0, 8)}</span>
+                )}
               </div>
             </button>
           ))}
@@ -403,9 +474,30 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
                   <h3 className="text-[14px] font-bold">{selected.title}</h3>
                   <p className="text-[10px]"><span className="text-[#999]">{selected.id}</span> · <span className="text-[#7B5EA7]">{selected.category}</span></p>
                 </div>
-                <button onClick={() => handleDelete(selected.id)} className="flex items-center gap-1 rounded-lg border border-[#E0E0E0] px-2.5 py-1 text-[11px] text-[#888] transition-colors hover:border-red-200 hover:text-red-400">
-                  <Trash2 className="h-3 w-3" /> Delete
-                </button>
+                <div className="flex items-center gap-1.5">
+                  {!selected.revokedAt && (
+                    <button
+                      onClick={() => handleToggleHide(selected.id, selected.isActive)}
+                      className="flex items-center gap-1 rounded-lg border border-[#E0E0E0] px-2.5 py-1 text-[11px] text-[#888] transition-colors hover:border-amber-300 hover:text-amber-500"
+                    >
+                      {selected.isActive
+                        ? <><EyeOff className="h-3 w-3" /> Hide</>
+                        : <><Eye className="h-3 w-3" /> Show</>
+                      }
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      if (!confirm(`Permanently soft-delete "${selected.title}"? This records revoked_at and cannot be undone.`)) return
+                      handleDelete(selected.id)
+                    }}
+                    disabled={!!selected.revokedAt}
+                    title={selected.revokedAt ? `Already deleted at ${selected.revokedAt}` : "Soft-delete (records revoked_at)"}
+                    className="flex items-center gap-1 rounded-lg border border-[#E0E0E0] px-2.5 py-1 text-[11px] text-[#888] transition-colors hover:border-red-200 hover:text-red-400 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 className="h-3 w-3" /> {selected.revokedAt ? "Deleted" : "Delete"}
+                  </button>
+                </div>
               </div>
               <div className="flex gap-0">
                 {subTabs.map((t) => (
