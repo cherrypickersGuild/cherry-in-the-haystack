@@ -237,36 +237,52 @@ export async function signAndSendNearProvenance(memo?: string): Promise<{
   const signerId = accounts?.[0]?.accountId
   if (!signerId) throw new Error("NEAR wallet not connected")
 
-  const outcome: any = await wallet.signAndSendTransaction({
-    network: NETWORK,
-    signerId,
-    receiverId: signerId, // self-transfer
-    actions: [
-      {
-        type: "Transfer",
-        params: { deposit: "1" }, // 1 yoctoNEAR — 실질 0원
-      } as any,
-    ],
-  })
-
   if (memo) console.log(`[NEAR provenance] memo=${memo}`)
-  // outcome shape가 지갑마다 달라서 (MNW redirect / popup / FinalExecutionOutcome) 모두 시도
-  console.log("[NEAR provenance] outcome:", outcome)
 
-  const firstArr = Array.isArray(outcome) ? outcome[0] : null
-  const txHash: string =
-    outcome?.transaction?.hash ??
-    outcome?.transaction_outcome?.id ??
-    outcome?.transactionHashes?.[0] ??
-    outcome?.hash ??
-    outcome?.id ??
-    firstArr?.transaction?.hash ??
-    firstArr?.transaction_outcome?.id ??
-    ""
+  let outcome: any
+  let txHash = ""
+  try {
+    outcome = await wallet.signAndSendTransaction({
+      network: NETWORK,
+      signerId,
+      receiverId: signerId, // self-transfer
+      actions: [
+        {
+          type: "Transfer",
+          params: { deposit: "1" }, // 1 yoctoNEAR — 실질 0원
+        } as any,
+      ],
+    })
+    console.log("[NEAR provenance] outcome:", outcome)
+
+    const firstArr = Array.isArray(outcome) ? outcome[0] : null
+    txHash =
+      outcome?.transaction?.hash ??
+      outcome?.transaction_outcome?.id ??
+      outcome?.transactionHashes?.[0] ??
+      outcome?.hash ??
+      outcome?.id ??
+      firstArr?.transaction?.hash ??
+      firstArr?.transaction_outcome?.id ??
+      ""
+  } catch (e: any) {
+    // @hot-labs/near-connect는 tx 제출 직후 RPC로 status를 polling하는데,
+    // NEAR 노드 인덱싱 지연으로 "Transaction <hash> doesn't exist" 에러를 던질 때가 있다.
+    // 이 경우 tx는 실제로 on-chain에 제출됐고 곧 확정되므로, 에러 메시지에서 hash를 복구해 진행.
+    const msg: string = e?.message ?? String(e)
+    const match = msg.match(/Transaction ([A-HJ-NP-Za-km-z1-9]{40,50})\s+doesn['']t\s+exist/i)
+    if (match) {
+      txHash = match[1]
+      console.warn(
+        `[NEAR provenance] RPC polling race — tx submitted but not yet indexed. Recovered hash from error: ${txHash}`,
+      )
+    } else {
+      console.error("[NEAR provenance] signAndSendTransaction failed:", e)
+      throw e
+    }
+  }
 
   if (!txHash) {
-    // 유저가 분명 서명했는데 hash를 못 뽑는 경우 — 폴백으로 서버 서명하면 double-sign이 된다.
-    // 명시적으로 실패시켜 상위에서 깨닫도록.
     console.error("[NEAR provenance] Could not extract tx hash from outcome:", outcome)
     throw new Error(
       "NEAR tx signed but hash not found in outcome. Check console for outcome shape.",

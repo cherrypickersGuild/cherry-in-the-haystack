@@ -79,6 +79,9 @@ export class KaasQueryController {
       // NEAR 등 유저-직접-서명 체인: 클라이언트가 pre_signed_tx 제공 → 서버는 DB만 차감
       const preSignedTx = (dto as any).pre_signed_tx as string | undefined;
       const chainOverride = (dto as any).chain as 'status' | 'near' | 'mock' | undefined;
+      this.logger.log(
+        `[DIAG purchase] dto.chain=${chainOverride} pre_signed_tx=${preSignedTx ? preSignedTx.slice(0, 10) + '...' : 'MISSING'} → branch=${preSignedTx && chainOverride ? 'consumeDbOnly(preSigned)' : 'consume(serverSign)'}`,
+      );
 
       const { consumed, remaining } = preSignedTx && chainOverride
         ? await this.credit.consumeDbOnly(

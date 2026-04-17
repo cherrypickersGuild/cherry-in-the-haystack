@@ -830,16 +830,24 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
           // NEAR + NEAR 지갑 에이전트 → 사용자 지갑이 직접 서명 (provenance self-transfer 1 yoctoNEAR)
           const currentAgent = agents[selectedAgentIdx]
           const agentWalletType = currentAgent?.wallet_type ?? "evm"
+          console.log(
+            `[DIAG purchase] selectedChain=${selectedChain} agentWalletType=${agentWalletType} agent=${currentAgent?.name} → ${selectedChain === "near" && agentWalletType === "near" ? "NEAR user-sign" : "server-sign"}`,
+          )
           let preSignedTx: string | undefined
           if (selectedChain === "near" && agentWalletType === "near") {
             // NEAR 경로는 유저 서명이 필수 — 실패하면 서버 서명 폴백 금지 (double-sign 방지)
             const { signAndSendNearProvenance } = await import("@/lib/near-connector")
+            console.log("[DIAG purchase] calling signAndSendNearProvenance…")
             const { txHash } = await signAndSendNearProvenance(`${act}:${conceptId}`)
+            console.log(`[DIAG purchase] got txHash=${txHash || 'EMPTY'}`)
             if (!txHash) {
               throw new Error("NEAR wallet signature required but hash not found")
             }
             preSignedTx = txHash
           }
+          console.log(
+            `[DIAG purchase] sending to backend: chain=${selectedChain} preSignedTx=${preSignedTx ? preSignedTx.slice(0, 10) + '...' : 'undefined'}`,
+          )
 
           const apiResult = act === "purchase"
             ? await purchaseConcept(apiKey, conceptId, selectedChain, preSignedTx ? { preSignedTx } : undefined)
