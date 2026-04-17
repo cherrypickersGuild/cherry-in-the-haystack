@@ -111,20 +111,38 @@ export default function CherryApp() {
           setActiveNav("kaas-catalog")
         }} />
 
-      // BASICS
-      case "prompting":
-      case "rag":
-      case "fine-tuning":
-      case "agent-architectures":
-      case "embeddings":
-      case "evaluation":
+      // BASICS (24 topics)
+      case "foundations":
+      case "prompting-reasoning":
+      case "model-selection":
+      case "context-engineering":
+      case "rag-systems":
+      case "knowledge-systems":
+      case "memory":
+      case "agents-reasoning":
+      case "agent-orchestration":
+      case "tool-use":
+      case "system-architecture":
+      case "performance-optimization":
+      case "reliability-safety":
+      case "data-engineering":
+      case "multi-agent-systems":
+      case "applications":
+      case "evaluation-systems":
+      case "failure-modes":
+      case "control-plane":
+      case "data-flywheel":
+      case "multimodal":
+      case "codegen-ai-dev":
+      case "security-adversarial":
+      case "human-ai-ux":
       // ADVANCED
       case "chain-of-thought":
       case "multi-hop-rag":
       case "peft-lora":
-      case "multi-agent":
       case "custom-embeddings":
       case "adversarial-eval":
+      case "agent-topologies":
         return <HandbookPlaceholder topicId={activeNav} />
 
       case "highlight":

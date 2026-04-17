@@ -6,38 +6,129 @@ import { BookOpen, Clock, Bell } from "lucide-react"
    Topic metadata
 ───────────────────────────────────────────── */
 const TOPIC_META: Record<string, { title: string; section: "BASICS" | "ADVANCED"; description: string }> = {
-  // BASICS
-  "prompting": {
-    title: "Prompting Techniques",
+  // ───────── BASICS (24 topics) ─────────
+  "foundations": {
+    title: "Foundations of LLM Systems",
     section: "BASICS",
-    description: "Zero-shot, few-shot, chain-of-thought prompting, prompt templates, and best practices for instruction design."
+    description: "Transformer architecture, tokenization & vocabulary design, pretraining objectives, fine-tuning, alignment, and inference & decoding."
   },
-  "rag": {
-    title: "RAG (Retrieval-Augmented Generation)",
+  "prompting-reasoning": {
+    title: "Prompting & Reasoning",
     section: "BASICS",
-    description: "Document chunking, embedding strategies, vector search, retrieval pipelines, and grounding LLM outputs with external knowledge."
+    description: "Prompt design principles, few-shot / zero-shot prompting, chain-of-thought, self-consistency, structured output prompting, and prompt templates & versioning."
   },
-  "fine-tuning": {
-    title: "Fine-tuning",
+  "model-selection": {
+    title: "Model Selection & Benchmarking",
     section: "BASICS",
-    description: "Supervised fine-tuning, instruction tuning, data preparation, hyperparameter selection, and evaluation metrics."
+    description: "Model capability benchmarking, latency vs cost tradeoffs, provider comparison, model families & sizes, and choosing the right model per task."
   },
-  "agent-architectures": {
-    title: "Agent Architectures",
+  "context-engineering": {
+    title: "Context Engineering",
     section: "BASICS",
-    description: "ReAct, tool-use patterns, planning loops, memory systems, and building autonomous AI agents."
+    description: "Context window management, rolling context windows, prompt compression & summarization, retrieval injection strategies, context prioritization, and long context handling."
   },
-  "embeddings": {
-    title: "Embeddings & Vector DBs",
+  "rag-systems": {
+    title: "Retrieval-Augmented Systems (RAG)",
     section: "BASICS",
-    description: "Text embeddings, similarity search, vector database selection, indexing strategies, and hybrid search."
+    description: "Embeddings, vector databases, chunking strategies, retrieval algorithms, RAG pipelines, and RAG evaluation."
   },
-  "evaluation": {
-    title: "Evaluation",
+  "knowledge-systems": {
+    title: "Knowledge Systems",
     section: "BASICS",
-    description: "Benchmarks, human evaluation, automated metrics, A/B testing, and measuring LLM performance systematically."
+    description: "Knowledge bases, GraphRAG, knowledge graph construction, semantic triples, dynamic knowledge graphs, and knowledge freshness & updating."
   },
-  // ADVANCED
+  "memory": {
+    title: "Memory Architectures",
+    section: "BASICS",
+    description: "Short-term memory, long-term memory, semantic memory, episodic memory, experience replay memory, and note-taking systems."
+  },
+  "agents-reasoning": {
+    title: "Agents & Reasoning Systems",
+    section: "BASICS",
+    description: "Reflex agents, ReAct agents, planner–executor agents, query decomposition agents, reflection agents, and deep research agents."
+  },
+  "agent-orchestration": {
+    title: "Agent Orchestration",
+    section: "BASICS",
+    description: "Task decomposition, planning strategies, multi-step reasoning flows, execution loops, error handling & retry logic, and human-in-the-loop systems."
+  },
+  "tool-use": {
+    title: "Tool Use & Integration",
+    section: "BASICS",
+    description: "Tool calling, tool selection, tool parameterization, API integration patterns, and external knowledge access."
+  },
+  "system-architecture": {
+    title: "System Architecture & Infrastructure",
+    section: "BASICS",
+    description: "LLM APIs & hosting, caching, streaming & batching, queue systems, observability & logging, and deployment patterns."
+  },
+  "performance-optimization": {
+    title: "Performance Optimization",
+    section: "BASICS",
+    description: "Latency optimization, cost optimization, prompt optimization, model distillation, caching strategies, and throughput scaling."
+  },
+  "reliability-safety": {
+    title: "Reliability & Safety",
+    section: "BASICS",
+    description: "Guardrails, output validation, hallucination mitigation, fallback systems, monitoring & alerting, and adversarial robustness."
+  },
+  "data-engineering": {
+    title: "Data Engineering for LLMs",
+    section: "BASICS",
+    description: "Dataset collection, data cleaning & filtering, synthetic data generation, data labeling pipelines, and dataset versioning & quality control."
+  },
+  "multi-agent-systems": {
+    title: "Multi-Agent Systems",
+    section: "BASICS",
+    description: "Agent communication protocols, role assignment, coordination strategies, conflict resolution, and emergent behavior."
+  },
+  "applications": {
+    title: "Applications & Productization",
+    section: "BASICS",
+    description: "Chat applications, autonomous systems, knowledge assistants, research agents, and workflow automation."
+  },
+  "evaluation-systems": {
+    title: "Evaluation Systems",
+    section: "BASICS",
+    description: "Evaluation pipelines (offline/online), evaluation metrics, A/B testing, LLM-as-a-judge, continuous evaluation loops, human feedback, qualitative evaluation (vibe checks), safety & robustness evaluation, and benchmark vs real-world gap."
+  },
+  "failure-modes": {
+    title: "Failure Modes & Debugging",
+    section: "BASICS",
+    description: "Hallucination taxonomy, retrieval failure modes, tool use failures, agent loop failures, context overflow, cost explosion patterns, and debugging workflows."
+  },
+  "control-plane": {
+    title: "Control Plane & Protocols",
+    section: "BASICS",
+    description: "Model Context Protocol (MCP), tool interoperability standards, agent capability specs, tool registry systems, and execution control layers."
+  },
+  "data-flywheel": {
+    title: "Data Flywheel & Learning Systems",
+    section: "BASICS",
+    description: "Data flywheel architecture, production feedback collection, online learning loops, continuous retraining loops, and eval-driven retraining."
+  },
+  "multimodal": {
+    title: "Multimodal Systems",
+    section: "BASICS",
+    description: "Vision-language models, voice agents, multimodal retrieval, diffusion pipelines, and cross-modal reasoning."
+  },
+  "codegen-ai-dev": {
+    title: "Code Generation & AI-assisted Development",
+    section: "BASICS",
+    description: "Codegen systems, agent coding systems, auto-debugging, and AI-assisted dev workflow."
+  },
+  "security-adversarial": {
+    title: "Security & Adversarial Systems",
+    section: "BASICS",
+    description: "Prompt injection, tool injection, data poisoning (RAG), output exploits, and secure execution."
+  },
+  "human-ai-ux": {
+    title: "Human–AI Interaction & UX",
+    section: "BASICS",
+    description: "Interaction design, trust calibration, explainability, HITL patterns, and cognitive load optimization."
+  },
+
+  // ───────── ADVANCED ─────────
   "chain-of-thought": {
     title: "Chain-of-Thought",
     section: "ADVANCED",
@@ -53,11 +144,6 @@ const TOPIC_META: Record<string, { title: string; section: "BASICS" | "ADVANCED"
     section: "ADVANCED",
     description: "Parameter-efficient fine-tuning, low-rank adaptation, quantized training, and efficient model customization."
   },
-  "multi-agent": {
-    title: "Multi-agent Systems",
-    section: "ADVANCED",
-    description: "Agent collaboration, orchestration patterns, communication protocols, and building agent teams."
-  },
   "custom-embeddings": {
     title: "Custom Embeddings",
     section: "ADVANCED",
@@ -68,7 +154,45 @@ const TOPIC_META: Record<string, { title: string; section: "BASICS" | "ADVANCED"
     section: "ADVANCED",
     description: "Red-teaming, jailbreak testing, robustness evaluation, and stress-testing LLM systems."
   },
+  "agent-topologies": {
+    title: "Agent Topologies",
+    section: "ADVANCED",
+    description: "Single-agent systems, multi-agent systems, parallel execution, sequential chains, and graph-based workflows."
+  },
 }
+
+/* 섹션별 카드 색상 팔레트 — BASICS는 블루, ADVANCED는 기존 보라 유지 */
+const CARD_PALETTE = {
+  BASICS: {
+    cardBg: "#EEF4FC",
+    cardBorder: "#C7D8EE",
+    iconBg: "#3E6FC0",
+    // 알림(badge/button)도 블루 톤으로
+    badgeBg: "#DCE8F7",
+    badgeBorder: "#C7D8EE",
+    badgeText: "#2A5699",
+    btnText: "#2A5699",
+    btnBorder: "#C7D8EE",
+    btnHoverBg: "#DCE8F7",
+    // 상단 section badge
+    sectionBadgeBg: "#DCE8F7",
+    sectionBadgeText: "#2A5699",
+  },
+  ADVANCED: {
+    cardBg: "#F3EFFA",
+    cardBorder: "#C7B8E8",
+    iconBg: "#7B5EA7",
+    // 기존 보라 유지
+    badgeBg: "#FDF0F3",
+    badgeBorder: "#F2C4CE",
+    badgeText: "#C94B6E",
+    btnText: "#7B5EA7",
+    btnBorder: "#C7B8E8",
+    btnHoverBg: "#E8E3F3",
+    sectionBadgeBg: "#FDF0F3",
+    sectionBadgeText: "#C94B6E",
+  },
+} as const
 
 /* ─────────────────────────────────────────────
    Handbook Placeholder Page
@@ -79,15 +203,16 @@ export function HandbookPlaceholder({ topicId }: { topicId: string }) {
     section: "BASICS" as const,
     description: "This topic is currently being developed."
   }
+  const palette = CARD_PALETTE[meta.section]
 
   return (
     <div style={{ maxWidth: "700px" }}>
         {/* Section badge */}
-        <span 
+        <span
           className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold mb-3"
-          style={{ 
-            backgroundColor: meta.section === "BASICS" ? "#F3EFFA" : "#FDF0F3",
-            color: meta.section === "BASICS" ? "#7B5EA7" : "#C94B6E"
+          style={{
+            backgroundColor: palette.sectionBadgeBg,
+            color: palette.sectionBadgeText,
           }}
         >
           {meta.section}
@@ -106,18 +231,18 @@ export function HandbookPlaceholder({ topicId }: { topicId: string }) {
         {meta.description}
       </p>
 
-      {/* Coming Soon Card */}
-      <div 
+      {/* Coming Soon Card — 섹션별 색상 (BASICS: 앰버, ADVANCED: 보라) */}
+      <div
         className="rounded-[12px] p-6"
-        style={{ 
-          backgroundColor: "#F3EFFA", 
-          border: "1px solid #C7B8E8"
+        style={{
+          backgroundColor: palette.cardBg,
+          border: `1px solid ${palette.cardBorder}`
         }}
       >
         <div className="flex items-start gap-4">
-          <div 
+          <div
             className="w-12 h-12 rounded-[10px] flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: "#7B5EA7" }}
+            style={{ backgroundColor: palette.iconBg }}
           >
             <BookOpen size={24} className="text-white" />
           </div>
@@ -133,16 +258,22 @@ export function HandbookPlaceholder({ topicId }: { topicId: string }) {
 
             {/* Status indicators */}
             <div className="flex flex-wrap gap-3">
-              <div 
+              <div
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium"
-                style={{ backgroundColor: "#FDF0F3", color: "#C94B6E", border: "1px solid #F2C4CE" }}
+                style={{ backgroundColor: palette.badgeBg, color: palette.badgeText, border: `1px solid ${palette.badgeBorder}` }}
               >
                 <Clock size={12} />
                 Expected Q2 2026
               </div>
-              <button 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-colors hover:bg-[#E8E3F3]"
-                style={{ backgroundColor: "white", color: "#7B5EA7", border: "1px solid #C7B8E8" }}
+              <button
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-colors"
+                style={{
+                  backgroundColor: "white",
+                  color: palette.btnText,
+                  border: `1px solid ${palette.btnBorder}`,
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = palette.btnHoverBg)}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
               >
                 <Bell size={12} />
                 Notify me when ready

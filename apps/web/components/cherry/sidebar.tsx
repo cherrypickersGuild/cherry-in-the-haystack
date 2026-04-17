@@ -44,7 +44,9 @@ type SectionDef = {
 /* ─────────────────────────────────────────────
    TreeStemList — 1px vertical stem + curve at last item only
 ───────────────────────────────────────────── */
-const ITEM_H    = 32   // height per row — same as NavButton
+const ITEM_H       = 32   // height per row — default (1 line)
+const ITEM_H_LONG  = 48   // height per row — 2 lines (long labels)
+const LONG_LABEL   = 25   // chars threshold for 2-line wrapping
 const CURVE_R   = 8    // arc radius
 const HORIZ_TAIL= 4    // short horizontal tail after arc
 const VERT_X    = 1    // x of vertical line
@@ -64,11 +66,19 @@ function TreeStemList({
   onCollapse?: () => void
 }) {
   const count  = items.length
-  const totalH = count * ITEM_H
   const [stemHovered, setStemHovered] = useState(false)
 
-  // midpoint Y of each row
-  const midY = (idx: number) => idx * ITEM_H + ITEM_H / 2
+  // 각 행 높이 — 라벨이 길면 2줄 슬롯
+  const rowH = (idx: number) => (items[idx].label.length > LONG_LABEL ? ITEM_H_LONG : ITEM_H)
+  // 슬롯 top (누적 합)
+  const slotTop = (idx: number) => {
+    let y = 0
+    for (let i = 0; i < idx; i++) y += rowH(i)
+    return y
+  }
+  const totalH = slotTop(count)
+  // midpoint Y of each row (슬롯 내 중앙)
+  const midY = (idx: number) => slotTop(idx) + rowH(idx) / 2
   // arc starts ARC_ABOVE pixels before midpoint
   const arcStartY = (idx: number) => midY(idx) - ARC_ABOVE
   // last item arc start = vertical line end
@@ -135,10 +145,11 @@ function TreeStemList({
         />
       )}
 
-      {/* Buttons — each centered exactly at row midpoint */}
+      {/* Buttons — fill the row (padding 3px top/bottom) so active bg contains wrapped text */}
       {items.map((item, idx) => {
-        const btnH   = 24
-        const btnTop = midY(idx) - btnH / 2
+        const rh     = rowH(idx)
+        const btnH   = rh - 6
+        const btnTop = slotTop(idx) + 3
         return (
           <TreeStemButton
             key={item.id}
@@ -177,9 +188,11 @@ function TreeStemButton(props: {
         left: leftPx,
         top: btnTop,
         height: btnH,
+        minHeight: btnH,
         color: textColor,
         backgroundColor: bg,
         fontWeight: isActive ? 600 : 500,
+        lineHeight: 1.25,
       }}
       aria-current={isActive ? "page" : undefined}
     >
@@ -227,12 +240,30 @@ const SECTIONS: SectionDef[] = [
       {
         id: "basics", icon: <GraduationCap size={16} />, label: "Basics",
         children: [
-          { id: "prompting",           label: "Prompting Techniques" },
-          { id: "rag",                 label: "RAG" },
-          { id: "fine-tuning",         label: "Fine-tuning" },
-          { id: "agent-architectures", label: "Agent Architectures" },
-          { id: "embeddings",          label: "Embeddings & Vector DBs" },
-          { id: "evaluation",          label: "Evaluation" },
+          { id: "foundations",              label: "Foundations of LLM Systems" },
+          { id: "prompting-reasoning",      label: "Prompting & Reasoning" },
+          { id: "model-selection",          label: "Model Selection & Benchmarking" },
+          { id: "context-engineering",      label: "Context Engineering" },
+          { id: "rag-systems",              label: "Retrieval-Augmented Systems (RAG)" },
+          { id: "knowledge-systems",        label: "Knowledge Systems" },
+          { id: "memory",                   label: "Memory Architectures" },
+          { id: "agents-reasoning",         label: "Agents & Reasoning Systems" },
+          { id: "agent-orchestration",      label: "Agent Orchestration" },
+          { id: "tool-use",                 label: "Tool Use & Integration" },
+          { id: "system-architecture",      label: "System Architecture & Infrastructure" },
+          { id: "performance-optimization", label: "Performance Optimization" },
+          { id: "reliability-safety",       label: "Reliability & Safety" },
+          { id: "data-engineering",         label: "Data Engineering for LLMs" },
+          { id: "multi-agent-systems",      label: "Multi-Agent Systems" },
+          { id: "applications",             label: "Applications & Productization" },
+          { id: "evaluation-systems",       label: "Evaluation Systems" },
+          { id: "failure-modes",            label: "Failure Modes & Debugging" },
+          { id: "control-plane",            label: "Control Plane & Protocols" },
+          { id: "data-flywheel",            label: "Data Flywheel & Learning Systems" },
+          { id: "multimodal",               label: "Multimodal Systems" },
+          { id: "codegen-ai-dev",           label: "Code Generation & AI Dev" },
+          { id: "security-adversarial",     label: "Security & Adversarial Systems" },
+          { id: "human-ai-ux",              label: "Human–AI Interaction & UX" },
         ],
       },
       {
@@ -241,9 +272,9 @@ const SECTIONS: SectionDef[] = [
           { id: "chain-of-thought",   label: "Chain-of-Thought" },
           { id: "multi-hop-rag",      label: "Multi-hop RAG" },
           { id: "peft-lora",          label: "PEFT / LoRA / QLoRA" },
-          { id: "multi-agent",        label: "Multi-agent Systems" },
           { id: "custom-embeddings",  label: "Custom Embeddings" },
           { id: "adversarial-eval",   label: "Adversarial Evaluation" },
+          { id: "agent-topologies",   label: "Agent Topologies" },
         ],
       },
     ],
