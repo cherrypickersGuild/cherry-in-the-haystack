@@ -796,7 +796,7 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
         let res: { answer: string; concepts: string[]; evidence: Evidence[]; qualityScore: number; creditsConsumed: number; creditsRemaining?: number; privacy?: boolean }
         let provData: Provenance | null = null
 
-        // 단계별 진행 메시지 (3초 간격)
+        // 단계별 진행 메시지 (5초 간격)
         const phases = [
           "Connecting to Cherry KaaS…",
           "Verifying agent credentials…",
@@ -808,7 +808,7 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
         const phaseTimer = setInterval(() => {
           phaseIdx++
           if (phaseIdx < phases.length) setLoadingPhase(phases[phaseIdx])
-        }, 3000)
+        }, 5000)
 
         try {
           const apiKey = apiKeyRef.current
