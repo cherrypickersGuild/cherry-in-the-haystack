@@ -1136,7 +1136,7 @@ function DepositWithdrawButtons({ agent, onDeposited, pendingAmount, curatorName
 
   return (
     <div className="flex flex-col gap-2">
-      {result && (
+      {false && result && (
         <div className={cn("text-[11px] px-3 py-1.5 rounded-lg flex items-center gap-2 flex-wrap", result.ok ? "text-[#2D7A5E] bg-[#EFF7F3]" : "text-red-500 bg-red-50")}>
           <span>{result.msg}</span>
           {result.tx && (
