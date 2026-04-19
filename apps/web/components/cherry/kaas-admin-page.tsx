@@ -692,6 +692,25 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
    Concept Page Publish Panel
    (content.concept_page + content.concept_changelog)
 ═══════════════════════════════════════════ */
+
+/* Mock graph-baseline data — simulates what ontology graph would return.
+   Once GraphDB is wired, replace with API fetch. */
+const MOCK_GRAPH_CHILDREN: Array<{ id: string; type: "SUBTOPIC" | "PREREQUISITE" | "EXTENDS" | "RELATED"; label: string; desc: string; color: string }> = [
+  { id: "graph:vector-db", type: "SUBTOPIC", label: "Vector Databases", desc: "Stores and retrieves embeddings for similarity search", color: "#7B5EA7" },
+  { id: "graph:hybrid-search", type: "SUBTOPIC", label: "Hybrid Search", desc: "Combines dense vector + sparse BM25 retrieval", color: "#7B5EA7" },
+  { id: "graph:embeddings", type: "PREREQUISITE", label: "Embeddings", desc: "Text → dense vector representation", color: "#9E97B3" },
+  { id: "graph:reranking", type: "EXTENDS", label: "Reranking", desc: "Post-retrieval re-scoring for relevance", color: "#2D7A5E" },
+  { id: "graph:chunking", type: "RELATED", label: "Chunking Strategies", desc: "How to split documents for retrieval", color: "#D4854A" },
+  { id: "graph:contextual-retrieval", type: "EXTENDS", label: "Contextual Retrieval", desc: "Adds context prefix before embedding each chunk", color: "#2D7A5E" },
+]
+
+const MOCK_GRAPH_REFS: Array<{ id: string; label: string; labelColor: string; title: string; learn: string; adds: string; depth: number }> = [
+  { id: "graph:ref-1", label: "START HERE", labelColor: "#C94B6E", title: "Chip Huyen — AI Engineering, Chapter 6", learn: "Broadest accessible overview. Retrieval-first mental model. Use as your first RAG reference.", adds: "Foundational mental model", depth: 0 },
+  { id: "graph:ref-2", label: "NEXT →", labelColor: "#9E97B3", title: "LlamaIndex Documentation — Production RAG Patterns", learn: "Operational depth: chunking, hybrid search, reranking. Hands-on.", adds: "Production gap knowledge", depth: 1 },
+  { id: "graph:ref-3", label: "THEN →", labelColor: "#9E97B3", title: "Anthropic Cookbook — Contextual Retrieval", learn: "State-of-the-art technique adding context prefix. -67% retrieval failures.", adds: "Latest SOTA technique", depth: 2 },
+  { id: "graph:ref-4", label: "DEEP DIVE →", labelColor: "#9E97B3", title: "ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction", learn: "Academic foundation for late interaction retrieval. For building custom retrievers.", adds: "Research-level depth", depth: 3 },
+]
+
 export function ConceptPagePublishPanel() {
   const [concepts, setConcepts] = useState<AdminConcept[]>([])
   const [loading, setLoading] = useState(true)
@@ -716,11 +735,15 @@ export function ConceptPagePublishPanel() {
   const [childPickerSearch, setChildPickerSearch] = useState("")
   const [childSaving, setChildSaving] = useState(false)
   const [childSavedFlash, setChildSavedFlash] = useState(false)
+  // Hidden graph-baseline children (local-only until hide-override column exists)
+  const [hiddenBaselineChildren, setHiddenBaselineChildren] = useState<string[]>([])
 
   // Progressive References editor — content.concept_page.progressive_refs
   const [refsDraft, setRefsDraft] = useState<ProgressiveRef[]>([])
   const [refsSaving, setRefsSaving] = useState(false)
   const [refsSavedFlash, setRefsSavedFlash] = useState(false)
+  // Hidden graph-baseline refs (local-only until hide-override column exists)
+  const [hiddenBaselineRefs, setHiddenBaselineRefs] = useState<string[]>([])
 
   // Cherries (kaas.evidence) CRUD — same backend as Evidence tab, inline here
   const [addingCherry, setAddingCherry] = useState(false)
@@ -1368,15 +1391,50 @@ export function ConceptPagePublishPanel() {
                   </div>
                 </div>
 
-                {/* Auto-suggested baseline from graph DB (placeholder until wired) */}
+                {/* Auto-suggested baseline from graph DB (mock until wired) */}
                 <div className="mt-3 rounded-lg border border-dashed border-[#7B5EA7]/40 bg-[#FBFAFE] p-3">
-                  <div className="flex items-center gap-1.5 mb-1">
+                  <div className="flex items-center gap-1.5 mb-2">
                     <span className="text-[10px] font-bold uppercase tracking-wide text-[#7B5EA7]">🔗 Auto-suggested by ontology graph</span>
-                    <span className="rounded-full bg-[#F0EDF8] px-1.5 py-0.5 text-[9px] font-medium text-[#7B5EA7] uppercase tracking-wide">pending</span>
+                    <span className="text-[10px] text-[#888]">
+                      ({MOCK_GRAPH_CHILDREN.length - hiddenBaselineChildren.length}/{MOCK_GRAPH_CHILDREN.length})
+                    </span>
                   </div>
-                  <p className="text-[11px] text-[#888] leading-relaxed">
-                    Graph DB not yet connected. Once available, related concepts traversed from <code className="font-mono text-[10.5px]">subtopic / related / extends / prerequisite</code> edges will appear here, and you'll hide / re-include them individually. Until then, use the manual pin list below.
-                  </p>
+                  <ul className="space-y-1.5">
+                    {MOCK_GRAPH_CHILDREN.map((item) => {
+                      const hidden = hiddenBaselineChildren.includes(item.id)
+                      return (
+                        <li
+                          key={item.id}
+                          className={cn(
+                            "flex items-start gap-2 rounded-md border border-[#E4E1EE] bg-white p-2",
+                            hidden && "opacity-40",
+                          )}
+                        >
+                          <span
+                            className="mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white"
+                            style={{ backgroundColor: item.color }}
+                          >
+                            {item.type}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-[12px] font-semibold text-[#1A1A1A] truncate">{item.label}</div>
+                            <div className="text-[10.5px] text-[#666] leading-tight">{item.desc}</div>
+                          </div>
+                          <button
+                            onClick={() =>
+                              setHiddenBaselineChildren((prev) =>
+                                hidden ? prev.filter((x) => x !== item.id) : [...prev, item.id],
+                              )
+                            }
+                            className="shrink-0 rounded p-1 text-[#888] hover:bg-[#FAFAFA] hover:text-[#C94B6E]"
+                            title={hidden ? "Re-include" : "Hide"}
+                          >
+                            {hidden ? <Plus className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
                 </div>
 
                 {/* Manually pinned */}
@@ -1476,15 +1534,51 @@ export function ConceptPagePublishPanel() {
                   </div>
                 </div>
 
-                {/* Auto-derived baseline from graph DB (placeholder until wired) */}
+                {/* Auto-derived baseline from graph DB (mock until wired) */}
                 <div className="mt-3 rounded-lg border border-dashed border-[#7B5EA7]/40 bg-[#FBFAFE] p-3">
-                  <div className="flex items-center gap-1.5 mb-1">
+                  <div className="flex items-center gap-1.5 mb-2">
                     <span className="text-[10px] font-bold uppercase tracking-wide text-[#7B5EA7]">🔗 Auto-derived from prerequisite chain</span>
-                    <span className="rounded-full bg-[#F0EDF8] px-1.5 py-0.5 text-[9px] font-medium text-[#7B5EA7] uppercase tracking-wide">pending</span>
+                    <span className="text-[10px] text-[#888]">
+                      ({MOCK_GRAPH_REFS.length - hiddenBaselineRefs.length}/{MOCK_GRAPH_REFS.length})
+                    </span>
                   </div>
-                  <p className="text-[11px] text-[#888] leading-relaxed">
-                    Graph DB not yet connected. Once available, the learning sequence (START&nbsp;HERE → NEXT → THEN → DEEP&nbsp;DIVE) will auto-derive from <code className="font-mono text-[10.5px]">prerequisite</code> edges sorted by depth. Re-order or add custom external resources below as overrides.
-                  </p>
+                  <ul className="space-y-1.5">
+                    {MOCK_GRAPH_REFS.map((item) => {
+                      const hidden = hiddenBaselineRefs.includes(item.id)
+                      return (
+                        <li
+                          key={item.id}
+                          className={cn(
+                            "flex items-start gap-2 rounded-md border border-[#E4E1EE] bg-white p-2",
+                            hidden && "opacity-40",
+                          )}
+                        >
+                          <span
+                            className="mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white"
+                            style={{ backgroundColor: item.labelColor }}
+                          >
+                            {item.label}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-[12px] font-semibold text-[#1A1A1A] truncate">{item.title}</div>
+                            <div className="text-[10.5px] text-[#666] leading-tight">{item.learn}</div>
+                            <div className="mt-0.5 text-[10px] italic text-[#888]">adds: {item.adds}</div>
+                          </div>
+                          <button
+                            onClick={() =>
+                              setHiddenBaselineRefs((prev) =>
+                                hidden ? prev.filter((x) => x !== item.id) : [...prev, item.id],
+                              )
+                            }
+                            className="shrink-0 rounded p-1 text-[#888] hover:bg-[#FAFAFA] hover:text-[#C94B6E]"
+                            title={hidden ? "Re-include" : "Hide"}
+                          >
+                            {hidden ? <Plus className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
                 </div>
 
                 {/* Manually authored */}
