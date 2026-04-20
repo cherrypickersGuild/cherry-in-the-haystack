@@ -9,6 +9,7 @@ import { KaasCompareController } from './kaas-compare.controller';
 import { KaasAdminController } from './kaas-admin.controller';
 import { KaasMcpController } from './kaas-mcp.controller';
 import { KaasCuratorRewardController } from './kaas-curator-reward.controller';
+import { KaasA2aController } from './kaas-a2a.controller';
 import { KaasWsGateway } from './kaas-ws.gateway';
 
 import { KaasAgentService } from './kaas-agent.service';
@@ -16,6 +17,7 @@ import { KaasKnowledgeService } from './kaas-knowledge.service';
 import { KaasCreditService } from './kaas-credit.service';
 import { KaasProvenanceService } from './kaas-provenance.service';
 import { KaasCuratorRewardService } from './kaas-curator-reward.service';
+import { KaasA2aService } from './kaas-a2a.service';
 import { KaasAgentDaemonService } from './kaas-agent-daemon.service';
 
 @Module({
@@ -29,6 +31,7 @@ import { KaasAgentDaemonService } from './kaas-agent-daemon.service';
     KaasAdminController,
     KaasMcpController,
     KaasCuratorRewardController,
+    KaasA2aController,
   ],
   providers: [
     KaasAgentService,
@@ -37,6 +40,7 @@ import { KaasAgentDaemonService } from './kaas-agent-daemon.service';
     KaasProvenanceService,
     KaasCuratorRewardService,
     KaasWsGateway,
+    KaasA2aService,
     KaasAgentDaemonService,
   ],
   exports: [

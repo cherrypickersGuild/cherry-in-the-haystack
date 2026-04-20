@@ -84,7 +84,8 @@
       "Bash(grep -i \"marketplace\\\\|shop.*skill\\\\|skill.*shop\" /Users/soma/IdeaProjects/cherry-in-the-haystack/docs/PRD/*.md)",
       "mcp__cherry-kaas__search_catalog",
       "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
-      "Bash(pnpm add *)"
+      "Bash(pnpm add *)",
+      "Bash(npm run *)"
     ],
     "deny": [],
     "ask": []

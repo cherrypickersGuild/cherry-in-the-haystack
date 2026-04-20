@@ -1212,9 +1212,6 @@ export function ConceptPagePublishPanel() {
                       </button>
                       {slugSavedFlash && <span className="text-[11px] text-[#2D7A5E] font-medium">✓ saved</span>}
                     </div>
-                    <p className="mt-1 text-[10px] text-[#999]">
-                      Lowercase letters, digits, Korean, and hyphens only. Auto-generated from title on first publish — override here if needed.
-                    </p>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
@@ -1306,9 +1303,6 @@ export function ConceptPagePublishPanel() {
                       <span className="text-[10px] font-bold uppercase tracking-[0.8px] text-[#9E97B3] whitespace-nowrap">02 — Cherries</span>
                       <div className="flex-1 h-px bg-[#E4E1EE]" />
                     </div>
-                    <p className="text-[11px] text-[#9E97B3] mb-4">
-                      Curated sources backing this concept — each covers a distinct, non-overlapping aspect.
-                    </p>
                     {(selected.evidence ?? []).length === 0 ? (
                       <p className="text-[12px] italic text-[#9E97B3]">(no cherries yet)</p>
                     ) : (
@@ -1387,9 +1381,6 @@ export function ConceptPagePublishPanel() {
                           <span className="text-[10px] font-bold uppercase tracking-[0.8px] text-[#9E97B3] whitespace-nowrap">04 — Progressive References</span>
                           <div className="flex-1 h-px bg-[#E4E1EE]" />
                         </div>
-                        <p className="text-[11px] text-[#9E97B3] mb-4">
-                          MECE learning path — each reference adds what the previous didn&rsquo;t cover.
-                        </p>
                         {totalCount === 0 ? (
                           <p className="text-[12px] italic text-[#9E97B3]">(no references)</p>
                         ) : (
@@ -1531,9 +1522,6 @@ export function ConceptPagePublishPanel() {
                             </div>
                           </div>
                         </div>
-                        <p className="mt-2 text-[10px] text-center text-[#999]">
-                          Auto-drawn from 04 — Progressive References (baseline ∪ manually authored), ordered by phase.
-                        </p>
                       </section>
                     )
                   })()}
@@ -1639,9 +1627,6 @@ export function ConceptPagePublishPanel() {
                     </pre>
                   </div>
                 )}
-                <p className="mt-1 text-[10px] text-[#999]">
-                  Edits the same <code className="font-mono">kaas.concept.content_md</code> used by the market card and the Content tab. Publishing copies the current value into <code className="font-mono">content.concept_page</code>.
-                </p>
               </section>
 
               <section className="mt-6">
@@ -1772,9 +1757,7 @@ export function ConceptPagePublishPanel() {
                     <span className="text-[10px] text-[#888]">({childIds.length})</span>
                   </div>
                   {childIds.length === 0 ? (
-                    <p className="text-[11px] italic text-[#888]">
-                      None pinned yet. While graph is pending, this list is the only source — pinned items always appear on the public page (graph baseline ∪ pinned − hidden).
-                    </p>
+                    <p className="text-[11px] italic text-[#888]">None pinned yet.</p>
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
                       {childIds.map((cid) => {
@@ -1841,9 +1824,6 @@ export function ConceptPagePublishPanel() {
                     </div>
                   )}
                 </div>
-                <p className="mt-2 text-[10px] text-[#999]">
-                  Pinned IDs stored on <code className="font-mono">content.concept_page.related_concepts</code>. Final public list = <em>graph baseline</em> ∪ <em>pinned</em> − <em>hidden</em>. Typed relations (SUBTOPIC / PREREQUISITE / EXTENDS / RELATED) and auto-baseline depend on ontology graph (pending).
-                </p>
               </section>
 
               {/* 04 — Progressive References : progressive_refs JSONB editor */}
@@ -1916,9 +1896,7 @@ export function ConceptPagePublishPanel() {
                 </div>
 
                 {refsDraft.length === 0 && (
-                  <p className="mt-1 text-[11px] italic text-[#888]">
-                    None authored yet. While graph is pending, this list is the only source for the learning path on the public page.
-                  </p>
+                  <p className="mt-1 text-[11px] italic text-[#888]">None authored yet.</p>
                 )}
 
                 <ul className="mt-2 space-y-2">
@@ -2017,9 +1995,6 @@ export function ConceptPagePublishPanel() {
                 >
                   <Plus className="h-3 w-3" /> Add reference
                 </button>
-                <p className="mt-2 text-[10px] text-[#999]">
-                  Stored as JSONB on <code className="font-mono">content.concept_page.progressive_refs</code> (treated as <strong>manual overrides</strong>). Final public list = <em>graph baseline (depth-sorted)</em> ∪ <em>authored</em>. Order = learning sequence.
-                </p>
               </section>
 
               {/* 05 — Contributors (Knowledge Team) */}
@@ -2039,9 +2014,6 @@ export function ConceptPagePublishPanel() {
                     {contributorsSavedFlash && <span className="text-[11px] text-[#2D7A5E] font-medium">✓ saved</span>}
                   </div>
                 </div>
-                <p className="mt-1 text-[10px] text-[#999]">
-                  Shown as the &ldquo;Knowledge Team&rdquo; card on the public concept page. First 3 appear in-card; rest show as &ldquo;+ N contributors&rdquo; link.
-                </p>
 
                 <ul className="mt-3 space-y-2">
                   {contributorsDraft.map((contrib) => (

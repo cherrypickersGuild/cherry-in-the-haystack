@@ -184,6 +184,22 @@ function connectWebSocket(apiKey, baseUrl) {
     process.stderr.write(`[WS] Room message from ${msg.from}: ${msg.content?.slice(0, 50)}...\n`);
   });
 
+  // ── A2A task 수신 ──
+  socket.on('a2a_task_received', (task) => {
+    const textPart = task.message?.parts?.find((p) => p.type === 'text')?.text ?? '(no text)';
+    const from = task['x-cherry']?.initiator_name ?? task['x-cherry']?.initiator_id?.slice(0, 8) ?? 'unknown';
+    process.stderr.write(`[A2A] ← incoming task ${task.id.slice(0, 8)} from ${from}: ${textPart}\n`);
+  });
+
+  socket.on('a2a_task_completed', (task) => {
+    const textPart = task.artifact?.parts?.find((p) => p.type === 'text')?.text ?? '(no text)';
+    process.stderr.write(`[A2A] ✓ task ${task.id.slice(0, 8)} completed: ${textPart}\n`);
+  });
+
+  socket.on('a2a_task_canceled', (task) => {
+    process.stderr.write(`[A2A] ✗ task ${task.id.slice(0, 8)} canceled\n`);
+  });
+
   // ── Purchase delivery: save skill to local filesystem and ack ──
   socket.on('save_skill_request', (req) => {
     const fs = require('fs');

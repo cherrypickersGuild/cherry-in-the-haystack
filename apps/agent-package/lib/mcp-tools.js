@@ -180,7 +180,118 @@ function registerTools(server, apiKey, baseUrl) {
     }
   );
 
-  process.stderr.write(`[cherry-kaas-agent] ${6} MCP tools registered\n`);
+  // ─── A2A: send_agent_task ───
+  server.tool(
+    'send_agent_task',
+    'Send a task to another Cherry-registered agent via A2A protocol.',
+    {
+      executor_agent_id: z.string().describe('Target agent UUID'),
+      text: z.string().describe('Message text'),
+      task_type: z.string().optional(),
+      session_id: z.string().optional(),
+    },
+    async ({ executor_agent_id, text, task_type, session_id }) => {
+      try {
+        const res = await fetch(`${baseUrl}/api/v1/kaas/a2a`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: Date.now(),
+            method: 'tasks/send',
+            params: {
+              executorAgentId: executor_agent_id,
+              taskType: task_type ?? 'message',
+              sessionId: session_id,
+              message: {
+                role: 'user',
+                parts: [{ type: 'text', text }],
+              },
+            },
+          }),
+        });
+        const data = await res.json();
+        if (data.error) {
+          return { content: [{ type: 'text', text: `A2A error: ${data.error.message}` }], isError: true };
+        }
+        return txt(`Task sent: ${data.result.id} (state: ${data.result.status.state})`);
+      } catch (err) {
+        return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
+      }
+    },
+  );
+
+  // ─── A2A: read_agent_inbox ───
+  server.tool(
+    'read_agent_inbox',
+    'Read tasks sent to this agent by other agents.',
+    {
+      status: z.string().optional().describe('Filter by status (submitted/completed/failed)'),
+      limit: z.number().optional(),
+    },
+    async ({ status, limit }) => {
+      try {
+        const url = new URL(`${baseUrl}/api/v1/kaas/a2a/inbox`);
+        if (status) url.searchParams.set('status', status);
+        if (limit) url.searchParams.set('limit', String(limit));
+        const res = await fetch(url.toString(), { headers: { 'x-api-key': apiKey } });
+        const data = await res.json();
+        if (!Array.isArray(data)) {
+          return { content: [{ type: 'text', text: `Inbox error: ${JSON.stringify(data)}` }], isError: true };
+        }
+        if (data.length === 0) return txt('Inbox empty.');
+        const lines = data.map((t) => {
+          const textPart = t.message?.parts?.find((p) => p.type === 'text')?.text ?? '(no text)';
+          const from = t['x-cherry']?.initiator_name ?? '?';
+          return `[${t.status.state}] ${t.id.slice(0, 8)} from ${from}: ${textPart}`;
+        });
+        return txt(`Inbox (${data.length}):\n${lines.join('\n')}`);
+      } catch (err) {
+        return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
+      }
+    },
+  );
+
+  // ─── A2A: respond_to_task ───
+  server.tool(
+    'respond_to_task',
+    'Respond to a task received from another agent.',
+    {
+      task_id: z.string(),
+      text: z.string(),
+      status: z.enum(['completed', 'failed']).optional(),
+    },
+    async ({ task_id, text, status }) => {
+      try {
+        const res = await fetch(`${baseUrl}/api/v1/kaas/a2a`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: Date.now(),
+            method: 'tasks/respond',
+            params: {
+              taskId: task_id,
+              status: status ?? 'completed',
+              output: { parts: [{ type: 'text', text }] },
+            },
+          }),
+        });
+        const data = await res.json();
+        if (data.error) {
+          return { content: [{ type: 'text', text: `A2A error: ${data.error.message}` }], isError: true };
+        }
+        return txt(`Responded to ${task_id.slice(0, 8)}: ${data.result.status.state}`);
+      } catch (err) {
+        return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
+      }
+    },
+  );
+
+  process.stderr.write(`[cherry-kaas-agent] ${9} MCP tools registered\n`);
 }
 
 /** WebSocket 인스턴스 주입 — agent.js에서 연결 후 호출 */

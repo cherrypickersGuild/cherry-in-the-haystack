@@ -314,7 +314,9 @@ export default function CherryApp() {
           style={{ backgroundColor: "#FBFAF8" }}
           id="main-content"
         >
-          {renderContent()}
+          <div className="w-full max-w-[1440px] mx-auto">
+            {renderContent()}
+          </div>
         </main>
       </div>
 

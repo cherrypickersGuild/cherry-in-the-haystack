@@ -123,6 +123,18 @@ type Message =
   | { role: "agent-done"; hash: string; blocked?: boolean }
   | { role: "agent-report"; reportData: any; agentId: string; agentName: string; generatedAt: string }
   | { role: "room"; from: "user" | "claude" | "cherry"; to: "user" | "claude" | "cherry"; content: string; ts: string }
+  | {
+      role: "a2a"
+      eventType: "task_created" | "task_responded" | "task_canceled" | "task_completed"
+      fromName: string
+      toName: string
+      fromId: string
+      toId: string
+      text: string
+      taskId: string
+      status: string
+      ts: string
+    }
 
 /* ═══════════════════════════════════════════════
    Mock engine
@@ -759,6 +771,37 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
           setOpen(true)
           setTimeout(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }), 50)
         })
+
+        // ── A2A task 이벤트 ──
+        socketInstance.on("a2a_task_event", (evt: {
+          type: "task_created" | "task_responded" | "task_canceled" | "task_completed"
+          task: any
+          from_agent: { id: string; name: string; user_id: string }
+          to_agent: { id: string; name: string; user_id: string }
+        }) => {
+          if (cancelled) return
+          console.log("[Console WS] a2a_task_event:", evt)
+
+          const textPart =
+            evt.task.message?.parts?.find((p: any) => p.type === "text")?.text ??
+            evt.task.artifact?.parts?.find((p: any) => p.type === "text")?.text ??
+            "(no text)"
+
+          setMessages((m) => [...m, {
+            role: "a2a",
+            eventType: evt.type,
+            fromName: evt.from_agent?.name ?? "unknown",
+            toName: evt.to_agent?.name ?? "unknown",
+            fromId: evt.from_agent?.id ?? "",
+            toId: evt.to_agent?.id ?? "",
+            text: textPart,
+            taskId: evt.task.id,
+            status: evt.task.status.state,
+            ts: evt.task.status.timestamp ?? new Date().toISOString(),
+          }])
+          setOpen(true)
+          setTimeout(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }), 50)
+        })
       } catch (e) { console.warn("[Console WS] init failed:", e) }
     })()
     return () => {
@@ -1376,6 +1419,25 @@ export const KaasConsole = forwardRef<KaasConsoleRef, { currentPage?: string }>(
                     generatedAt={msg.generatedAt}
                     source="agent"
                   />
+                </div>
+              </div>
+            )
+            case "a2a": return (
+              <div key={i} className="mb-2">
+                <div className="bg-[#1A1428] border-l-2 border-[#A078D8] rounded-lg px-3 py-2 max-w-[90%]">
+                  <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                    <span className="text-[10px] font-bold text-[#A078D8] uppercase tracking-wide">🔀 A2A</span>
+                    <span className="text-[10px] font-semibold text-[#D4854A]">{msg.fromName}</span>
+                    <span className="text-[#555] text-[10px]">→</span>
+                    <span className="text-[10px] font-semibold text-[#7B5EA7]">{msg.toName}</span>
+                    <span className="text-[9px] text-[#666] ml-auto font-mono">
+                      {msg.eventType} · {msg.taskId.slice(0, 8)}
+                    </span>
+                  </div>
+                  <p className="text-[12px] text-[#D0D0D0] leading-relaxed whitespace-pre-wrap break-words">{msg.text}</p>
+                  <div className="text-[9px] text-[#666] mt-1">
+                    status: <span className="font-semibold text-[#A078D8]">{msg.status}</span> · {new Date(msg.ts).toLocaleTimeString()}
+                  </div>
                 </div>
               </div>
             )

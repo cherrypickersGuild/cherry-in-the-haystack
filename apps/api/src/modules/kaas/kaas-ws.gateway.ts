@@ -237,6 +237,18 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { reply, agentName: socket.data.agentName };
   }
 
+  /** 특정 에이전트 소켓에 이벤트 푸시 (A2A용) */
+  pushToAgent(agentId: string, event: string, payload: any): boolean {
+    const socket = this.agentSockets.get(agentId);
+    if (!socket) {
+      this.logger.warn(`pushToAgent: agent=${agentId} not connected (event=${event})`);
+      return false;
+    }
+    socket.emit(event, payload);
+    this.logger.log(`pushToAgent: agent=${agentId} event=${event} ok`);
+    return true;
+  }
+
   /** 특정 agentId가 현재 웹소켓 접속 중인지 확인 (구매 Preflight용) */
   isAgentConnected(agentId: string): boolean {
     const has = this.agentSockets.has(agentId);
