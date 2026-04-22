@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
+import { API_URL, setAccessToken } from "@/lib/auth"
 
 function LoginContent() {
   const router = useRouter()
@@ -30,7 +29,7 @@ function LoginContent() {
         .then((res) => res.json())
         .then((data) => {
           if (data.accessToken) {
-            localStorage.setItem("accessToken", data.accessToken)
+            setAccessToken(data.accessToken)
             router.push("/")
           } else {
             setErrorMsg(data.message ?? "로그인에 실패했습니다.")

@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/cherry/page-header"
 import { CategoryTreemap } from "@/components/cherry/buzz-treemap"
 import { PatchNotesPage } from "@/components/cherry/patch-notes-page"
 import { fetchLanding, fetchLandingArticles, LandingResponse, LandingTopArticle } from "@/lib/api"
+import { useAuthTick, getAccessToken, decodeToken, clearAccessToken } from "@/lib/auth"
 import { NDFrameworksPage } from "@/components/cherry/nd-frameworks-page"
 import { NDModelUpdatesPage } from "@/components/cherry/nd-model-updates-page"
 import { NDCaseStudiesPage } from "@/components/cherry/nd-case-studies-page"
@@ -26,48 +27,35 @@ const STATIC_MOMENTUM = [
   { entityId: "s3", entityName: "Gemini 2.0", categoryName: "Google Family", page: "MODEL_UPDATES", thisWeekCount: 8, prevWeekCount: 3, changePct: 166 },
 ]
 
-/** JWT payload에서 role 추출 (검증 없이 디코딩만) */
-function parseJwtRole(token: string): string | null {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]))
-    return payload.role ?? null
-  } catch {
-    return null
-  }
-}
-
 export default function CherryApp() {
   const [activeNav, setActiveNav] = useState("highlight")
   const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "concept-page" | "template">("dashboard")
   const [marketConceptId, setMarketConceptId] = useState<string | null>(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userRole, setUserRole] = useState<string | null>(null)
   const [landing, setLanding] = useState<LandingResponse | null>(null)
   const [topArticles, setTopArticles] = useState<LandingTopArticle[]>([])
   const router = useRouter()
   const consoleRef = useRef<KaasConsoleRef>(null)
   const [showDashboard, setShowDashboard] = useState(false)
 
+  // Subscribe to auth change events for re-render; read the token fresh below.
+  useAuthTick()
+  // Read token directly at render time — no derived boolean state to go stale.
+  const token = getAccessToken()
+  const isAdmin = decodeToken(token)?.role === "ADMIN"
+
   useEffect(() => {
-    const token = localStorage.getItem("accessToken")
-    setIsLoggedIn(!!token)
-    if (token) setUserRole(parseJwtRole(token))
-    // 통계(treemap+momentum)와 기사 목록 동시에 fetch
     fetchLanding().then(setLanding).catch(() => {})
     fetchLandingArticles().then((r) => setTopArticles(r.items)).catch(() => {})
   }, [])
 
   const handleAuthClick = () => {
-    if (isLoggedIn) {
-      localStorage.removeItem("accessToken")
-      setIsLoggedIn(false)
-      setUserRole(null)
+    // Re-check at click time — don't rely on stale render-time value.
+    if (getAccessToken()) {
+      clearAccessToken()
     } else {
       router.push("/login")
     }
   }
-
-  const isAdmin = userRole === "ADMIN"
 
   /* ─────────────────────────────────────────────
      Route content based on active nav
@@ -270,7 +258,7 @@ export default function CherryApp() {
             <p className="text-[10px] text-text-muted font-medium">for AI Engineers</p>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            {isLoggedIn && (
+            {token && (
               <button
                 onClick={() => setShowDashboard(true)}
                 className="px-3 py-1.5 rounded-lg text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
@@ -283,7 +271,7 @@ export default function CherryApp() {
               onClick={handleAuthClick}
               className="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors"
             >
-              {isLoggedIn ? "Logout" : "Login"}
+              {token ? "Logout" : "Login"}
             </button>
             <MobileSidebar active={activeNav} onSelect={setActiveNav} />
           </div>
@@ -291,7 +279,7 @@ export default function CherryApp() {
 
         {/* Desktop top bar */}
         <div className="hidden lg:flex items-center justify-end gap-2 px-10 py-4 border-b border-[#E4E1EE] bg-white flex-shrink-0">
-          {isLoggedIn && (
+          {token && (
             <button
               onClick={() => setShowDashboard(true)}
               className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-white transition-opacity hover:opacity-90 cursor-pointer"
@@ -304,7 +292,7 @@ export default function CherryApp() {
             onClick={handleAuthClick}
             className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors cursor-pointer"
           >
-            {isLoggedIn ? "Logout" : "Login"}
+            {token ? "Logout" : "Login"}
           </button>
         </div>
 
@@ -314,9 +302,7 @@ export default function CherryApp() {
           style={{ backgroundColor: "#FBFAF8" }}
           id="main-content"
         >
-          <div className="w-full max-w-[1440px] mx-auto">
-            {renderContent()}
-          </div>
+          {renderContent()}
         </main>
       </div>
 

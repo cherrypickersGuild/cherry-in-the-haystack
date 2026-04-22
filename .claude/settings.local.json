@@ -85,7 +85,10 @@
       "mcp__cherry-kaas__search_catalog",
       "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
       "Bash(pnpm add *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"local:%{http_code}\\\\n\" http://localhost:4000/api/v1/kaas/a2a/agents --max-time 3)",
+      "Bash(curl -s -o /dev/null -w \"deploy:%{http_code}\\\\n\" https://api.solteti.site/api/v1/kaas/a2a/agents --max-time 5)",
+      "Bash(curl -s https://api.solteti.site/api/v1/kaas/a2a/agents)"
     ],
     "deny": [],
     "ask": []

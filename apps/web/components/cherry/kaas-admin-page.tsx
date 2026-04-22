@@ -35,6 +35,7 @@ interface ConceptPublication {
   progressiveRefs: ProgressiveRef[]
 }
 import { TemplateEditorBody } from "@/app/template/edit/page"
+import { useAuthTick, getAccessToken, decodeToken } from "@/lib/auth"
 
 /* ═══════════════════════════════════════════
    Styles
@@ -155,17 +156,9 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
     setTimeout(() => setSavedKey((k) => (k === key ? null : k)), 2000)
   }
 
-  // 로그인 유저 ID (JWT에서 추출)
-  const [userId, setUserId] = useState<string | null>(null)
-  useEffect(() => {
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
-      if (token) {
-        const payload = JSON.parse(atob(token.split('.')[1]))
-        setUserId(payload.id ?? null)
-      }
-    } catch {}
-  }, [])
+  // 로그인 유저 ID — 토큰에서 직접 디코드 (render 마다 최신값)
+  useAuthTick()
+  const userId = decodeToken(getAccessToken())?.id ?? null
 
   const loadConcepts = useCallback(async () => {
     try {

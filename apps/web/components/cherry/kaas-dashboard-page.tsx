@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { cn } from "@/lib/utils"
 import {
   Coins, ExternalLink, Shield, Wallet, ArrowUpRight, ArrowDownRight,
@@ -8,6 +9,7 @@ import {
 } from "lucide-react"
 import { KnowledgeCurationPanel, ConceptPagePublishPanel } from "./kaas-admin-page"
 import { TemplateEditorBody } from "@/app/template/edit/page"
+import { KaasWorkshopPanel } from "./kaas-workshop-panel"
 
 /* ═══════════════════════════════════════════════
    Privacy Mode Toggle (NEAR AI TEE)
@@ -563,9 +565,9 @@ const TIER_COLOR: Record<string, string> = { Silver: "#D4854A", Gold: "#D4854A",
    Left Panel — Agent List + Detail
 ═══════════════════════════════════════════════ */
 function AgentPanel({
-  agents, selectedId, onSelect, onAdd, onDelete, onUpdate,
+  agents, selectedId, onSelect, onAdd, onDelete, onUpdate, onWorkshopOpen,
 }: {
-  agents: Agent[]; selectedId: string; onSelect: (id: string) => void; onAdd: () => void; onDelete: (id: string) => void; onUpdate: (id: string, patch: Partial<Agent>) => void
+  agents: Agent[]; selectedId: string; onSelect: (id: string) => void; onAdd: () => void; onDelete: (id: string) => void; onUpdate: (id: string, patch: Partial<Agent>) => void; onWorkshopOpen: (id: string) => void
 }) {
   const selected = agents.find((a) => a.id === selectedId) ?? agents[0]
   const [cmdCopied, setCmdCopied] = useState(false)
@@ -644,6 +646,17 @@ function AgentPanel({
                 <div className="flex-1 min-w-0">
                   <p className="text-[12px] font-semibold text-[#1A1626] truncate">{a.name}</p>
                 </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onSelect(a.id)
+                    onWorkshopOpen(a.id)
+                  }}
+                  title="Open Workshop — equip skills, MCP tools, memory"
+                  className="text-[10px] font-semibold px-2 py-1 rounded border border-[#4A5FA0] text-[#2D3B66] bg-white hover:bg-[#EEF0F7] hover:border-[#2D3B66] cursor-pointer flex-shrink-0 transition-colors"
+                >
+                  Workshop
+                </button>
                 <button
                   onClick={async (e) => {
                     e.stopPropagation()
@@ -1522,6 +1535,8 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
   const [selectedAgentId, setSelectedAgentId] = useState("")
   const [showRegister, setShowRegister] = useState(false)
   const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "concept-page" | "template">("dashboard")
+  // Workshop 은 별도 팝업 — 특정 에이전트 카드에서 🔧 Workshop 버튼 눌러 열기
+  const [workshopOpenId, setWorkshopOpenId] = useState<string | null>(null)
 
   // Karma state — 상위에서 관리하여 좌측(AgentPanel) + 우측(WalletPanel) 양쪽 접근 가능
   const [onchainKarma, setOnchainKarma] = useState<import("@/lib/api").OnchainKarma | null>(null)
@@ -1673,7 +1688,7 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
           <div className="h-full overflow-y-auto p-4 lg:p-6">
             <div className="flex flex-col lg:flex-row gap-4 lg:gap-5 lg:h-full">
               {/* Left — Agent List + Detail */}
-              <div className="lg:w-[340px] flex-shrink-0 rounded-xl border border-[#E4E1EE] bg-white p-4">
+              <div className="lg:w-[420px] flex-shrink-0 rounded-xl border border-[#E4E1EE] bg-white p-4">
                 {showRegister || showRegisterAuto ? (
                   <RegisterForm
                     onComplete={(newAgent) => {
@@ -1701,6 +1716,7 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
                       await loadAgents()
                       window.dispatchEvent(new Event("kaas-agents-changed"))
                     }}
+                    onWorkshopOpen={(id) => setWorkshopOpenId(id)}
                   />
                 ) : null}
               </div>
@@ -1729,6 +1745,60 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
           </div>
         )}
       </div>
+
+      {/* Workshop popup — opened from Workshop button on an agent row.
+          Rendered via Portal to document.body so it escapes the Dashboard modal's
+          containing block (which has `animate-in zoom-in-95` — transforms create
+          a containing block for `fixed` descendants, causing clipping). */}
+      {workshopOpenId && typeof document !== "undefined" && (() => {
+        const workshopAgent = agents.find((a) => a.id === workshopOpenId)
+        if (!workshopAgent) return null
+        const apiKey = (workshopAgent as unknown as { apiKey?: string; api_key?: string }).apiKey
+          ?? (workshopAgent as unknown as { apiKey?: string; api_key?: string }).api_key
+        return createPortal(
+          <div
+            className="fixed inset-0 z-[60] flex items-center justify-center p-1.5"
+            onClick={() => setWorkshopOpenId(null)}
+          >
+            <div className="absolute inset-0 bg-black/55" />
+            <div
+              className="relative bg-white rounded-lg shadow-[0_20px_60px_rgba(0,0,0,0.35)] w-full max-w-[1200px] h-[calc(100vh-12px)] flex flex-col overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header — white bg matching Dashboard style */}
+              <div className="flex-shrink-0 flex items-center justify-between border-b border-[#E4E1EE] bg-white px-6 py-4">
+                <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-[18px] font-extrabold text-[#1A1626]" style={{ letterSpacing: "-0.3px" }}>
+                        Workshop
+                      </h2>
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6480] px-2 py-0.5 rounded bg-gray-100 border border-[#E4E1EE]">
+                        Agent Assembly
+                      </span>
+                    </div>
+                    <div className="text-[12px] text-[#6B6480] mt-0.5">
+                      Editing <span className="font-semibold text-[#1A1626]">{workshopAgent.name}</span>
+                    </div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setWorkshopOpenId(null)
+                  }}
+                  className="p-1.5 rounded-md hover:bg-gray-100 cursor-pointer transition-colors"
+                  aria-label="Close Workshop"
+                >
+                  <span className="text-[#6B6480] text-[18px] leading-none">×</span>
+                </button>
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <KaasWorkshopPanel currentAgent={workshopAgent} currentAgentApiKey={apiKey} />
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      })()}
     </div>
   )
 }
