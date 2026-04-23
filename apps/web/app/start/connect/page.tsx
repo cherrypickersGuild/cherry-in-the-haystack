@@ -329,10 +329,10 @@ export default function ConnectPage() {
             <CherryBao size={56} />
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-bold text-[#3A2A1C]">
-                아직 Claude Code 가 없으신가요?
+                Don't have Claude Code yet?
               </p>
               <p className="text-[11px] text-[#6B4F2A] mt-0.5">
-                Anthropic 에서 무료로 받으실 수 있어요.
+                Get it free from Anthropic.
               </p>
             </div>
             <a
@@ -341,7 +341,7 @@ export default function ConnectPage() {
               rel="noreferrer"
               className="px-4 py-2 rounded-full bg-[#3A2A1C] text-[#FDFBF5] text-[12px] font-bold hover:bg-[#6B4F2A] transition-colors flex-shrink-0"
             >
-              설치 가이드 →
+              Install guide →
             </a>
           </div>
         </>
@@ -398,13 +398,13 @@ function RegisterAgentModal({
     try {
       const eth = (window as any).ethereum
       if (!eth) {
-        setError("MetaMask 가 설치되어 있지 않아요. 먼저 설치해 주세요.")
+        setError("MetaMask isn't installed. Please install it first.")
         return
       }
       const accounts = await eth.request({ method: "eth_requestAccounts" })
       if (accounts?.[0]) setWalletAddress(accounts[0])
     } catch {
-      setError("MetaMask 연결에 실패했어요.")
+      setError("MetaMask connection failed.")
     } finally {
       setConnecting(false)
     }
@@ -418,7 +418,7 @@ function RegisterAgentModal({
       const id = await connectNearWallet()
       setWalletAddress(id)
     } catch (e: any) {
-      setError(`NEAR 지갑 연결 실패: ${e?.message ?? e}`)
+      setError(`NEAR wallet connection failed: ${e?.message ?? e}`)
     } finally {
       setConnecting(false)
     }
@@ -450,7 +450,7 @@ function RegisterAgentModal({
       })
       await onSuccess()
     } catch (e: any) {
-      setError(e?.message || "등록에 실패했어요.")
+      setError(e?.message || "Registration failed.")
     } finally {
       setRegistering(false)
     }
@@ -478,33 +478,33 @@ function RegisterAgentModal({
 
         <div className="flex flex-col items-center text-center mb-5">
           <CherryBao size={72} animate />
-          <h2 className="mt-3 text-[20px] font-extrabold text-[#3A2A1C]">새 AI 만들기</h2>
+          <h2 className="mt-3 text-[20px] font-extrabold text-[#3A2A1C]">Create a new AI</h2>
           <p className="mt-1 text-[12px] text-[#9A7C55]">
-            이름 하나, 지갑 연결 하나. 그게 전부예요.
+            A name and a wallet. That's all it takes.
           </p>
         </div>
 
-        {/* 1. 이름 */}
+        {/* 1. Name */}
         <label className="block mb-4">
           <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#9A7C55]">
-            1. 이 AI 의 이름
+            1. Name your AI
           </span>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="예: 코인 비서 · 경매 감시인"
+            placeholder="e.g. Crypto Watcher · Auction Sniper"
             className="mt-1.5 w-full px-4 py-2.5 rounded-xl bg-[#FBF6ED] text-[14px] text-[#3A2A1C] placeholder:text-[#C9B88A] outline-none focus:bg-white focus:ring-2 focus:ring-[#C8301E]/30 transition"
             style={{ border: "1px solid #E9D1A6" }}
           />
         </label>
 
-        {/* 2. 지갑 */}
+        {/* 2. Wallet */}
         <div className="mb-4">
           <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#9A7C55]">
-            2. 전자지갑 연결
+            2. Connect your wallet
           </span>
           <p className="text-[11px] text-[#9A7C55] mt-0.5 mb-2">
-            크레딧 충전·출금, 이용 기록이 이 지갑에 기록돼요.
+            Credit top-ups, withdrawals, and usage logs are recorded here.
           </p>
 
           <div className="inline-flex p-0.5 rounded-full bg-[#F5E4C2]/40 mb-3" style={{ border: "1px solid #E9D1A6" }}>
@@ -537,7 +537,7 @@ function RegisterAgentModal({
                 onClick={changeWallet}
                 className="text-[10px] font-bold text-[#6B4F2A] hover:underline flex-shrink-0"
               >
-                변경
+                Change
               </button>
             </div>
           ) : (
@@ -547,10 +547,10 @@ function RegisterAgentModal({
               className="w-full rounded-xl bg-[#3A2A1C] text-[#FDFBF5] py-3 text-[13px] font-extrabold hover:bg-[#6B4F2A] disabled:opacity-60 transition-colors"
             >
               {connecting
-                ? "연결 중…"
+                ? "Connecting…"
                 : walletType === "evm"
-                ? "🦊 MetaMask 연결"
-                : "🪐 NEAR 연결"}
+                ? "🦊 Connect MetaMask"
+                : "🪐 Connect NEAR"}
             </button>
           )}
         </div>
@@ -566,11 +566,11 @@ function RegisterAgentModal({
           disabled={!canRegister}
           className="w-full rounded-full bg-[#C8301E] text-white py-3 text-[14px] font-extrabold shadow-md hover:shadow-lg disabled:opacity-50 disabled:shadow-none transition-all"
         >
-          {registering ? "만드는 중…" : "✨ AI 만들기"}
+          {registering ? "Creating…" : "✨ Create AI"}
         </button>
 
         <p className="mt-3 text-center text-[11px] text-[#9A7C55]">
-          등록과 동시에 200 크레딧이 무료로 지급돼요.
+          You get 200 free credits the moment you register.
         </p>
       </div>
     </div>
@@ -585,7 +585,7 @@ function ConnectionDot({ id }: { id?: string }) {
         className="inline-block w-1.5 h-1.5 rounded-full"
         style={{ backgroundColor: connected ? "#2D7A5E" : "#9A7C55" }}
       />
-      {connected ? "준비됨" : "미연결"}
+      {connected ? "Ready" : "Not connected"}
     </div>
   )
 }

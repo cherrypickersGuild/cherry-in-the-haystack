@@ -112,15 +112,15 @@ export class AppUserAuthService {
     });
 
     const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
-    const loginLink = `${frontendUrl}/login?email=${encodeURIComponent(user.email)}&token=${signInToken}`;
+    const loginLink = `${frontendUrl}/start/login?email=${encodeURIComponent(user.email)}&token=${signInToken}`;
 
     await sendEmail(
       user.email,
-      '로그인 링크',
+      'Your Cherry sign-in link',
       EMAIL_TEMPLATE(
-        '로그인 링크',
-        '아래 버튼을 클릭하면 Cherry in the Haystack에 로그인됩니다.<br/>링크는 15분간 유효합니다.',
-        '로그인하기',
+        'Your sign-in link',
+        'Click the button below to sign in to Cherry in the Haystack.<br/>This link is valid for 15 minutes.',
+        'Sign in',
         loginLink,
       ),
     );
