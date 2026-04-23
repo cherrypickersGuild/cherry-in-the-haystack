@@ -238,5 +238,35 @@
     "sealed": true,
     "brand": "Framework",
     "model": "Laptop 13"
+  },
+  {
+    "id": "gram-06",
+    "title": "LG Gram 16\" 2024 — Sealed (Open-box)",
+    "price": 555,
+    "seller": "refurb_hub",
+    "posted_at": "2026-04-22T09:00:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-07",
+    "title": "LG Gram 16\" 2023 — Sealed",
+    "price": 599,
+    "seller": "used_gear_store",
+    "posted_at": "2026-04-22T14:30:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-08",
+    "title": "LG Gram 16\" 2024 — Sealed",
+    "price": 610,
+    "seller": "refurb_paradise",
+    "posted_at": "2026-04-21T18:15:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
   }
 ]

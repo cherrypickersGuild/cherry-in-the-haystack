@@ -1,10 +1,13 @@
 /**
- * Anthropic Claude client with a tool-use loop.
+ * Anthropic Claude client — public dispatcher + standard implementation.
  *
- * Single entry point `callClaude()` supports both:
- *   - baseline calls (no system prompt, no tools) — returns model text directly
- *   - enhanced calls (system + tools + dispatcher) — runs the tool-use loop
- *     until the model returns `stop_reason: "end_turn"` or the safety cap is hit
+ * `callClaude(input)` is the single public entry. It dispatches to:
+ *   - standard     → the tool-use loop (default, kept identical to Phase 1)
+ *   - plan-execute → 2-phase call (plan without tools → execute with tools)
+ *   - self-repair  → standard + validator + 1 retry on failure
+ *
+ * `callClaudeStandard` is exported so orchestration strategies can reuse
+ * the standard loop internally without re-implementing it.
  *
  * All tool calls are captured in `toolCalls` for logging + evaluation.
  */
@@ -12,6 +15,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 
 import type { AnthropicToolSchema } from './sets/set-definitions'
+import type { OrchestrationId } from './cards/card-registry'
 
 export const DEFAULT_MODEL = 'claude-haiku-4-5'
 
@@ -49,6 +53,8 @@ export interface ClaudeCallInput {
   maxTokens?: number
   temperature?: number
   maxToolIterations?: number
+  /** Phase 2: orchestration strategy. Defaults to 'standard' when undefined. */
+  orchestration?: OrchestrationId
 }
 
 export interface ClaudeCallResult {
@@ -68,7 +74,32 @@ export interface ClaudeCallResult {
 /** Safety cap — prevents runaway tool loops if the model never converges. */
 const DEFAULT_MAX_TOOL_ITERATIONS = 5
 
+/* ══════════════════════════════════════════════════════════════════
+   Dispatcher — routes to the requested orchestration strategy.
+   ════════════════════════════════════════════════════════════════ */
 export async function callClaude(
+  input: ClaudeCallInput,
+): Promise<ClaudeCallResult> {
+  switch (input.orchestration) {
+    case 'plan-execute': {
+      const { runPlanExecute } = await import('./orchestration/plan-execute.js')
+      return runPlanExecute(input)
+    }
+    case 'self-repair': {
+      const { runSelfRepair } = await import('./orchestration/self-repair.js')
+      return runSelfRepair(input)
+    }
+    case 'standard':
+    case undefined:
+    default:
+      return callClaudeStandard(input)
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Standard tool-use loop — Phase 1 behavior, unchanged.
+   ════════════════════════════════════════════════════════════════ */
+export async function callClaudeStandard(
   input: ClaudeCallInput,
 ): Promise<ClaudeCallResult> {
   const client = getClient()
@@ -85,9 +116,8 @@ export async function callClaude(
   let iterations = 0
 
   // Mutable working copy of the conversation.
-  const conversation: Array<
-    Anthropic.Messages.MessageParam
-  > = input.messages.map((m) => ({ role: m.role, content: m.content }))
+  const conversation: Array<Anthropic.Messages.MessageParam> =
+    input.messages.map((m) => ({ role: m.role, content: m.content }))
 
   let stopReason: string | null = null
   let finalText = ''
@@ -116,11 +146,9 @@ export async function callClaude(
       (c): c is Anthropic.Messages.ToolUseBlock => c.type === 'tool_use',
     )
 
-    // Keep the LAST textual answer as our response text.
     const lastText = textParts.map((p) => p.text).join('\n').trim()
     if (lastText) finalText = lastText
 
-    // No more tool calls or we're out of the tools regime — done.
     if (
       stopReason !== 'tool_use' ||
       toolUseBlocks.length === 0 ||
@@ -130,10 +158,8 @@ export async function callClaude(
       break
     }
 
-    // Append the assistant turn (unchanged, as SDK requires).
     conversation.push({ role: 'assistant', content: res.content })
 
-    // Execute all tool calls in parallel and build tool_result blocks.
     const results = await Promise.all(
       toolUseBlocks.map(async (tu) => {
         const callStarted = Date.now()
@@ -142,13 +168,12 @@ export async function callClaude(
             tu.name,
             (tu.input ?? {}) as Record<string, unknown>,
           )
-          const rec: ToolCallRecord = {
+          toolCalls.push({
             name: tu.name,
             input: (tu.input ?? {}) as Record<string, unknown>,
             output: out,
             durationMs: Date.now() - callStarted,
-          }
-          toolCalls.push(rec)
+          })
           return {
             type: 'tool_result' as const,
             tool_use_id: tu.id,
@@ -172,7 +197,6 @@ export async function callClaude(
       }),
     )
 
-    // Feed the tool_result back as a user turn.
     conversation.push({ role: 'user', content: results })
   }
 
@@ -188,5 +212,17 @@ export async function callClaude(
     latencyMs: Date.now() - started,
     model,
     iterations,
+  }
+}
+
+/** Sum two `ClaudeCallResult.usage` objects. Used by orchestration wrappers. */
+export function combineUsage(
+  a: ClaudeCallResult['usage'],
+  b: ClaudeCallResult['usage'],
+): ClaudeCallResult['usage'] {
+  return {
+    inputTokens: a.inputTokens + b.inputTokens,
+    outputTokens: a.outputTokens + b.outputTokens,
+    totalTokens: a.totalTokens + b.totalTokens,
   }
 }

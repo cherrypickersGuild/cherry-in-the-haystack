@@ -37,10 +37,24 @@ function loadListings(): MarketplaceListing[] {
  * Simple keyword match against brand + model + title.
  * Splits query into whitespace tokens; all tokens (case-insensitive) must hit.
  */
+/** Normalize for matching: lowercase, strip punctuation, collapse whitespace,
+ *  drop "inch" / "-inch" suffix variants so `16-inch` matches `16`. */
+function normalize(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/["']/g, '')
+    .replace(/-inch\b|(?<=\d)"/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 function matchesQuery(listing: MarketplaceListing, query: string): boolean {
   if (!query) return true
-  const hay = `${listing.brand} ${listing.model} ${listing.title}`.toLowerCase()
-  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean)
+  const hay = normalize(
+    `${listing.brand} ${listing.model} ${listing.title}`,
+  )
+  const tokens = normalize(query).split(/\s+/).filter(Boolean)
   return tokens.every((t) => hay.includes(t))
 }
 

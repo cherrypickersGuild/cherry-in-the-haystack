@@ -6,8 +6,8 @@ import { CherryBao } from "./cherry-bao"
 import { useAuthTick, getAccessToken, clearAccessToken } from "@/lib/auth"
 
 const TABS: { href: string; label: string }[] = [
-  { href: "/start/connect",  label: "Connect" },
   { href: "/start/workshop", label: "Workshop" },
+  { href: "/start/connect",  label: "Install Skill" },
   { href: "/start/shop",     label: "Shop" },
 ]
 

@@ -23,6 +23,9 @@ import { getEvaluator, type Metric } from './evaluators'
 import { captureOracleGroundTruth } from './evaluators/set1-oracle.evaluator'
 import { captureHunterGroundTruth } from './evaluators/set2-hunter.evaluator'
 import { capturePolicyGroundTruth } from './evaluators/set3-policy.evaluator'
+import { captureQuantGroundTruth } from './evaluators/set4-quant.evaluator'
+import { captureStrictHunterGroundTruth } from './evaluators/set5-strict-hunter.evaluator'
+import { captureGroundedGroundTruth } from './evaluators/set6-grounded.evaluator'
 import {
   composeRuntime,
   type AgentBuildInput,
@@ -174,6 +177,7 @@ export class BenchService {
       messages: [{ role: 'user', content: set.task }],
       maxTokens: 800,
       maxToolIterations: runtime.maxIterations,
+      orchestration: runtime.orchestrationId,
     })
 
     const [baseline, enhanced] = await Promise.all([
@@ -268,44 +272,67 @@ export class BenchService {
   private async captureGroundTruth(
     set: BenchSetDefinition,
   ): Promise<unknown> {
-    if (set.evalCriteria.kind === 'oracle') {
-      return captureOracleGroundTruth(
-        set.evalCriteria.symbols.map((s) => s.symbol),
-      )
+    const c = set.evalCriteria
+    switch (c.kind) {
+      case 'oracle':
+        return captureOracleGroundTruth(c.symbols.map((s) => s.symbol))
+      case 'hunter':
+        return captureHunterGroundTruth(
+          c.expectedIds,
+          c.requiredFields,
+          c.filter,
+        )
+      case 'policy':
+        return capturePolicyGroundTruth(c.expectedDocIds, c.keyFacts)
+      case 'quant-multi':
+        return captureQuantGroundTruth(c.symbols)
+      case 'strict-hunter':
+        return captureStrictHunterGroundTruth({
+          expectedIds: c.expectedIds,
+          requiredFields: c.requiredFields,
+          filter: c.filter,
+          sellerBlocklist: c.sellerBlocklist,
+        })
+      case 'grounded-abstain':
+        return captureGroundedGroundTruth({
+          expectedDocIds: c.expectedDocIds,
+          keyFacts: c.keyFacts.map((k) => ({
+            pattern: new RegExp(k.regex, 'i'),
+            description: k.description,
+          })),
+          expectedMissing: c.expectedMissing,
+        })
     }
-    if (set.evalCriteria.kind === 'hunter') {
-      return captureHunterGroundTruth(
-        set.evalCriteria.expectedIds,
-        set.evalCriteria.requiredFields,
-        set.evalCriteria.filter,
-      )
-    }
-    return capturePolicyGroundTruth(
-      set.evalCriteria.expectedDocIds,
-      set.evalCriteria.keyFacts,
-    )
   }
 
   private summarizeGroundTruth(
     set: BenchSetDefinition,
     gt: unknown,
   ): string {
-    if (set.evalCriteria.kind === 'oracle') {
-      const prices = (gt as any).prices as Array<{
-        symbol: string
-        priceUsd: number
-        change24hPct: number
-      }>
-      return prices
-        .map(
-          (p) =>
-            `${p.symbol} $${p.priceUsd.toLocaleString()} (${p.change24hPct >= 0 ? '+' : ''}${p.change24hPct}% 24h)`,
-        )
-        .join(' · ')
+    const c = set.evalCriteria
+    switch (c.kind) {
+      case 'oracle':
+      case 'quant-multi': {
+        const prices = (gt as any).prices as Array<{
+          symbol: string
+          priceUsd: number
+          change24hPct: number
+        }>
+        return prices
+          .map(
+            (p) =>
+              `${p.symbol} $${p.priceUsd.toLocaleString()} (${p.change24hPct >= 0 ? '+' : ''}${p.change24hPct}% 24h)`,
+          )
+          .join(' · ')
+      }
+      case 'hunter':
+        return `seed DB · top 3 by price: ${c.expectedIds.join(' · ')}`
+      case 'strict-hunter':
+        return `seed DB · clean top 3: ${c.expectedIds.join(' · ')} (blocklist: ${c.sellerBlocklist.join('|')})`
+      case 'policy':
+        return `${c.expectedDocIds.join(', ')} · ${c.keyFacts.map((f) => f.description).join(' · ')}`
+      case 'grounded-abstain':
+        return `${c.expectedDocIds.join(', ')} · expected missing: ${c.expectedMissing.join(' + ')}`
     }
-    if (set.evalCriteria.kind === 'hunter') {
-      return `seed DB · top 3 by price: ${set.evalCriteria.expectedIds.join(' · ')}`
-    }
-    return `${set.evalCriteria.expectedDocIds.join(', ')} · ${set.evalCriteria.keyFacts.map((f) => f.description).join(' · ')}`
   }
 }

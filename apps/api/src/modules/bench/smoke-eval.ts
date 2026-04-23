@@ -38,22 +38,19 @@ function toolsFor(set: BenchSetDefinition): BenchTool[] {
 }
 
 async function captureGroundTruth(set: BenchSetDefinition): Promise<unknown> {
-  if (set.evalCriteria.kind === 'oracle') {
-    return captureOracleGroundTruth(
-      set.evalCriteria.symbols.map((s) => s.symbol),
-    )
+  const c = set.evalCriteria
+  if (c.kind === 'oracle') {
+    return captureOracleGroundTruth(c.symbols.map((s) => s.symbol))
   }
-  if (set.evalCriteria.kind === 'hunter') {
-    return captureHunterGroundTruth(
-      set.evalCriteria.expectedIds,
-      set.evalCriteria.requiredFields,
-      set.evalCriteria.filter,
-    )
+  if (c.kind === 'hunter') {
+    return captureHunterGroundTruth(c.expectedIds, c.requiredFields, c.filter)
   }
-  return capturePolicyGroundTruth(
-    set.evalCriteria.expectedDocIds,
-    set.evalCriteria.keyFacts,
-  )
+  if (c.kind === 'policy') {
+    return capturePolicyGroundTruth(c.expectedDocIds, c.keyFacts)
+  }
+  // Phase 2 kinds not supported by this legacy Phase 1 script. The main
+  // smoke path is the HTTP `/v1/kaas/bench/run` + curl — not this file.
+  throw new Error(`[smoke-eval] kind ${c.kind} handled by service layer only`)
 }
 
 function section(title: string) {

@@ -477,9 +477,6 @@ export function KaasWorkshopPanel({ currentAgent }: KaasWorkshopPanelProps) {
 
           {/* Filter buttons */}
           <div className="flex gap-1 mb-4 flex-wrap flex-shrink-0">
-            <FilterButton active={filter === "all"} onClick={() => setFilter("all")}>
-              All
-            </FilterButton>
             {SKILL_TYPE_ORDER.map((t) => (
               <FilterButton key={t} active={filter === t} onClick={() => setFilter(t)} type={t}>
                 {TYPE_THEME[t].label}
@@ -630,10 +627,10 @@ function EquipSlot({
             >
               ⏏
             </button>
-            {/* Set tag — small glyph badge in top-left corner */}
-            {item.setTag && (
+            {/* Set tag — small glyph badge in top-left corner (first tag only in compact mode) */}
+            {item.setTag && item.setTag.length > 0 && (
               <div className="absolute top-1 left-1 z-10">
-                <SetBadge tag={item.setTag} compact />
+                <SetBadge tag={item.setTag[0]} compact />
               </div>
             )}
             <div className="flex flex-col items-center justify-center h-full text-center gap-1">
@@ -1089,10 +1086,12 @@ function InventoryCard({
         </span>
       </div>
 
-      {/* Set signature — bottom-right, icon + text pill. */}
-      {item.setTag && (
-        <div className="absolute bottom-1.5 right-2">
-          <SetBadge tag={item.setTag} />
+      {/* Set signature — bottom-right. Shared cards show multiple badges side-by-side. */}
+      {item.setTag && item.setTag.length > 0 && (
+        <div className="absolute bottom-1.5 right-2 flex items-center gap-1">
+          {item.setTag.map((tag) => (
+            <SetBadge key={tag} tag={tag} />
+          ))}
         </div>
       )}
       {item.source === "followed" && item.sourceAgent && (

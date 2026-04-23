@@ -127,7 +127,13 @@ export interface AppliedSlots {
   prompt: boolean
   mcp: boolean
   memory: boolean
+  /** Phase 2: number of skill slots actively composed into the system prompt. */
+  skillsActive?: number
+  /** Phase 2: orchestration slot equipped with a non-standard strategy. */
+  orchestrationActive?: boolean
+  /** @deprecated Phase 1 field, always 0 in Phase 2. Kept for response compat. */
   skillsIgnored: number
+  /** @deprecated Phase 1 field, always false in Phase 2. Kept for response compat. */
   orchestrationIgnored: boolean
 }
 

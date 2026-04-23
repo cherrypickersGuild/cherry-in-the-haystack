@@ -506,9 +506,14 @@ function AppliedSlotsBanner({
   applied: import("@/lib/bench-api").AppliedSlots
   memoryMode: string
 }) {
-  const anyApplied = applied.prompt || applied.mcp || applied.memory
-  const anyIgnored =
-    applied.skillsIgnored > 0 || applied.orchestrationIgnored
+  const skillsActive = applied.skillsActive ?? 0
+  const orchestrationActive = applied.orchestrationActive ?? false
+  const anyApplied =
+    applied.prompt ||
+    applied.mcp ||
+    applied.memory ||
+    skillsActive > 0 ||
+    orchestrationActive
 
   return (
     <div
@@ -525,23 +530,24 @@ function AppliedSlotsBanner({
       <AppliedDot label="prompt" on={applied.prompt} />
       <AppliedDot label="mcp" on={applied.mcp} />
       <AppliedDot
+        label={
+          skillsActive > 0
+            ? `skills × ${skillsActive}`
+            : "skills"
+        }
+        on={skillsActive > 0}
+      />
+      <AppliedDot
+        label={orchestrationActive ? "orchestration" : "orchestration"}
+        on={orchestrationActive}
+      />
+      <AppliedDot
         label={applied.memory ? `memory · ${memoryMode}` : "memory"}
         on={applied.memory}
       />
       {!anyApplied && (
         <span className="text-[#9A7C55] italic">
           Empty build — enhanced run ≈ baseline.
-        </span>
-      )}
-      {anyIgnored && (
-        <span
-          className="ml-auto text-[10px] font-semibold italic"
-          style={{ color: "#6B4F2A" }}
-        >
-          ⓘ {applied.skillsIgnored > 0 && `${applied.skillsIgnored} skill`}
-          {applied.skillsIgnored > 0 && applied.orchestrationIgnored && " + "}
-          {applied.orchestrationIgnored && "orchestration"} equipped — not yet
-          wired (Phase 2).
         </span>
       )}
     </div>

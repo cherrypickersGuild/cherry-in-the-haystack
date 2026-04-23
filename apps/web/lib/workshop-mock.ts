@@ -18,9 +18,18 @@
 export type SkillType = "prompt" | "mcp" | "skill" | "orchestration" | "memory"
 
 /** Diablo-style "set" tag — cards that share the same tag form an optimal
- *  combo. When all 3 cards of a set (prompt + mcp + memory) are equipped,
- *  the benchmark runs at peak effectiveness for that set's task. */
-export type SetTag = "oracle" | "hunter" | "policy"
+ *  combo. When all cards of a set are equipped, the benchmark runs at peak
+ *  effectiveness for that set's task.
+ *
+ *  Phase 1: 3 tags — oracle / hunter / policy (3-slot builds)
+ *  Phase 2: 3 more  — quant / strict / grounded (7-slot builds) */
+export type SetTag =
+  | "oracle"
+  | "hunter"
+  | "policy"
+  | "quant"
+  | "strict"
+  | "grounded"
 
 export interface SetMeta {
   label: string
@@ -30,9 +39,12 @@ export interface SetMeta {
 }
 
 export const SET_META: Record<SetTag, SetMeta> = {
-  oracle: { label: "Oracle Set",   symbol: "🜂", color: "#8B6C2A", softBg: "#F5E9C8" },
-  hunter: { label: "Hunter Set",   symbol: "🜄", color: "#8F1D12", softBg: "#F6D8D0" },
-  policy: { label: "Policy Set",   symbol: "🜁", color: "#2D3B66", softBg: "#D8DEEF" },
+  oracle:   { label: "Oracle Set",   symbol: "🜂", color: "#8B6C2A", softBg: "#F5E9C8" },
+  hunter:   { label: "Hunter Set",   symbol: "🜄", color: "#8F1D12", softBg: "#F6D8D0" },
+  policy:   { label: "Policy Set",   symbol: "🜁", color: "#2D3B66", softBg: "#D8DEEF" },
+  quant:    { label: "Quant Set",    symbol: "🜔", color: "#5E3A8A", softBg: "#E8DCF4" },
+  strict:   { label: "Strict Set",   symbol: "🜍", color: "#9A4A0F", softBg: "#F5DCC5" },
+  grounded: { label: "Grounded Set", symbol: "🜚", color: "#3F5A2E", softBg: "#DCE8D1" },
 }
 
 export interface InventoryItem {
@@ -46,8 +58,10 @@ export interface InventoryItem {
   summary?: string // Shown on card hover
   fileName?: string // For custom items: original uploaded filename
   content?: string // For custom items: raw text content (prompt body / config / etc.)
-  /** Diablo-style set membership — matching tags = optimal combo. */
-  setTag?: SetTag
+  /** Diablo-style set membership — cards with a shared tag form an optimal
+   *  combo. Array because some shared cards belong to multiple sets
+   *  (e.g. JSON Strict → ["quant","strict"]). */
+  setTag?: SetTag[]
 }
 
 export type SlotKey =
@@ -178,7 +192,7 @@ export const mockInventory: InventoryItem[] = [
     category: "Analyst",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: "oracle",
+    setTag: ["oracle"],
     summary:
       "Crypto market analyst. Cites real prices with timestamp + source; never guesses.",
   },
@@ -189,7 +203,7 @@ export const mockInventory: InventoryItem[] = [
     category: "Extraction",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: "hunter",
+    setTag: ["hunter"],
     summary:
       "Deal hunter that returns strict JSON listings; never invents records.",
   },
@@ -200,7 +214,7 @@ export const mockInventory: InventoryItem[] = [
     category: "Grounded",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: "policy",
+    setTag: ["policy"],
     summary:
       "Answers only from retrieved Cherry docs; cites doc IDs; says \"I don't have that\" when missing.",
   },
@@ -213,7 +227,7 @@ export const mockInventory: InventoryItem[] = [
     category: "Finance",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: "oracle",
+    setTag: ["oracle"],
     summary:
       "Live crypto prices via CoinGecko. Tool: get_crypto_price(symbol).",
   },
@@ -224,7 +238,7 @@ export const mockInventory: InventoryItem[] = [
     category: "Shopping",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: "hunter",
+    setTag: ["hunter"],
     summary:
       "Internal marketplace DB. Tool: search_marketplace(query, max_price, sealed_only).",
   },
@@ -235,7 +249,7 @@ export const mockInventory: InventoryItem[] = [
     category: "Docs",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: "policy",
+    setTag: ["policy"],
     summary:
       "Cherry internal policy docs. Tool: search_catalog(query, limit).",
   },
@@ -248,7 +262,7 @@ export const mockInventory: InventoryItem[] = [
     category: "None",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: "hunter",
+    setTag: ["hunter"],
     summary: "No retention — each turn starts fresh.",
   },
   {
@@ -258,7 +272,7 @@ export const mockInventory: InventoryItem[] = [
     category: "Conversation",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: "oracle",
+    setTag: ["oracle"],
     summary: "Full conversation context preserved within the session.",
   },
   {
@@ -268,8 +282,154 @@ export const mockInventory: InventoryItem[] = [
     category: "Tool output",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: "policy",
+    setTag: ["policy"],
     summary: "Retrieved tool results stay available across turns.",
+  },
+
+  // ══════════ Phase 2 — Quant / Strict / Grounded Prompts (3) ══════════
+  {
+    id: "inv-p-quant",
+    title: "Quantitative Analyst",
+    type: "prompt",
+    category: "Multi-asset",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["quant"],
+    summary:
+      "3-asset analyst that fetches each price, compares movement, returns structured JSON with citations.",
+  },
+  {
+    id: "inv-p-strict-hunter",
+    title: "Strict Deal Hunter",
+    type: "prompt",
+    category: "Constrained",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["strict"],
+    summary:
+      "Strict JSON listings; applies every filter; never invents records.",
+  },
+  {
+    id: "inv-p-grounded",
+    title: "Grounded Researcher",
+    type: "prompt",
+    category: "Retrieval",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["grounded"],
+    summary:
+      "Retrieves first, cites doc IDs, flags missing fields with 'missing:<field>'.",
+  },
+
+  // ══════════ Phase 2 — Skills (7) ══════════
+  {
+    id: "inv-s-decomp",
+    title: "Multi-step Decomposition",
+    type: "skill",
+    category: "Reasoning",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["quant"],
+    summary:
+      "Break the task into explicit subtasks and address each before synthesizing.",
+  },
+  {
+    id: "inv-s-json-strict",
+    title: "JSON Strict",
+    type: "skill",
+    category: "Output",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["quant", "strict"],
+    summary: "Output ONLY valid JSON matching the requested schema. No prose.",
+  },
+  {
+    id: "inv-s-citation",
+    title: "Citation Discipline",
+    type: "skill",
+    category: "Grounding",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["quant", "grounded"],
+    summary: "Every factual claim carries an inline source or citation.",
+  },
+  {
+    id: "inv-s-constraint-sat",
+    title: "Constraint Satisfaction",
+    type: "skill",
+    category: "Filtering",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["strict"],
+    summary:
+      "Apply EVERY stated filter. Reject any record that fails any single constraint.",
+  },
+  {
+    id: "inv-s-self-validate",
+    title: "Self-Validation",
+    type: "skill",
+    category: "Filtering",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["strict"],
+    summary:
+      "Re-read the draft against every constraint and drop any item that fails.",
+  },
+  {
+    id: "inv-s-multihop",
+    title: "Multi-hop Retrieval",
+    type: "skill",
+    category: "Retrieval",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["grounded"],
+    summary:
+      "Decompose queries and issue multiple retrievals when a single search isn't enough.",
+  },
+  {
+    id: "inv-s-abstention",
+    title: "Abstention",
+    type: "skill",
+    category: "Calibration",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["grounded"],
+    summary:
+      "If a required field is missing from retrieved content, output 'missing: <field>' — never guess.",
+  },
+
+  // ══════════ Phase 2 — Orchestration (3) ══════════
+  {
+    id: "inv-o-standard",
+    title: "Standard Loop",
+    type: "orchestration",
+    category: "Default",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    summary:
+      "Default ReAct-style tool-use loop. Functionally identical to leaving the slot empty — included for UX completeness.",
+  },
+  {
+    id: "inv-o-plan-execute",
+    title: "Plan-and-Execute",
+    type: "orchestration",
+    category: "Multi-phase",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["quant", "grounded"],
+    summary:
+      "Two-phase call: first produce a plan (no tools), then execute the plan with tools.",
+  },
+  {
+    id: "inv-o-self-repair",
+    title: "Self-Repair",
+    type: "orchestration",
+    category: "Retry",
+    updatedAt: "2026-04-24",
+    source: "builtin",
+    setTag: ["strict"],
+    summary:
+      "Runs the default loop, validates the output, retries once on failure.",
   },
 ]
 
@@ -287,8 +447,10 @@ export const defaultWorkshopState: WorkshopState = {
   cloneSimilarity: 0,
 }
 
-// v7: 7 slots restored, jigsaw shapes added, inventory still lean (9 real cards).
-export const WORKSHOP_STORAGE_KEY = "cherry_workshop_state_v7"
+// v8: Phase 2 — setTag array + 13 new cards (7 skill + 3 orch + 3 new prompts).
+// Inventory goes from 9 → 22. Storage bump invalidates any v7 saves whose setTag
+// was the old string form.
+export const WORKSHOP_STORAGE_KEY = "cherry_workshop_state_v8"
 
 /** Order of type filter buttons in the UI */
 export const SKILL_TYPE_ORDER: SkillType[] = [
