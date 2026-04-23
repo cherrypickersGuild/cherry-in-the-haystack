@@ -15,6 +15,7 @@ import { NDCaseStudiesPage } from "@/components/cherry/nd-case-studies-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
 import { HandbookPlaceholder } from "@/components/cherry/handbook-placeholder"
 import { KaasCatalogPage } from "@/components/cherry/kaas-catalog-page"
+import { KaasArenaPage } from "@/components/cherry/kaas-arena-page"
 import { KaasDashboardPage } from "@/components/cherry/kaas-dashboard-page"
 // KaasAdminPage는 KaasDashboardPage 내부 탭으로 통합됨
 import { KaasConsole, KaasConsoleRef } from "@/components/cherry/kaas-console"
@@ -92,6 +93,9 @@ export default function CherryApp() {
             consoleRef.current?.notify(`📊 Compare (${result.source ?? "db"}) — ${result.agentName ?? "agent"}\n${topics}\n\nup-to-date: ${upToDate} | outdated: ${outdated} | gaps: ${gaps}`, !!result.privacy, result.provenance ?? null)
           }}
         />
+
+      case "kaas-arena":
+        return <KaasArenaPage />
 
       case "concept-reader":
         return <ConceptReaderPage onBuyOnMarket={(conceptId) => {
@@ -296,13 +300,16 @@ export default function CherryApp() {
           </button>
         </div>
 
-        {/* Main scrollable content */}
+        {/* Main scrollable content — constrain inner page to 1200px,
+            left-aligned (no mx-auto) so content sits flush with the sidebar. */}
         <main
           className="flex-1 overflow-y-auto px-4 py-4 lg:px-10 lg:py-8"
           style={{ backgroundColor: "#FBFAF8" }}
           id="main-content"
         >
-          {renderContent()}
+          <div className="w-full max-w-[1000px]">
+            {renderContent()}
+          </div>
         </main>
       </div>
 

@@ -9,7 +9,7 @@
 //   ⑤ Memory         → state management
 //
 // Total: 7 slots · 5 types
-// LLM Model is not a slot — selected via pulldown below the flow
+// Foundation model is fixed to Claude Code (runtime). Not configurable per agent.
 
 export type SkillType = "prompt" | "mcp" | "skill" | "orchestration" | "memory"
 
@@ -62,7 +62,7 @@ export interface WorkshopState {
   builds: AgentBuild[] // Multiple saved slot configurations (tabbed)
   activeBuildId: string // Currently visible build
   inventory: InventoryItem[]
-  llmModel: string // Pulldown selection
+  // NOTE: Foundation model is fixed to Claude Code — no per-agent model switch.
   // NOTE: isListedOnMarket moved into AgentBuild (per-build listing).
   isFollowingAny: boolean
   cloneSimilarity?: number
@@ -142,27 +142,6 @@ export const SLOT_META: Record<SlotKey, SlotConfig> = {
     emptyLabel: "Memory strategy (vector / episodic / working)",
   },
 }
-
-/** LLM Foundation Model options for the pulldown */
-export interface LLMOption {
-  id: string
-  label: string
-  provider: "claude" | "openai" | "google" | "meta" | "near-ai"
-  badge?: string // e.g. "Recommended" / "TEE" / "Fast"
-}
-
-export const LLM_OPTIONS: LLMOption[] = [
-  { id: "claude-sonnet-4-5", label: "Claude Sonnet 4.5", provider: "claude", badge: "Recommended" },
-  { id: "claude-opus-4-6", label: "Claude Opus 4.6", provider: "claude" },
-  { id: "claude-haiku-4", label: "Claude Haiku 4", provider: "claude", badge: "Fast" },
-  { id: "gpt-4o", label: "GPT-4o", provider: "openai" },
-  { id: "gpt-4-1", label: "GPT-4.1", provider: "openai" },
-  { id: "gemini-2-0-flash", label: "Gemini 2.0 Flash", provider: "google", badge: "Fast" },
-  { id: "llama-3-1-70b", label: "Llama 3.1 70B", provider: "meta" },
-  { id: "near-qwen-30b", label: "Qwen3 30B (NEAR TEE)", provider: "near-ai", badge: "TEE" },
-]
-
-export const DEFAULT_LLM_MODEL = "claude-sonnet-4-5"
 
 /** Mock inventory — 2~3 items per type */
 export const mockInventory: InventoryItem[] = [
@@ -342,13 +321,12 @@ export const defaultWorkshopState: WorkshopState = {
   builds: DEFAULT_BUILDS,
   activeBuildId: DEFAULT_BUILDS[0].id,
   inventory: mockInventory,
-  llmModel: DEFAULT_LLM_MODEL,
   isFollowingAny: false,
   cloneSimilarity: 0,
 }
 
-// v4: per-build `isListedOnMarket` (previously a top-level shared flag)
-export const WORKSHOP_STORAGE_KEY = "cherry_workshop_state_v4"
+// v5: Foundation model pulldown removed (Claude Code fixed)
+export const WORKSHOP_STORAGE_KEY = "cherry_workshop_state_v5"
 
 /** Order of type filter buttons in the UI */
 export const SKILL_TYPE_ORDER: SkillType[] = ["prompt", "mcp", "skill", "orchestration", "memory"]

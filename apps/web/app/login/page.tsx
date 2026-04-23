@@ -13,6 +13,15 @@ function LoginContent() {
   const [step, setStep] = useState<"input" | "sent" | "verifying" | "error">("input")
   const [errorMsg, setErrorMsg] = useState("")
 
+  // 로그인 성공 후 돌아갈 경로 — /login?next=/start 로 들어오면 기억해둠
+  // 매직링크 이메일 왕복 시 URL 파라미터가 유실되므로 localStorage 에 저장
+  useEffect(() => {
+    const nextFromUrl = searchParams.get("next")
+    if (nextFromUrl && nextFromUrl.startsWith("/")) {
+      try { localStorage.setItem("cherry_login_next", nextFromUrl) } catch { /* noop */ }
+    }
+  }, [searchParams])
+
   // 매직링크 클릭 시 자동 로그인 처리
   useEffect(() => {
     const tokenFromUrl = searchParams.get("token")
@@ -30,7 +39,15 @@ function LoginContent() {
         .then((data) => {
           if (data.accessToken) {
             setAccessToken(data.accessToken)
-            router.push("/")
+            let dest = "/"
+            try {
+              const saved = localStorage.getItem("cherry_login_next")
+              if (saved && saved.startsWith("/")) {
+                dest = saved
+                localStorage.removeItem("cherry_login_next")
+              }
+            } catch { /* noop */ }
+            router.push(dest)
           } else {
             setErrorMsg(data.message ?? "로그인에 실패했습니다.")
             setStep("error")

@@ -14,6 +14,7 @@ import {
   GraduationCap,
   Zap,
   ShoppingBag,
+  Trophy,
   LayoutDashboard,
   Cherry as CherryLucide,
 } from "lucide-react"
@@ -221,6 +222,7 @@ const SECTIONS: SectionDef[] = [
     highlight: true,
     items: [
       { id: "kaas-catalog", icon: <ShoppingBag size={16} />, label: "Knowledge Market" },
+      { id: "kaas-arena", icon: <Trophy size={16} />, label: "Arena" },
     ],
   },
   {

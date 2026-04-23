@@ -232,6 +232,35 @@ export function KaasWorkshopPanel({ currentAgent }: KaasWorkshopPanelProps) {
               <h3 className="text-[15px] font-black text-[#1A1626] leading-tight">
                 Agent Equipment
               </h3>
+
+              {/* Compact Register toggle — sits in the header's empty right side
+                  so the layout fits the viewport without scrolling. */}
+              <div className="ml-auto flex items-center gap-2">
+                <button
+                  onClick={toggleListing}
+                  disabled={listingDisabled}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 ${
+                    listingDisabled
+                      ? "bg-gray-200 cursor-not-allowed"
+                      : activeBuild.isListedOnMarket
+                        ? "bg-[#2A5C3E]"
+                        : "bg-gray-300"
+                  }`}
+                  title={listingDisabledReason || "Make this build discoverable in Shop"}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      activeBuild.isListedOnMarket ? "translate-x-[18px]" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+                <span
+                  className={`text-[11px] font-bold ${listingDisabled ? "text-[#9E97B3]" : "text-[#1A1626]"}`}
+                  title={listingDisabledReason}
+                >
+                  Publish {activeBuild.name}
+                </span>
+              </div>
             </div>
 
             {/* ═══ Character Sheet — Diablo-style ═══
@@ -333,51 +362,6 @@ export function KaasWorkshopPanel({ currentAgent }: KaasWorkshopPanelProps) {
               </div>
             </div>
 
-          {/* Register toggle — lives INSIDE the flow container so it naturally
-              follows the active build (switching tabs swaps the toggle state). */}
-          <div className="mt-5 pt-4 border-t border-[#E4E1EE] flex items-center gap-3">
-            <button
-              onClick={toggleListing}
-              disabled={listingDisabled}
-              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 ${
-                listingDisabled
-                  ? "bg-gray-200 cursor-not-allowed"
-                  : activeBuild.isListedOnMarket
-                    ? "bg-[#2A5C3E]"
-                    : "bg-gray-300"
-              }`}
-              title={listingDisabledReason}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  activeBuild.isListedOnMarket ? "translate-x-[18px]" : "translate-x-0.5"
-                }`}
-              />
-            </button>
-            <div className="flex-1 min-w-0">
-              <div className={`text-[12px] font-bold ${listingDisabled ? "text-[#9E97B3]" : "text-[#1A1626]"}`}>
-                Register <span className="font-extrabold">{activeBuild.name}</span> to Special Agents
-              </div>
-              <div className="text-[10px] text-[#6B6480] truncate">
-                {listingDisabled
-                  ? listingDisabledReason
-                  : activeBuild.isListedOnMarket
-                    ? `${activeBuild.name} listed on marketplace`
-                    : "Each build can be registered independently"}
-              </div>
-            </div>
-            <details className="text-[10px] text-[#9E97B3]">
-              <summary className="cursor-pointer hover:text-[#6B6480]">debug</summary>
-              <div className="mt-1 flex gap-1 flex-wrap">
-                <button onClick={toggleFollowing} className="px-1.5 py-0.5 bg-gray-100 rounded border border-gray-200 hover:bg-gray-200 text-[9px]">
-                  follow: {String(state.isFollowingAny)}
-                </button>
-                <button onClick={toggleCloneFlag} className="px-1.5 py-0.5 bg-gray-100 rounded border border-gray-200 hover:bg-gray-200 text-[9px]">
-                  clone: {state.cloneSimilarity ?? 0}
-                </button>
-              </div>
-            </details>
-          </div>
           </div>
         </div>
       </section>
