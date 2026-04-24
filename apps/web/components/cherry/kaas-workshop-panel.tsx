@@ -46,7 +46,7 @@ interface KaasWorkshopPanelProps {
   currentAgentApiKey?: string
 }
 
-type FilterKey = "all" | SkillType
+type FilterKey = "all" | SkillType | "fullset"
 
 const ITEMS_PER_PAGE = 10 // 2 cols × 5 rows — fills visible area
 
@@ -184,6 +184,28 @@ export function KaasWorkshopPanel({ currentAgent }: KaasWorkshopPanelProps) {
   }
   function unequipAll() {
     updateActiveBuild((b) => ({ ...b, equipped: emptyEquipped() }))
+  }
+
+  /** Compose the equipped map from the inventory by filtering each slot on
+   *  `setTag`. One card per slot-type; skills take the first three matches.
+   *  Single source of truth = inventory setTag values. */
+  function equipFullSet(tag: SetTag) {
+    const inv = state.inventory
+    const firstBy = (t: SkillType) =>
+      inv.find((i) => i.type === t && i.setTag?.includes(tag))?.id ?? null
+    const skills = inv.filter((i) => i.type === "skill" && i.setTag?.includes(tag)).slice(0, 3)
+    updateActiveBuild((b) => ({
+      ...b,
+      equipped: {
+        prompt: firstBy("prompt"),
+        mcp: firstBy("mcp"),
+        skillA: skills[0]?.id ?? null,
+        skillB: skills[1]?.id ?? null,
+        skillC: skills[2]?.id ?? null,
+        orchestration: firstBy("orchestration"),
+        memory: firstBy("memory"),
+      },
+    }))
   }
   function toggleListing() {
     updateActiveBuild((b) => ({ ...b, isListedOnMarket: !b.isListedOnMarket }))
@@ -504,11 +526,25 @@ export function KaasWorkshopPanel({ currentAgent }: KaasWorkshopPanelProps) {
                 {TYPE_THEME[t].label}
               </FilterButton>
             ))}
+            <FilterButton active={filter === "fullset"} onClick={() => setFilter("fullset")}>
+              FULLSET
+            </FilterButton>
           </div>
 
           {/* Grid (2×3 = 6 items per page) */}
           <div className="flex-1 min-h-0">
-            {pagedInventory.length === 0 ? (
+            {filter === "fullset" ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 content-start">
+                {(Object.keys(SET_META) as SetTag[]).map((tag) => (
+                  <FullSetCard
+                    key={tag}
+                    tag={tag}
+                    inventory={state.inventory}
+                    onInsert={() => equipFullSet(tag)}
+                  />
+                ))}
+              </div>
+            ) : pagedInventory.length === 0 ? (
               <div className="text-[12px] italic text-[#9E97B3] py-12 text-center">
                 {availableInventory.length === 0
                   ? "All items equipped"
@@ -530,7 +566,7 @@ export function KaasWorkshopPanel({ currentAgent }: KaasWorkshopPanelProps) {
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
+          {filter !== "fullset" && totalPages > 1 && (
             <div className="flex items-center justify-between mt-4 flex-shrink-0 pt-3 border-t border-[#E4E1EE]">
               <button
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -1042,6 +1078,106 @@ function BuildTabs({
           </button>
         )
       })}
+    </div>
+  )
+}
+
+/** FullSetCard — virtual card that represents all inventory items tagged
+ *  with a given SetTag. Clicking Insert equips the active build with one
+ *  card per slot (prompt / mcp / up to 3 skills / orchestration / memory)
+ *  pulled from the inventory by setTag match. Overwrites existing equip. */
+function FullSetCard({
+  tag,
+  inventory,
+  onInsert,
+}: {
+  tag: SetTag
+  inventory: InventoryItem[]
+  onInsert: () => void
+}) {
+  const meta = SET_META[tag]
+  const matches = inventory.filter((i) => i.setTag?.includes(tag))
+  const byType = (t: SkillType) => matches.filter((i) => i.type === t)
+  const promptCard = byType("prompt")[0]
+  const slotCounts = {
+    prompt: byType("prompt").length > 0 ? 1 : 0,
+    mcp: byType("mcp").length > 0 ? 1 : 0,
+    skill: Math.min(3, byType("skill").length),
+    orchestration: byType("orchestration").length > 0 ? 1 : 0,
+    memory: byType("memory").length > 0 ? 1 : 0,
+  }
+  const totalFilled =
+    slotCounts.prompt + slotCounts.mcp + slotCounts.skill +
+    slotCounts.orchestration + slotCounts.memory
+  // Flatten a "7 dots" coverage bar — one dot per slot (prompt, mcp,
+  // skillA/B/C, orch, memory). Filled with SET color if covered, hollow
+  // outline if not. Quieter than 5 labeled pills.
+  const dots: boolean[] = [
+    slotCounts.prompt > 0,
+    slotCounts.mcp > 0,
+    slotCounts.skill > 0,
+    slotCounts.skill > 1,
+    slotCounts.skill > 2,
+    slotCounts.orchestration > 0,
+    slotCounts.memory > 0,
+  ]
+
+  return (
+    <div
+      className="relative border rounded-lg p-3 bg-white transition-all hover:shadow-md group/card"
+      style={{ borderLeftWidth: "4px", borderLeftColor: meta.color }}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[12px] leading-none" style={{ color: meta.color }}>
+              {meta.symbol}
+            </span>
+            <span className="text-[13px] font-bold text-[#1A1626] truncate">
+              {meta.label.replace(" Set", "")}
+            </span>
+          </div>
+          <div className="text-[10px] text-[#9E97B3] mt-0.5 truncate">
+            Full set · {totalFilled}/7 slots
+          </div>
+          {promptCard?.summary && (
+            <div className="text-[10px] text-[#6B6480] mt-1 line-clamp-2">
+              {promptCard.summary}
+            </div>
+          )}
+        </div>
+        <span
+          className="text-[8px] font-bold px-1.5 py-0.5 rounded tracking-[0.5px] flex-shrink-0 uppercase bg-[#1A1626] text-white"
+        >
+          FULLSET
+        </span>
+      </div>
+
+      {/* 7-dot coverage bar + Insert button */}
+      <div className="mt-2.5 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1">
+          {dots.map((on, i) => (
+            <span
+              key={i}
+              className="w-1.5 h-1.5 rounded-full"
+              style={{
+                backgroundColor: on ? meta.color : "transparent",
+                border: on ? "none" : `1px solid ${meta.color}44`,
+              }}
+            />
+          ))}
+        </div>
+        <button
+          onClick={onInsert}
+          className="text-[10px] font-bold tracking-tight rounded border bg-white px-2.5 py-1 flex items-center gap-1.5 transition-all active:translate-y-px group/btn"
+          style={{ color: meta.color, borderColor: meta.color }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${meta.color}0D` }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF" }}
+        >
+          <span className="transition-transform group-hover/btn:-translate-x-0.5">←</span>
+          <span>Equip</span>
+        </button>
+      </div>
     </div>
   )
 }
