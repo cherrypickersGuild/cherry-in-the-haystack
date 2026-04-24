@@ -16,6 +16,9 @@ import {
 } from './bench.service'
 import type { BenchSetSummary } from './sets/set-definitions'
 import type { AgentBuildInput } from './cards/compose-runtime'
+import { searchMarketplace } from './tools/marketplace.tool'
+import { fetchCryptoPrice } from './tools/coingecko.tool'
+import { searchCatalog } from './tools/catalog.tool'
 
 @Controller('v1/kaas/bench')
 @ApiTags('KaaS — Bench (Workshop Before/After demo)')
@@ -44,7 +47,7 @@ export class BenchController {
       properties: {
         setId: {
           type: 'string',
-          enum: ['set-1-oracle', 'set-2-hunter', 'set-3-policy'],
+          enum: ['set-2-hunter', 'set-3-policy', 'set-4-quant', 'set-6-grounded'],
         },
       },
     },
@@ -87,7 +90,7 @@ export class BenchController {
       properties: {
         taskId: {
           type: 'string',
-          enum: ['set-1-oracle', 'set-2-hunter', 'set-3-policy'],
+          enum: ['set-2-hunter', 'set-3-policy', 'set-4-quant', 'set-6-grounded'],
         },
         build: {
           type: 'object',
@@ -136,6 +139,94 @@ export class BenchController {
           message: msg,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
+      )
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     Agent-facing tool endpoints — called by cherry-kaas MCP (agent-package)
+     so Claude Code hits the SAME seeded data as the web bench. No auth:
+     tools are readonly and the seed is public demo content.
+     ════════════════════════════════════════════════════════════════ */
+
+  @Post('tools/search-marketplace')
+  @ApiOperation({
+    summary:
+      'Agent MCP tool — query seeded marketplace listings (Hunter Set 2). Mirrors the bench tool exactly.',
+  })
+  async toolSearchMarketplace(
+    @Body()
+    body: { query?: string; max_price?: number; sealed_only?: boolean },
+  ): Promise<ReturnType<typeof searchMarketplace>> {
+    const query = typeof body?.query === 'string' ? body.query : ''
+    if (!query.trim()) {
+      throw new HttpException(
+        { statusCode: 400, code: 'TOOL_QUERY_REQUIRED', message: 'query is required' },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    // Strip common generic tokens so "LG Gram 16 laptop" still matches the
+    // `LG Gram 16` seed. Safe because seed has no laptop/notebook/... tokens.
+    const STOP = new Set([
+      'laptop', 'laptops', 'notebook', 'notebooks', 'computer', 'computers',
+      'pc', 'pcs', 'sealed', 'new', 'used', 'opened', 'box',
+    ])
+    const cleaned =
+      query
+        .split(/\s+/)
+        .filter((t) => t && !STOP.has(t.toLowerCase()))
+        .join(' ')
+        .trim() || query
+    return searchMarketplace({
+      query: cleaned,
+      max_price: typeof body?.max_price === 'number' ? body.max_price : undefined,
+      sealed_only: typeof body?.sealed_only === 'boolean' ? body.sealed_only : undefined,
+    })
+  }
+
+  @Post('tools/search-cherry-docs')
+  @ApiOperation({
+    summary:
+      'Agent MCP tool — seeded Cherry internal docs (Policy Set 3 / Grounded Set 6). Mirrors bench search_catalog (karma-v2.md).',
+  })
+  async toolSearchCherryDocs(
+    @Body() body: { query?: string; limit?: number },
+  ): Promise<ReturnType<typeof searchCatalog>> {
+    const query = typeof body?.query === 'string' ? body.query : ''
+    if (!query.trim()) {
+      throw new HttpException(
+        { statusCode: 400, code: 'TOOL_QUERY_REQUIRED', message: 'query is required' },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    return searchCatalog({
+      query,
+      limit: typeof body?.limit === 'number' ? body.limit : undefined,
+    })
+  }
+
+  @Post('tools/get-crypto-price')
+  @ApiOperation({
+    summary:
+      'Agent MCP tool — CoinGecko spot price (Oracle Set 1 / Quant Set 4). Mirrors the bench tool exactly.',
+  })
+  async toolGetCryptoPrice(
+    @Body() body: { symbol?: string },
+  ): Promise<Awaited<ReturnType<typeof fetchCryptoPrice>>> {
+    const symbol = typeof body?.symbol === 'string' ? body.symbol.trim() : ''
+    if (!symbol) {
+      throw new HttpException(
+        { statusCode: 400, code: 'TOOL_SYMBOL_REQUIRED', message: 'symbol is required' },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    try {
+      return await fetchCryptoPrice(symbol)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      throw new HttpException(
+        { statusCode: 502, code: 'TOOL_COINGECKO_FAILED', message: msg },
+        HttpStatus.BAD_GATEWAY,
       )
     }
   }

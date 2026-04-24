@@ -18,7 +18,6 @@ import { coingeckoTool } from './tools/coingecko.tool'
 import { marketplaceTool } from './tools/marketplace.tool'
 import { catalogTool } from './tools/catalog.tool'
 import { getEvaluator } from './evaluators'
-import { captureOracleGroundTruth } from './evaluators/set1-oracle.evaluator'
 import { captureHunterGroundTruth } from './evaluators/set2-hunter.evaluator'
 import { capturePolicyGroundTruth } from './evaluators/set3-policy.evaluator'
 import type { Metric } from './evaluators'
@@ -39,9 +38,6 @@ function toolsFor(set: BenchSetDefinition): BenchTool[] {
 
 async function captureGroundTruth(set: BenchSetDefinition): Promise<unknown> {
   const c = set.evalCriteria
-  if (c.kind === 'oracle') {
-    return captureOracleGroundTruth(c.symbols.map((s) => s.symbol))
-  }
   if (c.kind === 'hunter') {
     return captureHunterGroundTruth(c.expectedIds, c.requiredFields, c.filter)
   }

@@ -170,6 +170,8 @@ export interface InstallBuildResponse {
   orphans_removed: string[]
   local_skills_after: LocalSkillItem[]
   warnings: string[]
+  /** Copy-ready natural-language prompt that activates the installed mode. */
+  activation_prompt: string
 }
 
 import { fetchWithAuth } from "./auth"

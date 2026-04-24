@@ -17,9 +17,11 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
+  buildActivationPrompt,
   buildMetaSkillFile,
   cardToSkillFile,
   collectSkillFiles,
+  getPrimaryTag,
   toSavePayload,
   type BuildContext,
   type SkillFile,
@@ -63,6 +65,9 @@ export interface InstallBuildResponse {
     mtime: string | null;
   }>;
   warnings: string[];
+  /** Copy-ready natural-language prompt that activates the installed mode
+   *  in Claude Code. e.g. "cherry quant 로 Compare BTC, ETH, ..." */
+  activation_prompt: string;
 }
 
 const SAVE_TIMEOUT_MS = 10_000;
@@ -313,6 +318,8 @@ export class InstallBuildService {
       this.logger.warn(`${logPrefix} self-report refresh failed: ${msg}`);
     }
 
+    const tag = getPrimaryTag(build.equipped.prompt);
+    const activationPrompt = buildActivationPrompt(build.equipped.prompt);
     const result: InstallBuildResponse = {
       installed,
       skipped,
@@ -320,7 +327,8 @@ export class InstallBuildService {
       meta_written: metaWritten,
       orphans_removed: orphansRemoved,
       local_skills_after: localSkillsAfter,
-      warnings: this.buildWarnings(),
+      warnings: this.buildWarnings(tag),
+      activation_prompt: activationPrompt,
     };
 
     this.logger.log(
@@ -394,11 +402,19 @@ export class InstallBuildService {
     return removed;
   }
 
-  /** Day 0 STEP 0.4 결과 — 사용자 수동 검증에서 Claude Code 가 **핫 리로드**
-   *  하는 것을 확인. 재시작 안내 경고는 제거. 새 Claude Code 세션에서는
-   *  자동으로 스킬이 컨텍스트에 들어옴. */
-  private buildWarnings(): string[] {
-    return [];
+  /** BMad-style mode trigger 안내.
+   *  Claude Code 는 SKILL.md 를 "참고 가능한 스킬" 로 로드한다.
+   *  강제 system prompt 로 주입되진 않지만, description 에 명시된 트리거
+   *  키워드를 사용자가 자연어로 말하면 Claude 가 해당 모드 body 를 적용한다.
+   *  예: "cherry quant 로 BTC ETH 분석해줘"  → quant mode 활성화 */
+  private buildWarnings(tag: string): string[] {
+    if (!tag || tag === 'cherry') {
+      return ['Say "cherry mode" in Claude Code to activate this build.'];
+    }
+    return [
+      `Activation trigger: say "cherry ${tag}" or "${tag} 모드로 ..." in Claude Code.`,
+      `Example: "cherry ${tag} 로 관련 작업 해줘"`,
+    ];
   }
 
   /** 최대 `concurrency` 동시 실행 + 순서 유지. */

@@ -55,7 +55,11 @@ type WalletType = "evm" | "near"
 
 export default function ConnectPage() {
   useAuthTick()
-  const token = getAccessToken()
+  // SSR returns null for localStorage-backed tokens; defer until mount so
+  // the Unauthenticated branch doesn't flip during hydration.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const token = mounted ? getAccessToken() : null
 
   const [agents, setAgents] = useState<Agent[]>([])
   const [selectedId, setSelectedId] = useState<string>("")
@@ -319,42 +323,6 @@ export default function ConnectPage() {
       {/* ── LEFT 2/3: 순차 가이드 + Live Proof ── */}
       <div className="lg:col-span-2 space-y-5">
 
-      {/* 최상단: 내 AI assistant — 간략 버전 (단일 행, 선택 + 신규 생성만) */}
-      <div
-        className="rounded-[16px] bg-[#FDFBF5] p-3 lg:p-4"
-        style={{ border: "1px solid #E9D1A6" }}
-      >
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#9A7C55] mr-2">
-            My AI assistants
-          </span>
-          {agents.map((a) => {
-            const isSelected = a.id === selectedId
-            return (
-              <button
-                key={a.id}
-                onClick={() => setSelectedId(a.id)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] transition-colors ${
-                  isSelected
-                    ? "bg-[#3A2A1C] text-[#FDFBF5] font-bold"
-                    : "bg-white border border-[#F0E7D4] text-[#6B4F2A] hover:bg-[#FBF6ED]"
-                }`}
-                title={`${a.name} · ${a.credits ?? 200}cr`}
-              >
-                <span className="text-[13px] leading-none">{a.icon ?? "🤖"}</span>
-                <span className="truncate max-w-[80px]">{a.name}</span>
-              </button>
-            )
-          })}
-          <button
-            onClick={() => setShowRegister(true)}
-            className="px-2.5 py-1 rounded-full border border-dashed border-[#E9D1A6] text-[11px] font-bold text-[#C8301E] hover:bg-[#FBE8E3]/50"
-          >
-            + New
-          </button>
-        </div>
-      </div>
-
       {/* Step 1: Claude Code 설치 안내 — 들여쓰기/두께를 Step 2 와 동일하게 */}
       <div
         className="rounded-[20px] bg-[#FDFBF5] p-5 lg:p-6"
@@ -363,7 +331,7 @@ export default function ConnectPage() {
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="min-w-0">
             <h3 className="text-[15px] font-bold text-[#3A2A1C]">
-              Step 1 · How to install Claude Code
+              Step 1 · Install Claude Code
             </h3>
             <p className="text-[12px] text-[#9A7C55] mt-0.5">
               Get it free from Anthropic.
@@ -545,8 +513,44 @@ export default function ConnectPage() {
 
       </div>{/* END LEFT 2/3 — manual */}
 
-      {/* ── RIGHT 1/3: Install Skill + Install Log (sticky) ── */}
+      {/* ── RIGHT 1/3: My AIs + Install Skill + Install Log (sticky) ── */}
       <div className="lg:sticky lg:top-16 space-y-4 lg:col-span-1">
+        {/* 내 AI assistant — 간략 칩 (선택 + 신규) */}
+        <div
+          className="rounded-[16px] bg-[#FDFBF5] p-3 lg:p-4"
+          style={{ border: "1px solid #E9D1A6" }}
+        >
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#9A7C55] mr-1 w-full mb-1">
+              My AI assistants
+            </span>
+            {agents.map((a) => {
+              const isSelected = a.id === selectedId
+              return (
+                <button
+                  key={a.id}
+                  onClick={() => setSelectedId(a.id)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] transition-colors ${
+                    isSelected
+                      ? "bg-[#3A2A1C] text-[#FDFBF5] font-bold"
+                      : "bg-white border border-[#F0E7D4] text-[#6B4F2A] hover:bg-[#FBF6ED]"
+                  }`}
+                  title={`${a.name} · ${a.credits ?? 200}cr`}
+                >
+                  <span className="text-[13px] leading-none">{a.icon ?? "🤖"}</span>
+                  <span className="truncate max-w-[80px]">{a.name}</span>
+                </button>
+              )
+            })}
+            <button
+              onClick={() => setShowRegister(true)}
+              className="px-2.5 py-1 rounded-full border border-dashed border-[#E9D1A6] text-[11px] font-bold text-[#C8301E] hover:bg-[#FBE8E3]/50"
+            >
+              + New
+            </button>
+          </div>
+        </div>
+
         {selected ? (
           <>
             <InstallSkillSection

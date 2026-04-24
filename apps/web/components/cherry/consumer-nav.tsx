@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { CherryBao } from "./cherry-bao"
@@ -15,7 +16,11 @@ export function ConsumerNav() {
   const pathname = usePathname()
   const router = useRouter()
   useAuthTick()
-  const token = getAccessToken()
+  // SSR returns null for localStorage-backed tokens; defer the label swap
+  // until after mount to avoid a hydration mismatch.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const token = mounted ? getAccessToken() : null
 
   function handleAuth() {
     if (getAccessToken()) {

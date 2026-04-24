@@ -291,7 +291,65 @@ function registerTools(server, apiKey, baseUrl) {
     },
   );
 
-  process.stderr.write(`[cherry-kaas-agent] ${9} MCP tools registered\n`);
+  // ── search_marketplace (bench Set 2 Hunter — SAME seeded data the web bench uses) ──
+  server.tool(
+    'search_marketplace',
+    "Search the Cherry-seeded marketplace (laptops / hardware listings). Returns { listings: [{id, title, price, seller, posted_at, sealed, brand, model}], matchCount }. Match rule: ALL whitespace-separated tokens in `query` must appear in the listing's brand+model+title (case-insensitive). IMPORTANT: pass ONLY the brand + model tokens, like `LG Gram 16`. Do NOT add generic words such as 'laptop', 'notebook', 'computer', 'sealed' — use the `sealed_only` boolean for that. Example call: { query: 'LG Gram 16', max_price: 700, sealed_only: true }.",
+    {
+      query: z.string().describe("Free-text brand+model query, e.g. 'LG Gram 16'."),
+      max_price: z.number().optional().describe('Upper bound (exclusive) on price in USD.'),
+      sealed_only: z.boolean().optional().describe('If true, only return sealed items.'),
+    },
+    async ({ query, max_price, sealed_only }) => {
+      try {
+        const data = await api(baseUrl, 'POST', '/v1/kaas/bench/tools/search-marketplace', null, {
+          query,
+          max_price,
+          sealed_only,
+        });
+        return txt(data);
+      } catch (err) {
+        return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
+      }
+    },
+  );
+
+  // ── search_cherry_docs (bench Set 3 Policy + Set 6 Grounded — seeded karma-v2.md etc.) ──
+  server.tool(
+    'search_cherry_docs',
+    "Search the Cherry internal documentation seed (karma-v2 and other seeded docs). Returns { docs: [{ id, title, content }], source }. Each doc has an id like `karma-v2` that MUST be cited in answers using [doc:<id>] format. Use this — NOT search_catalog — for the Policy / Grounded builds.",
+    {
+      query: z.string().describe("Search query, e.g. 'karma tier reward percentages'."),
+      limit: z.number().optional().describe('Max number of docs to return. Default 3.'),
+    },
+    async ({ query, limit }) => {
+      try {
+        const data = await api(baseUrl, 'POST', '/v1/kaas/bench/tools/search-cherry-docs', null, { query, limit });
+        return txt(data);
+      } catch (err) {
+        return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
+      }
+    },
+  );
+
+  // ── get_crypto_price (bench Set 1 Oracle + Set 4 Quant) ──
+  server.tool(
+    'get_crypto_price',
+    "Fetch the current USD price and 24h percent change for a cryptocurrency from CoinGecko. Returns { symbol, priceUsd, change24hPct, fetchedAt, source }. Use this for the Oracle / Quant builds.",
+    {
+      symbol: z.string().describe("Ticker symbol, e.g. 'BTC', 'ETH', 'SOL'."),
+    },
+    async ({ symbol }) => {
+      try {
+        const data = await api(baseUrl, 'POST', '/v1/kaas/bench/tools/get-crypto-price', null, { symbol });
+        return txt(data);
+      } catch (err) {
+        return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
+      }
+    },
+  );
+
+  process.stderr.write(`[cherry-kaas-agent] ${12} MCP tools registered\n`);
 }
 
 /** WebSocket 인스턴스 주입 — agent.js에서 연결 후 호출 */

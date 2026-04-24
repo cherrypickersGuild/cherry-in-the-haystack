@@ -65,11 +65,6 @@ export type CardImpl =
 
 export const CARD_REGISTRY: Record<string, CardImpl> = {
   /* ══════════ System prompts ══════════ */
-  'inv-p-oracle': {
-    type: 'prompt',
-    systemPrompt:
-      "You are a crypto market analyst. Always cite current prices with a timestamp and source. Never guess — if you don't have a tool result, say so.",
-  },
   'inv-p-hunter': {
     type: 'prompt',
     systemPrompt:
@@ -78,7 +73,7 @@ export const CARD_REGISTRY: Record<string, CardImpl> = {
   'inv-p-policy': {
     type: 'prompt',
     systemPrompt:
-      'Answer only using retrieved Cherry docs. Cite doc IDs in brackets like [doc:karma-v2]. If the answer is not in retrieved docs, respond exactly: "I don\'t have that information."',
+      'Answer only using Cherry docs retrieved via the `search_cherry_docs` tool (NOT `search_catalog` — that is the KaaS knowledge market, unrelated). Cite doc IDs in brackets like [doc:karma-v2]. If the answer is not in retrieved docs, respond exactly: "I don\'t have that information."',
   },
 
   /* ══════════ MCP tools ══════════ */
@@ -118,7 +113,7 @@ export const CARD_REGISTRY: Record<string, CardImpl> = {
   'inv-p-grounded': {
     type: 'prompt',
     systemPrompt:
-      'You are a research assistant. Use search_catalog to retrieve Cherry documentation before answering.',
+      'You are a research assistant. Use the `search_cherry_docs` tool (NOT `search_catalog`) to retrieve Cherry documentation before answering. Cite every retrieved doc using [doc:<id>].',
   },
 
   /* ══════════ Phase 2 — Skills (prompt-suffix append) ══════════

@@ -21,10 +21,9 @@ export type SkillType = "prompt" | "mcp" | "skill" | "orchestration" | "memory"
  *  combo. When all cards of a set are equipped, the benchmark runs at peak
  *  effectiveness for that set's task.
  *
- *  Phase 1: 3 tags — oracle / hunter / policy (3-slot builds)
+ *  Phase 1: 2 tags — hunter / policy (3-slot builds)
  *  Phase 2: 3 more  — quant / strict / grounded (7-slot builds) */
 export type SetTag =
-  | "oracle"
   | "hunter"
   | "policy"
   | "quant"
@@ -38,7 +37,6 @@ export interface SetMeta {
 }
 
 export const SET_META: Record<SetTag, SetMeta> = {
-  oracle:   { label: "Oracle Set",   symbol: "🜂", color: "#8B6C2A", softBg: "#F5E9C8" },
   hunter:   { label: "Hunter Set",   symbol: "🜄", color: "#8F1D12", softBg: "#F6D8D0" },
   policy:   { label: "Policy Set",   symbol: "🜁", color: "#2D3B66", softBg: "#D8DEEF" },
   quant:    { label: "Quant Set",    symbol: "🜔", color: "#5E3A8A", softBg: "#E8DCF4" },
@@ -177,23 +175,11 @@ export const SLOT_META: Record<SlotKey, SlotConfig> = {
 
 /** Real inventory — every card maps 1:1 to a real server-side behavior.
  *  The 3 preset combinations that work end-to-end in bench:
- *    Oracle   = prompt:p-oracle  + mcp:m-crypto   + memory:me-short
  *    Hunter   = prompt:p-hunter  + mcp:m-market   + memory:me-none
  *    Policy   = prompt:p-policy  + mcp:m-catalog  + memory:me-retrieval
  */
 export const mockInventory: InventoryItem[] = [
-  // ── System Prompts (3) ──
-  {
-    id: "inv-p-oracle",
-    title: "Market Oracle",
-    type: "prompt",
-    category: "Analyst",
-    updatedAt: "2026-04-23",
-    source: "builtin",
-    setTag: ["oracle"],
-    summary:
-      "Crypto market analyst. Cites real prices with timestamp + source; never guesses.",
-  },
+  // ── System Prompts ──
   {
     id: "inv-p-hunter",
     title: "Marketplace Hunter",
@@ -225,7 +211,7 @@ export const mockInventory: InventoryItem[] = [
     category: "Finance",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: ["oracle", "quant"],
+    setTag: ["quant"],
     summary:
       "Live crypto prices via CoinGecko. Tool: get_crypto_price(symbol).",
   },
@@ -270,7 +256,7 @@ export const mockInventory: InventoryItem[] = [
     category: "Conversation",
     updatedAt: "2026-04-23",
     source: "builtin",
-    setTag: ["oracle"],
+    setTag: [],
     summary: "Full conversation context preserved within the session.",
   },
   {
@@ -404,7 +390,7 @@ export const defaultWorkshopState: WorkshopState = {
 // v8: Phase 2 — setTag array + 13 new cards (7 skill + 3 orch + 3 new prompts).
 // Inventory goes from 9 → 22. Storage bump invalidates any v7 saves whose setTag
 // was the old string form.
-export const WORKSHOP_STORAGE_KEY = "cherry_workshop_state_v9"
+export const WORKSHOP_STORAGE_KEY = "cherry_workshop_state_v12"
 
 /** Order of type filter buttons in the UI */
 export const SKILL_TYPE_ORDER: SkillType[] = [

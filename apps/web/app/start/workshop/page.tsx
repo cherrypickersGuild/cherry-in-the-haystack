@@ -27,7 +27,11 @@ interface Agent {
 
 export default function WorkshopPage() {
   useAuthTick()
-  const token = getAccessToken()
+  // SSR returns null for localStorage-backed tokens; defer until mount so
+  // the Unauthenticated branch below doesn't flip during hydration.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const token = mounted ? getAccessToken() : null
 
   const [agents, setAgents] = useState<Agent[]>([])
   const [selectedId, setSelectedId] = useState<string>("")
@@ -49,7 +53,7 @@ export default function WorkshopPage() {
 
   const selected = agents.find((a) => a.id === selectedId)
 
-  // ── Unauthenticated ──
+  // ── Unauthenticated (or pre-mount SSR) ──
   if (!token) {
     return (
       <section className="flex flex-col items-center justify-center text-center py-16">

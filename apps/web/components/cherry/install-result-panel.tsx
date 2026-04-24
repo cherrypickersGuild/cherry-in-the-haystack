@@ -9,6 +9,7 @@
  * `apps/docs/install-skill/1-work-guidelines.md §7`.
  */
 
+import { useState } from "react"
 import type { InstallBuildResponse } from "@/lib/bench-api"
 
 interface Props {
@@ -137,17 +138,30 @@ export function InstallResultPanel({
             </Section>
           )}
 
-          {/* Warnings */}
+          {/* How to activate — BMad-style mode trigger + copy-ready prompt */}
           {lastResult.warnings.length > 0 && (
             <div
-              className="rounded-lg px-3 py-2 text-[11px]"
-              style={{ backgroundColor: "#FBF6ED", border: "1px solid #E9D1A6", color: "#6B4F2A" }}
+              className="rounded-xl p-3 space-y-2"
+              style={{
+                backgroundColor: "#FFF8E8",
+                border: "1.5px solid #E9C967",
+              }}
             >
+              <p className="text-[11px] font-black uppercase tracking-[0.15em] text-[#8B6C2A]">
+                How to activate
+              </p>
               {lastResult.warnings.map((w, i) => (
-                <p key={i} className="leading-relaxed">
-                  ⚠ {w}
+                <p
+                  key={i}
+                  className="text-[11px] text-[#3A2A1C] leading-relaxed"
+                >
+                  {w.includes('"') ? formatWithCode(w) : w}
                 </p>
               ))}
+
+              {lastResult.activation_prompt && (
+                <CopyablePrompt text={lastResult.activation_prompt} />
+              )}
             </div>
           )}
 
@@ -170,6 +184,56 @@ export function InstallResultPanel({
       )}
     </aside>
   )
+}
+
+/** Copy-to-clipboard block — click → feedback tooltip for 1.5s. */
+function CopyablePrompt({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  return (
+    <div
+      className="rounded-lg p-2.5 mt-1"
+      style={{ backgroundColor: "#FDFBF5", border: "1px solid #E9C967" }}
+    >
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <span className="text-[9px] font-black uppercase tracking-[0.18em] text-[#8B6C2A]">
+          ✨ Paste into Claude Code
+        </span>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(text).catch(() => {})
+            setCopied(true)
+            setTimeout(() => setCopied(false), 1500)
+          }}
+          className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-[#3A2A1C] text-[#FDFBF5] hover:bg-[#6B4F2A] transition-colors"
+        >
+          {copied ? "✓ Copied" : "📋 Copy"}
+        </button>
+      </div>
+      <pre className="text-[10px] font-mono text-[#3A2A1C] whitespace-pre-wrap break-words leading-relaxed">
+        {text}
+      </pre>
+    </div>
+  )
+}
+
+/** Render a warning string, wrapping `"quoted phrases"` in code-style spans. */
+function formatWithCode(text: string): React.ReactNode {
+  const parts = text.split(/("[^"]+")/g)
+  return parts.map((p, i) => {
+    if (/^".+"$/.test(p)) {
+      const inner = p.slice(1, -1)
+      return (
+        <code
+          key={i}
+          className="px-1.5 py-0.5 rounded font-mono text-[10px]"
+          style={{ backgroundColor: "#FDFBF5", border: "1px solid #E9C967", color: "#6B4F2A" }}
+        >
+          {inner}
+        </code>
+      )
+    }
+    return <span key={i}>{p}</span>
+  })
 }
 
 function Stat({ label, value, color }: { label: string; value: number; color: string }) {

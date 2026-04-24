@@ -936,6 +936,9 @@ function StepBadge({ n }: { n: number }) {
  *  Icon + text pill (soft bg + colored border). */
 function SetBadge({ tag, compact }: { tag: SetTag; compact?: boolean }) {
   const meta = SET_META[tag]
+  // Defensive: stale localStorage saves may carry a SetTag value that has
+  // since been removed from SET_META. Render nothing rather than crashing.
+  if (!meta) return null
   const text = meta.label.replace(" Set", "")
   return (
     <span

@@ -20,7 +20,6 @@ import { coingeckoTool } from './tools/coingecko.tool'
 import { marketplaceTool } from './tools/marketplace.tool'
 import { catalogTool } from './tools/catalog.tool'
 import { getEvaluator, type Metric } from './evaluators'
-import { captureOracleGroundTruth } from './evaluators/set1-oracle.evaluator'
 import { captureHunterGroundTruth } from './evaluators/set2-hunter.evaluator'
 import { capturePolicyGroundTruth } from './evaluators/set3-policy.evaluator'
 import { captureQuantGroundTruth } from './evaluators/set4-quant.evaluator'
@@ -273,8 +272,6 @@ export class BenchService {
   ): Promise<unknown> {
     const c = set.evalCriteria
     switch (c.kind) {
-      case 'oracle':
-        return captureOracleGroundTruth(c.symbols.map((s) => s.symbol))
       case 'hunter':
         return captureHunterGroundTruth(
           c.expectedIds,
@@ -303,7 +300,6 @@ export class BenchService {
   ): string {
     const c = set.evalCriteria
     switch (c.kind) {
-      case 'oracle':
       case 'quant-multi': {
         const prices = (gt as any).prices as Array<{
           symbol: string

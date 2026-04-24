@@ -16,6 +16,7 @@
 import { CARD_REGISTRY } from './card-registry'
 import type { AgentBuildInput } from './compose-runtime'
 import type { SaveSkillRequestPayload } from '../../kaas/kaas-ws.gateway'
+import { BENCH_SETS } from '../sets/set-definitions'
 
 /** Extended slot key: regular equip slots + a synthetic `_meta` for the
  *  build summary SKILL.md. */
@@ -59,63 +60,102 @@ export interface SkipEntry {
   reason: string
 }
 
-/** Card metadata (title + summary) — duplicated from
- *  `apps/web/lib/workshop-mock.ts` because the backend needs name/description
- *  for the SKILL.md frontmatter. Keep these in sync manually; see the
- *  inventory list in workshop-mock.ts for the source of truth. */
-const CARD_METADATA: Record<string, { name: string; description: string }> = {
+/** Card metadata — `name` + `description` used for SKILL.md frontmatter,
+ *  `tag` is the mode trigger keyword (first set tag from workshop-mock).
+ *  Duplicated from `apps/web/lib/workshop-mock.ts` — keep in sync manually. */
+interface CardMeta {
+  name: string
+  description: string
+  /** Primary set tag — becomes the `cherry <tag>` mode activator. */
+  tag: string
+}
+
+const CARD_METADATA: Record<string, CardMeta> = {
   // prompts
-  'inv-p-oracle': {
-    name: 'Market Oracle',
-    description:
-      'Crypto market analyst. Cites real prices with timestamp + source; never guesses.',
-  },
   'inv-p-hunter': {
     name: 'Marketplace Hunter',
     description:
-      'Deal hunter that returns strict JSON listings; never invents records.',
+      "Activate when user says 'cherry hunter' or asks marketplace deal search. Strict JSON listings, no invention.",
+    tag: 'hunter',
   },
   'inv-p-policy': {
     name: 'Policy Expert',
     description:
-      'Answers only from retrieved Cherry docs; cites doc IDs; says "I don\'t have that" when missing.',
+      "Activate when user says 'cherry policy' or asks Cherry docs questions. Cite doc IDs; abstain when missing.",
+    tag: 'policy',
   },
   'inv-p-quant': {
     name: 'Quantitative Analyst',
     description:
-      'Multi-asset analyst that fetches each price, compares movement, identifies biggest mover.',
+      "Activate when user says 'cherry quant' or asks multi-asset crypto analysis. Strict JSON output, per-asset citations, step-by-step breakdown.",
+    tag: 'quant',
   },
   'inv-p-grounded': {
     name: 'Grounded Researcher',
     description:
-      'Retrieves docs first, cites doc IDs, flags missing fields — never invents.',
+      "Activate when user says 'cherry grounded' or asks Cherry docs multi-hop research. Cite every fact, flag missing fields, never invent.",
+    tag: 'grounded',
   },
-  // skills
+  // skills — supporting rules, NOT independent modes
   'inv-s-decomp': {
-    name: 'Multi-step Decomposition',
+    name: 'Multi-step Decomposition (supporting)',
     description:
-      'Break tasks into explicit subtasks; require a numeric "step" field per entity.',
+      'Supporting rule for Cherry modes — break tasks into subtasks with a numeric "step" field per entity.',
+    tag: '',
   },
   'inv-s-json-strict': {
-    name: 'JSON Strict',
+    name: 'JSON Strict (supporting)',
     description:
-      'Output ONLY valid JSON matching the requested schema. No prose, no fences.',
+      'Supporting rule for Cherry modes — output ONLY valid JSON, no prose, no fences.',
+    tag: '',
   },
   'inv-s-citation': {
-    name: 'Citation Discipline',
+    name: 'Citation Discipline (supporting)',
     description:
-      'Every factual claim carries an inline source + timestamp tag.',
+      'Supporting rule for Cherry modes — every factual claim carries source + timestamp tag.',
+    tag: '',
   },
   'inv-s-multihop': {
-    name: 'Multi-hop Retrieval',
+    name: 'Multi-hop Retrieval (supporting)',
     description:
-      'One targeted search per sub-question, never a single broad query.',
+      'Supporting rule for Cherry modes — one targeted search per sub-question, never a broad query.',
+    tag: '',
   },
   'inv-s-abstention': {
-    name: 'Abstention Discipline',
+    name: 'Abstention Discipline (supporting)',
     description:
-      'If a field is not in retrieved docs, flag it missing — never invent.',
+      'Supporting rule for Cherry modes — flag missing fields explicitly, never invent.',
+    tag: '',
   },
+}
+
+/** Export — used by install-build.service to craft the user-facing activation
+ *  message (e.g. "Say 'cherry quant' to activate this build"). */
+export function getPrimaryTag(promptCardId: string | null): string {
+  if (!promptCardId) return 'cherry'
+  const meta = CARD_METADATA[promptCardId]
+  return meta?.tag || 'cherry'
+}
+
+/** Look up the sample task for a prompt card by matching its tag to a bench
+ *  SET (SET ids look like `set-N-<tag>`). Single source of truth = SET defs.
+ *  Returns null if no SET matches — caller falls back to a generic prompt. */
+function taskForPromptCard(promptCardId: string | null): string | null {
+  if (!promptCardId) return null
+  const tag = CARD_METADATA[promptCardId]?.tag
+  if (!tag) return null
+  const set = BENCH_SETS.find((s) => s.id.endsWith(`-${tag}`))
+  return set?.task ?? null
+}
+
+/** Build the full "copy this into Claude Code" string for the given prompt
+ *  card. Combines the mode trigger with the matching bench SET's task so
+ *  the Install Log stays in sync with whatever the SET definition says. */
+export function buildActivationPrompt(promptCardId: string | null): string {
+  const tag = getPrimaryTag(promptCardId)
+  const task = taskForPromptCard(promptCardId)
+  if (!task) return `cherry ${tag} 로 ...`
+  return `cherry ${tag} 로 ${task}`
 }
 
 const SLOT_DIR_PREFIX: Partial<Record<ExtSlotKey, string>> = {
@@ -153,15 +193,22 @@ function commentMeta(fields: Record<string, unknown>): string {
 }
 
 /**
- * Convert one equip slot + card id into a SkillFile. Returns `null` when:
- *   - slot is mcp / orchestration / memory (handled elsewhere),
- *   - cardId is null / empty,
- *   - card id is unknown (caller may record in `failed[]`),
- *   - card type doesn't match the slot (edge case).
+ * Convert one equip slot + card id into a SkillFile.
+ *
+ * BMad-style mode trigger pattern:
+ * - prompt slot → MONOLITHIC mode SKILL.md (role + skill rules + orch + memory)
+ *   that activates when user says `cherry <tag>` or matching natural language
+ * - skillA/B/C → supporting reference files (always loaded, but not the
+ *   primary mode trigger — their description says so explicitly)
+ * - mcp/orchestration/memory → null (handled by meta or claude mcp add)
+ *
+ * Needs the FULL `equipped` map to synthesize the prompt-slot mode body
+ * (pulls in skill suffixes, orch id, memory maxIterations).
  */
 export function cardToSkillFile(
   slot: 'prompt' | 'skillA' | 'skillB' | 'skillC' | 'mcp' | 'orchestration' | 'memory',
   cardId: string | null,
+  equipped: AgentBuildInput,
   ctx: BuildContext,
 ): SkillFile | null {
   if (slot === 'mcp' || slot === 'orchestration' || slot === 'memory') return null
@@ -176,35 +223,158 @@ export function cardToSkillFile(
   const prefix = SLOT_DIR_PREFIX[slot]
   if (!prefix) return null
 
-  let contentText = ''
   if (card.type === 'prompt' && slot === 'prompt') {
-    contentText = card.systemPrompt
-  } else if (card.type === 'skill' && slot !== 'prompt') {
-    contentText = card.promptSuffix
-  } else {
-    // card type doesn't match the slot (e.g. skill card in prompt slot)
-    return null
+    return buildPromptModeFile(cardId, card.systemPrompt, meta, equipped, ctx)
+  }
+  if (card.type === 'skill' && slot !== 'prompt') {
+    return buildSupportingSkillFile(slot, cardId, card.promptSuffix, meta, equipped, ctx)
+  }
+  return null
+}
+
+/** Prompt-slot SKILL.md — the MONOLITHIC mode file. When Claude sees its
+ *  description trigger, this body guides the whole build's behavior. */
+function buildPromptModeFile(
+  cardId: string,
+  systemPrompt: string,
+  meta: CardMeta,
+  equipped: AgentBuildInput,
+  ctx: BuildContext,
+): SkillFile {
+  const tag = meta.tag || 'cherry'
+  const dir = `cherry-p-${shortId(cardId)}`
+
+  // Collect companion skill rules — inline into the mode body
+  const skillBodies: { title: string; body: string }[] = []
+  for (const slot of ['skillA', 'skillB', 'skillC'] as const) {
+    const sid = equipped[slot]
+    if (!sid) continue
+    const sCard = CARD_REGISTRY[sid]
+    const sMeta = CARD_METADATA[sid]
+    if (sCard?.type === 'skill' && sMeta) {
+      skillBodies.push({ title: sMeta.name.replace(/ \(supporting\)$/, ''), body: sCard.promptSuffix })
+    }
   }
 
+  // Orchestration — append the process hint if plan-execute
+  const orchCard = equipped.orchestration ? CARD_REGISTRY[equipped.orchestration] : null
+  const orchId =
+    orchCard?.type === 'orchestration' ? orchCard.orchId : null
+  const orchSection =
+    orchId === 'plan-execute'
+      ? [
+          '## Process — Plan-and-Execute',
+          'Before answering, produce a numbered plan (`Step 1:`, `Step 2:`, ...). Then execute each step with tools. End your response with the literal field `plan_steps_executed: [1, 2, 3, ...]` listing the numbers you completed.',
+        ].join('\n')
+      : null
+
+  // Memory — just note iteration budget
+  const memCard = equipped.memory ? CARD_REGISTRY[equipped.memory] : null
+  const memMode = memCard?.type === 'memory' ? memCard.mode : null
+  const memMaxIter = memCard?.type === 'memory' ? memCard.maxIterations : null
+  const memSection = memCard
+    ? `## Memory: ${memMode} (maxIterations=${memMaxIter})`
+    : null
+
+  const header = commentMeta({
+    type: 'cherry-mode',
+    card_id: cardId,
+    slot: 'prompt',
+    tag,
+    build_id: ctx.buildId,
+    agent_id: ctx.agentId,
+    installed_at: ctx.installedAt,
+    run_id: ctx.runId,
+  })
+
+  const sections: string[] = []
+  sections.push(`# Cherry ${capitalize(tag)} Mode`)
+  sections.push('')
+
+  sections.push('## Activation triggers')
+  sections.push(`Switch into this mode when the user says any of:`)
+  sections.push(`- "cherry ${tag}"`)
+  sections.push(`- "${tag} 모드로 ..."`)
+  sections.push(`- Or clearly asks a task matching the description above.`)
+  sections.push(
+    'When activated, follow every rule below strictly — do NOT paraphrase or relax the output format.',
+  )
+  sections.push('')
+
+  sections.push('## Strict rules (non-negotiable)')
+  sections.push('### Role')
+  sections.push(systemPrompt)
+  if (skillBodies.length > 0) {
+    for (const s of skillBodies) {
+      sections.push('')
+      sections.push(`### ${s.title}`)
+      sections.push(s.body)
+    }
+  }
+  sections.push('')
+
+  if (orchSection) {
+    sections.push(orchSection)
+    sections.push('')
+  }
+  if (memSection) {
+    sections.push(memSection)
+  }
+
+  return {
+    slot: 'prompt',
+    cardId,
+    dir,
+    file: 'SKILL.md',
+    name: meta.name,
+    description: meta.description,
+    body: header + sections.join('\n'),
+  }
+}
+
+/** Skill-slot SKILL.md — supporting rule (NOT a mode trigger). */
+function buildSupportingSkillFile(
+  slot: 'skillA' | 'skillB' | 'skillC',
+  cardId: string,
+  promptSuffix: string,
+  meta: CardMeta,
+  equipped: AgentBuildInput,
+  ctx: BuildContext,
+): SkillFile {
+  // Link back to the active mode trigger word
+  const promptCardId = equipped.prompt
+  const promptMeta = promptCardId ? CARD_METADATA[promptCardId] : null
+  const parentTag = promptMeta?.tag || 'cherry'
+
+  const header = commentMeta({
+    type: 'supporting-skill',
+    card_id: cardId,
+    slot,
+    parent_tag: parentTag,
+    build_id: ctx.buildId,
+    agent_id: ctx.agentId,
+    installed_at: ctx.installedAt,
+    run_id: ctx.runId,
+  })
   const body =
-    commentMeta({
-      card_id: cardId,
-      slot,
-      build_id: ctx.buildId,
-      agent_id: ctx.agentId,
-      installed_at: ctx.installedAt,
-      run_id: ctx.runId,
-    }) + contentText
+    header +
+    `# Supporting rule for Cherry ${capitalize(parentTag)} Mode\n\n` +
+    `This rule is referenced by the \`cherry ${parentTag}\` mode — do NOT treat this as a standalone mode. It is loaded alongside the primary mode file.\n\n` +
+    `## Rule\n${promptSuffix}\n`
 
   return {
     slot,
     cardId,
-    dir: prefix + shortId(cardId),
+    dir: `cherry-s-${shortId(cardId)}`,
     file: 'SKILL.md',
     name: meta.name,
     description: meta.description,
     body,
   }
+}
+
+function capitalize(s: string): string {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
 }
 
 /** Assemble the synthetic `cherry-build-meta/SKILL.md` summarizing the whole
@@ -225,7 +395,7 @@ export function buildMetaSkillFile(
   const memoryMaxIter = memCard?.type === 'memory' ? memCard.maxIterations : null
 
   const datePart = ctx.installedAt.slice(0, 10)
-  const description = `Workshop build installed ${datePart} · ${ctx.buildName} · ${equippedCount} slot${equippedCount === 1 ? '' : 's'} equipped.`
+  const description = `Metadata only — do NOT activate as a mode. Records the ${ctx.buildName} build installed on ${datePart}.`
 
   const body =
     commentMeta({
@@ -271,7 +441,7 @@ export function collectSkillFiles(
   for (const slot of slots) {
     const cardId = equipped[slot]
     if (!cardId) continue // empty slot — neither saved nor skipped
-    const file = cardToSkillFile(slot, cardId, ctx)
+    const file = cardToSkillFile(slot, cardId, equipped, ctx)
     if (file) files.push(file)
     // unknown card id → caller records in `failed[]` when this returns null
   }
@@ -288,14 +458,14 @@ export function collectSkillFiles(
     skipped.push({
       slot: 'orchestration',
       card_id: equipped.orchestration,
-      reason: 'merged into build-meta',
+      reason: 'merged into the primary cherry mode SKILL.md (Process section)',
     })
   }
   if (equipped.memory) {
     skipped.push({
       slot: 'memory',
       card_id: equipped.memory,
-      reason: 'merged into build-meta',
+      reason: 'merged into the primary cherry mode SKILL.md (Memory note)',
     })
   }
 

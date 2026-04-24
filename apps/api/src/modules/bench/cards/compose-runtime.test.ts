@@ -55,11 +55,11 @@ section('Test 1 — Empty build')
 }
 
 /* ══════════ Test 2: prompt only ══════════ */
-section('Test 2 — Prompt only (oracle)')
+section('Test 2 — Prompt only (hunter)')
 {
-  const r = composeRuntime({ ...emptyBuild(), prompt: 'inv-p-oracle' })
+  const r = composeRuntime({ ...emptyBuild(), prompt: 'inv-p-hunter' })
   ok('systemPrompt defined', r.systemPrompt !== undefined)
-  ok('systemPrompt contains "crypto market analyst"', /crypto market analyst/i.test(r.systemPrompt ?? ''))
+  ok('systemPrompt contains "deal-hunting"', /deal-hunting/i.test(r.systemPrompt ?? ''))
   ok('no skill suffix appended', !r.systemPrompt?.includes('\n\n'))
   ok('skillsActive=0', r.appliedSlots.skillsActive === 0)
   ok('prompt=true', r.appliedSlots.prompt === true)
@@ -70,12 +70,12 @@ section('Test 3 — Prompt + 1 skill')
 {
   const r = composeRuntime({
     ...emptyBuild(),
-    prompt: 'inv-p-oracle',
+    prompt: 'inv-p-hunter',
     skillA: 'inv-s-json-strict',
   })
   const p = r.systemPrompt ?? ''
   ok('systemPrompt has 2 sections (split by \\n\\n)', p.split('\n\n').length === 2)
-  ok('contains base prompt', /crypto market analyst/i.test(p))
+  ok('contains base prompt', /deal-hunting/i.test(p))
   ok('contains json-strict suffix', /ONLY valid JSON/i.test(p))
   ok('skillsActive=1', r.appliedSlots.skillsActive === 1)
 }
@@ -105,7 +105,7 @@ section('Test 5 — Dedup same skill across 2 slots')
 {
   const r = composeRuntime({
     ...emptyBuild(),
-    prompt: 'inv-p-oracle',
+    prompt: 'inv-p-hunter',
     skillA: 'inv-s-citation',
     skillB: 'inv-s-citation', // same card
   })

@@ -22,14 +22,6 @@ export interface AnthropicToolSchema {
 }
 
 /** Per-set eval criteria — consumed by evaluators */
-export interface Set1OracleCriteria {
-  kind: 'oracle'
-  /** Symbols the task is about — used to fetch ground-truth prices */
-  symbols: Array<{ symbol: string; coingeckoId: string }>
-  /** A claimed price within ±5% of truth counts as "grounded" */
-  priceTolerancePct: number
-}
-
 export interface Set2HunterCriteria {
   kind: 'hunter'
   /** Top-3 listing ids (by price asc) that must appear in enhanced JSON */
@@ -64,7 +56,6 @@ export interface Set6GroundedCriteria {
 }
 
 export type EvalCriteria =
-  | Set1OracleCriteria
   | Set2HunterCriteria
   | Set3PolicyCriteria
   | Set4QuantCriteria
@@ -73,7 +64,6 @@ export type EvalCriteria =
 export type MemoryMode = 'none' | 'short' | 'retrieval'
 
 export type BenchSetId =
-  | 'set-1-oracle'
   | 'set-2-hunter'
   | 'set-3-policy'
   | 'set-4-quant'
@@ -96,45 +86,6 @@ export interface BenchSetDefinition {
   evaluatorId: BenchSetId
   /** Structured eval criteria */
   evalCriteria: EvalCriteria
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   SET 1 — Market Oracle (real-time factual grounding)
-   ════════════════════════════════════════════════════════════════ */
-
-const SET_1_ORACLE: BenchSetDefinition = {
-  id: 'set-1-oracle',
-  name: 'Market Oracle',
-  tabLabel: 'Market Oracle',
-  subtitle:
-    'Baseline Claude has no live data and confabulates prices. The build reads CoinGecko in real time.',
-  skills: ['Real-time Market Analysis', 'Citation Discipline'],
-  memoryMode: 'short',
-  task: `What is BTC's price right now and the 24h change? Should I sell 0.5 BTC today? Back every numeric claim with the fetched data and include a timestamp.`,
-  systemPrompt: `You are a crypto market analyst. Always cite current prices with a timestamp and source name. Never guess — if you do not have a tool result, say so.`,
-  tools: [
-    {
-      name: 'get_crypto_price',
-      description:
-        "Fetch the current USD price and 24h percent change for a cryptocurrency from CoinGecko. Returns { symbol, priceUsd, change24hPct, fetchedAt }.",
-      input_schema: {
-        type: 'object',
-        properties: {
-          symbol: {
-            type: 'string',
-            description: "Ticker symbol, e.g. 'BTC', 'ETH'.",
-          },
-        },
-        required: ['symbol'],
-      },
-    },
-  ],
-  evaluatorId: 'set-1-oracle',
-  evalCriteria: {
-    kind: 'oracle',
-    symbols: [{ symbol: 'BTC', coingeckoId: 'bitcoin' }],
-    priceTolerancePct: 5,
-  },
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -338,7 +289,6 @@ const SET_6_GROUNDED: BenchSetDefinition = {
    ════════════════════════════════════════════════════════════════ */
 
 export const BENCH_SETS: BenchSetDefinition[] = [
-  SET_1_ORACLE,
   SET_2_HUNTER,
   SET_3_POLICY,
   SET_4_QUANT,
