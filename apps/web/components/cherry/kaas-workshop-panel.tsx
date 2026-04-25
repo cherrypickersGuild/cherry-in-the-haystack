@@ -243,11 +243,17 @@ export function KaasWorkshopPanel({ currentAgent }: KaasWorkshopPanelProps) {
   function toggleFollowing() { setState((s) => ({ ...s, isFollowingAny: !s.isFollowingAny })) }
   function toggleCloneFlag() { setState((s) => ({ ...s, cloneSimilarity: (s.cloneSimilarity ?? 0) >= 0.8 ? 0 : 0.9 })) }
 
+  // Workshop only ships the 4 original prompt cards; the 3 extras
+  // (Writer/Tutor/Scribe) live in Shop By Component but aren't surfaced here.
+  const HIDDEN_PROMPT_IDS = new Set(["inv-p-writer", "inv-p-tutor", "inv-p-scribe"])
+
   // Exclude items currently equipped in the ACTIVE build (items can be reused
   // across builds — each build has its own equipped state).
   const availableInventory = useMemo(() => {
     const equippedIds = new Set(Object.values(activeBuild.equipped).filter(Boolean) as string[])
-    return state.inventory.filter((i) => !equippedIds.has(i.id))
+    return state.inventory.filter(
+      (i) => !equippedIds.has(i.id) && !HIDDEN_PROMPT_IDS.has(i.id),
+    )
   }, [state.inventory, activeBuild.equipped])
 
   const filteredInventory = useMemo(
