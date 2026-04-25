@@ -110,42 +110,25 @@ export function ShopByAgent() {
 
   return (
     <div>
-      {/* Top bar: my agent selector (left) + summary (right) */}
-      <div
-        className="mb-4 rounded-xl bg-white px-4 py-3 flex items-center justify-between gap-4 flex-wrap"
-        style={{
-          border: "1px solid #E9D1A6",
-          boxShadow: "0 1px 0 rgba(107,79,42,0.04), 0 2px 8px rgba(107,79,42,0.05)",
-        }}
-      >
-        <label className="flex items-center gap-2 min-w-0">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A7C55]">
-            Compare from
-          </span>
-          <select
-            value={myAgentId}
-            onChange={(e) => setMyAgentId(e.target.value)}
-            className="rounded-md border bg-[#FBF6ED] px-2.5 py-1.5 text-[12px] font-extrabold text-[#3A2A1C] cursor-pointer"
-            style={{ borderColor: "#E9D1A6" }}
-          >
-            {myAgents.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-                {typeof a.credits === "number" ? ` · ${a.credits} cr` : ""}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="flex items-center gap-3 text-[10px]">
-          <span className="inline-flex items-center gap-1 font-bold tracking-wider uppercase text-[#2D7A5E]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2D7A5E] animate-pulse" />
-            {onlineCount} online
-          </span>
-          <span className="text-[#9A7C55]">·</span>
-          <span className="font-bold tracking-wider uppercase text-[#9A7C55]">
-            {others.length} total
-          </span>
-        </div>
+      {/* Compare-from selector */}
+      <div className="mb-4 flex items-center gap-2 text-[12px] text-[#6B4F2A]">
+        <span>Compare from:</span>
+        <select
+          value={myAgentId}
+          onChange={(e) => setMyAgentId(e.target.value)}
+          className="rounded-md border bg-white px-2 py-1 text-[12px] font-semibold text-[#3A2A1C] cursor-pointer"
+          style={{ borderColor: "#E9D1A6" }}
+        >
+          {myAgents.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.name}
+              {typeof a.credits === "number" ? ` · ${a.credits} cr` : ""}
+            </option>
+          ))}
+        </select>
+        <span className="ml-auto text-[10px] text-[#9A7C55]">
+          {onlineCount} online · {others.length} total
+        </span>
       </div>
 
       {loading && (
@@ -159,9 +142,11 @@ export function ShopByAgent() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {others.map((a) => (
-          <AgentCard key={a.id} agent={a} onCompare={() => setTarget(a)} />
-        ))}
+        {[...others]
+          .sort((a, b) => Number(b.connected) - Number(a.connected))
+          .map((a) => (
+            <AgentCard key={a.id} agent={a} onCompare={() => setTarget(a)} />
+          ))}
       </div>
 
       {target && myAgent && (
@@ -320,26 +305,14 @@ function DiffModal({
   )
 }
 
-/** Two-letter initials from the agent name, falling back to first chars of id.
- *  Korean handles the full hangul; ASCII names take the first char of each
- *  whitespace-split token. */
-function initialsOf(name: string): string {
-  const trimmed = name.trim()
-  if (!trimmed) return "?"
-  // Hangul or other non-Latin: take the first char (a single hangul block reads
-  // as one initial). Keeps `클로드` → `클`, prevents weird two-byte slicing.
-  if (/[^\x00-\x7F]/.test(trimmed)) return trimmed.slice(0, 1)
-  const parts = trimmed.split(/\s+/)
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[1][0]).toUpperCase()
-}
-
-/** Stable, deterministic accent color for an agent based on its uuid prefix. */
-const ACCENT_COLORS = ["#C8301E", "#2F5BA8", "#9C5A1F", "#2D7A5E", "#7A2D6F", "#A86A1F"]
+/** Subtle, muted accent palette so each agent gets a slightly different left
+ *  edge without breaking the cream/cherry tone. Offline agents collapse to a
+ *  dim beige so connection state still reads at a glance. */
+const AGENT_ACCENTS = ["#9C5A1F", "#2F5BA8", "#7A2D6F", "#2D7A5E", "#A86A1F", "#5C4A8A"]
 function accentFor(id: string): string {
   let hash = 0
   for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0
-  return ACCENT_COLORS[hash % ACCENT_COLORS.length]
+  return AGENT_ACCENTS[hash % AGENT_ACCENTS.length]
 }
 
 function AgentCard({
@@ -349,78 +322,48 @@ function AgentCard({
   agent: { id: string; name: string; connected: boolean }
   onCompare: () => void
 }) {
-  const accent = accentFor(agent.id)
-  const initials = initialsOf(agent.name)
+  const accent = agent.connected ? accentFor(agent.id) : "#C9B88A"
   return (
     <article
-      className="relative rounded-xl bg-white p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-md"
+      className="relative rounded-lg bg-white p-3 transition-all hover:shadow-md"
       style={{
         border: "1px solid #D4CEBD",
         borderLeftWidth: "4px",
         borderLeftColor: accent,
-        boxShadow: "0 1px 0 rgba(107,79,42,0.04), 0 2px 8px rgba(107,79,42,0.06)",
       }}
     >
-      {/* Live status pill */}
-      <span
-        className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
-        style={{
-          backgroundColor: agent.connected ? "#E9F6EF" : "#F5EFE2",
-          color: agent.connected ? "#2D7A5E" : "#9A7C55",
-          border: `1px solid ${agent.connected ? "#BEE0D0" : "#E9D1A6"}`,
-        }}
-        title={agent.connected ? "Connected via cherry-kaas MCP" : "Not connected"}
-      >
-        <span
-          className={`w-1.5 h-1.5 rounded-full ${agent.connected ? "animate-pulse" : ""}`}
-          style={{ backgroundColor: agent.connected ? "#2D7A5E" : "#C9B88A" }}
-        />
-        {agent.connected ? "live" : "offline"}
-      </span>
-
-      {/* Avatar + name */}
-      <div className="flex items-center gap-3 pr-12">
-        <div
-          className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-[16px] font-extrabold text-white"
-          style={{
-            backgroundColor: accent,
-            boxShadow: `0 2px 6px ${accent}33`,
-          }}
-        >
-          {initials}
-        </div>
+      <header className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A7C55]">
-            Agent
-          </div>
-          <div className="text-[14px] font-extrabold text-[#3A2A1C] truncate">
+          <div className="text-[13px] font-bold text-[#1A1626] truncate">
             {agent.name}
           </div>
+          <div className="text-[10px] font-mono text-[#9A7C55] mt-0.5 truncate">
+            {agent.id.slice(0, 8)}…
+          </div>
         </div>
-      </div>
-
-      {/* Meta row */}
-      <div
-        className="mt-3 flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5"
-        style={{ backgroundColor: "#FBF6ED", border: "1px solid #F0E7D4" }}
-      >
-        <span className="text-[9px] font-bold uppercase tracking-wider text-[#9A7C55]">
-          ID
+        <span
+          className="inline-flex items-center gap-1 text-[8px] font-bold tracking-wider px-1.5 py-0.5 rounded-full uppercase flex-shrink-0"
+          style={{
+            backgroundColor: agent.connected ? "#E9F6EF" : "#F5EFE2",
+            color: agent.connected ? "#2D7A5E" : "#9A7C55",
+            border: `1px solid ${agent.connected ? "#BEE0D0" : "#E9D1A6"}`,
+          }}
+        >
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${agent.connected ? "animate-pulse" : ""}`}
+            style={{ backgroundColor: agent.connected ? "#2D7A5E" : "#C9B88A" }}
+          />
+          {agent.connected ? "Live" : "Offline"}
         </span>
-        <span className="text-[10px] font-mono text-[#6B4F2A] truncate">
-          {agent.id.slice(0, 8)}…
-        </span>
-      </div>
-
-      {/* Action */}
+      </header>
       <button
         onClick={onCompare}
         disabled={!agent.connected}
         title={agent.connected ? "" : "Offline — diff returns empty"}
-        className="mt-3 w-full h-9 rounded-lg text-[12px] font-extrabold text-white shadow-sm hover:shadow-md cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-[#B8A788] disabled:shadow-none"
-        style={{ backgroundColor: agent.connected ? "#C8301E" : undefined }}
+        className="mt-2.5 h-7 px-2.5 rounded-md text-[11px] font-bold border bg-white text-[#B12A17] hover:bg-[#FBE8E3]/40 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        style={{ borderColor: "#E89080" }}
       >
-        Compare knowledge →
+        Compare →
       </button>
     </article>
   )
@@ -545,11 +488,11 @@ function SkillRow({
       </div>
       <button
         onClick={() => onBuy(item)}
-        className="flex-shrink-0 h-9 px-3 rounded-lg text-[12px] font-extrabold text-white shadow-sm hover:shadow-md cursor-pointer transition-shadow tabular-nums"
-        style={{ backgroundColor: "#C8301E" }}
+        className="flex-shrink-0 h-8 px-3 rounded-md text-[11px] font-bold border bg-white text-[#B12A17] hover:bg-[#FBE8E3]/40 cursor-pointer transition-colors tabular-nums"
+        style={{ borderColor: "#E89080" }}
       >
         Buy {AGENT_TRADE_FLAT_PRICE}
-        <span className="text-[9px] font-bold opacity-80 ml-0.5">cr</span>
+        <span className="text-[9px] opacity-80 ml-0.5">cr</span>
       </button>
     </li>
   )
