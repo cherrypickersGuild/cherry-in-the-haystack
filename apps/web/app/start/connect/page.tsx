@@ -521,19 +521,38 @@ export default function ConnectPage() {
             {agents.map((a) => {
               const isSelected = a.id === selectedId
               return (
-                <button
+                <span
                   key={a.id}
-                  onClick={() => setSelectedId(a.id)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] transition-colors ${
+                  className={`relative inline-flex items-center gap-1.5 px-2.5 py-1 pr-1 rounded-full text-[12px] transition-colors group ${
                     isSelected
                       ? "bg-[#3A2A1C] text-[#FDFBF5] font-bold"
                       : "bg-white border border-[#F0E7D4] text-[#6B4F2A] hover:bg-[#FBF6ED]"
                   }`}
                   title={`${a.name} · ${a.credits ?? 200}cr`}
                 >
-                  <span className="text-[13px] leading-none">{a.icon ?? "🤖"}</span>
-                  <span className="truncate max-w-[80px]">{a.name}</span>
-                </button>
+                  <button
+                    onClick={() => setSelectedId(a.id)}
+                    className="flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span className="text-[13px] leading-none">{a.icon ?? "🤖"}</span>
+                    <span className="truncate max-w-[80px]">{a.name}</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setDeleteConfirmId(a.id)
+                    }}
+                    aria-label={`Delete ${a.name}`}
+                    title="Remove this agent"
+                    className={`ml-0.5 w-4 h-4 inline-flex items-center justify-center rounded-full text-[10px] leading-none cursor-pointer transition-colors ${
+                      isSelected
+                        ? "text-[#FDFBF5]/70 hover:bg-white/15 hover:text-[#FDFBF5]"
+                        : "text-[#9A7C55] hover:bg-[#FBE8E3] hover:text-[#C8301E]"
+                    }`}
+                  >
+                    ×
+                  </button>
+                </span>
               )
             })}
             <button
@@ -583,6 +602,53 @@ export default function ConnectPage() {
         )}
       </div>{/* END RIGHT 1/3 — install */}
       </div>{/* END main grid */}
+
+      {/* Delete confirm — small modal over the page */}
+      {deleteConfirmId && (() => {
+        const a = agents.find((x) => x.id === deleteConfirmId)
+        return (
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => !deleting && setDeleteConfirmId(null)}
+          >
+            <div className="absolute inset-0 bg-[#3A2A1C]/40 backdrop-blur-sm" />
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-[360px] rounded-2xl bg-[#FDFBF5] p-5 shadow-2xl"
+              style={{ border: "1px solid #E9D1A6" }}
+            >
+              <h3 className="text-[14px] font-extrabold text-[#3A2A1C]">
+                Remove {a?.name ?? "this agent"}?
+              </h3>
+              <p className="mt-2 text-[11px] text-[#6B4F2A] leading-relaxed">
+                The registration and its API key are deleted. Any Claude Code
+                that still uses this key will stop connecting. This cannot be
+                undone.
+              </p>
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={() => !deleting && setDeleteConfirmId(null)}
+                  disabled={deleting}
+                  className="flex-1 h-9 rounded-md bg-white border text-[12px] font-semibold text-[#6B4F2A] hover:bg-[#F5E4C2]/40 cursor-pointer disabled:opacity-50"
+                  style={{ borderColor: "#E9D1A6" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(deleteConfirmId)}
+                  disabled={deleting}
+                  className="flex-1 h-9 rounded-md text-white text-[12px] font-extrabold cursor-pointer disabled:opacity-50"
+                  style={{ backgroundColor: "#C8301E" }}
+                >
+                  {deleting ? "Removing…" : "Remove"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </section>
   )
 }

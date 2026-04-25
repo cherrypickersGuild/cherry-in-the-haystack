@@ -227,7 +227,7 @@ export class AgentTradeService {
     if (!this.ws.isAgentConnected(agentId)) return []
     try {
       const r: any = await this.ws.requestSelfReport(agentId)
-      const items: any[] = r?.report?.local_skills?.items ?? []
+      const items: any[] = r?.local_skills?.items ?? r?.report?.local_skills?.items ?? []
       return items
         .filter((it) => it?.hasSkillMd)
         .map((it) => {
