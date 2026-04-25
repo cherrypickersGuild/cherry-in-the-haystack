@@ -14,6 +14,7 @@ import { KaasWsGateway } from './kaas-ws.gateway';
 import { InstallBuildController } from './install-build.controller';
 import { ShopController } from './shop/shop.controller';
 import { AgentTradeController } from './shop/agent-trade.controller';
+import { FlockExportController } from './flock/flock-export.controller';
 
 import { KaasAgentService } from './kaas-agent.service';
 import { KaasKnowledgeService } from './kaas-knowledge.service';
@@ -25,6 +26,8 @@ import { KaasAgentDaemonService } from './kaas-agent-daemon.service';
 import { InstallBuildService } from './install-build.service';
 import { BuySetService } from './shop/buy-set.service';
 import { AgentTradeService } from './shop/agent-trade.service';
+import { FlockExportService } from './flock/flock-export.service';
+import { AgentverseExportService } from './flock/agentverse-export.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -41,6 +44,7 @@ import { AgentTradeService } from './shop/agent-trade.service';
     InstallBuildController,
     ShopController,
     AgentTradeController,
+    FlockExportController,
   ],
   providers: [
     KaasAgentService,
@@ -54,6 +58,8 @@ import { AgentTradeService } from './shop/agent-trade.service';
     InstallBuildService,
     BuySetService,
     AgentTradeService,
+    FlockExportService,
+    AgentverseExportService,
   ],
   exports: [
     KaasAgentService,

@@ -30,7 +30,7 @@ import { PurchaseModal, type PurchaseTarget } from "./purchase-modal"
 function lookupCard(slug: string): { title: string; summary: string } | null {
   const found = mockInventory.find((i) => i.id === `inv-${slug}`)
   if (!found) return null
-  return { title: found.title, summary: found.summary }
+  return { title: found.title, summary: found.summary ?? "" }
 }
 
 /** Pretty-print kind for the badge. Concept = market knowledge, Workshop =

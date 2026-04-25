@@ -597,6 +597,87 @@ export async function buyAgentTradeSkill(
   return res.json()
 }
 
+// ── Flock export ─────────────────────────────────────────────
+
+export interface FlockExportRequest {
+  build_id: string
+  build_name: string
+  build_summary?: string
+  equipped: {
+    prompt: string | null
+    mcp: string | null
+    skillA: string | null
+    skillB: string | null
+    skillC: string | null
+    orchestration: string | null
+    memory: string | null
+  }
+  api_key: string
+  public?: boolean
+}
+
+export interface FlockExportResponse {
+  agent: { id: string; handle?: string; address?: string; raw: any }
+  knowledge_graph?: { id: string; raw: any } | null
+  documents: Array<{ slot: string; card_id: string; document_id?: string; ok: boolean; error?: string }>
+  public_url_candidates: string[]
+  warnings: string[]
+}
+
+export async function fetchFlockExportConfig(): Promise<{ server_key_configured: boolean; key_source: string | null }> {
+  const res = await fetch(`${KAAS_BASE}/flock/config`)
+  if (!res.ok) return { server_key_configured: false, key_source: null }
+  return res.json()
+}
+
+// ── Agentverse export ─────────────────────────────────────────
+
+export interface AgentverseExportResponse {
+  agent: { address?: string; name: string; readme: string; raw: any }
+  public_url_candidates: string[]
+  warnings: string[]
+}
+
+export async function fetchAgentverseConfig(): Promise<{ server_key_configured: boolean }> {
+  const res = await fetch(`${KAAS_BASE}/flock/agentverse-config`)
+  if (!res.ok) return { server_key_configured: false }
+  return res.json()
+}
+
+export async function exportToAgentverse(req: Omit<FlockExportRequest, "api_key"> & { api_key?: string }): Promise<AgentverseExportResponse> {
+  const res = await fetch(`${KAAS_BASE}/flock/export-agentverse`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req),
+  })
+  if (!res.ok) {
+    const b = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(b?.message ?? `exportToAgentverse ${res.status}`), {
+      code: b?.code,
+      status: res.status,
+      detail: b?.detail,
+    })
+  }
+  return res.json()
+}
+
+export async function exportToFlockx(req: FlockExportRequest): Promise<FlockExportResponse> {
+  const res = await fetch(`${KAAS_BASE}/flock/export-build`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req),
+  })
+  if (!res.ok) {
+    const b = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(b?.message ?? `exportToFlockx ${res.status}`), {
+      code: b?.code,
+      status: res.status,
+      detail: b?.detail,
+    })
+  }
+  return res.json()
+}
+
 export interface CardSource {
   id: string
   type: "prompt" | "mcp" | "skill" | "orchestration" | "memory"

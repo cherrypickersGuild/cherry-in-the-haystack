@@ -6,6 +6,8 @@ import { deleteAgent, fetchAgents, fetchAgentSelfReport, registerAgent } from "@
 import { installBuild, type InstallBuildResponse } from "@/lib/bench-api"
 import { getAccessToken, useAuthTick } from "@/lib/auth"
 import { CherryBao } from "@/components/cherry/cherry-bao"
+import { ExportFlockxModal } from "@/components/cherry/export-flockx-modal"
+import { ExportAgentverseModal } from "@/components/cherry/export-agentverse-modal"
 import { InstallResultPanel } from "@/components/cherry/install-result-panel"
 import { LiveProofCard } from "@/components/cherry/live-proof-card"
 import { StartFlowNav } from "@/components/cherry/start-flow-nav"
@@ -685,6 +687,8 @@ function InstallSkillSection({
    *  SKILL.md body 파싱이 필요하므로 이번 스코프에선 존재 여부만 확인. */
   const [agentHasInstall, setAgentHasInstall] = useState<boolean | null>(null)
   const [verifying, setVerifying] = useState(false)
+  const [showFlockxExport, setShowFlockxExport] = useState(false)
+  const [showAgentverseExport, setShowAgentverseExport] = useState(false)
   /** Claude Code 에서 사용자가 `cherry-kaas:generate_self_report` 등을 돌렸을 때
    *  WebSocket 으로 푸시된 실시간 report. 서버 HTTP 조회와 별개의 증거. */
   const [liveReport, setLiveReport] = useState<{
@@ -936,6 +940,20 @@ function InstallSkillSection({
               : `📥 Install to ${agent.name} (${selectedEquippedCount} slot${selectedEquippedCount === 1 ? "" : "s"})`}
         </button>
 
+        <button
+          onClick={() => setShowAgentverseExport(true)}
+          disabled={!selectedBuild || selectedEquippedCount === 0 || installing}
+          title={
+            selectedEquippedCount === 0
+              ? "This build has no equipped cards."
+              : "Publish this build to Agentverse marketplace"
+          }
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border text-[12px] font-bold text-[#B12A17] hover:bg-[#FBE8E3]/40 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ borderColor: "#E89080" }}
+        >
+          🚀 Export to Flock
+        </button>
+
         {/* Empty-build warning — explain why the button is disabled */}
         {selectedEquippedCount === 0 && !installing && (
           <span className="text-[11px] text-[#C8301E] font-semibold">
@@ -966,6 +984,50 @@ function InstallSkillSection({
           </span>
         )}
       </div>
+
+      <ExportAgentverseModal
+        open={showAgentverseExport}
+        onClose={() => setShowAgentverseExport(false)}
+        build={
+          selectedBuild
+            ? {
+                id: selectedBuild.id,
+                name: selectedBuild.name,
+                equipped: {
+                  prompt: selectedBuild.equipped.prompt ?? null,
+                  mcp: selectedBuild.equipped.mcp ?? null,
+                  skillA: selectedBuild.equipped.skillA ?? null,
+                  skillB: selectedBuild.equipped.skillB ?? null,
+                  skillC: selectedBuild.equipped.skillC ?? null,
+                  orchestration: selectedBuild.equipped.orchestration ?? null,
+                  memory: selectedBuild.equipped.memory ?? null,
+                },
+              }
+            : null
+        }
+      />
+
+      <ExportFlockxModal
+        open={showFlockxExport}
+        onClose={() => setShowFlockxExport(false)}
+        build={
+          selectedBuild
+            ? {
+                id: selectedBuild.id,
+                name: selectedBuild.name,
+                equipped: {
+                  prompt: selectedBuild.equipped.prompt ?? null,
+                  mcp: selectedBuild.equipped.mcp ?? null,
+                  skillA: selectedBuild.equipped.skillA ?? null,
+                  skillB: selectedBuild.equipped.skillB ?? null,
+                  skillC: selectedBuild.equipped.skillC ?? null,
+                  orchestration: selectedBuild.equipped.orchestration ?? null,
+                  memory: selectedBuild.equipped.memory ?? null,
+                },
+              }
+            : null
+        }
+      />
     </div>
   )
 }
