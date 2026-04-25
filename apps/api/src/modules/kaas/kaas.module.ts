@@ -13,6 +13,7 @@ import { KaasA2aController } from './kaas-a2a.controller';
 import { KaasWsGateway } from './kaas-ws.gateway';
 import { InstallBuildController } from './install-build.controller';
 import { ShopController } from './shop/shop.controller';
+import { AgentTradeController } from './shop/agent-trade.controller';
 
 import { KaasAgentService } from './kaas-agent.service';
 import { KaasKnowledgeService } from './kaas-knowledge.service';
@@ -23,6 +24,7 @@ import { KaasA2aService } from './kaas-a2a.service';
 import { KaasAgentDaemonService } from './kaas-agent-daemon.service';
 import { InstallBuildService } from './install-build.service';
 import { BuySetService } from './shop/buy-set.service';
+import { AgentTradeService } from './shop/agent-trade.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -38,6 +40,7 @@ import { BuySetService } from './shop/buy-set.service';
     KaasA2aController,
     InstallBuildController,
     ShopController,
+    AgentTradeController,
   ],
   providers: [
     KaasAgentService,
@@ -50,6 +53,7 @@ import { BuySetService } from './shop/buy-set.service';
     KaasAgentDaemonService,
     InstallBuildService,
     BuySetService,
+    AgentTradeService,
   ],
   exports: [
     KaasAgentService,

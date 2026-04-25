@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react"
 import { ShopByDomain } from "@/components/cherry/shop-by-domain"
 import { ShopByComponent } from "@/components/cherry/shop-by-component"
+import { ShopByAgent } from "@/components/cherry/shop-by-agent"
 import { StartFlowNav } from "@/components/cherry/start-flow-nav"
 import { useAuthTick } from "@/lib/auth"
 
-type RootTab = "domain" | "component"
+type RootTab = "domain" | "component" | "agent"
 
 export default function ShopPage() {
   useAuthTick()
@@ -60,9 +61,21 @@ export default function ShopPage() {
           label="By Component"
           hint="Browse individual pieces"
         />
+        <RootTabButton
+          active={root === "agent"}
+          onClick={() => setRoot("agent")}
+          label="By Agent"
+          hint="Trade with another agent"
+        />
       </div>
 
-      {root === "domain" ? <ShopByDomain /> : <ShopByComponent />}
+      {root === "domain" ? (
+        <ShopByDomain />
+      ) : root === "component" ? (
+        <ShopByComponent />
+      ) : (
+        <ShopByAgent />
+      )}
     </div>
   )
 }

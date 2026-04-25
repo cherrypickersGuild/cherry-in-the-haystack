@@ -525,6 +525,76 @@ export interface ShopSet {
   components: ShopSetComponent[]
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   Agent Trade — Shop "By Agent" tab. Diff target agent's installed
+   skills vs caller's, then buy any missing one for a flat 5 credits.
+   Mirrors `apps/api/src/modules/kaas/shop/agent-trade.controller.ts`.
+   ════════════════════════════════════════════════════════════════ */
+
+export type AgentTradeSkillKind = "concept" | "card" | "meta" | "unknown"
+
+export interface ClassifiedSkill {
+  slug: string
+  kind: AgentTradeSkillKind
+  title?: string
+  summary?: string
+}
+
+export interface AgentTradeDiff {
+  both: ClassifiedSkill[]
+  onlyMine: ClassifiedSkill[]
+  onlyTheirs: ClassifiedSkill[]
+}
+
+export const AGENT_TRADE_FLAT_PRICE = 5
+
+export async function fetchShopAgents(myApiKey?: string): Promise<{ id: string; name: string; connected: boolean }[]> {
+  const u = new URL(`${KAAS_BASE}/shop/agents`)
+  if (myApiKey) u.searchParams.set("exclude_self", myApiKey)
+  const res = await fetch(u, { cache: "no-store" })
+  if (!res.ok) throw new Error(`fetchShopAgents ${res.status}`)
+  return res.json()
+}
+
+export async function fetchAgentDiff(
+  targetAgentId: string,
+  myApiKey: string,
+): Promise<AgentTradeDiff> {
+  const u = new URL(`${KAAS_BASE}/shop/agents/${encodeURIComponent(targetAgentId)}/diff`)
+  u.searchParams.set("vs_api_key", myApiKey)
+  const res = await fetch(u, { cache: "no-store" })
+  if (!res.ok) throw new Error(`fetchAgentDiff ${res.status}`)
+  return res.json()
+}
+
+export interface BuyAgentTradeSkillResponse {
+  installed: boolean
+  saved_path?: string
+  size_bytes?: number
+  credits_consumed: number
+  credits_after: number
+  provenance: { hash: string | null; chain: string; explorer_url: string | null; on_chain: boolean }
+}
+
+export async function buyAgentTradeSkill(
+  apiKey: string,
+  slug: string,
+): Promise<BuyAgentTradeSkillResponse> {
+  const res = await fetch(`${KAAS_BASE}/shop/agents/skills/buy`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slug, api_key: apiKey }),
+  })
+  if (!res.ok) {
+    const b = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(b?.message ?? `buyAgentTradeSkill ${res.status}`), {
+      code: b?.code,
+      status: res.status,
+    })
+  }
+  return res.json()
+}
+
 export interface CardSource {
   id: string
   type: "prompt" | "mcp" | "skill" | "orchestration" | "memory"

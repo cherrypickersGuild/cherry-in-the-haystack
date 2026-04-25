@@ -49,6 +49,13 @@ export class KaasAgentService {
       .orderBy('created_at', 'desc');
   }
 
+  /** 모든 활성 에이전트 (Agent Trade 등 멀티-에이전트 화면용). */
+  async findAllActive(): Promise<KaasAgentEntity[]> {
+    return this.knex('kaas.agent')
+      .where({ is_active: true })
+      .orderBy('created_at', 'desc');
+  }
+
   /** API Key로 에이전트 조회 (인증용) */
   async findByApiKey(apiKey: string): Promise<KaasAgentEntity | null> {
     const agent = await this.knex('kaas.agent')
