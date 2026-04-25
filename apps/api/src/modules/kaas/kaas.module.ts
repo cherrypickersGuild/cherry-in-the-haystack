@@ -10,6 +10,7 @@ import { KaasAdminController } from './kaas-admin.controller';
 import { KaasMcpController } from './kaas-mcp.controller';
 import { KaasCuratorRewardController } from './kaas-curator-reward.controller';
 import { KaasA2aController } from './kaas-a2a.controller';
+import { KaasAcpController } from './kaas-acp.controller';
 import { KaasWsGateway } from './kaas-ws.gateway';
 import { InstallBuildController } from './install-build.controller';
 import { ShopController } from './shop/shop.controller';
@@ -42,6 +43,7 @@ import { FlockBundleService } from './flock/flock-bundle.service';
     KaasMcpController,
     KaasCuratorRewardController,
     KaasA2aController,
+    KaasAcpController,
     InstallBuildController,
     ShopController,
     AgentTradeController,
