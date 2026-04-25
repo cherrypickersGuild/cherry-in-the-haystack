@@ -227,11 +227,14 @@ function DiffModal({
         >
           <div className="min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A7C55]">
-              Knowledge diff
+              Learn from another agent
             </div>
             <h2 className="mt-0.5 text-[15px] font-extrabold text-[#3A2A1C] truncate">
-              {target.name} vs {myAgent.name}
+              {target.name}'s knowledge
             </h2>
+            <p className="mt-0.5 text-[11px] text-[#8E7555]">
+              Skills {target.name} has that {myAgent.name} doesn't.
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -242,9 +245,9 @@ function DiffModal({
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-5 py-4">
           {!diff && !error && (
-            <p className="text-[11px] italic text-[#9A7C55]">Loading diff…</p>
+            <p className="text-[11px] italic text-[#9A7C55]">Loading…</p>
           )}
           {error && (
             <div
@@ -254,15 +257,25 @@ function DiffModal({
               {error}
             </div>
           )}
-          {diff && (
-            <>
-              <Section title={`Only ${target.name} has`} items={diff.onlyTheirs}
-                       buyableLabel={`Buy ${AGENT_TRADE_FLAT_PRICE} cr`}
-                       onBuy={buy} />
-              <Section title="Both have" items={diff.both} muted />
-              <Section title={`Only ${myAgent.name} has`} items={diff.onlyMine} muted />
-            </>
-          )}
+          {diff && (() => {
+            const buyable = diff.onlyTheirs.filter(
+              (i) => i.kind !== "meta" && i.kind !== "unknown",
+            )
+            if (buyable.length === 0) {
+              return (
+                <p className="text-[12px] italic text-[#9A7C55] py-10 text-center">
+                  Nothing new to learn — {myAgent.name} already has every shared skill.
+                </p>
+              )
+            }
+            return (
+              <ul className="space-y-2">
+                {buyable.map((item) => (
+                  <SkillRow key={item.slug} item={item} onBuy={buy} />
+                ))}
+              </ul>
+            )
+          })()}
         </div>
       </div>
 
@@ -282,59 +295,57 @@ function DiffModal({
   )
 }
 
-function Section({
-  title,
-  items,
-  muted = false,
-  buyableLabel,
+const KIND_THEME: Record<string, { label: string; bg: string; fg: string }> = {
+  concept: { label: "Concept",  bg: "#EAF1FB", fg: "#2F5BA8" },
+  card:    { label: "Workshop", bg: "#FBF1E4", fg: "#9C5A1F" },
+}
+
+function SkillRow({
+  item,
   onBuy,
 }: {
-  title: string
-  items: ClassifiedSkill[]
-  muted?: boolean
-  buyableLabel?: string
-  onBuy?: (item: ClassifiedSkill) => void
+  item: ClassifiedSkill
+  onBuy: (item: ClassifiedSkill) => void
 }) {
+  const theme = KIND_THEME[item.kind] ?? { label: item.kind, bg: "#F0E7D4", fg: "#6B4F2A" }
   return (
-    <section>
-      <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#9A7C55] mb-1.5">
-        {title} <span className="font-mono">({items.length})</span>
-      </h3>
-      {items.length === 0 ? (
-        <p className="text-[11px] italic text-[#B8A788] pl-1">none</p>
-      ) : (
-        <ul className="space-y-1">
-          {items.map((item) => (
-            <li
-              key={item.slug}
-              className="flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5"
-              style={{
-                backgroundColor: muted ? "transparent" : "#FBF6ED",
-                border: muted ? "1px dashed #E9D1A6" : "1px solid #F0E7D4",
-              }}
-            >
-              <div className="min-w-0">
-                <div className="text-[12px] font-bold text-[#3A2A1C] truncate">
-                  {item.title || item.slug}
-                </div>
-                <div className="text-[9px] font-mono text-[#9A7C55] truncate">
-                  {item.kind} · {item.slug}
-                </div>
-              </div>
-              {onBuy && buyableLabel && (
-                <button
-                  onClick={() => onBuy(item)}
-                  disabled={item.kind === "meta" || item.kind === "unknown"}
-                  className="h-7 px-2.5 rounded-md text-[10px] font-bold border cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ color: "#B12A17", borderColor: "#E89080", backgroundColor: "#FBE8E3" }}
-                >
-                  {buyableLabel}
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+    <li
+      className="rounded-xl bg-white p-3 transition-all hover:-translate-y-0.5 hover:shadow-md flex items-center gap-3"
+      style={{
+        border: "1px solid #D4CEBD",
+        boxShadow: "0 1px 0 rgba(107,79,42,0.04), 0 2px 8px rgba(107,79,42,0.05)",
+      }}
+    >
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <span
+            className="text-[8px] font-bold tracking-wider px-1.5 py-0.5 rounded uppercase"
+            style={{ backgroundColor: theme.bg, color: theme.fg }}
+          >
+            {theme.label}
+          </span>
+        </div>
+        <div className="text-[13px] font-extrabold text-[#3A2A1C] truncate">
+          {item.title || item.slug}
+        </div>
+        {item.summary ? (
+          <p className="mt-0.5 text-[11px] text-[#6B4F2A] leading-snug line-clamp-1">
+            {item.summary}
+          </p>
+        ) : (
+          <div className="mt-0.5 text-[10px] font-mono text-[#9A7C55] truncate">
+            {item.slug}
+          </div>
+        )}
+      </div>
+      <button
+        onClick={() => onBuy(item)}
+        className="flex-shrink-0 h-9 px-3 rounded-lg text-[12px] font-extrabold text-white shadow-sm hover:shadow-md cursor-pointer transition-shadow tabular-nums"
+        style={{ backgroundColor: "#C8301E" }}
+      >
+        Buy {AGENT_TRADE_FLAT_PRICE}
+        <span className="text-[9px] font-bold opacity-80 ml-0.5">cr</span>
+      </button>
+    </li>
   )
 }
