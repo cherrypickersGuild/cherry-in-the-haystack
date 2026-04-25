@@ -36,8 +36,8 @@ function lookupCard(slug: string): { title: string; summary: string } | null {
 /** Pretty-print kind for the badge. Concept = market knowledge, Workshop =
  *  hand-built card from the inventory. */
 const KIND_LABEL: Record<string, string> = {
-  concept: "지식",
-  card: "워크샵 카드",
+  concept: "Concept",
+  card: "Workshop",
 }
 
 interface MyAgent {
@@ -244,16 +244,11 @@ function DiffModal({
         >
           <div className="min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A7C55]">
-              Agent Trade · 5 cr / 파일
+              Agent Trade · {AGENT_TRADE_FLAT_PRICE} cr / file
             </div>
             <h2 className="mt-1 text-[16px] font-extrabold text-[#3A2A1C] truncate">
-              📚 {target.name} 만 가진 지식
+              {target.name} → {myAgent.name}
             </h2>
-            <p className="mt-1 text-[11px] text-[#6B4F2A] leading-snug">
-              <span className="font-semibold">{target.name}</span>의 에이전트가 보유 중이고,{" "}
-              <span className="font-semibold">{myAgent.name}</span>에는 아직 없는 스킬 파일이에요.
-              구매하면 5cr이 차감되고 곧바로 내 에이전트에 설치됩니다.
-            </p>
           </div>
           <button
             onClick={onClose}
@@ -283,19 +278,29 @@ function DiffModal({
             if (buyable.length === 0) {
               return (
                 <p className="text-[12px] italic text-[#9A7C55] py-10 text-center">
-                  배울 게 더 없어요 — {myAgent.name}은(는) 이미 공유 지식을 모두 갖고 있어요.
+                  Nothing new to learn — {myAgent.name} already has every shared skill.
                 </p>
               )
             }
             return (
               <>
-                <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#9A7C55]">
-                    구매 가능한 지식{" "}
-                    <span className="font-mono text-[#3A2A1C]">({buyable.length})</span>
-                  </h3>
-                  <span className="text-[10px] text-[#9A7C55]">
-                    한 파일 = {AGENT_TRADE_FLAT_PRICE} cr
+                <div
+                  className="mb-3 rounded-lg px-3 py-2 flex items-center justify-between gap-2"
+                  style={{ backgroundColor: "#FBF6ED", border: "1px solid #F0E7D4" }}
+                >
+                  <div className="min-w-0">
+                    <div className="text-[9px] font-bold uppercase tracking-wider text-[#9A7C55]">
+                      Knowledge only in
+                    </div>
+                    <div className="text-[13px] font-extrabold text-[#3A2A1C] truncate">
+                      {target.name}
+                    </div>
+                  </div>
+                  <span
+                    className="flex-shrink-0 text-[10px] font-extrabold tabular-nums px-2 py-1 rounded-md"
+                    style={{ backgroundColor: "#FBE8E3", color: "#B12A17" }}
+                  >
+                    {buyable.length} file{buyable.length === 1 ? "" : "s"}
                   </span>
                 </div>
                 <ul className="space-y-2">
@@ -327,10 +332,10 @@ function DiffModal({
 
 function ComparingState({ targetName, myName }: { targetName: string; myName: string }) {
   const messages = [
-    "지식 체계를 비교하는 중…",
-    "스킬 파일 목록을 받아오는 중…",
-    "공통점과 차이점을 정렬하는 중…",
-    "구매 가능한 항목을 추리는 중…",
+    "Comparing knowledge systems…",
+    "Fetching skill manifests…",
+    "Sorting shared vs unique skills…",
+    "Filtering buyable items…",
   ]
   const [idx, setIdx] = useState(0)
   useEffect(() => {
@@ -367,7 +372,7 @@ function ComparingState({ targetName, myName }: { targetName: string; myName: st
         {messages[idx]}
       </p>
       <p className="mt-1 text-[10px] text-[#9A7C55]">
-        대상 에이전트가 직접 보고하는 self-report를 읽고 있어요.
+        Reading the target agent's self-report.
       </p>
     </div>
   )

@@ -133,12 +133,12 @@ export function PurchaseModal({
     }
   }, [defaultAgentId, agents, selectedAgentId])
 
-  // Cycle loading messages every 1.2s so the wait feels alive
+  // Cycle loading messages every 5s so it doesn't loop in a blink.
   useEffect(() => {
     if (phase !== "loading") return
     const t = setInterval(() => {
       setLoadingMsgIdx((i) => (i + 1) % LOADING_MESSAGES.length)
-    }, 1200)
+    }, 5000)
     return () => clearInterval(t)
   }, [phase])
 
