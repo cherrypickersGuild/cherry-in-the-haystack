@@ -3,7 +3,9 @@ import csv
 import json
 import os
 import re
+import time
 from datetime import datetime, timezone
+from html import unescape
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -265,6 +267,7 @@ DEFAULT_ARTICLE_ASSESSMENT_PROMPTS = {
         "Write decision_reason in English. "
         "Select the best representative entity only from allowed_entities. Never invent ids. "
         "If the article evidence is weak, be conservative and prefer the most explicitly mentioned entity only. "
+        "When quality_guardrails.assessment_mode is compact, rely only on the title, summary, and grounding chunks that clearly support the choice, and keep confidence conservative. "
         "Choose the best page/category/entity path, produce ranked candidates, decide one side_category_code, "
         "and explain the decision briefly. "
         "Return ONLY JSON with keys: representative_entity, classification_candidates, decision_reason, side_category_code. "
@@ -277,6 +280,7 @@ DEFAULT_ARTICLE_ASSESSMENT_PROMPTS = {
         "ai_summary must be 1-2 English sentences only. "
         "Do not infer product details not supported by the article body. "
         "Score the article from 1 to 5 using relevance, depth, novelty, and practicality. "
+        "When quality_guardrails.assessment_mode is compact, be conservative, keep the score within quality_guardrails.score_cap, avoid specific claims that are not directly stated, and prefer 1-2 grounded key points only. "
         "Produce a concise AI summary, score breakdown, and reader-useful snippets. "
         "Return ONLY JSON with keys: ai_summary, ai_score, score_breakdown, ai_snippets_json. "
         "score_breakdown must include relevance, depth, novelty, practicality, rationale. "
@@ -288,6 +292,7 @@ DEFAULT_ARTICLE_ASSESSMENT_PROMPTS = {
         "Use only the provided grounding_chunks when creating evidence items. "
         "Every evidence_items[].text must be copied from a grounding chunk verbatim or as an exact substring. "
         "Do not invent evidence lines. "
+        "When quality_guardrails.assessment_mode is compact, extract fewer, stronger evidence items and prefer omission over weakly supported tags. "
         "Extract grounded tags, evidence items, and a compact structured extraction object from the article. "
         "Return ONLY JSON with keys: ai_tags_json, ai_evidence_json, ai_structured_extraction_json. "
         "ai_tags_json must contain TAG or KEYWORD objects only. "
@@ -299,6 +304,7 @@ DEFAULT_ARTICLE_ASSESSMENT_PROMPTS = {
         "You will receive article context, allowed entity constraints, and intermediate agent outputs. "
         "Write ai_summary, decision_reason, why_it_matters, key_points, risk_notes in English. "
         "Do not add unsupported facts beyond the article body or grounding_chunks. "
+        "When quality_guardrails.assessment_mode is compact, keep the output conservative, prefer fewer grounded points, and do not exceed quality_guardrails.score_cap. "
         "Return ONLY the final raw contract JSON with these top-level keys exactly: "
         "idempotency_key, version, representative_entity, ai_summary, ai_score, ai_classification_json, "
         "side_category_code, ai_tags_json, ai_snippets_json, ai_evidence_json, ai_structured_extraction_json. "
@@ -686,6 +692,99 @@ def as_text(value: Any, default: str = "") -> str:
     return str(value).strip()
 
 
+FULL_ARTICLE_CONTENT_MIN = 300
+FULL_ARTICLE_SUMMARY_MIN = 120
+COMPACT_ARTICLE_CONTENT_MIN = 80
+COMPACT_ARTICLE_SUMMARY_MIN = 60
+COMPACT_ARTICLE_MIN_WORDS = 8
+MAX_AGENT_ARTICLE_CHARS = 6000
+
+
+def html_to_plain_text(text: str) -> str:
+    normalized = as_text(text)
+    if not normalized:
+        return ""
+    normalized = normalized.replace("\r\n", "\n").replace("\r", "\n")
+    normalized = re.sub(r"(?is)<\s*br\s*/?\s*>", "\n", normalized)
+    normalized = re.sub(r"(?is)</\s*(p|div|section|article|blockquote|figure|figcaption|h[1-6])\s*>", "\n\n", normalized)
+    normalized = re.sub(r"(?is)<\s*li\b[^>]*>", "\n- ", normalized)
+    normalized = re.sub(r"(?is)</\s*li\s*>", "\n", normalized)
+    normalized = re.sub(r"(?is)<\s*/?\s*(ul|ol)\b[^>]*>", "\n", normalized)
+    normalized = re.sub(r"(?is)<\s*script\b[^>]*>.*?<\s*/\s*script\s*>", " ", normalized)
+    normalized = re.sub(r"(?is)<\s*style\b[^>]*>.*?<\s*/\s*style\s*>", " ", normalized)
+    normalized = re.sub(r"(?is)<[^>]+>", " ", normalized)
+    normalized = unescape(normalized).replace("\u00a0", " ")
+    normalized = re.sub(r"[ \t]+", " ", normalized)
+    normalized = re.sub(r"\n{3,}", "\n\n", normalized)
+    normalized = re.sub(r" *\n *", "\n", normalized)
+    return normalized.strip()
+
+
+def article_body_text(article: Dict[str, Any]) -> str:
+    return html_to_plain_text(as_text(article.get("content_raw") or article.get("content")))
+
+
+def article_summary_text(article: Dict[str, Any]) -> str:
+    return html_to_plain_text(as_text(article.get("summary")))
+
+
+def sentence_candidates(text: str) -> List[str]:
+    cleaned = html_to_plain_text(text)
+    if not cleaned:
+        return []
+    return [part.strip(" -") for part in re.split(r"(?<=[.!?])\s+", cleaned) if part.strip(" -")]
+
+
+def build_article_quality_profile(article: Dict[str, Any]) -> Dict[str, Any]:
+    content_text = article_body_text(article)
+    summary_text = article_summary_text(article)
+    title = as_text(article.get("title"))
+    content_length = len(content_text)
+    summary_length = len(summary_text)
+    word_count = len(tokenize_for_match(content_text))
+    sentence_count = len(sentence_candidates(content_text))
+
+    if content_length >= FULL_ARTICLE_CONTENT_MIN or summary_length >= FULL_ARTICLE_SUMMARY_MIN:
+        assessment_mode = "standard"
+        allow_assessment = True
+        score_cap = 5
+        reason = "standard_article_body"
+    elif (
+        content_length >= COMPACT_ARTICLE_CONTENT_MIN
+        or summary_length >= COMPACT_ARTICLE_SUMMARY_MIN
+        or (title and content_length >= 40 and word_count >= COMPACT_ARTICLE_MIN_WORDS)
+    ):
+        assessment_mode = "compact"
+        allow_assessment = True
+        score_cap = 4 if content_length >= 160 or summary_length >= 90 else 3
+        reason = "compact_article_body"
+    else:
+        assessment_mode = "reject"
+        allow_assessment = False
+        score_cap = 3
+        reason = "insufficient_article_body"
+
+    return {
+        "allow_assessment": allow_assessment,
+        "assessment_mode": assessment_mode,
+        "reason": reason,
+        "score_cap": score_cap,
+        "content_length_clean": content_length,
+        "summary_length_clean": summary_length,
+        "word_count": word_count,
+        "sentence_count": sentence_count,
+    }
+
+
+def truncate_article_for_agent(text: str, limit: int = MAX_AGENT_ARTICLE_CHARS) -> str:
+    cleaned = html_to_plain_text(text)
+    if len(cleaned) <= limit:
+        return cleaned
+    head = cleaned[: int(limit * 0.7)].strip()
+    tail = cleaned[-int(limit * 0.2) :].strip()
+    return f"{head}\n\n[...]\n\n{tail}".strip()
+
+
 def normalize_allowed_entities(allowed_entities: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     normalized: List[Dict[str, Any]] = []
     for item in safe_list(allowed_entities):
@@ -708,9 +807,7 @@ def tokenize_for_match(text: str) -> List[str]:
 
 
 def has_sufficient_article_body(article: Dict[str, Any]) -> bool:
-    content_raw = as_text(article.get("content_raw") or article.get("content"))
-    summary = as_text(article.get("summary"))
-    return len(content_raw) >= 300 or len(summary) >= 120
+    return build_article_quality_profile(article).get("allow_assessment", False)
 
 
 def split_grounding_chunks(text: str, chunk_size: int = 420, overlap: int = 80) -> List[str]:
@@ -769,9 +866,31 @@ def build_grounding_chunks(article: Dict[str, Any], limit: int = 5) -> List[Dict
             }
         )
     scored.sort(key=lambda item: (item["score"], len(item["text"])), reverse=True)
+    if summary:
+        summary_chunk = {
+            "chunk_id": 0,
+            "text": summary,
+            "score": len(set(tokenize_for_match(summary)) & query_tokens) + 1,
+        }
+        scored.insert(0, summary_chunk)
+    if title:
+        title_chunk = {
+            "chunk_id": -1,
+            "text": title if not summary else f"{title}. {summary}",
+            "score": len(set(tokenize_for_match(title)) & query_tokens) + 1,
+        }
+        scored.insert(0, title_chunk)
     if not scored and summary:
         return [{"chunk_id": 1, "text": summary, "score": 1}]
-    return scored[:limit]
+    deduped: List[Dict[str, Any]] = []
+    seen_texts = set()
+    for item in scored:
+        text = as_text(item.get("text"))
+        if not text or text in seen_texts:
+            continue
+        seen_texts.add(text)
+        deduped.append(item)
+    return deduped[:limit]
 
 
 def entity_match_score(article: Dict[str, Any], entity: Dict[str, Any]) -> int:
@@ -1026,8 +1145,8 @@ def normalize_structured_extraction(
     article: Dict[str, Any],
     side_category_code: str | None,
 ) -> Dict[str, Any]:
-    source = payload.get("source") if isinstance(payload, dict) else {}
-    review = payload.get("review") if isinstance(payload, dict) else {}
+    source = payload.get("source") if isinstance(payload, dict) and isinstance(payload.get("source"), dict) else {}
+    review = payload.get("review") if isinstance(payload, dict) and isinstance(payload.get("review"), dict) else {}
     return {
         "source": {
             "name": as_text((source or {}).get("name")) or as_text(article.get("source_name")),
@@ -1038,6 +1157,146 @@ def normalize_structured_extraction(
             "reviewer": (review or {}).get("reviewer"),
             "comment": (review or {}).get("comment"),
         },
+    }
+
+
+def fallback_summary_text(article: Dict[str, Any], *, compact_mode: bool) -> str:
+    candidates = sentence_candidates(as_text(article.get("summary"))) + sentence_candidates(as_text(article.get("content_raw")))
+    if not candidates:
+        return as_text(article.get("title"))
+    limit = 1 if compact_mode else 2
+    return " ".join(candidates[:limit]).strip()
+
+
+def fallback_decision_reason(article: Dict[str, Any], representative_entity: Dict[str, Any], *, compact_mode: bool) -> str:
+    entity_name = as_text(representative_entity.get("name")) or "the selected entity"
+    if compact_mode:
+        return f"Selected {entity_name} conservatively based on the strongest explicit overlap in the title and limited article text."
+    return f"Selected {entity_name} based on the strongest overlap across the title, summary, and article text."
+
+
+def fallback_why_it_matters(article: Dict[str, Any], representative_entity: Dict[str, Any], *, compact_mode: bool) -> str:
+    entity_name = as_text(representative_entity.get("name")) or as_text(article.get("source_name")) or "this topic"
+    if compact_mode:
+        return f"This item may matter for readers tracking {entity_name}, but the available source context is limited."
+    return f"This item helps readers tracking {entity_name} understand the reported development and its practical implications."
+
+
+def fallback_key_points(article: Dict[str, Any], *, compact_mode: bool) -> List[str]:
+    candidates = sentence_candidates(as_text(article.get("summary"))) + sentence_candidates(as_text(article.get("content_raw")))
+    if not candidates:
+        title = as_text(article.get("title"))
+        return [title] if title else ["Limited source context available."]
+    limit = 2 if compact_mode else 3
+    return dedupe_preserve_order(candidates)[:limit]
+
+
+def fallback_risk_notes(article: Dict[str, Any], *, compact_mode: bool) -> List[str]:
+    if compact_mode:
+        return ["Limited source context; verify the original article before relying on fine-grained details."]
+    warnings: List[str] = []
+    if len(as_text(article.get("content_raw"))) < FULL_ARTICLE_CONTENT_MIN:
+        warnings.append("The available source text is shorter than a typical long-form article.")
+    return warnings[:2]
+
+
+def compact_heuristic_score(article: Dict[str, Any], score_cap: int) -> int:
+    content_length = len(as_text(article.get("content_raw")))
+    sentence_count = len(sentence_candidates(as_text(article.get("content_raw"))))
+    score = 2
+    if content_length >= 140 or sentence_count >= 2:
+        score = 3
+    if content_length >= 220 and sentence_count >= 3:
+        score = 4
+    return min(score, score_cap)
+
+
+def build_compact_scorer_output(
+    article: Dict[str, Any],
+    representative_entity: Dict[str, Any],
+    quality_guardrails: Dict[str, Any],
+) -> Dict[str, Any]:
+    compact_mode = True
+    score_cap = int(quality_guardrails.get("score_cap") or 3)
+    ai_summary = fallback_summary_text(article, compact_mode=compact_mode)
+    why_it_matters = fallback_why_it_matters(article, representative_entity, compact_mode=compact_mode)
+    key_points = fallback_key_points(article, compact_mode=compact_mode)[:2]
+    risk_notes = fallback_risk_notes(article, compact_mode=compact_mode)[:1]
+    ai_score = compact_heuristic_score(article, score_cap)
+    return {
+        "ai_summary": ai_summary,
+        "ai_score": ai_score,
+        "score_breakdown": {
+            "relevance": ai_score,
+            "depth": max(1, min(ai_score, 2)),
+            "novelty": max(1, ai_score - 1),
+            "practicality": max(1, ai_score - 1),
+            "rationale": "Compact-mode heuristic score capped for short but potentially meaningful source text.",
+        },
+        "ai_snippets_json": {
+            "why_it_matters": why_it_matters,
+            "key_points": key_points,
+            "risk_notes": risk_notes,
+        },
+    }
+
+
+def build_compact_evidence_output(
+    article: Dict[str, Any],
+    representative_entity: Dict[str, Any],
+    side_category_code: str | None,
+) -> Dict[str, Any]:
+    source_name = as_text(article.get("source_name"))
+    url = as_text(article.get("url"))
+    published_at = article.get("published_at")
+    grounding_chunks = safe_list(article.get("grounding_chunks"))
+    evidence_items = []
+    for chunk in grounding_chunks[:2]:
+        if not isinstance(chunk, dict):
+            continue
+        text = as_text(chunk.get("text"))
+        if not text:
+            continue
+        evidence_items.append(
+            {
+                "kind": "quote",
+                "text": text[:500],
+                "url": url,
+                "source_name": source_name,
+                "published_at": published_at,
+            }
+        )
+    return {
+        "ai_tags_json": safe_list(article.get("tags")),
+        "ai_evidence_json": {
+            "evidence_items": evidence_items,
+        },
+        "ai_structured_extraction_json": {
+            "source": {
+                "name": source_name,
+                "type": as_text(article.get("source_type")) or "UNKNOWN",
+            },
+            "review": {
+                "type": side_category_code.replace("_", " ").title() if side_category_code else "Announcement",
+                "reviewer": None,
+                "comment": (
+                    f"Compact-mode extraction for {as_text(representative_entity.get('name')) or 'the selected entity'}."
+                    if as_text(representative_entity.get("name"))
+                    else "Compact-mode extraction."
+                ),
+            },
+        },
+    }
+
+
+def make_skipped_stage_meta(reason: str) -> Dict[str, Any]:
+    return {
+        "attempt_count": 0,
+        "ok": True,
+        "validation_errors": [],
+        "usage": {},
+        "attempts": [],
+        "skipped_reason": reason,
     }
 
 
@@ -1079,13 +1338,32 @@ def normalize_article_assessment_output(
     evidence_json = qa_output.get("ai_evidence_json") if isinstance(qa_output.get("ai_evidence_json"), dict) else {}
     evidence_stage = evidence_output.get("ai_evidence_json") if isinstance(evidence_output.get("ai_evidence_json"), dict) else {}
     tag_source = safe_list(qa_output.get("ai_tags_json")) or safe_list(evidence_output.get("ai_tags_json"))
+    quality = article.get("quality") if isinstance(article.get("quality"), dict) else {}
+    compact_mode = as_text(quality.get("assessment_mode")) == "compact"
+    score_cap = int(quality.get("score_cap") or 5)
 
     user_article_state_id = as_text(article_input.get("user_article_state_id")) or "unknown"
-    ai_summary = as_text(qa_output.get("ai_summary")) or as_text(scorer_output.get("ai_summary")) or as_text(article.get("summary")) or as_text(article.get("title"))
+    ai_summary = as_text(qa_output.get("ai_summary")) or as_text(scorer_output.get("ai_summary")) or fallback_summary_text(article, compact_mode=compact_mode)
     ai_score = clamp_score(qa_output.get("ai_score") or scorer_output.get("ai_score"), 3)
+    ai_score = min(ai_score, score_cap)
     decision_reason = as_text(
         qa_classification.get("decision_reason") or entity_output.get("decision_reason")
     )
+    if not decision_reason:
+        decision_reason = fallback_decision_reason(article, representative_entity, compact_mode=compact_mode)
+
+    why_it_matters = as_text(snippets.get("why_it_matters")) or as_text(scorer_snippets.get("why_it_matters"))
+    if not why_it_matters:
+        why_it_matters = fallback_why_it_matters(article, representative_entity, compact_mode=compact_mode)
+    key_points = [as_text(value) for value in safe_list(snippets.get("key_points")) or safe_list(scorer_snippets.get("key_points")) if as_text(value)]
+    if not key_points:
+        key_points = fallback_key_points(article, compact_mode=compact_mode)
+    risk_notes = [as_text(value) for value in safe_list(snippets.get("risk_notes")) or safe_list(scorer_snippets.get("risk_notes")) if as_text(value)]
+    if not risk_notes:
+        risk_notes = fallback_risk_notes(article, compact_mode=compact_mode)
+    if compact_mode:
+        key_points = key_points[:2]
+        risk_notes = risk_notes[:1]
 
     return {
         "idempotency_key": f"uas:{user_article_state_id.lower()}",
@@ -1101,9 +1379,9 @@ def normalize_article_assessment_output(
         "side_category_code": side_category_code,
         "ai_tags_json": normalize_tag_items(tag_source, article, representative_entity),
         "ai_snippets_json": {
-            "why_it_matters": as_text(snippets.get("why_it_matters")) or as_text(scorer_snippets.get("why_it_matters")),
-            "key_points": [as_text(value) for value in safe_list(snippets.get("key_points")) or safe_list(scorer_snippets.get("key_points")) if as_text(value)],
-            "risk_notes": [as_text(value) for value in safe_list(snippets.get("risk_notes")) or safe_list(scorer_snippets.get("risk_notes")) if as_text(value)],
+            "why_it_matters": why_it_matters,
+            "key_points": key_points,
+            "risk_notes": risk_notes,
         },
         "ai_evidence_json": {
             "evidence_items": normalize_evidence_items(
@@ -1485,7 +1763,18 @@ def run_agent_json(
     attempt_payload = dict(payload)
     errors: List[str] = []
     for attempt in range(max_attempts):
-        result = runner.run_sync(agent, json.dumps(attempt_payload, ensure_ascii=True, indent=2))
+        request_json = json.dumps(attempt_payload, ensure_ascii=True, indent=2)
+        result = None
+        for request_attempt in range(3):
+            try:
+                result = runner.run_sync(agent, request_json)
+                break
+            except Exception as exc:
+                message = str(exc).lower()
+                if request_attempt < 2 and ("rate limit" in message or "429" in message):
+                    time.sleep(15 * (request_attempt + 1))
+                    continue
+                raise
         parsed = parse_json_output(result.final_output)
         if parsed is None:
             errors = [f"{stage}: output must be an object"]
@@ -1512,7 +1801,17 @@ def run_agent_json_with_meta(
     attempts: List[Dict[str, Any]] = []
     result = None
     for attempt in range(max_attempts):
-        result = runner.run_sync(agent, json.dumps(attempt_payload, ensure_ascii=True, indent=2))
+        request_json = json.dumps(attempt_payload, ensure_ascii=True, indent=2)
+        for request_attempt in range(3):
+            try:
+                result = runner.run_sync(agent, request_json)
+                break
+            except Exception as exc:
+                message = str(exc).lower()
+                if request_attempt < 2 and ("rate limit" in message or "429" in message):
+                    time.sleep(15 * (request_attempt + 1))
+                    continue
+                raise
         usage = extract_usage_summary(result) or {}
         parsed = parse_json_output(result.final_output)
         if parsed is None:
@@ -1576,6 +1875,18 @@ def run_article_assessment_debug(
     if not safe_list(article_input.get("allowed_entities")):
         raise ValueError("allowed_entities is required for FR-2.1 input.")
 
+    raw_content = as_text(article.get("content_raw") or article.get("content"))
+    cleaned_content = html_to_plain_text(raw_content)
+    model_content = truncate_article_for_agent(cleaned_content)
+    cleaned_summary = article_summary_text(article)
+    quality = build_article_quality_profile(
+        {
+            "title": article.get("title"),
+            "content_raw": raw_content,
+            "summary": article.get("summary"),
+        }
+    )
+
     normalized_input = {
         "user_article_state_id": as_text(article_input.get("user_article_state_id")),
         "version": as_text(article_input.get("version"), "0.3") or "0.3",
@@ -1584,14 +1895,17 @@ def run_article_assessment_debug(
         "article": {
             "title": as_text(article.get("title")),
             "url": as_text(article.get("url") or article.get("article_url")),
-            "content_raw": as_text(article.get("content_raw") or article.get("content")),
+            "content_raw": model_content,
+            "content_raw_full": cleaned_content,
+            "content_raw_original": raw_content,
             "published_at": article.get("published_at"),
-            "summary": as_text(article.get("summary")),
+            "summary": cleaned_summary,
             "source_name": as_text(article.get("source_name")),
             "source_type": as_text(article.get("source_type")) or "UNKNOWN",
             "author": as_text(article.get("author") or article.get("article_author")),
             "language": as_text(article.get("language") or article.get("article_language")),
             "tags": safe_list(article.get("tags")),
+            "quality": quality,
         },
         "allowed_entities": normalize_allowed_entities(safe_list(article_input.get("allowed_entities"))),
         "allowed_side_categories": safe_list(article_input.get("allowed_side_categories")),
@@ -1603,7 +1917,23 @@ def run_article_assessment_debug(
     normalized_input["allowed_entities_reduced"] = reduced_allowed_entities
     expected_entity_name = reduced_allowed_entities[0].get("name") if reduced_allowed_entities else ""
     normalized_input["article"]["expected_entity_name"] = expected_entity_name
-    normalized_input["article"]["grounding_chunks"] = build_grounding_chunks(normalized_input["article"])
+    grounding_limit = 3 if quality.get("assessment_mode") == "compact" else 5
+    grounding_source = dict(normalized_input["article"])
+    grounding_source["content_raw"] = cleaned_content
+    normalized_input["article"]["grounding_chunks"] = build_grounding_chunks(grounding_source, limit=grounding_limit)
+    quality_guardrails = {
+        "assessment_mode": quality.get("assessment_mode"),
+        "score_cap": quality.get("score_cap"),
+        "content_length_clean": quality.get("content_length_clean"),
+        "summary_length_clean": quality.get("summary_length_clean"),
+        "confidence_mode": "conservative" if quality.get("assessment_mode") == "compact" else "standard",
+        "instruction": (
+            "Use only directly supported claims from the title, summary, and grounding chunks. "
+            "Prefer omission over speculation when source context is compact."
+            if quality.get("assessment_mode") == "compact"
+            else "Use grounded article evidence and avoid unsupported claims."
+        ),
+    }
 
     Runner, agents_map = build_article_assessment_agents(prompts)
 
@@ -1612,6 +1942,8 @@ def run_article_assessment_debug(
         "article": normalized_input["article"],
         "allowed_entities": normalized_input["allowed_entities_reduced"],
         "allowed_side_categories": normalized_input["allowed_side_categories"],
+        "grounding_chunks": normalized_input["article"].get("grounding_chunks", []),
+        "quality_guardrails": quality_guardrails,
     }
     entity_output, entity_meta = run_agent_json_with_meta(Runner, agents_map["entity_classifier"], entity_input, stage="entity_classifier")
 
@@ -1622,9 +1954,9 @@ def run_article_assessment_debug(
         "decision_reason": entity_output.get("decision_reason"),
         "side_category_code": entity_output.get("side_category_code"),
         "quality_dimensions": ["relevance", "depth", "novelty", "practicality"],
+        "grounding_chunks": normalized_input["article"].get("grounding_chunks", []),
+        "quality_guardrails": quality_guardrails,
     }
-    scorer_output, scorer_meta = run_agent_json_with_meta(Runner, agents_map["content_scorer"], scorer_input, stage="content_scorer")
-
     evidence_input = {
         "article": normalized_input["article"],
         "representative_entity": entity_output.get("representative_entity"),
@@ -1632,8 +1964,25 @@ def run_article_assessment_debug(
         "review_context": normalized_input["review_context"],
         "existing_tags": normalized_input["article"].get("tags", []),
         "grounding_chunks": normalized_input["article"].get("grounding_chunks", []),
+        "quality_guardrails": quality_guardrails,
     }
-    evidence_output, evidence_meta = run_agent_json_with_meta(Runner, agents_map["evidence_extractor"], evidence_input, stage="evidence_extractor")
+    compact_fast_path = quality.get("assessment_mode") == "compact"
+    if compact_fast_path:
+        scorer_output = build_compact_scorer_output(
+            normalized_input["article"],
+            entity_output.get("representative_entity") if isinstance(entity_output.get("representative_entity"), dict) else {},
+            quality_guardrails,
+        )
+        scorer_meta = make_skipped_stage_meta("compact_fast_path")
+        evidence_output = build_compact_evidence_output(
+            normalized_input["article"],
+            entity_output.get("representative_entity") if isinstance(entity_output.get("representative_entity"), dict) else {},
+            entity_output.get("side_category_code"),
+        )
+        evidence_meta = make_skipped_stage_meta("compact_fast_path")
+    else:
+        scorer_output, scorer_meta = run_agent_json_with_meta(Runner, agents_map["content_scorer"], scorer_input, stage="content_scorer")
+        evidence_output, evidence_meta = run_agent_json_with_meta(Runner, agents_map["evidence_extractor"], evidence_input, stage="evidence_extractor")
 
     qa_input = {
         "user_article_state_id": normalized_input["user_article_state_id"],
@@ -1646,6 +1995,7 @@ def run_article_assessment_debug(
         "evidence_output": evidence_output,
         "prompt_template_version_id": normalized_input["prompt_template_version_id"],
         "run_log_id": normalized_input["run_log_id"],
+        "quality_guardrails": quality_guardrails,
     }
     qa_output, qa_meta = run_agent_json_with_meta(Runner, agents_map["assessment_qa"], qa_input, stage="assessment_qa")
 
