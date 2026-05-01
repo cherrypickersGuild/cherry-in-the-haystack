@@ -661,7 +661,15 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
   }, [initialConceptId, onInitialConceptConsumed])
   const [agents, setAgents] = useState<any[]>([])
 
-  const reloadAgents = () => {
+  const reloadAgents = async () => {
+    // 비로그인 상태에서 fetchAgents → 401 → fetchWithAuth 의 redirectToLogin()
+    // 트리거되어 마켓 진입 시 /login 으로 강제이동되는 버그 방지.
+    const { getAccessToken } = await import("@/lib/auth")
+    if (!getAccessToken()) {
+      setAgents([])
+      setSelectedAgentId("")
+      return
+    }
     fetchAgents().then((data) => {
       if (Array.isArray(data) && data.length > 0) {
         setAgents(data)
