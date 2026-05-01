@@ -10,6 +10,7 @@ import {
 import { KnowledgeCurationPanel, ConceptPagePublishPanel } from "./kaas-admin-page"
 import { TemplateEditorBody } from "@/app/template/edit/page"
 import { KaasWorkshopPanel } from "./kaas-workshop-panel"
+import dash from "./dashboard.module.css"
 
 /* ═══════════════════════════════════════════════
    Privacy Mode Toggle (NEAR AI TEE)
@@ -1651,44 +1652,39 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
   ]
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className={dash.root}>
       {/* Header + Tabs */}
-      <div className="shrink-0 border-b border-[#E4E1EE] bg-white px-4 lg:px-6 pt-4 lg:pt-5 pb-0">
-        <h2 className="text-[16px] lg:text-[18px] font-extrabold text-[#1A1626] mb-2 lg:mb-3" style={{ letterSpacing: "-0.3px" }}>
+      <div className={dash.header}>
+        <h2 className={dash.headerTitle}>
           Dashboard
         </h2>
-        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between lg:gap-4">
+        <div className={dash.tabRow}>
           {tabs.length > 1 ? (
-            <div className="flex gap-0 overflow-x-auto">
+            <div className={dash.tabBar}>
               {tabs.map((t) => (
                 <button
                   key={t.key}
                   onClick={() => setActiveTab(t.key)}
-                  className={cn(
-                    "border-b-2 px-3 lg:px-4 py-2 lg:py-2.5 text-[12px] lg:text-[13px] font-semibold transition-colors whitespace-nowrap",
-                    activeTab === t.key
-                      ? "border-[var(--cherry)] text-[#1A1626]"
-                      : "border-transparent text-[#9E97B3] hover:text-[#3D3652]",
-                  )}
+                  className={cn(dash.tab, activeTab === t.key && dash.tabActive)}
                 >
                   {t.label}
                 </button>
               ))}
             </div>
           ) : <div />}
-          <div className="flex-shrink-0 pb-2 lg:pb-0">
+          <div className={dash.tabRowEnd}>
             <CompactPrivacyToggle />
           </div>
         </div>
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-hidden">
+      <div className={dash.tabContent}>
         {activeTab === "dashboard" && (
-          <div className="h-full overflow-y-auto p-4 lg:p-6">
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-5 lg:h-full">
+          <div className={dash.dashboardTab}>
+            <div className={dash.panelRow}>
               {/* Left — Agent List + Detail */}
-              <div className="lg:w-[420px] flex-shrink-0 rounded-xl border border-[#E4E1EE] bg-white p-4">
+              <div className={dash.leftPanel}>
                 {showRegister || showRegisterAuto ? (
                   <RegisterForm
                     onComplete={(newAgent) => {
@@ -1721,7 +1717,7 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
                 ) : null}
               </div>
               {/* Right — Wallet & Rewards */}
-              <div className="flex-1 rounded-xl border border-[#E4E1EE] bg-white p-4 lg:p-5 min-w-0 overflow-y-auto">
+              <div className={dash.rightPanel}>
                 {selectedAgent ? <WalletPanel agent={selectedAgent} onRefresh={loadAgents} karma={onchainKarma} karmaLoading={karmaLoading} karmaError={karmaError} onRefreshKarma={refreshOnchainKarma} isAdmin={isAdmin} /> : (
                   <div className="flex items-center justify-center h-full text-[13px] text-[#999]">Register an agent</div>
                 )}
@@ -1730,17 +1726,17 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
           </div>
         )}
         {activeTab === "curation" && (
-          <div className="h-full flex flex-col lg:flex-row overflow-hidden bg-[#FAFAFA]">
+          <div className={dash.subTab}>
             <KnowledgeCurationPanel isAdmin={isAdmin} />
           </div>
         )}
         {activeTab === "concept-page" && (
-          <div className="h-full flex flex-col lg:flex-row overflow-hidden bg-[#FAFAFA]">
+          <div className={dash.subTab}>
             <ConceptPagePublishPanel />
           </div>
         )}
         {activeTab === "template" && (
-          <div className="h-full flex flex-col lg:flex-row overflow-hidden bg-[#FAFAFA]">
+          <div className={dash.subTab}>
             <TemplateEditorBody />
           </div>
         )}
