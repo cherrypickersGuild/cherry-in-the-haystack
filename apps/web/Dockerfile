@@ -20,12 +20,13 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
-# Skew Protection: 배포마다 고유 deploymentId. CI에서 git hash 넘기면 그걸 쓰고,
-# 안 넘기면 Dockerfile RUN 시각으로 기본값 — 어쨌든 빌드마다 새 값.
+# Skew Protection: 배포마다 고유 deploymentId.
+# 핵심: 빌드 시점과 런타임 시점이 같은 값을 가져야 함 (다르면 client/server mismatch → 무한 reload 루프).
+# 빌드 시 한 번 결정해서 파일로 저장 → 런타임 컨테이너에 복사 → 서버 시작 시 env로 주입.
 ARG NEXT_DEPLOYMENT_ID=""
-ENV NEXT_DEPLOYMENT_ID=$NEXT_DEPLOYMENT_ID
-
-RUN pnpm --filter=my-project run build
+RUN DEPLOY_ID="${NEXT_DEPLOYMENT_ID:-build-$(date +%s)}" && \
+    echo "$DEPLOY_ID" > /tmp/deployment-id && \
+    NEXT_DEPLOYMENT_ID="$DEPLOY_ID" pnpm --filter=my-project run build
 
 # ---- Production Stage ----
 FROM node:20-alpine AS runner
@@ -42,6 +43,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 
+# 빌드 시 결정된 deploymentId 파일을 런타임으로 가져옴
+COPY --from=builder --chown=nextjs:nodejs /tmp/deployment-id ./deployment-id
+
 USER nextjs
 
 EXPOSE 3000
@@ -49,4 +53,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "apps/web/server.js"]
+# 시작 시 파일에서 deploymentId 읽어서 env로 주입 → next.config.mjs 가 빌드 때와 같은 값을 보게 됨.
+CMD ["sh", "-c", "export NEXT_DEPLOYMENT_ID=$(cat ./deployment-id) && exec node apps/web/server.js"]
