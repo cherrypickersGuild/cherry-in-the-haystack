@@ -831,11 +831,14 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
   const selected = filtered.find((c) => c.id === selectedId) ?? null
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col" style={{ gap: 20 }}>
       {/* Header + Compare button */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between" style={{ gap: 12 }}>
         <div>
-          <div className="flex flex-col lg:flex-row lg:items-start gap-2 lg:gap-3 mb-2">
+          <div
+            className="flex flex-col lg:flex-row lg:items-start"
+            style={{ gap: 8, marginBottom: 8 }}
+          >
             <h1
               className="font-extrabold text-[#1A1626] leading-none text-[20px] lg:text-[28px]"
               style={{ letterSpacing: "-0.5px" }}

@@ -319,12 +319,19 @@ function NavButton({
       onClick={() => onSelect(item.id)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={cn(
-        "w-full flex items-center gap-2.5 rounded-lg text-left transition-all duration-150 cursor-pointer",
-        "pl-5 pr-3 py-2 text-[13.5px] font-medium",
-        isActive && "font-semibold"
-      )}
-      style={{ color, backgroundColor: bg }}
+      className="w-full flex items-center text-left transition-all duration-150 cursor-pointer"
+      style={{
+        color,
+        backgroundColor: bg,
+        gap: 10,
+        paddingLeft: 20,
+        paddingRight: 12,
+        paddingTop: 8,
+        paddingBottom: 8,
+        borderRadius: 8,
+        fontSize: 13.5,
+        fontWeight: isActive ? 600 : 500,
+      }}
       aria-current={isActive ? "page" : undefined}
     >
       <span className="flex-shrink-0" style={{ color }}>{item.icon}</span>
@@ -358,8 +365,18 @@ function GroupHeaderButton({
       onClick={onToggle}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="w-full flex items-center gap-2.5 rounded-lg text-left transition-all duration-150 cursor-pointer pl-5 pr-3 text-[13.5px] font-medium"
-      style={{ color, backgroundColor: bg, height: ITEM_H }}
+      className="w-full flex items-center text-left transition-all duration-150 cursor-pointer"
+      style={{
+        color,
+        backgroundColor: bg,
+        height: ITEM_H,
+        gap: 10,
+        paddingLeft: 20,
+        paddingRight: 12,
+        borderRadius: 8,
+        fontSize: 13.5,
+        fontWeight: 500,
+      }}
       aria-expanded={!isCollapsed}
     >
       <span className="flex-shrink-0" style={{ color }}>{item.icon}</span>
@@ -421,13 +438,17 @@ export function Sidebar({
 
   return (
     <aside
-      className={cn("flex flex-col w-[240px] min-h-screen bg-sidebar border-r border-sidebar-border flex-shrink-0", className)}
+      className={cn("flex flex-col bg-sidebar border-r border-sidebar-border flex-shrink-0", className)}
+      style={{ width: 240, minHeight: "100vh" }}
       aria-label="Main navigation"
     >
       {/* Logo — hidden in mobile sheet */}
       {!hideLogo && (
-        <div className="px-4 pt-5 pb-4 flex-shrink-0 border-b border-sidebar-border">
-          <div className="flex items-center gap-2.5">
+        <div
+          className="flex-shrink-0 border-b border-sidebar-border"
+          style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 20, paddingBottom: 16 }}
+        >
+          <div className="flex items-center" style={{ gap: 10 }}>
             <CherryIcon className="flex-shrink-0" />
             <div className="leading-tight">
               <span className="text-[17px] font-bold text-text-primary tracking-tight">Cherry</span>
@@ -438,19 +459,28 @@ export function Sidebar({
       )}
 
       {/* Nav sections */}
-      <nav className="flex-1 overflow-y-auto px-2 py-4 pb-6 flex flex-col gap-0.5">
+      <nav
+        className="flex-1 overflow-y-auto flex flex-col"
+        style={{ paddingLeft: 8, paddingRight: 8, paddingTop: 16, paddingBottom: 24, gap: 2 }}
+      >
         {SECTIONS.map((section, si) => (
-          <div key={section.id} className={si > 0 ? "mt-3" : ""}>
-            <p className="text-[10px] font-bold uppercase tracking-[0.8px] px-2 mb-1 text-text-muted">
+          <div key={section.id} style={si > 0 ? { marginTop: 12 } : undefined}>
+            <p
+              className="text-[10px] font-bold uppercase tracking-[0.8px] text-text-muted"
+              style={{ paddingLeft: 8, paddingRight: 8, marginBottom: 4 }}
+            >
               {section.label}
               {section.highlight && (
-                <span className="ml-1.5 text-[9px] font-semibold tracking-normal bg-[var(--cherry)] text-white rounded px-1 py-[1px] align-middle">
+                <span
+                  className="text-[9px] font-semibold tracking-normal bg-[var(--cherry)] text-white align-middle"
+                  style={{ marginLeft: 6, borderRadius: 4, paddingLeft: 4, paddingRight: 4, paddingTop: 1, paddingBottom: 1 }}
+                >
                   HOT
                 </span>
               )}
             </p>
 
-            <div className="flex flex-col gap-0.5">
+            <div className="flex flex-col" style={{ gap: 2 }}>
               {section.items.map((item) => (
                 <div key={item.id}>
                   {item.children && item.children.length > 0 ? (

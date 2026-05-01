@@ -84,10 +84,10 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#FBFAF8" }}>
-      <div className="w-full max-w-md px-6">
+      <div className="w-full max-w-md" style={{ paddingLeft: 24, paddingRight: 24 }}>
         {/* 로고 */}
-        <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-2 mb-3">
+        <div className="text-center" style={{ marginBottom: 40 }}>
+          <div className="flex items-center justify-center" style={{ gap: 8, marginBottom: 12 }}>
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
               <circle cx="14" cy="14" r="14" fill="#C94B6E" />
               <circle cx="14" cy="11" r="5" fill="white" />

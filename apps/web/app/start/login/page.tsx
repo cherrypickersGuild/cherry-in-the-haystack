@@ -80,21 +80,30 @@ function StartLoginContent() {
   }
 
   return (
-    <div className="flex flex-col items-center pt-8 pb-16">
+    <div
+      className="flex flex-col items-center"
+      style={{ paddingTop: 32, paddingBottom: 64 }}
+    >
       <div className="w-full max-w-[440px]">
         <div
-          className="rounded-[24px] bg-[#FDFBF5] p-7 lg:p-8"
-          style={{ border: "1px solid #E9D1A6", boxShadow: "0 10px 30px rgba(107,79,42,0.10)" }}
+          className="rounded-[24px] bg-[#FDFBF5]"
+          style={{ border: "1px solid #E9D1A6", boxShadow: "0 10px 30px rgba(107,79,42,0.10)", padding: 28 }}
         >
           {step === "input" && (
             <>
-              <div className="flex flex-col items-center text-center mb-5">
+              <div
+                className="flex flex-col items-center text-center"
+                style={{ marginBottom: 20 }}
+              >
                 <CherryBao size={80} animate />
               </div>
               <h1 className="text-[22px] font-extrabold text-[#3A2A1C] text-center">
                 Start with your email
               </h1>
-              <p className="mt-1.5 text-[13px] text-[#6B4F2A] leading-relaxed text-center">
+              <p
+                className="text-[13px] text-[#6B4F2A] leading-relaxed text-center"
+                style={{ marginTop: 6 }}
+              >
                 No password needed. We'll send you a sign-in link by email.
                 <br />
                 First time here? You get signed up automatically and <b className="text-[#C8301E]">200 credits</b> land in your account.
