@@ -40,8 +40,12 @@ export default function CherryApp() {
 
   // Subscribe to auth change events for re-render; read the token fresh below.
   useAuthTick()
-  // Read token directly at render time — no derived boolean state to go stale.
-  const token = getAccessToken()
+  // Hydration mismatch 방지: 서버는 localStorage 못 보니 token=null 로 SSR 함.
+  // 클라이언트도 hydration 끝날 때까진 token=null 로 동일하게 렌더해야 React 가
+  // 트리 통째로 버리고 재렌더하는 사고(error #418) 안 남. mounted 후에 진짜 token 읽음.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+  const token = mounted ? getAccessToken() : null
   const isAdmin = decodeToken(token)?.role === "ADMIN"
 
   useEffect(() => {
