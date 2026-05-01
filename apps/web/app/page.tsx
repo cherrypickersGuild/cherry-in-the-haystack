@@ -282,19 +282,30 @@ export default function CherryApp() {
         </header>
 
         {/* Desktop top bar */}
-        <div className="hidden lg:flex items-center justify-end gap-2 px-10 py-4 border-b border-[#E4E1EE] bg-white flex-shrink-0">
+        <div
+          className="hidden lg:flex items-center justify-end border-b border-[#E4E1EE] bg-white flex-shrink-0"
+          style={{ gap: 8, paddingLeft: 40, paddingRight: 40, paddingTop: 16, paddingBottom: 16 }}
+        >
           {token && (
             <button
               onClick={() => setShowDashboard(true)}
-              className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-white transition-opacity hover:opacity-90 cursor-pointer"
-              style={{ backgroundColor: "#C94B6E" }}
+              className="text-[12px] font-semibold text-white transition-opacity hover:opacity-90 cursor-pointer"
+              style={{
+                backgroundColor: "#C94B6E",
+                paddingLeft: 12, paddingRight: 12, paddingTop: 6, paddingBottom: 6,
+                borderRadius: 8,
+              }}
             >
               Dashboard
             </button>
           )}
           <button
             onClick={handleAuthClick}
-            className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors cursor-pointer"
+            className="text-[12px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors cursor-pointer"
+            style={{
+              paddingLeft: 12, paddingRight: 12, paddingTop: 6, paddingBottom: 6,
+              borderRadius: 8,
+            }}
           >
             {token ? "Logout" : "Login"}
           </button>

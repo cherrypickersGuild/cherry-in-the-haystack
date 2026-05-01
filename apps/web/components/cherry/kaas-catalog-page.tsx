@@ -231,13 +231,20 @@ function ConceptCard({
     <button
       onClick={onSelect}
       className={cn(
-        "block w-full text-left rounded-md p-4 transition-all duration-150 cursor-pointer",
-        "border hover:shadow-sm relative bg-white",
-        isSelected
-          ? "border-[var(--cherry)] shadow-sm ring-1 ring-[var(--cherry)]/20"
-          : "border-[#E4E1EE] hover:border-[#C7B8E8]"
+        "transition-all duration-150 cursor-pointer hover:shadow-sm relative",
+        isSelected ? "shadow-sm ring-1 ring-[var(--cherry)]/20" : ""
       )}
-      style={onSale ? { borderTopRightRadius: saleCornerRadius } : undefined}
+      style={{
+        display: "block",
+        width: "100%",
+        textAlign: "left",
+        padding: 16,
+        borderRadius: 6,
+        backgroundColor: "#FFFFFF",
+        border: `1px solid ${isSelected ? "var(--cherry)" : "#E4E1EE"}`,
+        position: "relative",
+        ...(onSale ? { borderTopRightRadius: saleCornerRadius } : {}),
+      }}
     >
       {/* SALE 코너 탭 — 카드 우상단 모서리에 딱 붙음. 카드의 우상단을 6px로 줄였으므로 탭도 같은 값으로 매칭 */}
       {onSale && (
@@ -275,7 +282,7 @@ function ConceptCard({
       ) : null}
 
       {/* Quality + Category */}
-      <div className="flex items-center gap-2 mb-2.5">
+      <div className="flex items-center" style={{ gap: 8, marginBottom: 10 }}>
         <Stars score={concept.qualityScore} />
         <span className="text-[10px] font-semibold" style={{ color: badge.text }}>
           {concept.category}
@@ -283,18 +290,27 @@ function ConceptCard({
       </div>
 
       {/* Title */}
-      <h3 className="text-[14px] font-bold text-[#1A1626] leading-snug mb-1.5">
+      <h3
+        className="text-[14px] font-bold text-[#1A1626] leading-snug"
+        style={{ marginBottom: 6 }}
+      >
         {concept.title}
       </h3>
 
       {/* Summary — 2 lines */}
-      <p className="text-[12px] text-text-muted leading-relaxed line-clamp-2 mb-3">
+      <p
+        className="text-[12px] text-text-muted leading-relaxed line-clamp-2"
+        style={{ marginBottom: 12 }}
+      >
         {concept.summary}
       </p>
 
       {/* Creator + Karma */}
       {concept.creator && (
-        <div className="flex items-center gap-1.5 mb-2 text-[10px]">
+        <div
+          className="flex items-center text-[10px]"
+          style={{ gap: 6, marginBottom: 8 }}
+        >
           <span className="text-[#666]">by</span>
           <span className="font-semibold text-[#3D3652]">{concept.creator.name === "__SYSTEM__" ? "Market" : concept.creator.name}</span>
           <span className={cn(
@@ -310,7 +326,10 @@ function ConceptCard({
       )}
 
       {/* Footer: sources + updated + gap recommendation */}
-      <div className="flex items-center gap-3 text-[11px] text-text-muted">
+      <div
+        className="flex items-center text-[11px] text-text-muted"
+        style={{ gap: 12 }}
+      >
         <span>
           <span className="font-semibold text-[#3D3652]">{concept.sourceCount}</span> sources
         </span>
@@ -831,11 +850,14 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
   const selected = filtered.find((c) => c.id === selectedId) ?? null
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col" style={{ gap: 20 }}>
       {/* Header + Compare button */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between" style={{ gap: 12 }}>
         <div>
-          <div className="flex flex-col lg:flex-row lg:items-start gap-2 lg:gap-3 mb-2">
+          <div
+            className="flex flex-col lg:flex-row lg:items-start"
+            style={{ gap: 8, marginBottom: 8 }}
+          >
             <h1
               className="font-extrabold text-[#1A1626] leading-none text-[20px] lg:text-[28px]"
               style={{ letterSpacing: "-0.5px" }}
@@ -935,8 +957,17 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
         })}
       </div></div>
 
-      {/* Cards grid — each card shows compare status after submit */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      {/* Cards grid — each card shows compare status after submit.
+          grid 유틸 클래스가 청크에서 누락되면 카드들이 inline-block으로 흐르므로
+          핵심 layout(display:grid + columns)을 인라인으로 박아 방어. */}
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        style={{
+          display: "grid",
+          gap: 12,
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+        }}
+      >
         {filtered.map((c) => (
           <ConceptCard
             key={c.id}

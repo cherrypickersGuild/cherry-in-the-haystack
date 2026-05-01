@@ -339,19 +339,40 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
           </button>
         </div>
         {isAdmin && (
-          <div className="flex border-b border-[#F0F0F0] px-3 pb-0">
-            {(["market", "user"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => { setListTab(tab); setSelectedId(null); setSearch("") }}
-                className={cn(
-                  "border-b-2 px-3 py-1.5 text-[11px] font-semibold capitalize transition-colors",
-                  listTab === tab ? "border-[#D4854A] text-[#1A1626]" : "border-transparent text-[#888] hover:text-[#333]"
-                )}
-              >
-                {tab === "market" ? "Market" : "User"}
-              </button>
-            ))}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              borderBottom: "1px solid #F0F0F0",
+              paddingLeft: 12,
+              paddingRight: 12,
+              paddingBottom: 0,
+            }}
+          >
+            {(["market", "user"] as const).map((tab) => {
+              const isActive = listTab === tab
+              return (
+                <button
+                  key={tab}
+                  onClick={() => { setListTab(tab); setSelectedId(null); setSearch("") }}
+                  className="font-semibold capitalize transition-colors"
+                  style={{
+                    borderBottom: `2px solid ${isActive ? "#D4854A" : "transparent"}`,
+                    paddingLeft: 12,
+                    paddingRight: 12,
+                    paddingTop: 6,
+                    paddingBottom: 6,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: isActive ? "#1A1626" : "#888",
+                    backgroundColor: "transparent",
+                    cursor: "pointer",
+                  }}
+                >
+                  {tab === "market" ? "Market" : "User"}
+                </button>
+              )
+            })}
           </div>
         )}
         <div className="px-3 pt-2 pb-1">
@@ -360,21 +381,42 @@ export function KnowledgeCurationPanel({ isAdmin = false }: { isAdmin?: boolean 
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={isAdmin && listTab === "user" ? "Search title, user ID…" : "Search"} className="w-full rounded-lg border border-[#E0E0E0] bg-[#FBFAF8] py-1.5 pl-8 pr-3 text-[12px] outline-none placeholder:text-[#888] focus:border-[#1A1626] focus:bg-white" />
           </div>
         </div>
-        <div className="flex gap-1 px-3 pb-2 flex-wrap">
-          {CATEGORY_FILTERS.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategoryFilter(cat as typeof categoryFilter)}
-              className={cn(
-                "rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition-colors border",
-                categoryFilter === cat
-                  ? "bg-[#1A1626] text-white border-[#1A1626]"
-                  : "border-[#E0E0E0] text-[#888] hover:border-[#999] hover:text-[#555]"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 4,
+            paddingLeft: 12,
+            paddingRight: 12,
+            paddingBottom: 8,
+          }}
+        >
+          {CATEGORY_FILTERS.map((cat) => {
+            const isActive = categoryFilter === cat
+            return (
+              <button
+                key={cat}
+                onClick={() => setCategoryFilter(cat as typeof categoryFilter)}
+                className="font-semibold transition-colors"
+                style={{
+                  borderRadius: 9999,
+                  paddingLeft: 10,
+                  paddingRight: 10,
+                  paddingTop: 2,
+                  paddingBottom: 2,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  border: `1px solid ${isActive ? "#1A1626" : "#E0E0E0"}`,
+                  backgroundColor: isActive ? "#1A1626" : "transparent",
+                  color: isActive ? "#FFFFFF" : "#888",
+                  cursor: "pointer",
+                }}
+              >
+                {cat}
+              </button>
+            )
+          })}
         </div>
 
         <div className="flex-1 overflow-y-auto px-2">
@@ -1120,21 +1162,42 @@ export function ConceptPagePublishPanel() {
             />
           </div>
         </div>
-        <div className="flex gap-1 px-3 pb-2 flex-wrap">
-          {CATEGORY_FILTERS.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategoryFilter(cat as typeof categoryFilter)}
-              className={cn(
-                "rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition-colors border",
-                categoryFilter === cat
-                  ? "bg-[#1A1626] text-white border-[#1A1626]"
-                  : "border-[#E0E0E0] text-[#888] hover:border-[#999] hover:text-[#555]",
-              )}
-            >
-              {cat}
-            </button>
-          ))}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 4,
+            paddingLeft: 12,
+            paddingRight: 12,
+            paddingBottom: 8,
+          }}
+        >
+          {CATEGORY_FILTERS.map((cat) => {
+            const isActive = categoryFilter === cat
+            return (
+              <button
+                key={cat}
+                onClick={() => setCategoryFilter(cat as typeof categoryFilter)}
+                className="font-semibold transition-colors"
+                style={{
+                  borderRadius: 9999,
+                  paddingLeft: 10,
+                  paddingRight: 10,
+                  paddingTop: 2,
+                  paddingBottom: 2,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  border: `1px solid ${isActive ? "#1A1626" : "#E0E0E0"}`,
+                  backgroundColor: isActive ? "#1A1626" : "transparent",
+                  color: isActive ? "#FFFFFF" : "#888",
+                  cursor: "pointer",
+                }}
+              >
+                {cat}
+              </button>
+            )
+          })}
         </div>
         <div className="flex-1 overflow-y-auto px-2 pb-2">
           {filtered.length === 0 && (
@@ -2096,25 +2159,46 @@ export default function KaasAdminPage() {
   return (
     <div className="flex h-full flex-col overflow-hidden text-[#1A1626]">
       {/* Header — Dashboard 스타일: 제목 + 탭 나란히 */}
-      <div className="shrink-0 border-b border-[#E0E0E0] bg-white px-6 pt-5 pb-0">
-        <div className="flex items-center gap-6 mb-3">
-          <h2 className="text-[18px] font-bold">Admin</h2>
+      <div
+        className="shrink-0 bg-white"
+        style={{
+          flexShrink: 0,
+          borderBottom: "1px solid #E0E0E0",
+          backgroundColor: "#FFFFFF",
+          paddingLeft: 24,
+          paddingRight: 24,
+          paddingTop: 20,
+          paddingBottom: 0,
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 24, marginBottom: 12 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700 }}>Admin</h2>
         </div>
-        <div className="flex gap-0">
-          {topTabs.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTopTab(t.key)}
-              className={cn(
-                "border-b-2 px-4 py-2.5 text-[13px] font-semibold transition-colors",
-                topTab === t.key
-                  ? "border-[#D4854A] text-[#1A1626]"
-                  : "border-transparent text-[#888] hover:text-[#333]",
-              )}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div style={{ display: "flex", flexDirection: "row", gap: 0 }}>
+          {topTabs.map((t) => {
+            const isActive = topTab === t.key
+            return (
+              <button
+                key={t.key}
+                onClick={() => setTopTab(t.key)}
+                className="font-semibold transition-colors"
+                style={{
+                  borderBottom: `2px solid ${isActive ? "#D4854A" : "transparent"}`,
+                  paddingLeft: 16,
+                  paddingRight: 16,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: isActive ? "#1A1626" : "#888",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                {t.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 

@@ -617,98 +617,228 @@ function AgentPanel({
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {/* Agent list — 스크롤 영역 */}
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[15px] font-bold text-[#1A1626]">My Agents</h3>
+      <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 12,
+          }}
+        >
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1A1626" }}>My Agents</h3>
           <button
             onClick={onAdd}
-            className="w-6 h-6 rounded-md border border-[#E4E1EE] flex items-center justify-center hover:border-[var(--cherry)] hover:text-[var(--cherry)] text-[#6B727E] cursor-pointer transition-colors"
+            className="hover:border-[var(--cherry)] hover:text-[var(--cherry)] transition-colors"
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 6,
+              border: "1px solid #E4E1EE",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#6B727E",
+              cursor: "pointer",
+              backgroundColor: "transparent",
+            }}
           >
             <Plus size={13} />
           </button>
         </div>
-        <div className="space-y-1.5">
-          {agents.map((a) => (
-            <div
-              key={a.id}
-              onClick={() => onSelect(a.id)}
-              className={cn(
-                "w-full text-left rounded-lg px-3 py-2 transition-all cursor-pointer border",
-                a.id === selectedId
-                  ? "border-[#D4854A] bg-[#FFF8F0]"
-                  : "border-[#E4E1EE] hover:border-[#C7B8E8] bg-white"
-              )}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-[14px]">{a.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-semibold text-[#1A1626] truncate">{a.name}</p>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onSelect(a.id)
-                    onWorkshopOpen(a.id)
-                  }}
-                  title="Open Workshop — equip skills, MCP tools, memory"
-                  className="text-[10px] font-semibold px-2 py-1 rounded border border-[#4A5FA0] text-[#2D3B66] bg-white hover:bg-[#EEF0F7] hover:border-[#2D3B66] cursor-pointer flex-shrink-0 transition-colors"
-                >
-                  Workshop
-                </button>
-                <button
-                  onClick={async (e) => {
-                    e.stopPropagation()
-                    try {
-                      const { fetchAgentSelfReport } = await import("@/lib/api")
-                      const r = await fetchAgentSelfReport(a.id)
-                      if (r?.ok && r?.report) {
-                        window.dispatchEvent(new CustomEvent("kaas-self-report", {
-                          detail: { report: r.report, agentId: a.id, agentName: a.name },
-                        }))
-                      } else {
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {agents.map((a) => {
+            const isSelected = a.id === selectedId
+            return (
+              <div
+                key={a.id}
+                onClick={() => onSelect(a.id)}
+                className="transition-all"
+                style={{
+                  width: "100%",
+                  textAlign: "left",
+                  borderRadius: 8,
+                  paddingLeft: 12,
+                  paddingRight: 12,
+                  paddingTop: 8,
+                  paddingBottom: 8,
+                  cursor: "pointer",
+                  border: `1px solid ${isSelected ? "#D4854A" : "#E4E1EE"}`,
+                  backgroundColor: isSelected ? "#FFF8F0" : "#FFFFFF",
+                }}
+              >
+                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 14 }}>{a.icon}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: "#1A1626",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {a.name}
+                    </p>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onSelect(a.id)
+                      onWorkshopOpen(a.id)
+                    }}
+                    title="Open Workshop — equip skills, MCP tools, memory"
+                    className="hover:bg-[#EEF0F7] hover:border-[#2D3B66] transition-colors"
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 600,
+                      paddingLeft: 8,
+                      paddingRight: 8,
+                      paddingTop: 4,
+                      paddingBottom: 4,
+                      borderRadius: 4,
+                      border: "1px solid #4A5FA0",
+                      color: "#2D3B66",
+                      backgroundColor: "#FFFFFF",
+                      cursor: "pointer",
+                      flexShrink: 0,
+                    }}
+                  >
+                    Workshop
+                  </button>
+                  <button
+                    onClick={async (e) => {
+                      e.stopPropagation()
+                      try {
+                        const { fetchAgentSelfReport } = await import("@/lib/api")
+                        const r = await fetchAgentSelfReport(a.id)
+                        if (r?.ok && r?.report) {
+                          window.dispatchEvent(new CustomEvent("kaas-self-report", {
+                            detail: { report: r.report, agentId: a.id, agentName: a.name },
+                          }))
+                        } else {
+                          window.dispatchEvent(new CustomEvent("kaas-self-report-error", {
+                            detail: { error: r?.error ?? "Self-report unavailable", hint: r?.hint },
+                          }))
+                        }
+                      } catch (err: any) {
                         window.dispatchEvent(new CustomEvent("kaas-self-report-error", {
-                          detail: { error: r?.error ?? "Self-report unavailable", hint: r?.hint },
+                          detail: { error: err?.message ?? "Self-report request failed" },
                         }))
                       }
-                    } catch (err: any) {
-                      window.dispatchEvent(new CustomEvent("kaas-self-report-error", {
-                        detail: { error: err?.message ?? "Self-report request failed" },
-                      }))
-                    }
-                  }}
-                  title="View Knowledge Diff (self-report)"
-                  className="flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded border border-[#D4854A] text-[#A85D2C] bg-white hover:bg-[#FFF3E5] hover:border-[#A85D2C] cursor-pointer flex-shrink-0 transition-colors"
-                >
-                  📚 <span>Diff</span>
-                </button>
-                <div className="text-right flex-shrink-0">
-                  <p className="text-[11px] font-bold text-[#1A1626]">{a.credits}<span className="text-[9px] font-semibold text-[#6B727E]"> cr</span></p>
+                    }}
+                    title="View Knowledge Diff (self-report)"
+                    className="hover:bg-[#FFF3E5] hover:border-[#A85D2C] transition-colors"
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 4,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      paddingLeft: 8,
+                      paddingRight: 8,
+                      paddingTop: 4,
+                      paddingBottom: 4,
+                      borderRadius: 4,
+                      border: "1px solid #D4854A",
+                      color: "#A85D2C",
+                      backgroundColor: "#FFFFFF",
+                      cursor: "pointer",
+                      flexShrink: 0,
+                    }}
+                  >
+                    📚 <span>Diff</span>
+                  </button>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: "#1A1626" }}>
+                      {a.credits}
+                      <span style={{ fontSize: 9, fontWeight: 600, color: "#6B727E" }}> cr</span>
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
       {/* Selected agent detail — 고정 하단 */}
-      <div className="shrink-0 border-t border-[#E4E1EE] pt-3 mt-3 space-y-3">
-
-
+      <div
+        style={{
+          flexShrink: 0,
+          borderTop: "1px solid #E4E1EE",
+          paddingTop: 12,
+          marginTop: 12,
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+        }}
+      >
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">MCP Server</p>
-          <div className="flex items-center gap-1.5">
-            <Globe size={12} className={mcpConnected ? "text-[#2D7A5E]" : "text-[#9E97B3]"} />
-            <span className="text-[11px] font-mono text-[#1A1626]">cherry-kaas.mcp.server</span>
+          <p
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.6px",
+              color: "#6B727E",
+              marginBottom: 4,
+            }}
+          >
+            MCP Server
+          </p>
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Globe size={12} style={{ color: mcpConnected ? "#2D7A5E" : "#9E97B3" }} />
+            <span style={{ fontSize: 11, fontFamily: "monospace", color: "#1A1626" }}>cherry-kaas.mcp.server</span>
             {mcpConnected ? (
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#EFF7F3] text-[#2D7A5E] font-semibold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#2D7A5E] animate-pulse" />
+              <span
+                style={{
+                  fontSize: 9,
+                  paddingLeft: 6,
+                  paddingRight: 6,
+                  paddingTop: 2,
+                  paddingBottom: 2,
+                  borderRadius: 4,
+                  backgroundColor: "#EFF7F3",
+                  color: "#2D7A5E",
+                  fontWeight: 600,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                <span
+                  className="animate-pulse"
+                  style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#2D7A5E" }}
+                />
                 Connected
               </span>
             ) : (
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#F3F1F7] text-[#9E97B3] font-semibold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#9E97B3]" />
+              <span
+                style={{
+                  fontSize: 9,
+                  paddingLeft: 6,
+                  paddingRight: 6,
+                  paddingTop: 2,
+                  paddingBottom: 2,
+                  borderRadius: 4,
+                  backgroundColor: "#F3F1F7",
+                  color: "#9E97B3",
+                  fontWeight: 600,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#9E97B3" }} />
                 Disconnected
               </span>
             )}
@@ -716,74 +846,258 @@ function AgentPanel({
         </div>
 
         <div>
-          <span className="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-[#EFF7F3] text-[#2D7A5E] border border-[#A8D4C0] mb-1.5">
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 9,
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              paddingLeft: 6,
+              paddingRight: 6,
+              paddingTop: 2,
+              paddingBottom: 2,
+              borderRadius: 4,
+              backgroundColor: "#EFF7F3",
+              color: "#2D7A5E",
+              border: "1px solid #A8D4C0",
+              marginBottom: 6,
+            }}
+          >
             ✓ Paste & run in terminal
           </span>
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E]">Claude Code Connection</p>
-            <div className="flex items-center gap-0.5 bg-[#F3F1F7] rounded-md p-0.5">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 4,
+            }}
+          >
+            <p
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.6px",
+                color: "#6B727E",
+              }}
+            >
+              Claude Code Connection
+            </p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 2,
+                backgroundColor: "#F3F1F7",
+                borderRadius: 6,
+                padding: 2,
+              }}
+            >
               <button
                 onClick={() => setOsTab("mac")}
-                className={cn("text-[9px] font-semibold px-2 py-0.5 rounded cursor-pointer transition-colors", osTab === "mac" ? "bg-white text-[#1A1626] shadow-sm" : "text-[#9E97B3] hover:text-[#6B727E]")}
+                style={{
+                  fontSize: 9,
+                  fontWeight: 600,
+                  paddingLeft: 8,
+                  paddingRight: 8,
+                  paddingTop: 2,
+                  paddingBottom: 2,
+                  borderRadius: 4,
+                  cursor: "pointer",
+                  backgroundColor: osTab === "mac" ? "#FFFFFF" : "transparent",
+                  color: osTab === "mac" ? "#1A1626" : "#9E97B3",
+                  boxShadow: osTab === "mac" ? "0 1px 2px rgba(0,0,0,0.05)" : "none",
+                  border: "none",
+                }}
               >
                 Mac / Linux
               </button>
               <button
                 onClick={() => setOsTab("win")}
-                className={cn("text-[9px] font-semibold px-2 py-0.5 rounded cursor-pointer transition-colors", osTab === "win" ? "bg-white text-[#1A1626] shadow-sm" : "text-[#9E97B3] hover:text-[#6B727E]")}
+                style={{
+                  fontSize: 9,
+                  fontWeight: 600,
+                  paddingLeft: 8,
+                  paddingRight: 8,
+                  paddingTop: 2,
+                  paddingBottom: 2,
+                  borderRadius: 4,
+                  cursor: "pointer",
+                  backgroundColor: osTab === "win" ? "#FFFFFF" : "transparent",
+                  color: osTab === "win" ? "#1A1626" : "#9E97B3",
+                  boxShadow: osTab === "win" ? "0 1px 2px rgba(0,0,0,0.05)" : "none",
+                  border: "none",
+                }}
               >
                 Windows
               </button>
             </div>
           </div>
-          <div className="bg-[#F9F7F5] rounded-lg px-3 py-2 border border-[#E4E1EE] relative">
-            <p className="text-[10px] font-mono text-[#1A1626] break-all leading-relaxed pr-6">{mcpCommand}</p>
+          <div
+            style={{
+              backgroundColor: "#F9F7F5",
+              borderRadius: 8,
+              paddingLeft: 12,
+              paddingRight: 12,
+              paddingTop: 8,
+              paddingBottom: 8,
+              border: "1px solid #E4E1EE",
+              position: "relative",
+            }}
+          >
+            <p
+              style={{
+                fontSize: 10,
+                fontFamily: "monospace",
+                color: "#1A1626",
+                wordBreak: "break-all",
+                lineHeight: 1.5,
+                paddingRight: 24,
+              }}
+            >
+              {mcpCommand}
+            </p>
             <button
               onClick={handleCmdCopy}
-              className="absolute top-2 right-2 p-0.5 hover:bg-white rounded cursor-pointer flex-shrink-0"
               title="Copy command"
+              style={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                padding: 2,
+                borderRadius: 4,
+                cursor: "pointer",
+                flexShrink: 0,
+                backgroundColor: "transparent",
+                border: "none",
+              }}
             >
-              {cmdCopied ? <Check size={12} className="text-[#2D7A5E]" /> : <Copy size={12} className="text-[#6B727E]" />}
+              {cmdCopied ? <Check size={12} style={{ color: "#2D7A5E" }} /> : <Copy size={12} style={{ color: "#6B727E" }} />}
             </button>
           </div>
-
         </div>
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Connection Test</p>
-          <div className="bg-[#F9F7F5] rounded-lg px-3 py-2 border border-[#E4E1EE] relative">
-            <p className="text-[10px] font-mono text-[#1A1626] pr-6">Submit a self-report of your knowledge to Cherry KaaS server.</p>
+          <p
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.6px",
+              color: "#6B727E",
+              marginBottom: 4,
+            }}
+          >
+            Connection Test
+          </p>
+          <div
+            style={{
+              backgroundColor: "#F9F7F5",
+              borderRadius: 8,
+              paddingLeft: 12,
+              paddingRight: 12,
+              paddingTop: 8,
+              paddingBottom: 8,
+              border: "1px solid #E4E1EE",
+              position: "relative",
+            }}
+          >
+            <p style={{ fontSize: 10, fontFamily: "monospace", color: "#1A1626", paddingRight: 24 }}>
+              Submit a self-report of your knowledge to Cherry KaaS server.
+            </p>
             <button
               onClick={() => {
                 navigator.clipboard.writeText("Submit a self-report of your knowledge to Cherry KaaS server.")
                 setTestCopied(true)
                 setTimeout(() => setTestCopied(false), 2000)
               }}
-              className="absolute top-2 right-2 p-0.5 hover:bg-white rounded cursor-pointer flex-shrink-0"
               title="Copy test prompt"
+              style={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                padding: 2,
+                borderRadius: 4,
+                cursor: "pointer",
+                flexShrink: 0,
+                backgroundColor: "transparent",
+                border: "none",
+              }}
             >
-              {testCopied ? <Check size={12} className="text-[#2D7A5E]" /> : <Copy size={12} className="text-[#6B727E]" />}
+              {testCopied ? <Check size={12} style={{ color: "#2D7A5E" }} /> : <Copy size={12} style={{ color: "#6B727E" }} />}
             </button>
           </div>
         </div>
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1">Disconnect MCP</p>
-          <div className="bg-[#F9F7F5] rounded-lg px-3 py-2 border border-[#E4E1EE] relative">
-            <p className="text-[10px] font-mono text-[#1A1626] pr-6">{removeCommand}</p>
+          <p
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.6px",
+              color: "#6B727E",
+              marginBottom: 4,
+            }}
+          >
+            Disconnect MCP
+          </p>
+          <div
+            style={{
+              backgroundColor: "#F9F7F5",
+              borderRadius: 8,
+              paddingLeft: 12,
+              paddingRight: 12,
+              paddingTop: 8,
+              paddingBottom: 8,
+              border: "1px solid #E4E1EE",
+              position: "relative",
+            }}
+          >
+            <p style={{ fontSize: 10, fontFamily: "monospace", color: "#1A1626", paddingRight: 24 }}>
+              {removeCommand}
+            </p>
             <button
               onClick={handleRemoveCopy}
-              className="absolute top-2 right-2 p-0.5 hover:bg-white rounded cursor-pointer flex-shrink-0"
               title="Copy disconnect command"
+              style={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                padding: 2,
+                borderRadius: 4,
+                cursor: "pointer",
+                flexShrink: 0,
+                backgroundColor: "transparent",
+                border: "none",
+              }}
             >
-              {removeCopied ? <Check size={12} className="text-[#2D7A5E]" /> : <Copy size={12} className="text-[#6B727E]" />}
+              {removeCopied ? <Check size={12} style={{ color: "#2D7A5E" }} /> : <Copy size={12} style={{ color: "#6B727E" }} />}
             </button>
           </div>
         </div>
 
         <button
           onClick={() => { if (confirm(`Delete agent "${selected.name}"?`)) onDelete(selected.id) }}
-          className="w-full text-[12px] font-medium text-[#999] hover:text-red-400 py-0 -mt-2 cursor-pointer transition-colors leading-tight"
+          style={{
+            width: "100%",
+            fontSize: 12,
+            fontWeight: 500,
+            color: "#999",
+            paddingTop: 0,
+            paddingBottom: 0,
+            marginTop: -8,
+            cursor: "pointer",
+            backgroundColor: "transparent",
+            border: "none",
+            lineHeight: 1.25,
+          }}
         >
           Delete Agent
         </button>
@@ -1652,49 +1966,112 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* Header + Tabs */}
-      <div className="shrink-0 border-b border-[#E4E1EE] bg-white px-4 lg:px-6 pt-4 lg:pt-5 pb-0">
-        <h2 className="text-[16px] lg:text-[18px] font-extrabold text-[#1A1626] mb-2 lg:mb-3" style={{ letterSpacing: "-0.3px" }}>
+      {/* Header + Tabs — 인라인 style 로 spacing/border/flex 모두 박음 (Tailwind 클래스 누락에도 안 무너지게) */}
+      <div
+        className="shrink-0 bg-white"
+        style={{
+          flexShrink: 0,
+          borderBottom: "1px solid #E4E1EE",
+          backgroundColor: "#FFFFFF",
+          paddingLeft: 16,
+          paddingRight: 16,
+          paddingTop: 16,
+          paddingBottom: 0,
+        }}
+      >
+        <h2
+          className="font-extrabold text-[#1A1626]"
+          style={{
+            fontSize: 18,
+            fontWeight: 800,
+            color: "#1A1626",
+            marginBottom: 12,
+            letterSpacing: "-0.3px",
+          }}
+        >
           Dashboard
         </h2>
-        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between lg:gap-4">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: 16,
+            flexWrap: "wrap",
+          }}
+        >
           {tabs.length > 1 ? (
-            <div className="flex gap-0 overflow-x-auto">
-              {tabs.map((t) => (
-                <button
-                  key={t.key}
-                  onClick={() => setActiveTab(t.key)}
-                  className={cn(
-                    "border-b-2 px-3 lg:px-4 py-2 lg:py-2.5 text-[12px] lg:text-[13px] font-semibold transition-colors whitespace-nowrap",
-                    activeTab === t.key
-                      ? "border-[var(--cherry)] text-[#1A1626]"
-                      : "border-transparent text-[#9E97B3] hover:text-[#3D3652]",
-                  )}
-                >
-                  {t.label}
-                </button>
-              ))}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 0,
+                overflowX: "auto",
+              }}
+            >
+              {tabs.map((t) => {
+                const isActive = activeTab === t.key
+                return (
+                  <button
+                    key={t.key}
+                    onClick={() => setActiveTab(t.key)}
+                    className="font-semibold transition-colors"
+                    style={{
+                      borderBottom: `2px solid ${isActive ? "var(--cherry)" : "transparent"}`,
+                      paddingLeft: 16,
+                      paddingRight: 16,
+                      paddingTop: 10,
+                      paddingBottom: 10,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: isActive ? "#1A1626" : "#9E97B3",
+                      whiteSpace: "nowrap",
+                      backgroundColor: "transparent",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                )
+              })}
             </div>
           ) : <div />}
-          <div className="flex-shrink-0 pb-2 lg:pb-0">
+          <div style={{ flexShrink: 0, paddingBottom: 0 }}>
             <CompactPrivacyToggle />
           </div>
         </div>
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-hidden">
+      <div style={{ flex: 1, overflow: "hidden" }}>
         {activeTab === "dashboard" && (
-          <div className="h-full overflow-y-auto p-4 lg:p-6">
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-5 lg:h-full">
+          <div style={{ height: "100%", overflowY: "auto", padding: 24 }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 20,
+                height: "100%",
+                flexWrap: "wrap",
+              }}
+            >
               {/* Left — Agent List + Detail */}
-              <div className="lg:w-[420px] flex-shrink-0 rounded-xl border border-[#E4E1EE] bg-white p-4">
+              <div
+                style={{
+                  width: 420,
+                  flexShrink: 0,
+                  borderRadius: 12,
+                  border: "1px solid #E4E1EE",
+                  backgroundColor: "#FFFFFF",
+                  padding: 16,
+                }}
+              >
                 {showRegister || showRegisterAuto ? (
                   <RegisterForm
                     onComplete={(newAgent) => {
                       setSelectedAgentId(newAgent.id)
                       setShowRegister(false)
-                      // 에이전트 목록 + 잔고 새로 불러오기 (welcome 200cr 반영)
                       loadAgents()
                       window.dispatchEvent(new Event("kaas-agents-changed"))
                     }}
@@ -1721,26 +2098,81 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
                 ) : null}
               </div>
               {/* Right — Wallet & Rewards */}
-              <div className="flex-1 rounded-xl border border-[#E4E1EE] bg-white p-4 lg:p-5 min-w-0 overflow-y-auto">
-                {selectedAgent ? <WalletPanel agent={selectedAgent} onRefresh={loadAgents} karma={onchainKarma} karmaLoading={karmaLoading} karmaError={karmaError} onRefreshKarma={refreshOnchainKarma} isAdmin={isAdmin} /> : (
-                  <div className="flex items-center justify-center h-full text-[13px] text-[#999]">Register an agent</div>
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  borderRadius: 12,
+                  border: "1px solid #E4E1EE",
+                  backgroundColor: "#FFFFFF",
+                  padding: 20,
+                  overflowY: "auto",
+                }}
+              >
+                {selectedAgent ? (
+                  <WalletPanel
+                    agent={selectedAgent}
+                    onRefresh={loadAgents}
+                    karma={onchainKarma}
+                    karmaLoading={karmaLoading}
+                    karmaError={karmaError}
+                    onRefreshKarma={refreshOnchainKarma}
+                    isAdmin={isAdmin}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: "100%",
+                      fontSize: 13,
+                      color: "#999",
+                    }}
+                  >
+                    Register an agent
+                  </div>
                 )}
               </div>
             </div>
           </div>
         )}
         {activeTab === "curation" && (
-          <div className="h-full flex flex-col lg:flex-row overflow-hidden bg-[#FAFAFA]">
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "row",
+              overflow: "hidden",
+              backgroundColor: "#FAFAFA",
+            }}
+          >
             <KnowledgeCurationPanel isAdmin={isAdmin} />
           </div>
         )}
         {activeTab === "concept-page" && (
-          <div className="h-full flex flex-col lg:flex-row overflow-hidden bg-[#FAFAFA]">
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "row",
+              overflow: "hidden",
+              backgroundColor: "#FAFAFA",
+            }}
+          >
             <ConceptPagePublishPanel />
           </div>
         )}
         {activeTab === "template" && (
-          <div className="h-full flex flex-col lg:flex-row overflow-hidden bg-[#FAFAFA]">
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "row",
+              overflow: "hidden",
+              backgroundColor: "#FAFAFA",
+            }}
+          >
             <TemplateEditorBody />
           </div>
         )}
