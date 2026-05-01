@@ -37,6 +37,20 @@ export class AgentCommController {
     return this.service.buildEvaluationPackage(type, tags);
   }
 
+  @Get('get-prompts')
+  @ApiOperation({
+    summary: '프롬프트만 반환 (타입 + 버전 태그 → 템플릿 메타 + versions)',
+  })
+  @ApiQuery({ name: 'type', required: true, enum: ['ARTICLE_AI', 'NEWSLETTER', 'CONCEPT_PAGE', 'REFINE'], description: '템플릿 타입' })
+  @ApiQuery({ name: 'version_tags', required: true, type: String, description: '버전 태그 (쉼표 구분: A 또는 A,B,C)' })
+  async getPrompts(
+    @Query('type') type: string,
+    @Query('version_tags') versionTags: string,
+  ) {
+    const tags = versionTags.split(',').map((t) => t.trim()).filter(Boolean);
+    return this.service.getPrompts(type, tags);
+  }
+
   @Post('finish-evaluation')
   @HttpCode(200)
   @ApiOperation({ summary: '평가 결과 저장 (agent_json_raw에 기록)' })

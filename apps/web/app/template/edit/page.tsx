@@ -6,6 +6,7 @@ import { ChevronLeft, Search, Plus, Check, Clock, Trash2, Loader2 } from "lucide
 import Link from "next/link"
 import {
   fetchTemplates,
+  createTemplate as apiCreateTemplate,
   updateTemplate as apiUpdateTemplate,
   updateVersion as apiUpdateVersion,
   activateVersion as apiActivateVersion,
@@ -270,6 +271,15 @@ export function TemplateEditorBody() {
   const [activeTab, setActiveTab] = useState<"list" | "editor" | "preview">("list")
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  // 새 템플릿 생성 모달
+  const [showCreate, setShowCreate] = useState(false)
+  const [createType, setCreateType] = useState("REFINE")
+  const [createName, setCreateName] = useState("")
+  const [createCode, setCreateCode] = useState("")
+  const [createTone, setCreateTone] = useState("")
+  const [createPrompt, setCreatePrompt] = useState("")
+  const [creating, setCreating] = useState(false)
+  const [createError, setCreateError] = useState("")
 
   const loadTemplates = useCallback(async () => {
     try {
@@ -340,6 +350,33 @@ export function TemplateEditorBody() {
     await loadTemplates()
   }
 
+  async function handleCreateTemplate() {
+    if (!createName.trim() || !createCode.trim() || !createTone.trim() || !createPrompt.trim()) {
+      setCreateError("All fields are required")
+      return
+    }
+    setCreating(true)
+    setCreateError("")
+    try {
+      await apiCreateTemplate({
+        type: createType,
+        code: createCode.trim(),
+        name: createName.trim(),
+        tone_text: createTone.trim(),
+        prompt_text: createPrompt.trim(),
+        change_note: "Initial",
+      })
+      setShowCreate(false)
+      setCreateName(""); setCreateCode(""); setCreateTone(""); setCreatePrompt("")
+      setCreateType("REFINE")
+      await loadTemplates()
+    } catch (err: any) {
+      setCreateError(err?.message ?? "Failed to create")
+    } finally {
+      setCreating(false)
+    }
+  }
+
   const tabs = [
     { key: "list" as const, label: "Versions" },
     { key: "editor" as const, label: "Editor" },
@@ -359,9 +396,17 @@ export function TemplateEditorBody() {
   return (
     <div className="flex flex-col lg:flex-row flex-1 gap-4 lg:gap-5 overflow-hidden bg-[#FAFAFA] p-4 lg:p-5 text-[#1A1626]">
         {/* 왼쪽 패널 — 카드 */}
-        <div className="flex w-full lg:w-[300px] shrink-0 flex-col rounded-xl border border-[#E0E0E0] bg-white overflow-hidden max-h-[35vh] lg:max-h-none">
+        <div className="flex w-full lg:w-[420px] shrink-0 flex-col rounded-xl border border-[#E0E0E0] bg-white overflow-hidden max-h-[35vh] lg:max-h-none">
           <div className="px-4 pt-4 pb-2">
-            <h3 className="text-[14px] font-bold text-[#1A1626] mb-2">Templates</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-[14px] font-bold text-[#1A1626]">Templates</h3>
+              <button
+                onClick={() => setShowCreate(true)}
+                className="flex items-center gap-1 text-[11px] font-semibold text-[#D4854A] hover:text-[#A85D2C] cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" /> New
+              </button>
+            </div>
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#888]" />
               <input
@@ -631,6 +676,91 @@ export function TemplateEditorBody() {
           </>
           )}
         </div>
+
+        {/* Create Template 모달 */}
+        {showCreate && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+            onClick={() => !creating && setShowCreate(false)}
+          >
+            <div
+              className="bg-white rounded-xl shadow-xl w-full max-w-md p-5"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-[15px] font-bold text-[#1A1626] mb-3">New Template</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6B727E] mb-1 block">Type</label>
+                  <select
+                    value={createType}
+                    onChange={(e) => setCreateType(e.target.value)}
+                    className="w-full rounded-lg border border-[#E0E0E0] bg-white px-3 py-2 text-[13px] outline-none focus:border-[#D4854A]"
+                  >
+                    <option value="ARTICLE_AI">Article AI</option>
+                    <option value="NEWSLETTER">Newsletter</option>
+                    <option value="CONCEPT_PAGE">Concept Page</option>
+                    <option value="REFINE">Refine</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6B727E] mb-1 block">Code (unique)</label>
+                  <input
+                    value={createCode}
+                    onChange={(e) => setCreateCode(e.target.value)}
+                    placeholder="e.g. refine_default"
+                    className="w-full rounded-lg border border-[#E0E0E0] bg-white px-3 py-2 text-[13px] outline-none focus:border-[#D4854A]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6B727E] mb-1 block">Name</label>
+                  <input
+                    value={createName}
+                    onChange={(e) => setCreateName(e.target.value)}
+                    placeholder="e.g. Article Refine"
+                    className="w-full rounded-lg border border-[#E0E0E0] bg-white px-3 py-2 text-[13px] outline-none focus:border-[#D4854A]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6B727E] mb-1 block">Tone</label>
+                  <textarea
+                    value={createTone}
+                    onChange={(e) => setCreateTone(e.target.value)}
+                    placeholder="Tone / direction"
+                    rows={2}
+                    className="w-full rounded-lg border border-[#E0E0E0] bg-white px-3 py-2 text-[13px] outline-none focus:border-[#D4854A] resize-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6B727E] mb-1 block">Prompt (v1)</label>
+                  <textarea
+                    value={createPrompt}
+                    onChange={(e) => setCreatePrompt(e.target.value)}
+                    placeholder="Initial prompt text"
+                    rows={4}
+                    className="w-full rounded-lg border border-[#E0E0E0] bg-white px-3 py-2 text-[13px] outline-none focus:border-[#D4854A] resize-none"
+                  />
+                </div>
+                {createError && <p className="text-[11px] text-[#C94B6E]">{createError}</p>}
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={() => setShowCreate(false)}
+                  disabled={creating}
+                  className="px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#6B727E] hover:bg-[#FAFAFA] cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateTemplate}
+                  disabled={creating}
+                  className="px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-[#D4854A] text-white hover:opacity-90 cursor-pointer disabled:opacity-50"
+                >
+                  {creating ? "Creating..." : "Create"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   )
 }
