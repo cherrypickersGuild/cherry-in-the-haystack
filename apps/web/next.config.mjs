@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  // Version skew protection — 배포마다 다른 deploymentId 를 박아서
+  // 옛 청크가 사라진 상황(404)에서 클라이언트가 자동으로 hard reload 하도록 함.
+  // env로 안 받으면 빌드 타임 timestamp 폴백, 어쨌든 매 빌드 변함.
+  // ref: https://nextjs.org/docs/app/api-reference/config/next-config-js/deploymentId
+  deploymentId: process.env.NEXT_DEPLOYMENT_ID || `build-${Date.now()}`,
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -9,13 +14,6 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-  },
-  experimental: {
-    // CSS 청크 분리 끄기 — Turbopack 기본은 컴포넌트별로 CSS를 잘게 쪼개는데,
-    // 배포할 때마다 청크 파일명이 바뀌어 옛 HTML 캐시가 사라진 청크를 참조하면
-    // --spacing 같은 변수가 누락돼 padding/gap이 0으로 무너졌음.
-    // false 로 두면 모든 CSS가 한 파일로 묶여 그런 부분 누락이 발생하지 않음.
-    cssChunking: false,
   },
   async headers() {
     // Turbopack이 매 배포마다 청크 파일명을 새로 뽑는데, 브라우저가 옛 HTML을

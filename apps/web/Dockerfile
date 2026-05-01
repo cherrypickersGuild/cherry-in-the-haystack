@@ -20,6 +20,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
+# Skew Protection: 배포마다 고유 deploymentId. CI에서 git hash 넘기면 그걸 쓰고,
+# 안 넘기면 Dockerfile RUN 시각으로 기본값 — 어쨌든 빌드마다 새 값.
+ARG NEXT_DEPLOYMENT_ID=""
+ENV NEXT_DEPLOYMENT_ID=$NEXT_DEPLOYMENT_ID
+
 RUN pnpm --filter=my-project run build
 
 # ---- Production Stage ----
