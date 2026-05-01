@@ -120,7 +120,8 @@ CREATE TYPE content.ai_status_enum AS ENUM (
 CREATE TYPE core.prompt_template_type_enum AS ENUM (
     'ARTICLE_AI',
     'NEWSLETTER',
-    'CONCEPT_PAGE'
+    'CONCEPT_PAGE',
+    'REFINE'
 );
 
 CREATE TYPE core.template_scope_enum AS ENUM (

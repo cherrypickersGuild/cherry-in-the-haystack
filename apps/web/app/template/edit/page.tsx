@@ -21,12 +21,16 @@ import {
 const TYPE_LABEL: Record<string, string> = {
   ARTICLE_AI: "Article AI",
   NEWSLETTER: "Newsletter",
+  CONCEPT_PAGE: "Concept Page",
+  REFINE: "Refine",
 }
 
 const TYPE_FILTERS = [
   { value: "ALL", label: "All" },
   { value: "ARTICLE_AI", label: "Article AI" },
   { value: "NEWSLETTER", label: "Newsletter" },
+  { value: "CONCEPT_PAGE", label: "Concept Page" },
+  { value: "REFINE", label: "Refine" },
 ]
 
 /* ─────────────────────────────────────────────

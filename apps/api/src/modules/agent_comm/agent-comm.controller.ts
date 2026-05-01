@@ -27,7 +27,7 @@ export class AgentCommController {
   @ApiOperation({
     summary: '평가 실행 패키지 요청 (타입 + 버전 태그 → prompts + catalog + items)',
   })
-  @ApiQuery({ name: 'type', required: true, enum: ['ARTICLE_AI', 'NEWSLETTER'], description: '템플릿 타입' })
+  @ApiQuery({ name: 'type', required: true, enum: ['ARTICLE_AI', 'NEWSLETTER', 'CONCEPT_PAGE', 'REFINE'], description: '템플릿 타입' })
   @ApiQuery({ name: 'version_tags', required: true, type: String, description: '버전 태그 (쉼표 구분: A 또는 A,B)' })
   async askEvaluation(
     @Query('type') type: string,
