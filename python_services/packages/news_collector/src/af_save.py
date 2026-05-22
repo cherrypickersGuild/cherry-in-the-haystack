@@ -132,43 +132,63 @@ def process_youtube(args):
         data_ranked=data_summarized,
         pushed_stats=pushed_stats)
 
-
 def process_rss(args):
     print("#####################################################")
-    print(f"# Process RSS, dedup: {args.dedup}")
+    print("# Process RSS (raw only)")
     print("#####################################################")
     op = OperatorRSS()
 
     data = op.readFromJson(args.data_folder, args.run_id, "rss.json")
-    data_deduped = data
-
-    need_dedup = utils.str2bool(args.dedup)
-    if need_dedup:
-        data_deduped = op.dedup(data, target="toread")
-    else:
-        data_deduped = [x for x in data.values()]
-
-    data_scored = op.score(
-        data_deduped,
-        start_date=args.start,
-        max_distance=args.max_distance)
-
-    # Only pick top 1 to reduce the overflow
-    data_filtered = op.filter(data_scored, k=1, min_score=4)
-    data_summarized = op.summarize(data_filtered)
+    pages = list(data.values()) if isinstance(data, dict) else data
 
     targets = args.targets.split(",")
-    pushed_stats = op.push(data_summarized, targets)
+    pushed_stats = op.push(pages, targets)
 
     return op.createStats(
         "RSS",
         "",
         data,
-        data_deduped=data_deduped,
-        data_scored=data_scored,
-        data_filtered=data_filtered,
-        data_summarized=data_summarized,
-        pushed_stats=pushed_stats)
+        data_deduped=pages,
+        data_ranked=pages,
+        pushed_stats=pushed_stats,
+    )
+
+# def process_rss(args):
+#     print("#####################################################")
+#     print(f"# Process RSS, dedup: {args.dedup}")
+#     print("#####################################################")
+#     op = OperatorRSS()
+
+#     data = op.readFromJson(args.data_folder, args.run_id, "rss.json")
+#     data_deduped = data
+
+#     need_dedup = utils.str2bool(args.dedup)
+#     if need_dedup:
+#         data_deduped = op.dedup(data, target="toread")
+#     else:
+#         data_deduped = [x for x in data.values()]
+
+#     data_scored = op.score(
+#         data_deduped,
+#         start_date=args.start,
+#         max_distance=args.max_distance)
+
+#     # Only pick top 1 to reduce the overflow
+#     data_filtered = op.filter(data_scored, k=1, min_score=4)
+#     data_summarized = op.summarize(data_filtered)
+
+#     targets = args.targets.split(",")
+#     pushed_stats = op.push(data_summarized, targets)
+
+#     return op.createStats(
+#         "RSS",
+#         "",
+#         data,
+#         data_deduped=data_deduped,
+#         data_scored=data_scored,
+#         data_filtered=data_filtered,
+#         data_summarized=data_summarized,
+#         pushed_stats=pushed_stats)
 
 
 def process_reddit(args):

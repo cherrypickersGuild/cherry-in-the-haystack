@@ -19,9 +19,19 @@ try:
 except ImportError:
     from config.rss_feeds import get_enabled_feeds
 
+from agent_communication_api import AgentAPIClient
+from dotenv import load_dotenv
+from pathlib import Path
+
 import feedparser
 import requests
 
+load_dotenv(os.path.join(os.path.dirname(__file__), "../api.env"))
+agent_api_key = os.environ["AGENT_API_KEY"]
+
+BASE_DIR = Path(__file__).resolve().parent
+ENV_PATH = BASE_DIR / "token.env"
+load_dotenv(ENV_PATH)
 
 class OperatorRSS(OperatorBase):
     """
@@ -34,6 +44,22 @@ class OperatorRSS(OperatorBase):
     - ranking
     - publish
     """
+    
+    def extract_content(self, entry) -> str:
+        # 1. Substack / Medium / Ghost 계열 (content:encoded)
+        if hasattr(entry, "content") and entry.content:
+            value = entry.content[0].get("value")
+            if value:
+                return value
+
+        # 2. fallback
+        if entry.get("summary"):
+            return entry.get("summary")
+
+        if entry.get("description"):
+            return entry.get("description")
+
+        return ""
 
     def _fetch_articles(self, list_name, feed_url, count=3):
         """
@@ -73,9 +99,16 @@ class OperatorRSS(OperatorBase):
                 print(f"[fetch_articles] Stop pulling, reached count: {count}")
                 break
 
+            article_raw = ""
+            try:
+                article_raw = utils.load_web(link, validate=True, min_length=200) or ""
+            except Exception:
+                article_raw = ""
+
             # Extract relevant information from each entry
             title = entry.title
             link = entry.link
+            author = entry.get("author", "")
 
             # Example: Thu, 03 Mar 2022 08:00:00 GMT
             published = entry.published
@@ -83,10 +116,10 @@ class OperatorRSS(OperatorBase):
             published_key = published
 
             # Convert above struct_time object to datetime
-            created_time = date.today().isoformat()
+            created_time = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             if published_parsed:
-                dt = datetime.fromtimestamp(mktime(published_parsed))
-                created_time = dt.isoformat()
+                dt = datetime.utcfromtimestamp(mktime(published_parsed))
+                created_time = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
                 # Notes: The feedparser returns unreliable dates, e.g.
                 # sometimes 2023-05-25T16:09:00.004-07:00
@@ -100,19 +133,28 @@ class OperatorRSS(OperatorBase):
 
             print(f"[fetch_articles] pulled_cnt: {pulled_cnt}, list_name: {list_name}, title: {title}, published: {created_time}, article_id: {article_id}, hash_key: [{hash_key}]")
 
-            # Create a dictionary representing an article
+            # Create a dictionary representing an article 
+            # article = {
+            #     "id": article_id,
+            #     'source': "RSS",
+            #     'list_name': list_name,
+            #     'title': title,
+            #     'url': link,
+            #     'created_time': created_time,
+            #     "summary": entry.get("summary") or "",
+            #     "content": "",
+            #     "tags": entry.get("tags") or [],
+            #     "published": published,
+            #     "published_key": published_key,
+            # }
+
             article = {
-                "id": article_id,
-                'source': "RSS",
-                'list_name': list_name,
-                'title': title,
-                'url': link,
-                'created_time': created_time,
-                "summary": entry.get("summary") or "",
-                "content": "",
-                "tags": entry.get("tags") or [],
-                "published": published,
-                "published_key": published_key,
+                "url": link,
+                "title": title,
+                "author": author,
+                "article_raw": self.extract_content(entry),
+                "published_at": created_time, 
+                "list_name": list_name,
             }
 
             # Add the article to the list
@@ -121,36 +163,59 @@ class OperatorRSS(OperatorBase):
         return articles
 
     def pull(self):
-        """
-        Pull RSS
-
-        @return pages <id, page>
-        """
         print("#####################################################")
         print("# Pulling RSS")
         print("#####################################################")
 
-        # Load RSS feeds from centralized configuration
         rss_list = get_enabled_feeds()
-        print(f"Loaded {len(rss_list)} enabled RSS feeds from config")
 
-        # Fetch articles from rss list
-        pages = {}
+        pages = []
 
         for rss in rss_list:
             name = rss["name"]
             url = rss["url"]
-            count = rss.get("count", 3)  # Use configured count or default to 3
-            print(f"Fetching RSS: {name}, url: {url}, count: {count}")
+            count = rss.get("count", 3)
+            cherry_category = rss.get("cherry_category", "")
 
             articles = self._fetch_articles(name, url, count=count)
-            print(f"articles: {articles}")
 
             for article in articles:
-                page_id = article["id"]
-                pages[page_id] = article
+                article["cherry_category"] = cherry_category
+                pages.append(article)
 
         return pages
+
+    # def pull(self):
+    #     """
+    #     Pull RSS
+
+    #     @return pages <id, page>
+    #     """
+    #     print("#####################################################")
+    #     print("# Pulling RSS")
+    #     print("#####################################################")
+
+    #     # Load RSS feeds from centralized configuration
+    #     rss_list = get_enabled_feeds()
+    #     print(f"Loaded {len(rss_list)} enabled RSS feeds from config")
+
+    #     # Fetch articles from rss list
+    #     pages = {}
+
+    #     for rss in rss_list:
+    #         name = rss["name"]
+    #         url = rss["url"]
+    #         count = rss.get("count", 3)  # Use configured count or default to 3
+    #         print(f"Fetching RSS: {name}, url: {url}, count: {count}")
+
+    #         articles = self._fetch_articles(name, url, count=count)
+    #         print(f"articles: {articles}")
+
+    #         for article in articles:
+    #             page_id = article["id"]
+    #             pages[page_id] = article
+
+    #     return pages
 
     def dedup(self, extractedPages, target="inbox"):
         print("#####################################################")
@@ -463,13 +528,12 @@ class OperatorRSS(OperatorBase):
         tops = sorted(items, key=itemgetter(1), reverse=True)
         return tops[:k]
 
-    def push(self, pages, targets, topk=3):
+    def push(self, pages, targets):
         print("#####################################################")
         print("# Push RSS")
         print("#####################################################")
         print(f"Number of pages: {len(pages)}")
         print(f"Targets: {targets}")
-        print(f"Top-K: {topk}")
         print(f"input data: {pages}")
         stat = {
             "total": 0,
@@ -496,28 +560,30 @@ class OperatorRSS(OperatorBase):
                 if not database_id:
                     print("[ERROR] no index db pages found... skip")
                     break
-
+                
+                client = AgentAPIClient(api_key=agent_api_key)
                 for page in pages:
                     stat["total"] += 1
 
                     try:
-                        page_id = page["id"]
+                        # 1. 기사 삽입
+                        insert_result = client.insert_article(page)
+
+                        # # 2. 평가 패키지 요청
+                        evaluation_package = client.ask_evaluation(type="ARTICLE_AI", version_tags="A")
+
+                        # # 3. 평가 결과 저장
+                        # save_result = client.finish_evaluation(results=evaluation_package["items"])
+
+                        page_id = page["url"]
                         list_name = page["list_name"]
                         title = page["title"]
-                        tags = page["tags"]
 
                         print(f"Pushing page, title: {title}")
 
-                        topics_topk = [x["term"].replace(",", " ")[:20] for x in tags]
-                        topics_topk = topics_topk[:topk]
-
-                        categories_topk = []
-
                         notion_agent.createDatabaseItem_ToRead_RSS(
                             database_id,
-                            page,
-                            topics_topk,
-                            categories_topk)
+                            page)
 
                         self.markVisited(page_id, source="rss", list_name=list_name)
 

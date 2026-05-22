@@ -1366,8 +1366,8 @@ class NotionAgent:
         blocks,
         database_id,
         ranked_page,
-        topics: list,
-        categories: list,
+        topics: list = [],
+        categories: list = [],
         **kwargs
     ):
         # assemble topics
@@ -1381,7 +1381,7 @@ class NotionAgent:
 
         properties.update({"Source": {
             "select": {
-                "name": ranked_page["source"],
+                "name": ranked_page.get("source", "RSS"),
             }
         }})
 
@@ -1392,13 +1392,15 @@ class NotionAgent:
                 },
             })
 
-        properties.update({"Topic": {
-            "multi_select": topics_list,
-        }})
+        if len(topics_list) > 0:
+            properties.update({"Topic": {
+                "multi_select": topics_list,
+            }})
 
-        properties.update({"Category": {
-            "multi_select": categories_list,
-        }})
+        if len(categories_list) > 0:
+            properties.update({"Category": {
+                "multi_select": categories_list,
+            }})
 
         if ranked_page.get("__relevant_score"):
             properties.update({"Relevant Score": {
@@ -1474,139 +1476,171 @@ class NotionAgent:
 
         return new_page
 
-    def createDatabaseItem_ToRead_RSS(
-        self,
-        database_id,
-        page,
-        topics: list,
-        categories: list
-    ):
-        """
-        Create RSS item in ToRead database with enhanced analysis fields:
-        - Properties: AI summary, URL, Why it matters, Insights, Examples
-        - Blocks: ## {title}\n{content}\n{link}
-        """
-        content = page.get("content") or ""
-        summary = page.get("__summary") or ""
-        categories = page.get("__categories") or []
+    # def createDatabaseItem_ToRead_RSS(
+    #     self,
+    #     database_id,
+    #     page,
+    #     topics: list,
+    #     categories: list
+    # ):
+        # """
+        # Create RSS item in ToRead database with enhanced analysis fields:
+        # - Properties: AI summary, URL, Why it matters, Insights, Examples
+        # - Blocks: ## {title}\n{content}\n{link}
+        # """
+        # content = page.get("content") or ""
+        # summary = page.get("__summary") or ""
+        # categories = page.get("__categories") or []
+        # title = page["title"]
+        # url = page["url"]
+        # created_time_pdt = utils.convertUTC2PDT_str(page["created_time"])
+
+        # # Extract enhanced analysis fields
+        # why_it_matters = page.get("__why_it_matters", "")
+        # insights = page.get("__insights", [])
+        # examples = page.get("__examples", [])
+
+        # # Convert lists to formatted strings
+        # insights_text = "\n".join(f"• {item}" for item in insights) if insights else ""
+        # examples_text = "\n".join(f"• {item}" for item in examples) if examples else ""
+
+        # # Properties: Name, Published at, AI summary, Category, URL, enhanced analysis fields
+        # properties = {
+        #     "Name": {
+        #         "title": [
+        #             {
+        #                 "text": {
+        #                     "content": title
+        #                 }
+        #             }
+        #         ]
+        #     },
+        #     "Published at": {
+        #         "date": {
+        #             "start": created_time_pdt.isoformat(),
+        #         }
+        #     },
+        #     "URL": {
+        #         "url": url
+        #     },
+        #     "Why it matters": {
+        #         "rich_text": [
+        #             {
+        #                 "text": {
+        #                     "content": why_it_matters[:2000]  # Notion limit: 2000 chars
+        #                 }
+        #             }
+        #         ]
+        #     },
+        #     "Insights": {
+        #         "rich_text": [
+        #             {
+        #                 "text": {
+        #                     "content": insights_text[:2000]  # Notion limit: 2000 chars
+        #                 }
+        #             }
+        #         ]
+        #     },
+        #     "Examples": {
+        #         "rich_text": [
+        #             {
+        #                 "text": {
+        #                     "content": examples_text[:2000]  # Notion limit: 2000 chars
+        #                 }
+        #             }
+        #         ]
+        #     }
+        # }
+
+        # # Add Category property if available (multi-select)
+        # if categories:
+        #     properties["Category"] = {
+        #         "multi_select": [
+        #             {"name": category} for category in categories
+        #         ]
+        #     }
+
+        # # Blocks: ## {title}\n{summary}\n{link}
+        # blocks = []
+
+        # # Heading 2: {title}
+        # blocks.append({
+        #     "object": "block",
+        #     "type": "heading_2",
+        #     "heading_2": {
+        #         "rich_text": [
+        #             {
+        #                 "text": {
+        #                     "content": title
+        #                 }
+        #             }
+        #         ]
+        #     }
+        # })
+
+        # # Summary paragraphs (use existing helper to handle 2000 char limit)
+        # if content:
+        #     content_blocks = self._createBlock_RichText("paragraph", content)
+        #     blocks.extend(content_blocks)
+
+        # # Link
+        # blocks.append({
+        #     "object": "block",
+        #     "type": "paragraph",
+        #     "paragraph": {
+        #         "rich_text": [
+        #             {
+        #                 "text": {
+        #                     "content": url,
+        #                     "link": {
+        #                         "url": url
+        #                     }
+        #                 }
+        #             }
+        #         ]
+        #     }
+        # })
+
+    def createDatabaseItem_ToRead_RSS(self, database_id, page):
         title = page["title"]
         url = page["url"]
-        created_time_pdt = utils.convertUTC2PDT_str(page["created_time"])
+        article_raw = page.get("article_raw", "")
+        published_at = page["published_at"]
 
-        # Extract enhanced analysis fields
-        why_it_matters = page.get("__why_it_matters", "")
-        insights = page.get("__insights", [])
-        examples = page.get("__examples", [])
+        created_time_pdt = utils.convertUTC2PDT_str(published_at)
 
-        # Convert lists to formatted strings
-        insights_text = "\n".join(f"• {item}" for item in insights) if insights else ""
-        examples_text = "\n".join(f"• {item}" for item in examples) if examples else ""
-
-        # Properties: Name, Published at, AI summary, Category, URL, enhanced analysis fields
         properties = {
             "Name": {
-                "title": [
-                    {
-                        "text": {
-                            "content": title
-                        }
-                    }
-                ]
+                "title": [{"text": {"content": title}}]
             },
             "Published at": {
-                "date": {
-                    "start": created_time_pdt.isoformat(),
-                }
-            },
-            "AI summary": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": summary[:2000]  # Notion limit: 2000 chars
-                        }
-                    }
-                ]
+                "date": {"start": created_time_pdt.isoformat()}
             },
             "URL": {
                 "url": url
-            },
-            "Why it matters": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": why_it_matters[:2000]  # Notion limit: 2000 chars
-                        }
-                    }
-                ]
-            },
-            "Insights": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": insights_text[:2000]  # Notion limit: 2000 chars
-                        }
-                    }
-                ]
-            },
-            "Examples": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": examples_text[:2000]  # Notion limit: 2000 chars
-                        }
-                    }
-                ]
             }
         }
 
-        # Add Category property if available (multi-select)
-        if categories:
-            properties["Category"] = {
-                "multi_select": [
-                    {"name": category} for category in categories
-                ]
+        if page.get("cherry_category"):
+            properties["Cherry Category"] = {
+                "multi_select": [{"name": page["cherry_category"]}]
             }
 
-        # Blocks: ## {title}\n{summary}\n{link}
-        blocks = []
-
-        # Heading 2: {title}
-        blocks.append({
-            "object": "block",
-            "type": "heading_2",
-            "heading_2": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": title
-                        }
-                    }
-                ]
+        blocks = [
+            {
+                "object": "block",
+                "type": "heading_2",
+                "heading_2": {"rich_text": [{"text": {"content": title}}]}
+            },
+            # *self._createBlock_RichText("paragraph", article_raw),
+            {
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [{"text": {"content": url, "link": {"url": url}}}]
+                }
             }
-        })
-
-        # Summary paragraphs (use existing helper to handle 2000 char limit)
-        if content:
-            content_blocks = self._createBlock_RichText("paragraph", content)
-            blocks.extend(content_blocks)
-
-        # Link
-        blocks.append({
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": url,
-                            "link": {
-                                "url": url
-                            }
-                        }
-                    }
-                ]
-            }
-        })
+        ]
 
         # Common fields for article, youtube, etc
         return self._postprocess_ToRead(
@@ -1614,8 +1648,6 @@ class NotionAgent:
             blocks,
             database_id,
             page,
-            topics,
-            categories,
             list_names=[page["list_name"]]
         )
 

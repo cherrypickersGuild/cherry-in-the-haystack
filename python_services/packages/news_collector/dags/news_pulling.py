@@ -40,9 +40,7 @@ with DAG(
         max_active_runs=1,
         description='news pulling, config: {"sources":  "targets": "notion", '
                     '"dedup": true}',
-        schedule_interval="15 * * * *",  # At minute 15 every hour
-        # schedule_interval=timedelta(minutes=60),
-        # schedule_interval=None,
+        schedule_interval="0 0 * * *",  # 매일 자정 실행
         start_date=days_ago(0),
         tags=['NewsBot'],
 ) as dag:
@@ -64,7 +62,7 @@ with DAG(
                      '--run-id={{ run_id }} '
                      '--job-id={{ ti.job_id }} '
                      '--data-folder="data/news" '
-                     '--sources=RSS,CrawlBlogSuperhuman,CrawlBlogNatoLambert',
+                     '--sources=RSS',
     )
 
     t4 = BashOperator(
@@ -77,7 +75,7 @@ with DAG(
                      '--data-folder="data/news" '
                      '--targets={{ dag_run.conf.setdefault("targets", "notion") }} '
                      '--dedup={{ dag_run.conf.setdefault("dedup", True) }} '
-                     '--sources=RSS,CrawlBlogSuperhuman,CrawlBlogNatoLambert',
+                     '--sources=RSS',
     )
 
     t5 = BashOperator(
