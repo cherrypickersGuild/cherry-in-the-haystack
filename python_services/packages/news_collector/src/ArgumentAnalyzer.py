@@ -1,17 +1,15 @@
 import json
+import os
 import re
 from collections import Counter
-from litellm import completion, completion_cost
 
-# -----------------------------
-# Optional OpenAI import
-# -----------------------------
-try:
-    from openai import OpenAI
-    OPENAI_AVAILABLE = True
-except ImportError:
-    OPENAI_AVAILABLE = False
-    print("Warning: openai package not installed. Run: pip install openai")
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import SystemMessage, HumanMessage
+
+load_dotenv()
+
+OPENAI_AVAILABLE = True
 
 
 class ArgumentAnalyzer:
@@ -106,29 +104,32 @@ class ArgumentAnalyzer:
     #        LLM CLASSIFIER
     # -----------------------------
     def _classify_paragraphs(self, paragraphs):
-        """Classify paragraphs through OpenAI / LiteLLM."""
-        if not OPENAI_AVAILABLE:
-            raise ImportError("openai package is required. Install with: pip install openai")
+        """Classify paragraphs through DeepSeek."""
 
         system_prompt = self._build_system_prompt()
         user_prompt = self._build_user_prompt(paragraphs)
 
+        model_name = self.model_name or os.getenv("LLM_MODEL", "deepseek-chat")
+
+        kwargs: dict = {"model": model_name, "temperature": 0.1}
+        base_url = os.getenv("LLM_BASE_URL", "https://api.deepseek.com")
+        if base_url:
+            kwargs["base_url"] = base_url
+        api_key = self.api_key or os.getenv("LLM_API_KEY") or os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_API_KEY")
+        if api_key:
+            kwargs["api_key"] = api_key
+
+        llm = ChatOpenAI(**kwargs)
+
         try:
-            response = completion(
-                model=self.model_name,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                temperature=0.1,
-                response_format={"type": "json_object"},
-                api_key=self.api_key
-            )
+            response = llm.invoke([
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=user_prompt),
+            ])
 
-            cost = completion_cost(completion_response=response)
-            cost = f"${float(cost):.10f}"
+            cost = "N/A"
 
-            result_text = response.choices[0].message.content
+            result_text = response.content
             result_json = json.loads(result_text)
 
             structure = self._empty_structure()

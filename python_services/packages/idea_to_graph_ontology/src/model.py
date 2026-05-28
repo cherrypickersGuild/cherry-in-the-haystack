@@ -26,8 +26,13 @@ Examples:
 """
 
 import os
+import re
+import json
 
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
+
+load_dotenv()
 
 _DEFAULT_MODEL = "deepseek-chat"
 
@@ -49,3 +54,11 @@ def get_llm(model: str | None = None, temperature: float = 0.0) -> ChatOpenAI:
         kwargs["api_key"] = api_key
 
     return ChatOpenAI(**kwargs)
+
+
+def parse_json_response(text: str) -> dict:
+    """Parse JSON from LLM response, handling markdown code fences."""
+    text = text.strip()
+    text = re.sub(r'^```(?:json)?\s*\n?', '', text)
+    text = re.sub(r'\n?```\s*$', '', text)
+    return json.loads(text)

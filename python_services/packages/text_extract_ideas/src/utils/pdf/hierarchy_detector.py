@@ -3,7 +3,7 @@ from typing import List, Tuple, Optional, Dict, Any
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from src.model.model import get_default_llm
+from src.model.model import get_default_llm, parse_json_response
 from src.model.schemas import (
     DetectedChapter,
     DetectedSection,
@@ -236,22 +236,22 @@ def split_into_paragraphs(
     # 텍스트가 너무 길면 truncate
     text_for_llm = _truncate_text(text, MAX_TEXT_FOR_PARAGRAPH_SPLIT)
 
-    # LLM 호출
+    # LLM 호출 (JSON mode, DeepSeek-compatible)
     llm = get_default_llm()
-    structured_llm = llm.with_structured_output(
-        ParagraphSplitResult,
-        method="json_mode"
-    )
+
+    json_instruction = "\n\nReturn ONLY valid JSON (no markdown):\n{\"paragraphs\": [{\"text\": \"...\", \"start_marker\": \"...\"}]}"
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system", PARAGRAPH_SPLIT_PROMPT),
+        ("system", PARAGRAPH_SPLIT_PROMPT + json_instruction),
         ("human", PARAGRAPH_SPLIT_HUMAN),
     ])
 
-    chain = prompt | structured_llm
+    messages = prompt.format_messages(text=text_for_llm)
 
     try:
-        result = chain.invoke({"text": text_for_llm})
+        response = llm.invoke(messages)
+        data = parse_json_response(response.content)
+        result = ParagraphSplitResult(**data)
     except Exception as e:
         print(f"      [경고] 문단 분할 실패: {e}")
         # 폴백: 더블 뉴라인으로 단순 분할

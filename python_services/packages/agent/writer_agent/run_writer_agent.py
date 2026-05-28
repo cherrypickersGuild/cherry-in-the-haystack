@@ -306,12 +306,12 @@ def build_agents():
             "package before running this script."
         ) from exc
 
-    model_name = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+    model_name = os.getenv("LLM_MODEL", "deepseek-chat")
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
         raise ValueError("OPENAI_API_KEY is not set.")
 
-    provider = OpenAIProvider(api_key=api_key)
+    provider = OpenAIProvider(api_key=api_key, base_url="https://api.deepseek.com")
     model = provider.get_model(model_name)
 
     @function_tool

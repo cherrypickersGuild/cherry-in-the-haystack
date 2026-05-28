@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root / "src"))
+sys.path.insert(0, str(project_root.parent.parent))  # python_services/
 
 from packages.ontology.src.model import get_llm
 from packages.ontology.src.utils import load_all_concepts, update_ttl_descriptions

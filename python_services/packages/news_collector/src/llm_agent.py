@@ -8,13 +8,10 @@ from langchain.text_splitter import (
 from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.summarize import load_summarize_chain
-from langchain_community.chat_models import ChatOllama
 from langchain_community.document_loaders import YoutubeLoader
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.document_loaders import ArxivLoader
 from langchain.utilities.arxiv import ArxivAPIWrapper
-from langchain_google_genai import ChatGoogleGenerativeAI
-import google.generativeai as genai
 
 import llm_prompts
 
@@ -195,63 +192,31 @@ class LLMAgentBase:
         temperature=0,
         create_default_chain=True
     ):
-        provider = provider or os.getenv("LLM_PROVIDER", "openai")
-        llm = None
+        model_name = model_name or os.getenv("LLM_MODEL", "deepseek-chat")
 
-        # TODO: support non-openAI llm
-        if provider == "openai":
-            model_name = model_name or os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
-            proxy = os.getenv('OPENAI_PROXY')
-            if proxy and proxy.strip():
-                client = httpx.Client(proxies={"http://": proxy,
-                                            "https://": proxy})
-                llm = ChatOpenAI(
-                    # model_name="text-davinci-003"
-                    # model_name=model_name,
-                    model_name="glm-4.5",
-                    http_client=client,
-                    # temperature dictates how whacky the output should be
-                    # for fixed response format task, set temperature = 0
-                    temperature=temperature,
-                    openai_api_base="https://api.z.ai/api/coding/paas/v4")
-            else:
-                llm = ChatOpenAI(
-                    # model_name="text-davinci-003"
-                    # model_name=model_name,
-                    model_name="glm-4.5",
-                    # temperature dictates how whacky the output should be
-                    # for fixed response format task, set temperature = 0
-                    temperature=temperature,
-                    openai_api_base="https://api.z.ai/api/coding/paas/v4")
+        kwargs: dict = {
+            "model": model_name,
+            "temperature": temperature,
+        }
 
-        elif provider == "google":
-            model_name = model_name or os.getenv("GOOGLE_MODEL", "gemini-pro")
+        base_url = os.getenv("LLM_BASE_URL", "https://api.deepseek.com")
+        if base_url:
+            kwargs["base_url"] = base_url
 
-            llm = ChatGoogleGenerativeAI(
-                model=model_name,
-                temperature=temperature)
+        api_key = os.getenv("LLM_API_KEY") or os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_API_KEY")
+        if api_key:
+            kwargs["api_key"] = api_key
 
-        elif provider == "ollama":
-            model_name = model_name or os.getenv("OLLAMA_MODEL", "llama3")
-            ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+        proxy = os.getenv('OPENAI_PROXY')
+        if proxy and proxy.strip():
+            kwargs["http_client"] = httpx.Client(proxies={"http://": proxy, "https://": proxy})
 
-            llm = ChatOllama(
-                base_url=ollama_url,
-                model=model_name,
-                temperature=temperature,
-            )
+        self.llm = ChatOpenAI(**kwargs)
 
-        else:
-            print(f"[ERROR] Non-supported LLM provider: {provider}")
-            raise
-
-        self.llm = llm
-
-        # Create a default chain
         if create_default_chain:
             self.llmchain = LLMChain(llm=self.llm, prompt=self.prompt_tpl)
 
-        print(f"LLM chain initalized, provider: {provider}, model_name: {model_name}, temperature: {temperature}")
+        print(f"LLM chain initalized, model: {model_name}, temperature: {temperature}")
 
     def get_num_tokens(self, text):
         return self.llm.get_num_tokens(text)
@@ -467,45 +432,39 @@ class LLMAgentGeneric(LLMAgentBase):
 
 
 class LLMAgentGemini:
-    """
-    A Gemini standalone LLM
-    """
-    def __init__(self, api_key="", model_name="gemini-pro", temperature=0):
-        self.api_key = api_key if api_key else os.getenv("GOOGLE_API_KEY")
-        self.model_name = model_name or os.getenv("GOOGLE_MODEL", "gemini-pro")
+    """A standalone LLM agent (DeepSeek-compatible)."""
 
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel(self.model_name)
-        self.temperature = temperature
+    def __init__(self, api_key="", model_name="", temperature=0):
+        model_name = model_name or os.getenv("LLM_MODEL", "deepseek-chat")
+
+        kwargs: dict = {
+            "model": model_name,
+            "temperature": temperature,
+        }
+
+        base_url = os.getenv("LLM_BASE_URL", "https://api.deepseek.com")
+        if base_url:
+            kwargs["base_url"] = base_url
+
+        api_key = os.getenv("LLM_API_KEY") or os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_API_KEY")
+        if api_key:
+            kwargs["api_key"] = api_key
+
+        self.llm = ChatOpenAI(**kwargs)
 
     def init_prompt(self, prompt=""):
-        self.default_prompt = """
-        Write a concise and precise numbered list summary of the following text without losing any numbers and key points (English numbers need to be converted to digital numbers): {}
-        """
-
-        self.prompt = prompt or self.default_prompt
+        from langchain_core.prompts import PromptTemplate
+        self.default_prompt = "Write a concise and precise numbered list summary of the following text without losing any numbers and key points: {text}"
+        self.prompt_tpl = PromptTemplate(
+            input_variables=["text"],
+            template=prompt or self.default_prompt,
+        )
 
     def init_llm(self):
         pass
 
     def run(self, text: str):
-        prompt = self.prompt.format(text)
-        print(f"[LLMAgentGemini] prompt: {prompt}")
-
-        response = self.model.generate_content(
-            prompt,
-
-            # pass a config
-            generation_config=genai.types.GenerationConfig(
-                temperature=self.temperature),
-
-            # safety settings
-            safety_settings={
-                'HARASSMENT'        : 'block_none',
-                'HATE_SPEECH'       : 'block_none',
-                'DANGEROUS_CONTENT' : 'block_none',
-                'SEXUALLY_EXPLICIT' : 'block_none',
-            }
-        )
-
+        print(f"[LLMAgentGemini] running with text: {text[:100]}...")
+        messages = [{"role": "user", "content": self.prompt_tpl.format(text=text)}]
+        response = self.llm.invoke(self.prompt_tpl.format(text=text))
         return response

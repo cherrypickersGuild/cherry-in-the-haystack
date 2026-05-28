@@ -16,7 +16,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))  # python_services/
 
 from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
 from packages.ontology.src.storage.vector_store import VectorStore
@@ -141,7 +141,7 @@ def main():
         )
 
         for st in sub_topics:
-            all_sub_topics.append(st.model_dump())
+            all_sub_topics.append(st if isinstance(st, dict) else st.model_dump())
 
         if idx % 20 == 0 and not args.debug:
             print(f"  [{idx}/{len(concepts)}] {len(all_sub_topics)} sub-topics extracted so far")
