@@ -5,14 +5,13 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
+from packages.ontology.src.model import get_llm
 from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
 from packages.ontology.src.storage.vector_store import VectorStore
 from packages.ontology.src.pipeline.concept_matcher import ConceptMatcher
 from packages.ontology.src.pipeline.ontology_graph_manager import OntologyGraphManager
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from pydantic import BaseModel, Field
-import os
 
 
 class KoreanDescriptionResult(BaseModel):
@@ -35,7 +34,7 @@ class AdditionalMatchResult:
         self.reason = reason
 
 
-def generate_korean_description(concept: str, chunk_text: str, llm: ChatOpenAI) -> str:
+def generate_korean_description(concept: str, chunk_text: str, llm) -> str:
     """개념을 한글 설명으로 변환.
     
     Args:
@@ -362,8 +361,7 @@ def judge_additional_match(
         concept_id: Optional[str] = Field(None, description="추가할 개념 ID (should_add가 True인 경우)")
         reason: str = Field(..., description="추가할 가치가 있는지 여부에 대한 이유")
     
-    model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-    llm = ChatOpenAI(model=model, temperature=0)
+    llm = get_llm()
     structured_llm = llm.with_structured_output(AdditionalMatchResultModel)
     
     existing_matches_str = ", ".join(existing_matches)

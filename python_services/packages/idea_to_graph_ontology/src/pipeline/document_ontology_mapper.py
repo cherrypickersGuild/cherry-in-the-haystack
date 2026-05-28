@@ -1,16 +1,15 @@
 """Document ontology mapper using LangGraph workflow."""
 
 import json
-import os
 import re
 from typing import Dict, List, Any, TypedDict, Optional
 
 from pydantic import BaseModel, Field
 
 from langgraph.graph import StateGraph, END
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
+from packages.ontology.src.model import get_llm
 from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
 from packages.ontology.src.storage.vector_store import VectorStore
 from packages.ontology.src.storage.new_concept_manager import NewConceptManager
@@ -85,8 +84,7 @@ class DocumentOntologyMapper:
         self.debug = debug
         
         # 한글 description 생성을 위한 LLM 초기화
-        model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-        self.llm = ChatOpenAI(model=model, temperature=0)
+        self.llm = get_llm()
         self.structured_llm_description = self.llm.with_structured_output(KoreanDescriptionResult)
         self.structured_llm_cluster_validation = self.llm.with_structured_output(ClusterValidationResult)
         

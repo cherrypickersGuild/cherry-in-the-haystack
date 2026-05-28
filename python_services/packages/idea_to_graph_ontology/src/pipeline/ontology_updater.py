@@ -1,13 +1,12 @@
 """Ontology updater for adding new concepts and relations."""
 
-import os
 from typing import Dict, List, Any, Optional, Tuple
 
 from pydantic import BaseModel, Field
 
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
+from packages.ontology.src.model import get_llm
 from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
 from packages.ontology.src.storage.vector_store import VectorStore
 from packages.ontology.src.pipeline.ontology_graph_manager import OntologyGraphManager
@@ -81,7 +80,7 @@ class OntologyUpdater:
         self,
         graph_engine: GraphQueryEngine,
         vector_store: VectorStore,
-        llm: ChatOpenAI = None,
+        llm=None,
         graph_manager: Optional[OntologyGraphManager] = None,
         staging_manager: Optional[StagingManager] = None
     ) -> None:
@@ -96,8 +95,7 @@ class OntologyUpdater:
         """
         self.graph_engine = graph_engine
         self.vector_store = vector_store
-        model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-        self.llm = llm or ChatOpenAI(model=model, temperature=0)
+        self.llm = llm or get_llm()
         self.structured_llm_parent = self.llm.with_structured_output(ParentConceptResult)
         self.structured_llm_parent_candidates = self.llm.with_structured_output(ParentCandidatesResult)
         self.structured_llm_critic = self.llm.with_structured_output(CriticReviewResult)
