@@ -31,14 +31,12 @@ from src.utils.pdf.hierarchy_detector import get_leaf_sections
 
 
 def _matches_chapter(chapter, chapter_numbers: list[int]) -> bool:
-    """챕터 번호 매칭: 제목에서 'Chapter N' 패턴 또는 내부 chapter_number로 매칭."""
+    """챕터 번호 매칭: 제목에서 'Chapter N' 패턴만 신뢰."""
     import re
-    # 제목에서 "Chapter N" 패턴 추출 (e.g. "Chapter 9. Inference Optimization")
     m = re.search(r'Chapter\s+(\d+)', chapter.title, re.IGNORECASE)
     if m:
         return int(m.group(1)) in chapter_numbers
-    # 폴백: 내부 chapter_number로 비교
-    return chapter.chapter_number in chapter_numbers
+    return False
 
 
 def run_pipeline_for_chapters(
@@ -93,7 +91,7 @@ def run_pipeline_for_chapters(
 
     print(f"\n✅ 필터링된 챕터:")
     for c in filtered_chapters:
-        print(f"   Chapter {c.chapter_number}: {c.title}")
+        print(f"   {c.title}")
 
     # filtered 챕터로 all_sections 재구성
     filtered_sections = []

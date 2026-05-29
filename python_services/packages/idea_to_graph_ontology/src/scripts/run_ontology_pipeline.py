@@ -100,6 +100,28 @@ def main():
     print(f"[Init] Connecting to GraphDB: {args.graph_endpoint}")
     graph_engine = GraphQueryEngine(args.graph_endpoint)
 
+    # Ensure base ontology is loaded
+    class_count = len(graph_engine.query(
+        "PREFIX owl: <http://www.w3.org/2002/07/owl#> SELECT ?s WHERE { ?s a owl:Class . } LIMIT 10"
+    ))
+    if class_count < 10:
+        print("[Init] Base ontology missing, loading...")
+        ttl_path = project_root / "data" / "llm_ontology.ttl"
+        if ttl_path.exists():
+            import requests as _r
+            _r.post(
+                f"{args.graph_endpoint}/statements",
+                data=ttl_path.read_bytes(),
+                headers={"Content-Type": "text/turtle"},
+                timeout=30,
+            )
+            new_count = len(graph_engine.query(
+                "PREFIX owl: <http://www.w3.org/2002/07/owl#> SELECT ?s WHERE { ?s a owl:Class . } LIMIT 10"
+            ))
+            print(f"  Loaded {new_count}+ classes")
+        else:
+            print(f"  WARNING: {ttl_path} not found")
+
     print(f"[Init] Loading VectorStore: {vector_db_path}")
     vector_store = VectorStore(vector_db_path)
 
