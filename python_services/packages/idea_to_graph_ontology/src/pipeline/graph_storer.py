@@ -49,7 +49,6 @@ class GraphStorer:
             concept_id = topic.get("canonical_id", "")
             label = topic.get("label", concept_id)
             description = topic.get("description", "")
-            node_type = topic.get("type", "instance")
             keywords = topic.get("keywords", [])
             merged_from = topic.get("merged_from", [concept_id])
 
@@ -95,7 +94,6 @@ class GraphStorer:
                     label=label,
                     parent=parent,
                     description=description,
-                    node_type=node_type,
                     keywords=keywords,
                     source=source,
                 )
@@ -125,7 +123,6 @@ class GraphStorer:
             added.append({
                 "concept_id": concept_id,
                 "label": label,
-                "type": node_type,
                 "parent": parent,
                 "source": source,
                 "keywords": keywords,

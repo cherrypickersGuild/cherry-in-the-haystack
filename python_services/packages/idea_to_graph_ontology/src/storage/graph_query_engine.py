@@ -111,7 +111,6 @@ class GraphQueryEngine:
         label: str,
         parent: str,
         description: str,
-        node_type: str = "instance",
         keywords: list | None = None,
         source: str = "",
     ) -> None:
@@ -122,7 +121,6 @@ class GraphQueryEngine:
             label: 개념 레이블
             parent: 부모 개념 ID
             description: 개념 설명
-            node_type: "class" 또는 "instance"
             keywords: 대체 이름/동의어 배열
             source: 출처 책/자료 식별자
         """
@@ -145,8 +143,7 @@ class GraphQueryEngine:
                 rdfs:label "{escaped_label}"@en ;
                 rdfs:subClassOf llm:{parent} ;
                 llm:description "{escaped_description}" ;
-                {keywords_str}llm:type "{node_type}" ;
-                llm:source "{escaped_source}" .
+                {keywords_str}llm:source "{escaped_source}" .
         }}
         """
         self.update(query)
