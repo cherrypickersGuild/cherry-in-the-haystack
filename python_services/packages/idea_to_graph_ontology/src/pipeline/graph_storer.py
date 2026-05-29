@@ -95,6 +95,9 @@ class GraphStorer:
                     label=label,
                     parent=parent,
                     description=description,
+                    node_type=node_type,
+                    keywords=keywords,
+                    source=source,
                 )
             except Exception as e:
                 if self.debug:
