@@ -19,7 +19,7 @@ from typing import Dict, List, Set, Tuple
 
 from tqdm import tqdm
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))  # python_services/
 
 from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
 

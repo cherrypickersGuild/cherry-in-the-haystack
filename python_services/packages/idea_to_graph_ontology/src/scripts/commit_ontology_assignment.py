@@ -11,7 +11,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))  # python_services/
 
 from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
 from packages.ontology.src.storage.vector_store import VectorStore

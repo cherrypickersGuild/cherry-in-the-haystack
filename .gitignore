@@ -51,3 +51,10 @@ n8n-atmt-d7a9a05899be.json
 # KaaS local docs
 apps/docs/KaaS_plan/
 
+# Ontology pipeline test artifacts
+*.jsonl
+local_dev.db
+
+# symlink for import resolution
+python_services/packages/ontology
+
