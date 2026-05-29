@@ -279,7 +279,7 @@ def _extract_idea(
     try:
         llm = get_default_llm()
 
-        json_instruction = "\n\nReturn ONLY valid JSON (no markdown):\n{\"concept\": \"5-10 word descriptive noun phrase\"}"
+        json_instruction = "\n\nReturn ONLY valid JSON (no markdown):\n{{\"concept\": \"5-10 word descriptive noun phrase\"}}"
 
         prompt = ChatPromptTemplate.from_messages([
             ("system", EXTRACTION_PROMPT + json_instruction),

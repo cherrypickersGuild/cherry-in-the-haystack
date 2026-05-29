@@ -239,7 +239,7 @@ def split_into_paragraphs(
     # LLM 호출 (JSON mode, DeepSeek-compatible)
     llm = get_default_llm()
 
-    json_instruction = "\n\nReturn ONLY valid JSON (no markdown):\n{\"paragraphs\": [{\"text\": \"...\", \"start_marker\": \"...\"}]}"
+    json_instruction = "\n\nReturn ONLY valid JSON (no markdown):\n{{\"paragraphs\": [{{\"text\": \"...\", \"start_marker\": \"...\"}}]}}"
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", PARAGRAPH_SPLIT_PROMPT + json_instruction),

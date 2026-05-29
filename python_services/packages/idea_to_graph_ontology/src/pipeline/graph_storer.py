@@ -183,6 +183,8 @@ class GraphStorer:
                 description=description,
                 debug=self.debug,
             )
+            # Filter out self-references
+            candidates = [c for c in candidates if c["concept"] != concept_id]
             if candidates:
                 parent = candidates[0]["concept"]
                 return (parent, candidates, reason)

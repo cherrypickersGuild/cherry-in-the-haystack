@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from langchain_core.messages import SystemMessage, HumanMessage
 
-from packages.ontology.src.model import get_llm
+from packages.ontology.src.model import get_llm, parse_json_response
 from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
 from packages.ontology.src.storage.vector_store import VectorStore
 from packages.ontology.src.pipeline.ontology_graph_manager import OntologyGraphManager
@@ -361,68 +361,61 @@ class OntologyUpdater:
             for idx, info in enumerate(candidate_info_list, 1)
         ])
         
+        json_fmt = '{"candidates": [{"concept": "ParentID", "score": 3}], "reason": "한국어 설명"}'
+
         messages = [
-            SystemMessage(content="""당신은 온톨로지 전문가입니다.
-새로운 개념을 온톨로지의 적절한 위치에 배치해야 합니다.
+            SystemMessage(content=f"""당신은 온톨로지 전문가입니다. 새 개념을 가능한 한 깊은 계층에 배치하세요.
 
-**작업:**
-주어진 후보 부모 개념들 중에서 최대 3개를 선택하고, 각각에 대해 1-3점 척도로 적합도를 점수화하세요.
+**핵심 원칙:**
+- LLMConcept 직속은 최후의 수단. 구체적인 부모를 찾을 수 있으면 반드시 사용하세요.
+- 이미 비슷한 형제 개념이 있는 부모를 우선하세요 (계층 응집도).
+- 가장 구체적이고 적합한 부모를 골라 트리의 깊은 곳에 배치하세요.
 
-**점수 기준:**
-- 3점: 매우 적합한 부모 개념 (논리적 일관성, 서브트리 구조, 형제 개념 비교, 의미적 유사도 모두 우수)
-- 2점: 적합한 부모 개념 (대부분의 기준을 만족하지만 일부 부족한 점이 있음)
-- 1점: 약간 적합한 부모 개념 (일부 기준은 만족하지만 다른 기준에서 부족함)
+Return ONLY valid JSON (no markdown):
+{json_fmt}
 
-**판단 기준:**
-1. 새 개념이 후보 부모의 하위 개념으로 논리적으로 적합한가?
-2. 서브트리 구조를 보면 이 위치가 적절한가?
-3. 형제 개념들과 비교했을 때 같은 레벨에 있어야 하는가?
-4. 의미적 유사도가 높은가?
+3=매우적합(하위개념으로 완벽), 2=적합, 1=약간적합.
+최대 3개, 점수 높은 순. 한국어로 작성."""),
+            HumanMessage(content=f"""새 개념: {concept_id}
+설명: {description[:500]}
 
-**중요:**
-- 최대 3개까지만 선택하세요
-- 점수가 높은 순으로 정렬하세요
-- 각 후보에 대한 점수와 이유를 명확히 설명하세요
-- 모든 피드백은 **한국어로** 작성하세요"""),
-            HumanMessage(content=f"""다음 새 개념의 부모 개념 후보를 최대 3개까지 선택하고 각각에 점수를 부여해주세요:
-
-**새 개념:**
-- 개념 ID: {concept_id}
-- 설명: {description[:500]}
-
-**후보 부모 개념들:**
-
-{candidate_info_str}
-
-최대 3개를 선택하고 각각에 1-3점 척도로 점수를 부여해주세요. 점수가 높은 순으로 정렬하고, 각 후보를 선택한 이유를 **한국어로** 상세히 설명해주세요.""")
+후보 부모:
+{candidate_info_str}""")
         ]
         
         try:
             if debug:
                 print(f"\n[4단계] LLM으로 부모 개념 후보 결정 중...", flush=True)
             
-            result = self.structured_llm_parent_candidates.invoke(messages)
+            response = self.llm.invoke(messages)
+            data = parse_json_response(response.content)
+            result_candidates = data.get('candidates', [])[:3]
+            result_reason = data.get('reason', '')
             
             candidates = []
-            for candidate in result.candidates[:3]:
+            for candidate in result_candidates:
                 candidates.append({
-                    "concept": candidate.concept,
-                    "score": candidate.score
+                    'concept': candidate['concept'],
+                    'score': candidate['score']
                 })
             
-            if debug:
-                print(f"\n[부모 개념 후보 결정 결과]", flush=True)
-                for idx, cand in enumerate(candidates, 1):
-                    print(f"  {idx}. {cand['concept']} (점수: {cand['score']})", flush=True)
-                if result.reason:
-                    print(f"  결정 이유: {result.reason[:200]}...", flush=True)
-            
-            return (candidates, result.reason)
-        
+            if candidates:
+                return (candidates, result_reason)
+
         except Exception as e:
             if debug:
-                print(f"[LLM 오류] 부모 개념 후보 결정 실패: {e}", flush=True)
-            return ([], None)
+                print(f"[LLM 오류] 부모 결정 실패: {e}", flush=True)
+
+        # Vector fallback
+        if similar_concepts:
+            top = similar_concepts[0]
+            path = top.get("path_to_root", [])
+            fb = path[-2] if len(path) >= 2 else top.get("concept_id")
+            if fb and fb != "LLMConcept":
+                if debug:
+                    print(f"  -> vector fallback: {fb}", flush=True)
+                return ([{"concept": fb, "score": 1}], "vector search fallback")
+        return ([], None)
 
     def _decide_parent_concept(
         self,
