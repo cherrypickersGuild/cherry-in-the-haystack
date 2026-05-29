@@ -236,7 +236,7 @@ def main():
     if result["added"]:
         print(f"Newly added concepts:")
         for c in result["added"]:
-            print(f"  [{c['type']}] {c['concept_id']} → parent: {c['parent']}")
+            print(f"  {c['concept_id']} → parent: {c['parent']}")
 
 
 if __name__ == "__main__":
