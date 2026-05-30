@@ -71,6 +71,8 @@ class PipelineState(TypedDict, total=False):
 
     # ─── 설정 ───
     model_version: str
+    enable_semantic_dedup: bool  # 시맨틱 중복제거 활성화
+    semantic_threshold: float  # 임베딩 유사도 임계값
 
 
 def create_initial_state(
@@ -78,6 +80,8 @@ def create_initial_state(
     book_id: Optional[int] = None,
     resume: bool = False,
     model_version: str = "gemini-2.5-flash",
+    enable_semantic_dedup: bool = False,
+    semantic_threshold: float = 0.95,
 ) -> PipelineState:
     """초기 PipelineState 생성."""
     return PipelineState(
@@ -85,6 +89,8 @@ def create_initial_state(
         book_id=book_id,
         resume=resume,
         model_version=model_version,
+        enable_semantic_dedup=enable_semantic_dedup,
+        semantic_threshold=semantic_threshold,
         # 기본값 설정
         chapters=[],
         all_sections=[],
@@ -102,6 +108,10 @@ def create_initial_state(
             "total_ideas": 0,
             "duplicates_skipped": 0,
             "detection_method": "toc",
+            # 중복제거 통계
+            "dedup_skipped_hash": 0,
+            "dedup_skipped_embedding": 0,
+            "dedup_skipped_idea": 0,
         },
     )
 

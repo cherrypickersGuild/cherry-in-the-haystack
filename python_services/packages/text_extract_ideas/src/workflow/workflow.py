@@ -52,6 +52,8 @@ def run_pdf_pipeline(
     resume: bool = False,
     book_id: Optional[int] = None,
     model_version: str = "gemini-2.5-flash",
+    enable_semantic_dedup: bool = False,
+    semantic_threshold: float = 0.95,
 ) -> dict:
     """
     단일 LangGraph를 통해 전체 PDF 처리 수행:
@@ -60,6 +62,14 @@ def run_pdf_pipeline(
     3. DB에 책/챕터/섹션 저장
     4. 각 섹션별 문단 분할 및 아이디어 추출
     5. 처리 결과 요약
+
+    Args:
+        pdf_path: PDF 파일 경로
+        resume: 재개 모드
+        book_id: 책 ID (재개 모드 시)
+        model_version: LLM 모델 버전
+        enable_semantic_dedup: 시맨틱 중복제거 활성화 (기본: False)
+        semantic_threshold: 임베딩 유사도 임계값 (기본: 0.95)
     """
     # 초기 상태 생성
     initial_state = create_initial_state(
@@ -67,6 +77,8 @@ def run_pdf_pipeline(
         book_id=book_id,
         resume=resume,
         model_version=model_version,
+        enable_semantic_dedup=enable_semantic_dedup,
+        semantic_threshold=semantic_threshold,
     )
 
     print(f"📄 PDF 파이프라인 시작: {pdf_path}")

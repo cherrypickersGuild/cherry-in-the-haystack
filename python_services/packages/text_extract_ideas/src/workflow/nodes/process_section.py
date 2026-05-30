@@ -7,8 +7,11 @@ from src.model.schemas import ExtractedIdea, HierarchicalChunk
 from src.prompts.extraction import EXTRACTION_PROMPT, HUMAN_PROMPT
 from src.utils.pdf.hierarchy_detector import split_into_paragraphs
 from src.db.connection import get_session
-from src.db.models import ParagraphChunk as DBParagraphChunk, KeyIdea
+from src.db.models import ParagraphChunk as DBParagraphChunk, KeyIdea, ParagraphEmbedding
 from src.workflow.utils import get_concept_from_idea
+from python_services.packages.text_extract_ideas.src.dedup.dedup_service import DeduplicationService
+from python_services.packages.text_extract_ideas.src.dedup.hash_utils import compute_paragraph_hash, compute_simhash64
+from python_services.packages.text_extract_ideas.src.dedup.embedding_utils import compute_embedding
 
 
 def process_section(state: PipelineState) -> PipelineState:
@@ -35,6 +38,8 @@ def process_section(state: PipelineState) -> PipelineState:
 
     section_text = section.content
     stats = state.get("stats", {})
+    enable_semantic_dedup = state.get("enable_semantic_dedup", False)
+    semantic_threshold = state.get("semantic_threshold", 0.95)
 
     # 진행률 표시
     progress_pct = (current_idx + 1) / total_sections * 100
@@ -62,7 +67,7 @@ def process_section(state: PipelineState) -> PipelineState:
 
         stats["total_paragraphs"] = stats.get("total_paragraphs", 0) + len(chunks)
 
-        # 2. 각 청크 처리: 아이디어 추출 → 중복 체크 → 저장
+        # 2. 각 청크 처리: 중복 체크 → 아이디어 추출 → 아이디어 중복 체크 → 저장
         for i, chunk in enumerate(chunks):
             chunk.section_id = section_id
 
@@ -77,11 +82,17 @@ def process_section(state: PipelineState) -> PipelineState:
                 section_id=section_id,
                 prev_text=prev_text,
                 next_text=next_text,
+                enable_semantic_dedup=enable_semantic_dedup,
+                semantic_threshold=semantic_threshold,
             )
 
             if result.get("saved"):
                 stats["total_ideas"] = stats.get("total_ideas", 0) + 1
-            if result.get("is_duplicate"):
+            if result.get("is_chunk_duplicate"):
+                stats["dedup_skipped_hash"] = stats.get("dedup_skipped_hash", 0) + 1
+                stats["duplicates_skipped"] = stats.get("duplicates_skipped", 0) + 1
+            if result.get("is_idea_duplicate"):
+                stats["dedup_skipped_idea"] = stats.get("dedup_skipped_idea", 0) + 1
                 stats["duplicates_skipped"] = stats.get("duplicates_skipped", 0) + 1
 
         stats["completed_sections"] = stats.get("completed_sections", 0) + 1
@@ -211,19 +222,57 @@ def _process_chunk(
     section_id: int,
     prev_text: str = "",
     next_text: str = "",
+    enable_semantic_dedup: bool = False,
+    semantic_threshold: float = 0.95,
 ) -> dict:
     """
-    단일 청크 처리: 아이디어 추출 → 중복 체크 → 저장.
+    단일 청크 처리: 중복 체크 → 아이디어 추출 → 아이디어 중복 체크 → 저장.
 
     Returns:
-        {"saved": bool, "is_duplicate": bool, "error": str | None}
+        {"saved": bool, "is_chunk_duplicate": bool, "is_idea_duplicate": bool, "error": str | None}
     """
     chunk_text = chunk.text
 
     if not chunk_text or len(chunk_text.strip()) < 50:
-        return {"saved": False, "is_duplicate": False}
+        return {"saved": False, "is_chunk_duplicate": False, "is_idea_duplicate": False}
 
     try:
+        # 0. 청크 중복 체크 (해시 기반) - LLM 호출 전에 실행
+        chunk_para_hash = compute_paragraph_hash(chunk_text)
+        chunk_simhash = compute_simhash64(chunk_text)
+
+        # 해시 기반 중복 체크
+        session = get_session()
+        try:
+            # 정확한 해시 매칭
+            hash_match = session.query(DBParagraphChunk.id).filter(
+                DBParagraphChunk.paragraph_hash == chunk_para_hash
+            ).first()
+            if hash_match:
+                session.close()
+                return {"saved": False, "is_chunk_duplicate": True, "is_idea_duplicate": False}
+
+            # SimHash 퍼지 매칭 (시맨틱 중복제거 활성화 시)
+            if enable_semantic_dedup:
+                # SimHash 체크
+                simhash_match = session.query(DBParagraphChunk.id).filter(
+                    DBParagraphChunk.simhash64.isnot(None)
+                ).first()
+                # TODO: SimHamming 거리 계산 추가 필요
+
+                # 임베딩 기반 의미적 중복 체크
+                dedup_service = DeduplicationService(
+                    session=session,
+                    semantic_threshold=semantic_threshold,
+                    enable_semantic=True,
+                )
+                semantic_result = dedup_service.check_duplicate(chunk_text, book_id)
+                if semantic_result.is_duplicate:
+                    session.close()
+                    return {"saved": False, "is_chunk_duplicate": True, "is_idea_duplicate": False, "duplicate_type": semantic_result.duplicate_type}
+        finally:
+            session.close()
+
         # 1. 아이디어 추출 (컨텍스트 포함)
         extracted_idea = _extract_idea(
             chunk_text,
@@ -233,14 +282,14 @@ def _process_chunk(
         )
 
         if not extracted_idea:
-            return {"saved": False, "is_duplicate": False}
+            return {"saved": False, "is_chunk_duplicate": False, "is_idea_duplicate": False}
 
-        # 2. 중복 체크
+        # 2. 아이디어 중복 체크
         concept = get_concept_from_idea(extracted_idea)
         is_duplicate = _check_duplicate(concept, book_id)
 
         if is_duplicate:
-            return {"saved": False, "is_duplicate": True}
+            return {"saved": False, "is_chunk_duplicate": False, "is_idea_duplicate": True}
 
         # 3. DB 저장
         _save_to_db(
@@ -249,12 +298,15 @@ def _process_chunk(
             book_id=book_id,
             chapter_id=chapter_id,
             section_id=section_id,
+            chunk_para_hash=chunk_para_hash,
+            chunk_simhash=chunk_simhash,
+            enable_semantic_dedup=enable_semantic_dedup,
         )
 
-        return {"saved": True, "is_duplicate": False}
+        return {"saved": True, "is_chunk_duplicate": False, "is_idea_duplicate": False}
 
     except Exception as e:
-        return {"saved": False, "is_duplicate": False, "error": str(e)}
+        return {"saved": False, "is_chunk_duplicate": False, "is_idea_duplicate": False, "error": str(e)}
 
 
 def _get_first_sentence(text: str) -> str:
@@ -327,11 +379,14 @@ def _save_to_db(
     book_id: int,
     chapter_id: int,
     section_id: int,
+    chunk_para_hash: str = None,
+    chunk_simhash: int = None,
+    enable_semantic_dedup: bool = False,
 ) -> None:
-    """청크와 아이디어를 DB에 저장."""
+    """청크와 아이디어를 DB에 저장 (해시 및 임베딩 포함)."""
     session = get_session()
     try:
-        # ParagraphChunk 저장
+        # ParagraphChunk 저장 (해시 포함)
         db_chunk = DBParagraphChunk(
             book_id=book_id,
             chapter_id=chapter_id,
@@ -339,9 +394,26 @@ def _save_to_db(
             paragraph_index=chunk.paragraph_index,
             chapter_paragraph_index=chunk.chapter_paragraph_index,
             body_text=chunk.text,
+            paragraph_hash=chunk_para_hash,
+            simhash64=chunk_simhash,
         )
         session.add(db_chunk)
         session.flush()
+
+        # 임베딩 저장 (시맨틱 중복제거 활성화 시)
+        if enable_semantic_dedup:
+            try:
+                embedding_result = compute_embedding(chunk.text)
+                db_embedding = ParagraphEmbedding(
+                    chunk_id=db_chunk.id,
+                    book_id=book_id,
+                    embedding=embedding_result.embedding,
+                    model_name=embedding_result.model,
+                )
+                session.add(db_embedding)
+            except Exception as e:
+                # 임베딩 생성 실패해도 청크는 저장
+                print(f"   ⚠️ 임베딩 생성 실패 (무시): {e}")
 
         # KeyIdea 저장
         concept = get_concept_from_idea(extracted_idea)

@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, Text, ForeignKey, String, Sequence
-from sqlalchemy.dialects.postgresql import TIMESTAMP
+from sqlalchemy import Column, Integer, Text, ForeignKey, String, Sequence, BigInteger, Index
+from sqlalchemy.dialects.postgresql import TIMESTAMP, VECTOR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 
@@ -79,6 +79,10 @@ class ParagraphChunk(Base):
     chapter_paragraph_index = Column(Integer)  # 챕터 내 문단 인덱스
     section_id = Column(Integer, ForeignKey("sections.id"))  # 섹션 참조 (정규화)
 
+    # 중복제거 컬럼 (deduplication)
+    paragraph_hash = Column(String(64), Index("idx_paragraph_hash"))  # SHA256 해시
+    simhash64 = Column(BigInteger, Index("idx_simhash64"))  # SimHash (퍼지 매칭용)
+
 
 class IdeaGroup(Base):
     """아이디어 묶음 (중복 제거용) - 기존 스키마 유지"""
@@ -128,3 +132,30 @@ class ProcessingProgress(Base):
     # 추가 컬럼 (챕터 기반 추적)
     chapter_id = Column(Integer, ForeignKey("chapters.id"))  # 챕터 기반 진행 추적
     processing_unit = Column(String(50), default='page')  # 'page' or 'chapter'
+
+
+class ParagraphEmbedding(Base):
+    """임베딩 테이블 (의미적 중복제거용)
+
+    OpenAI text-embedding-3-small (1536차원) 임베딩을 저장하여
+    pgvector 코사인 유사도 검색을 지원합니다.
+    """
+
+    __tablename__ = "paragraph_embeddings"
+
+    id = Column(Integer, Sequence('paragraph_embeddings_id_seq'), primary_key=True)
+    chunk_id = Column(
+        Integer,
+        ForeignKey("paragraph_chunks.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False,
+    )
+    book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
+    embedding = Column(VECTOR(1536), nullable=False)  # pgvector
+    model_name = Column(String(100), default="text-embedding-3-small")
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    # 인덱스 (pgvector IVFFlat 코사ine 유사도)
+    __table_args__ = (
+        Index("idx_embedding_vector", "embedding", postgresql_using="ivfflat", postgresql_with={"lists": 100}),
+    )
