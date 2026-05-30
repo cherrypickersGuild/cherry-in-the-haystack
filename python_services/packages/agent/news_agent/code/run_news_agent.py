@@ -364,12 +364,12 @@ def build_agents(prompts: Dict[str, str]):
             "Agents SDK is not available. Install the OpenAI Agents SDK package before running this script."
         ) from exc
 
-    model_name = os.getenv("OPENAI_MODEL", "gpt-4.1")
+    model_name = os.getenv("LLM_MODEL", "deepseek-chat")
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
         raise ValueError("OPENAI_API_KEY is not set.")
 
-    provider = OpenAIProvider(api_key=api_key)
+    provider = OpenAIProvider(api_key=api_key, base_url="https://api.deepseek.com")
     model = provider.get_model(model_name)
 
     analyst = Agent(
@@ -407,12 +407,12 @@ def build_newsletter_agent(prompt: str):
             "Agents SDK is not available. Install the OpenAI Agents SDK package before running this script."
         ) from exc
 
-    model_name = os.getenv("OPENAI_MODEL", "gpt-4.1")
+    model_name = os.getenv("LLM_MODEL", "deepseek-chat")
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
         raise ValueError("OPENAI_API_KEY is not set.")
 
-    provider = OpenAIProvider(api_key=api_key)
+    provider = OpenAIProvider(api_key=api_key, base_url="https://api.deepseek.com")
     model = provider.get_model(model_name)
 
     agent = Agent(
@@ -431,12 +431,12 @@ def build_newsletter_pipeline_agents(prompts: Dict[str, str]):
             "Agents SDK is not available. Install the OpenAI Agents SDK package before running this script."
         ) from exc
 
-    model_name = os.getenv("OPENAI_MODEL", "gpt-4.1")
+    model_name = os.getenv("LLM_MODEL", "deepseek-chat")
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
         raise ValueError("OPENAI_API_KEY is not set.")
 
-    provider = OpenAIProvider(api_key=api_key)
+    provider = OpenAIProvider(api_key=api_key, base_url="https://api.deepseek.com")
     model = provider.get_model(model_name)
 
     agent_names = [
@@ -469,12 +469,12 @@ def build_article_assessment_agents(prompts: Dict[str, str]):
             "Agents SDK is not available. Install the OpenAI Agents SDK package before running this script."
         ) from exc
 
-    model_name = os.getenv("OPENAI_MODEL", "gpt-4.1")
+    model_name = os.getenv("LLM_MODEL", "deepseek-chat")
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
         raise ValueError("OPENAI_API_KEY is not set.")
 
-    provider = OpenAIProvider(api_key=api_key)
+    provider = OpenAIProvider(api_key=api_key, base_url="https://api.deepseek.com")
     model = provider.get_model(model_name)
 
     agent_names = [

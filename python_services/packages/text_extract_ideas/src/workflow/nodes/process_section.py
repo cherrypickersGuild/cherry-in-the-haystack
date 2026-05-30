@@ -2,7 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from tqdm import tqdm
 
 from src.workflow.state import PipelineState
-from src.model.model import get_default_llm
+from src.model.model import get_default_llm, parse_json_response
 from src.model.schemas import ExtractedIdea, HierarchicalChunk
 from src.prompts.extraction import EXTRACTION_PROMPT, HUMAN_PROMPT
 from src.utils.pdf.hierarchy_detector import split_into_paragraphs
@@ -278,20 +278,23 @@ def _extract_idea(
     """청크에서 아이디어 추출 (컨텍스트 정보 포함)."""
     try:
         llm = get_default_llm()
-        structured_llm = llm.with_structured_output(ExtractedIdea, method="json_mode")
+
+        json_instruction = "\n\nReturn ONLY valid JSON (no markdown):\n{{\"concept\": \"5-10 word descriptive noun phrase\"}}"
 
         prompt = ChatPromptTemplate.from_messages([
-            ("system", EXTRACTION_PROMPT),
+            ("system", EXTRACTION_PROMPT + json_instruction),
             ("human", HUMAN_PROMPT),
         ])
 
-        chain = prompt | structured_llm
-        return chain.invoke({
-            "text": chunk_text,
-            "hierarchy_path": hierarchy_path or "N/A",
-            "prev_summary": _get_first_sentence(prev_text),
-            "next_summary": _get_first_sentence(next_text),
-        })
+        messages = prompt.format_messages(
+            text=chunk_text,
+            hierarchy_path=hierarchy_path or "N/A",
+            prev_summary=_get_first_sentence(prev_text),
+            next_summary=_get_first_sentence(next_text),
+        )
+        response = llm.invoke(messages)
+        data = parse_json_response(response.content)
+        return ExtractedIdea(**data)
 
     except Exception:
         return None

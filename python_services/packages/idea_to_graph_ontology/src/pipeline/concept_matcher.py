@@ -4,10 +4,9 @@ from typing import Dict, List, Any, Optional
 
 from pydantic import BaseModel, Field
 
+from packages.ontology.src.model import get_llm
 from packages.ontology.src.storage.vector_store import VectorStore
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
-import os
 
 
 class ExtractedConcept(BaseModel):
@@ -58,8 +57,7 @@ class ConceptMatcher:
             vector_store: 벡터 스토어 인스턴스
         """
         self.vector_store = vector_store
-        model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-        self.llm = ChatOpenAI(model=model, temperature=0)
+        self.llm = get_llm()
         self.structured_llm = self.llm.with_structured_output(MatchingResult)
         self.structured_llm_extraction = self.llm.with_structured_output(ConceptExtractionResult)
 

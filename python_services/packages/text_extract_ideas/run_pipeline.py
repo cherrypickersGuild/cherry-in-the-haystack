@@ -10,9 +10,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.workflow.workflow import run_pdf_pipeline
+from src.db.connection import init_db
 
 
 def main():
+    init_db()  # create tables if they don't exist
     # 기본값 또는 인자로 PDF 경로 받기
     if len(sys.argv) > 1:
         pdf_path = sys.argv[1]
@@ -22,8 +24,10 @@ def main():
         #LLM Engineers Handbook.pdf
     model_version = sys.argv[2] if len(sys.argv) > 2 else 'gemini-2.5-flash'
 
+    import os as _os
+    actual_model = _os.getenv("LLM_MODEL", "deepseek-chat")
     print(f"📄 PDF: {pdf_path}")
-    print(f"🤖 Model: {model_version}")
+    print(f"🤖 Model: {actual_model}")
     print()
 
     result = run_pdf_pipeline(

@@ -12,7 +12,7 @@ import { KaasModule } from './modules/kaas/kaas.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../../.env', '.env'] }),
     AppUserModule,
     PipelineModule,
     PipelineUserModule,

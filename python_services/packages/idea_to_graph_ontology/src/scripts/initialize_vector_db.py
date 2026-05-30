@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """온톨로지 개념들에 대한 description을 생성하고 Vector DB를 초기화하는 스크립트."""
 
-import os
 import sys
 from pathlib import Path
 
 project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root / "src"))
+sys.path.insert(0, str(project_root.parent.parent))  # python_services/
 
+from packages.ontology.src.model import get_llm
 from packages.ontology.src.utils import load_all_concepts, update_ttl_descriptions
 from packages.ontology.src.storage.vector_store import VectorStore
 from packages.ontology.src.storage.graph_query_engine import GraphQueryEngine
 from packages.ontology.src.pipeline.ontology_updater import OntologyUpdater
-from langchain_openai import ChatOpenAI
 
 
 def main():
@@ -31,8 +30,7 @@ def main():
     if empty_desc_concepts:
         print("\n3. LLM으로 description 생성 중...")
         
-        model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-        llm = ChatOpenAI(model=model, temperature=0)
+        llm = get_llm()
         graph_engine = GraphQueryEngine("http://localhost:7200/repositories/llm-ontology")
         vector_store = VectorStore(str(vector_db_path))
         

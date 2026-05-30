@@ -110,30 +110,40 @@ class GraphQueryEngine:
         concept_id: str,
         label: str,
         parent: str,
-        description: str
+        description: str,
+        keywords: list | None = None,
+        source: str = "",
     ) -> None:
         """새 개념을 그래프 DB에 추가.
-        
+
         Args:
             concept_id: 개념 ID
             label: 개념 레이블
             parent: 부모 개념 ID
             description: 개념 설명
+            keywords: 대체 이름/동의어 배열
+            source: 출처 책/자료 식별자
         """
-        # 특수 문자 이스케이프
         escaped_label = self._escape_sparql_string(label)
         escaped_description = self._escape_sparql_string(description)
-        
+        escaped_source = self._escape_sparql_string(source)
+
+        keywords_str = ""
+        if keywords:
+            kw_escaped = [f'"{self._escape_sparql_string(kw)}"' for kw in keywords]
+            keywords_str = f'llm:keywords {", ".join(kw_escaped)} ;\n                '
+
         query = f"""
         PREFIX llm: <http://example.org/llm-ontology#>
         PREFIX owl: <http://www.w3.org/2002/07/owl#>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        
+
         INSERT DATA {{
             llm:{concept_id} a owl:Class ;
                 rdfs:label "{escaped_label}"@en ;
                 rdfs:subClassOf llm:{parent} ;
-                llm:description "{escaped_description}" .
+                llm:description "{escaped_description}" ;
+                {keywords_str}llm:source "{escaped_source}" .
         }}
         """
         self.update(query)

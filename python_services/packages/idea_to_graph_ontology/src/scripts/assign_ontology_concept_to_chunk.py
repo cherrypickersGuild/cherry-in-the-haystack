@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))  # python_services/
 
 if sys.stdout.isatty() is False:
     sys.stdout.reconfigure(line_buffering=True)
