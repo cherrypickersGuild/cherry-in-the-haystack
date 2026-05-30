@@ -21,6 +21,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 
+// Bench tool impls — reused so Claude Code hits the SAME seeded data the
+// web benchmark uses. See apps/docs/install-skill/1-work-guidelines.md.
+import { searchMarketplace } from './modules/bench/tools/marketplace.tool';
+import { fetchCryptoPrice } from './modules/bench/tools/coingecko.tool';
+
 /* ═══════════════════════════════════════════
    Skills directory helpers
    - stdio MCP는 유저 로컬 PC에서 실행 → ~/.claude/skills/ 접근 가능
@@ -213,6 +218,55 @@ server.tool(
       if (category) concepts = concepts.filter((c: any) => c.category === category);
     }
     return { content: [{ type: 'text', text: JSON.stringify(concepts, null, 2) }] };
+  },
+);
+
+// --- Tool: search_marketplace (bench Set 2 Hunter) ---
+// Exposes the SAME seeded marketplace data the web benchmark uses, so Claude
+// Code agents running `cherry hunter` mode produce comparable results.
+server.tool(
+  'search_marketplace',
+  "Search the Cherry-seeded marketplace (laptops / hardware listings). Returns { listings: [{id, title, price, seller, posted_at, sealed, brand, model}], matchCount }. Match rule: ALL whitespace-separated tokens in `query` must appear in the listing's brand+model+title (case-insensitive). IMPORTANT: pass ONLY the brand + model tokens, like `LG Gram 16`. Do NOT add generic words such as 'laptop', 'notebook', 'computer', 'sealed' — use the `sealed_only` boolean for that. Example call: { query: 'LG Gram 16', max_price: 700, sealed_only: true }.",
+  {
+    query: z.string().describe("Free-text query, e.g. 'LG Gram 16'."),
+    max_price: z.number().optional().describe('Upper bound (exclusive) on price in USD.'),
+    sealed_only: z.boolean().optional().describe('If true, only return sealed items.'),
+  },
+  async ({ query, max_price, sealed_only }) => {
+    // Strip common generic words Claude Code tends to append — the match rule
+    // requires ALL tokens to hit listing.brand+model+title, so "laptop" etc.
+    // would zero out valid results. Same spirit as sealed_only being a field.
+    const STOP = new Set([
+      'laptop', 'laptops', 'notebook', 'notebooks', 'computer', 'computers',
+      'pc', 'pcs', 'sealed', 'new', 'used', 'opened', 'box',
+    ]);
+    const cleaned = query
+      .split(/\s+/)
+      .filter((t) => t && !STOP.has(t.toLowerCase()))
+      .join(' ')
+      .trim() || query; // fall back to original if stop-filter left nothing
+    const result = searchMarketplace({ query: cleaned, max_price, sealed_only });
+    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+  },
+);
+
+// --- Tool: get_crypto_price (bench Set 1 Oracle + Set 4 Quant) ---
+// Hits CoinGecko free API with 60s fresh cache + 5min stale fallback. Same
+// handler the web bench uses — results match across channels.
+server.tool(
+  'get_crypto_price',
+  "Fetch the current USD price and 24h percent change for a cryptocurrency from CoinGecko. Returns { symbol, priceUsd, change24hPct, fetchedAt, source }. Use this for the Oracle / Quant builds.",
+  {
+    symbol: z.string().describe("Ticker symbol, e.g. 'BTC', 'ETH', 'SOL'."),
+  },
+  async ({ symbol }) => {
+    try {
+      const result = await fetchCryptoPrice(symbol);
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { content: [{ type: 'text', text: `get_crypto_price error: ${msg}` }], isError: true };
+    }
   },
 );
 
@@ -809,6 +863,72 @@ function connectWebSocket(apiKey: string) {
         wsSocket!.emit('save_skill_error', {
           request_id: req.request_id,
           message: err.message ?? String(err),
+        });
+      } catch { /* ignore */ }
+    }
+  });
+
+  /* ═══════════════════════════════════════════
+     delete_skill_request — 서버가 ~/.claude/skills/<dir> 삭제 요청
+     install-build 고아 정리용. target_dir 은 반드시 cherry-* 로 끝나야 함.
+  ═══════════════════════════════════════════ */
+  wsSocket.on('delete_skill_request', (req: {
+    request_id: string;
+    target_dir: string;  // "~/.claude/skills/cherry-<short>"
+  }) => {
+    console.error(`[WS] 📥 delete_skill_request RECEIVED: request=${req.request_id} target=${req.target_dir}`);
+    try {
+      // ~ 확장
+      const expand = (p: string) => p.startsWith('~')
+        ? path.join(os.homedir(), p.slice(1).replace(/^\/+/, ''))
+        : p;
+      const absDir = expand(req.target_dir);
+      const resolved = path.resolve(absDir);
+
+      // 방어 1: 반드시 ~/.claude/skills/ 하위
+      const skillsRoot = path.resolve(path.join(os.homedir(), '.claude', 'skills'));
+      if (!resolved.startsWith(skillsRoot + path.sep)) {
+        wsSocket!.emit('delete_skill_ack', {
+          request_id: req.request_id,
+          deleted: false,
+          error_reason: `target_dir is outside ~/.claude/skills/ — refusing (${resolved})`,
+        });
+        return;
+      }
+      // 방어 2: 반드시 cherry- 접두사로 끝남
+      const baseName = path.basename(resolved);
+      if (!/^cherry-[a-z0-9-]+$/.test(baseName)) {
+        wsSocket!.emit('delete_skill_ack', {
+          request_id: req.request_id,
+          deleted: false,
+          error_reason: `target_dir basename is not a cherry-* dir (${baseName})`,
+        });
+        return;
+      }
+
+      if (fs.existsSync(resolved)) {
+        fs.rmSync(resolved, { recursive: true, force: true });
+        console.error(`[WS]   ✓ removed ${resolved}`);
+        wsSocket!.emit('delete_skill_ack', {
+          request_id: req.request_id,
+          deleted: true,
+          removed_path: resolved,
+        });
+      } else {
+        console.error(`[WS]   - already absent: ${resolved}`);
+        wsSocket!.emit('delete_skill_ack', {
+          request_id: req.request_id,
+          deleted: false,
+          error_reason: 'target_dir does not exist (already removed)',
+        });
+      }
+    } catch (err: any) {
+      console.error(`[WS] ✗ delete_skill FAILED: ${err.message}`);
+      try {
+        wsSocket!.emit('delete_skill_ack', {
+          request_id: req.request_id,
+          deleted: false,
+          error_reason: err.message ?? String(err),
         });
       } catch { /* ignore */ }
     }

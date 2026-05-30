@@ -1,10 +1,6 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
+import { API_URL, fetchWithAuth } from "./auth"
 
-/** JWT 인증 헤더 — localStorage에서 토큰 읽어서 Bearer 헤더 생성 */
-function authHeaders(): Record<string, string> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
-  return token ? { 'Authorization': `Bearer ${token}` } : {}
-}
+export { API_URL }
 
 export interface PatchNoteItem {
   id: string
@@ -379,9 +375,9 @@ export async function fetchConcept(conceptId: string) {
 
 /** 에이전트 등록 (JWT 인증 필요) */
 export async function registerAgent(data: { name: string; wallet_address?: string; wallet_type?: "evm" | "near"; llm_provider?: string; llm_model?: string; llm_api_key?: string; domain_interests: string[] }) {
-  const res = await fetch(`${KAAS_BASE}/agents/register`, {
+  const res = await fetchWithAuth(`${KAAS_BASE}/agents/register`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...authHeaders() },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   })
   if (!res.ok) throw new Error("Failed to register agent")
@@ -390,13 +386,13 @@ export async function registerAgent(data: { name: string; wallet_address?: strin
 
 /** 에이전트 삭제 (JWT 인증 필요) */
 export async function deleteAgent(agentId: string) {
-  const res = await fetch(`${KAAS_BASE}/agents/${agentId}`, { method: "DELETE", headers: authHeaders() })
+  const res = await fetchWithAuth(`${KAAS_BASE}/agents/${agentId}`, { method: "DELETE" })
   if (!res.ok) throw new Error("Failed to delete agent")
 }
 
 /** 에이전트 목록 (JWT 인증 필요 — 로그인 유저의 에이전트만) */
 export async function fetchAgents() {
-  const res = await fetch(`${KAAS_BASE}/agents`, { headers: authHeaders() })
+  const res = await fetchWithAuth(`${KAAS_BASE}/agents`)
   if (!res.ok) throw new Error("Failed to fetch agents")
   return res.json()
 }
@@ -415,7 +411,7 @@ export interface OnchainKarma {
 }
 
 export async function fetchAgentKarma(agentId: string): Promise<OnchainKarma> {
-  const res = await fetch(`${KAAS_BASE}/agents/${agentId}/karma`, { cache: "no-store", headers: authHeaders() })
+  const res = await fetchWithAuth(`${KAAS_BASE}/agents/${agentId}/karma`, { cache: "no-store" })
   if (!res.ok) throw new Error("Failed to fetch onchain karma")
   return res.json()
 }
@@ -446,7 +442,7 @@ export async function purchaseConcept(
   apiKey: string,
   conceptId: string,
   chain?: "status" | "near" | "mock",
-  opts?: { preSignedTx?: string },
+  opts?: { preSignedTx?: string; privacyMode?: boolean },
 ) {
   const res = await fetch(`${KAAS_BASE}/purchase`, {
     method: "POST",
@@ -456,6 +452,7 @@ export async function purchaseConcept(
       api_key: apiKey,
       ...(chain ? { chain } : {}),
       ...(opts?.preSignedTx ? { pre_signed_tx: opts.preSignedTx } : {}),
+      ...(opts?.privacyMode ? { privacy_mode: true } : {}),
     }),
   })
   if (!res.ok) {
@@ -473,7 +470,7 @@ export async function followConcept(
   apiKey: string,
   conceptId: string,
   chain?: "status" | "near" | "mock",
-  opts?: { preSignedTx?: string },
+  opts?: { preSignedTx?: string; privacyMode?: boolean },
 ) {
   const res = await fetch(`${KAAS_BASE}/follow`, {
     method: "POST",
@@ -483,11 +480,295 @@ export async function followConcept(
       api_key: apiKey,
       ...(chain ? { chain } : {}),
       ...(opts?.preSignedTx ? { pre_signed_tx: opts.preSignedTx } : {}),
+      ...(opts?.privacyMode ? { privacy_mode: true } : {}),
     }),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw Object.assign(new Error(err.message || "Follow failed"), { code: err.code, status: res.status })
+  }
+  return res.json()
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Shop — consumer storefront (sets only). Mirrors
+   `apps/api/src/modules/kaas/shop/` endpoints.
+   ════════════════════════════════════════════════════════════════ */
+
+export interface ShopSetComponent {
+  slot: string
+  cardId: string
+  type: string
+  title: string
+  summary: string
+}
+
+export interface ShopSet {
+  id: string
+  domain: string
+  title: string
+  subtitle: string
+  icon: string
+  equipped: {
+    prompt: string | null
+    mcp: string | null
+    skillA: string | null
+    skillB: string | null
+    skillC: string | null
+    orchestration: string | null
+    memory: string | null
+  }
+  slotCount: number
+  priceBundled: number
+  qualityScore: number
+  installs: number
+  components: ShopSetComponent[]
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Agent Trade — Shop "By Agent" tab. Diff target agent's installed
+   skills vs caller's, then buy any missing one for a flat 5 credits.
+   Mirrors `apps/api/src/modules/kaas/shop/agent-trade.controller.ts`.
+   ════════════════════════════════════════════════════════════════ */
+
+export type AgentTradeSkillKind = "concept" | "card" | "meta" | "unknown"
+
+export interface ClassifiedSkill {
+  slug: string
+  kind: AgentTradeSkillKind
+  title?: string
+  summary?: string
+}
+
+export interface AgentTradeDiff {
+  both: ClassifiedSkill[]
+  onlyMine: ClassifiedSkill[]
+  onlyTheirs: ClassifiedSkill[]
+}
+
+export const AGENT_TRADE_FLAT_PRICE = 5
+
+export async function fetchShopAgents(myApiKey?: string): Promise<{ id: string; name: string; connected: boolean }[]> {
+  const u = new URL(`${KAAS_BASE}/shop/agents`)
+  if (myApiKey) u.searchParams.set("exclude_self", myApiKey)
+  const res = await fetch(u, { cache: "no-store" })
+  if (!res.ok) throw new Error(`fetchShopAgents ${res.status}`)
+  return res.json()
+}
+
+export async function fetchAgentDiff(
+  targetAgentId: string,
+  myApiKey: string,
+): Promise<AgentTradeDiff> {
+  const u = new URL(`${KAAS_BASE}/shop/agents/${encodeURIComponent(targetAgentId)}/diff`)
+  u.searchParams.set("vs_api_key", myApiKey)
+  const res = await fetch(u, { cache: "no-store" })
+  if (!res.ok) throw new Error(`fetchAgentDiff ${res.status}`)
+  return res.json()
+}
+
+export interface BuyAgentTradeSkillResponse {
+  installed: boolean
+  saved_path?: string
+  size_bytes?: number
+  credits_consumed: number
+  credits_after: number
+  provenance: { hash: string | null; chain: string; explorer_url: string | null; on_chain: boolean }
+}
+
+export async function buyAgentTradeSkill(
+  apiKey: string,
+  slug: string,
+): Promise<BuyAgentTradeSkillResponse> {
+  const res = await fetch(`${KAAS_BASE}/shop/agents/skills/buy`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slug, api_key: apiKey }),
+  })
+  if (!res.ok) {
+    const b = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(b?.message ?? `buyAgentTradeSkill ${res.status}`), {
+      code: b?.code,
+      status: res.status,
+      credits_required: b?.credits_required,
+      credits_available: b?.credits_available,
+    })
+  }
+  return res.json()
+}
+
+// ── Flock export ─────────────────────────────────────────────
+
+export interface FlockExportRequest {
+  build_id: string
+  build_name: string
+  build_summary?: string
+  equipped: {
+    prompt: string | null
+    mcp: string | null
+    skillA: string | null
+    skillB: string | null
+    skillC: string | null
+    orchestration: string | null
+    memory: string | null
+  }
+  api_key: string
+  public?: boolean
+}
+
+export interface FlockExportResponse {
+  agent: { id: string; handle?: string; address?: string; raw: any }
+  knowledge_graph?: { id: string; raw: any } | null
+  documents: Array<{ slot: string; card_id: string; document_id?: string; ok: boolean; error?: string }>
+  public_url_candidates: string[]
+  warnings: string[]
+}
+
+export async function fetchFlockExportConfig(): Promise<{ server_key_configured: boolean; key_source: string | null }> {
+  const res = await fetch(`${KAAS_BASE}/flock/config`)
+  if (!res.ok) return { server_key_configured: false, key_source: null }
+  return res.json()
+}
+
+// ── Agentverse export ─────────────────────────────────────────
+
+export interface AgentverseExportResponse {
+  agent: { address?: string; name: string; readme: string; raw: any }
+  public_url_candidates: string[]
+  warnings: string[]
+}
+
+export async function fetchAgentverseConfig(): Promise<{ server_key_configured: boolean }> {
+  const res = await fetch(`${KAAS_BASE}/flock/agentverse-config`)
+  if (!res.ok) return { server_key_configured: false }
+  return res.json()
+}
+
+// ── FLock bundle (manual co-creation upload) ─────────────────
+
+export interface FlockBundleFile {
+  filename: string
+  content: string
+  mime: "text/plain" | "text/markdown" | "application/json"
+}
+
+export interface FlockBundleResponse {
+  files: FlockBundleFile[]
+  flock_platform_url: string
+  warnings: string[]
+}
+
+export async function buildFlockBundle(req: Omit<FlockExportRequest, "api_key" | "public">): Promise<FlockBundleResponse> {
+  const res = await fetch(`${KAAS_BASE}/flock/flock-bundle`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req),
+  })
+  if (!res.ok) {
+    const b = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(b?.message ?? `buildFlockBundle ${res.status}`), {
+      code: b?.code,
+      status: res.status,
+    })
+  }
+  return res.json()
+}
+
+export async function exportToAgentverse(req: Omit<FlockExportRequest, "api_key"> & { api_key?: string }): Promise<AgentverseExportResponse> {
+  const res = await fetch(`${KAAS_BASE}/flock/export-agentverse`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req),
+  })
+  if (!res.ok) {
+    const b = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(b?.message ?? `exportToAgentverse ${res.status}`), {
+      code: b?.code,
+      status: res.status,
+      detail: b?.detail,
+    })
+  }
+  return res.json()
+}
+
+export async function exportToFlockx(req: FlockExportRequest): Promise<FlockExportResponse> {
+  const res = await fetch(`${KAAS_BASE}/flock/export-build`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req),
+  })
+  if (!res.ok) {
+    const b = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(b?.message ?? `exportToFlockx ${res.status}`), {
+      code: b?.code,
+      status: res.status,
+      detail: b?.detail,
+    })
+  }
+  return res.json()
+}
+
+export interface CardSource {
+  id: string
+  type: "prompt" | "mcp" | "skill" | "orchestration" | "memory"
+  body: string
+  language: "markdown" | "json"
+}
+
+/** Read-only source for a single Workshop card (systemPrompt / promptSuffix
+ *  / tool schema / memory config). Used by the Workshop card inspector. */
+export async function fetchCardSource(cardId: string): Promise<CardSource> {
+  const res = await fetch(
+    `${KAAS_BASE}/shop/cards/${encodeURIComponent(cardId)}/source`,
+    { cache: "no-store" },
+  )
+  if (!res.ok) throw new Error(`fetchCardSource ${res.status}`)
+  return res.json()
+}
+
+export async function fetchShopSets(): Promise<ShopSet[]> {
+  const res = await fetch(`${KAAS_BASE}/shop/sets`, { cache: "no-store" })
+  if (!res.ok) throw new Error(`fetchShopSets ${res.status}`)
+  return res.json()
+}
+
+export interface BuySetResponse {
+  installed: Array<{ slot: string; card_id: string; dir: string; file: string; saved_path: string; size_bytes: number }>
+  skipped: Array<{ slot: string; card_id: string | null; reason: string }>
+  failed: Array<{ slot: string; card_id: string; error: string }>
+  meta_written: boolean
+  orphans_removed: string[]
+  local_skills_after: Array<{ dir: string; hasSkillMd: boolean; sizeBytes: number; mtime: string | null }>
+  warnings: string[]
+  activation_prompt: string
+  credits_consumed: number
+  credits_after: number
+  provenance: {
+    hash: string | null
+    chain: string
+    explorer_url: string | null
+    on_chain: boolean
+  }
+  partial: boolean
+}
+
+export async function buySet(
+  apiKey: string,
+  setId: string,
+  chain: "status" | "near" | "mock" = "status",
+): Promise<BuySetResponse> {
+  const res = await fetch(`${KAAS_BASE}/shop/buy-and-install`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ set_id: setId, api_key: apiKey, chain }),
+  })
+  // 207 Multi-Status 도 응답 파싱
+  if (!res.ok && res.status !== 207) {
+    const b = await res.json().catch(() => ({}))
+    throw Object.assign(new Error(b?.message ?? `buySet ${res.status}`), {
+      code: b?.code,
+      status: res.status,
+    })
   }
   return res.json()
 }
@@ -555,9 +836,9 @@ export async function mcpChat(message: string, agentId?: string) {
 
 /** MCP Elicitation — 에이전트에게 지식 목록 요청 후 gap 분석 */
 export async function elicitKnowledge(agentId?: string) {
-  const res = await fetch(`${KAAS_BASE}/mcp/elicit`, {
+  const res = await fetchWithAuth(`${KAAS_BASE}/mcp/elicit`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...authHeaders() },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ agent_id: agentId }),
   })
   if (!res.ok) throw new Error("Elicitation failed")

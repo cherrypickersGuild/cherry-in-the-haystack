@@ -184,6 +184,22 @@ function connectWebSocket(apiKey, baseUrl) {
     process.stderr.write(`[WS] Room message from ${msg.from}: ${msg.content?.slice(0, 50)}...\n`);
   });
 
+  // ── A2A task 수신 ──
+  socket.on('a2a_task_received', (task) => {
+    const textPart = task.message?.parts?.find((p) => p.type === 'text')?.text ?? '(no text)';
+    const from = task['x-cherry']?.initiator_name ?? task['x-cherry']?.initiator_id?.slice(0, 8) ?? 'unknown';
+    process.stderr.write(`[A2A] ← incoming task ${task.id.slice(0, 8)} from ${from}: ${textPart}\n`);
+  });
+
+  socket.on('a2a_task_completed', (task) => {
+    const textPart = task.artifact?.parts?.find((p) => p.type === 'text')?.text ?? '(no text)';
+    process.stderr.write(`[A2A] ✓ task ${task.id.slice(0, 8)} completed: ${textPart}\n`);
+  });
+
+  socket.on('a2a_task_canceled', (task) => {
+    process.stderr.write(`[A2A] ✗ task ${task.id.slice(0, 8)} canceled\n`);
+  });
+
   // ── Purchase delivery: save skill to local filesystem and ack ──
   socket.on('save_skill_request', (req) => {
     const fs = require('fs');
@@ -238,6 +254,75 @@ function connectWebSocket(apiKey, baseUrl) {
         socket.emit('save_skill_error', {
           request_id: req && req.request_id,
           message: msg,
+        });
+      } catch {}
+    }
+  });
+
+  // ── Install Skill: remove a cherry-* skill dir for Build A → B transitions ──
+  socket.on('delete_skill_request', (req) => {
+    const fs = require('fs');
+    const path = require('path');
+    const os = require('os');
+    process.stderr.write(
+      `[WS] 📥 delete_skill_request RECEIVED: request=${req?.request_id} target=${req?.target_dir}\n`
+    );
+    try {
+      const expand = (p) => {
+        if (!p) return p;
+        if (p.startsWith('~')) {
+          return path.join(os.homedir(), p.slice(1).replace(/^\/+/, ''));
+        }
+        return p;
+      };
+      const absDir = expand(req.target_dir);
+      const resolved = path.resolve(absDir);
+      const skillsRoot = path.resolve(path.join(os.homedir(), '.claude', 'skills'));
+
+      // Defense 1: must be under ~/.claude/skills/
+      if (!resolved.startsWith(skillsRoot + path.sep)) {
+        socket.emit('delete_skill_ack', {
+          request_id: req.request_id,
+          deleted: false,
+          error_reason: `target_dir is outside ~/.claude/skills/ — refusing (${resolved})`,
+        });
+        return;
+      }
+      // Defense 2: basename must match cherry-* pattern
+      const baseName = path.basename(resolved);
+      if (!/^cherry-[a-z0-9-]+$/.test(baseName)) {
+        socket.emit('delete_skill_ack', {
+          request_id: req.request_id,
+          deleted: false,
+          error_reason: `target_dir basename is not a cherry-* dir (${baseName})`,
+        });
+        return;
+      }
+
+      if (fs.existsSync(resolved)) {
+        fs.rmSync(resolved, { recursive: true, force: true });
+        process.stderr.write(`[WS]   ✓ removed ${resolved}\n`);
+        socket.emit('delete_skill_ack', {
+          request_id: req.request_id,
+          deleted: true,
+          removed_path: resolved,
+        });
+      } else {
+        process.stderr.write(`[WS]   - already absent: ${resolved}\n`);
+        socket.emit('delete_skill_ack', {
+          request_id: req.request_id,
+          deleted: false,
+          error_reason: 'target_dir does not exist (already removed)',
+        });
+      }
+    } catch (err) {
+      const msg = err && err.message ? err.message : String(err);
+      process.stderr.write(`[WS] ✗ delete_skill FAILED: ${msg}\n`);
+      try {
+        socket.emit('delete_skill_ack', {
+          request_id: req && req.request_id,
+          deleted: false,
+          error_reason: msg,
         });
       } catch {}
     }

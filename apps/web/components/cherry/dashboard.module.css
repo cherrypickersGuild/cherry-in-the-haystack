@@ -1,0 +1,176 @@
+/* Dashboard layout — Tailwind 의존 끊고 직접 px + media query 로 박아 청크
+   누락 시에도 안 무너지게. 디자인 값은 8928edf 원본과 동일 (px 단위만 환산). */
+
+/* 외곽: flex flex-col h-full overflow-hidden */
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 헤더 영역: shrink-0 border-b bg-white px-4 lg:px-6 pt-4 lg:pt-5 pb-0 */
+.header {
+  flex-shrink: 0;
+  border-bottom: 1px solid #E4E1EE;
+  background: #FFFFFF;
+  padding: 16px 16px 0 16px;
+}
+@media (min-width: 1024px) {
+  .header {
+    padding: 20px 24px 0 24px;
+  }
+}
+
+/* 헤더 타이틀: text-[16px] lg:text-[18px] font-extrabold mb-2 lg:mb-3 */
+.headerTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1A1626;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.3px;
+}
+@media (min-width: 1024px) {
+  .headerTitle {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+}
+
+/* 탭 행: flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between lg:gap-4 */
+.tabRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+@media (min-width: 1024px) {
+  .tabRow {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+}
+
+/* 탭 바: flex gap-0 overflow-x-auto */
+.tabBar {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  overflow-x: auto;
+}
+
+/* 탭 버튼: border-b-2 px-3 lg:px-4 py-2 lg:py-2.5 text-[12px] lg:text-[13px]
+   font-semibold transition-colors whitespace-nowrap */
+.tab {
+  border-bottom: 2px solid transparent;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9E97B3;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 150ms, border-color 150ms;
+}
+.tab:hover {
+  color: #3D3652;
+}
+@media (min-width: 1024px) {
+  .tab {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+.tabActive {
+  border-bottom-color: var(--cherry, #C94B6E);
+  color: #1A1626;
+}
+
+/* 탭 우측 toggle 자리: flex-shrink-0 pb-2 lg:pb-0 */
+.tabRowEnd {
+  flex-shrink: 0;
+  padding-bottom: 8px;
+}
+@media (min-width: 1024px) {
+  .tabRowEnd {
+    padding-bottom: 0;
+  }
+}
+
+/* 탭 콘텐츠 wrapper: flex-1 overflow-hidden */
+.tabContent {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Dashboard 탭 안 — 좌우 2단 컨테이너:
+   flex flex-col lg:flex-row gap-4 lg:gap-5 lg:h-full */
+.panelRow {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+@media (min-width: 1024px) {
+  .panelRow {
+    flex-direction: row;
+    gap: 20px;
+    height: 100%;
+  }
+}
+
+/* Dashboard 탭 컨테이너: h-full overflow-y-auto p-4 lg:p-6 */
+.dashboardTab {
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px;
+}
+@media (min-width: 1024px) {
+  .dashboardTab {
+    padding: 24px;
+  }
+}
+
+/* 좌측 패널 (Agent): lg:w-[420px] flex-shrink-0 rounded-xl border border-[#E4E1EE] bg-white p-4 */
+.leftPanel {
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1px solid #E4E1EE;
+  background: #FFFFFF;
+  padding: 16px;
+}
+@media (min-width: 1024px) {
+  .leftPanel {
+    width: 420px;
+  }
+}
+
+/* 우측 패널 (Wallet): flex-1 rounded-xl border border-[#E4E1EE] bg-white p-4 lg:p-5 min-w-0 overflow-y-auto */
+.rightPanel {
+  flex: 1;
+  border-radius: 12px;
+  border: 1px solid #E4E1EE;
+  background: #FFFFFF;
+  padding: 16px;
+  min-width: 0;
+  overflow-y: auto;
+}
+@media (min-width: 1024px) {
+  .rightPanel {
+    padding: 20px;
+  }
+}
+
+/* 다른 탭 (curation/concept-page/template): h-full flex flex-col lg:flex-row overflow-hidden bg-[#FAFAFA] */
+.subTab {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #FAFAFA;
+}
+@media (min-width: 1024px) {
+  .subTab {
+    flex-direction: row;
+  }
+}

@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { Search, X, GitCompare, CheckCircle2, AlertCircle, ArrowRight, RefreshCw, ChevronDown, ExternalLink } from "lucide-react"
 import { MOCK_AGENTS } from "./kaas-dashboard-page"
-import { fetchCatalog, fetchAgents } from "@/lib/api"
+import { fetchCatalog, fetchAgents, fetchAgentSelfReport } from "@/lib/api"
 
 /* ─────────────────────────────────────────────
    Mock data — seed-data.json 스펙 기준 3개 개념
@@ -231,13 +231,20 @@ function ConceptCard({
     <button
       onClick={onSelect}
       className={cn(
-        "block w-full text-left rounded-md p-4 transition-all duration-150 cursor-pointer",
-        "border hover:shadow-sm relative bg-white",
-        isSelected
-          ? "border-[var(--cherry)] shadow-sm ring-1 ring-[var(--cherry)]/20"
-          : "border-[#E4E1EE] hover:border-[#C7B8E8]"
+        "transition-all duration-150 cursor-pointer hover:shadow-sm relative",
+        isSelected ? "shadow-sm ring-1 ring-[var(--cherry)]/20" : ""
       )}
-      style={onSale ? { borderTopRightRadius: saleCornerRadius } : undefined}
+      style={{
+        display: "block",
+        width: "100%",
+        textAlign: "left",
+        padding: 16,
+        borderRadius: 6,
+        backgroundColor: "#FFFFFF",
+        border: `1px solid ${isSelected ? "var(--cherry)" : "#E4E1EE"}`,
+        position: "relative",
+        ...(onSale ? { borderTopRightRadius: saleCornerRadius } : {}),
+      }}
     >
       {/* SALE 코너 탭 — 카드 우상단 모서리에 딱 붙음. 카드의 우상단을 6px로 줄였으므로 탭도 같은 값으로 매칭 */}
       {onSale && (
@@ -275,7 +282,7 @@ function ConceptCard({
       ) : null}
 
       {/* Quality + Category */}
-      <div className="flex items-center gap-2 mb-2.5">
+      <div className="flex items-center" style={{ gap: 8, marginBottom: 10 }}>
         <Stars score={concept.qualityScore} />
         <span className="text-[10px] font-semibold" style={{ color: badge.text }}>
           {concept.category}
@@ -283,18 +290,27 @@ function ConceptCard({
       </div>
 
       {/* Title */}
-      <h3 className="text-[14px] font-bold text-[#1A1626] leading-snug mb-1.5">
+      <h3
+        className="text-[14px] font-bold text-[#1A1626] leading-snug"
+        style={{ marginBottom: 6 }}
+      >
         {concept.title}
       </h3>
 
       {/* Summary — 2 lines */}
-      <p className="text-[12px] text-text-muted leading-relaxed line-clamp-2 mb-3">
+      <p
+        className="text-[12px] text-text-muted leading-relaxed line-clamp-2"
+        style={{ marginBottom: 12 }}
+      >
         {concept.summary}
       </p>
 
       {/* Creator + Karma */}
       {concept.creator && (
-        <div className="flex items-center gap-1.5 mb-2 text-[10px]">
+        <div
+          className="flex items-center text-[10px]"
+          style={{ gap: 6, marginBottom: 8 }}
+        >
           <span className="text-[#666]">by</span>
           <span className="font-semibold text-[#3D3652]">{concept.creator.name === "__SYSTEM__" ? "Market" : concept.creator.name}</span>
           <span className={cn(
@@ -310,7 +326,10 @@ function ConceptCard({
       )}
 
       {/* Footer: sources + updated + gap recommendation */}
-      <div className="flex items-center gap-3 text-[11px] text-text-muted">
+      <div
+        className="flex items-center text-[11px] text-text-muted"
+        style={{ gap: 12 }}
+      >
         <span>
           <span className="font-semibold text-[#3D3652]">{concept.sourceCount}</span> sources
         </span>
@@ -642,7 +661,15 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
   }, [initialConceptId, onInitialConceptConsumed])
   const [agents, setAgents] = useState<any[]>([])
 
-  const reloadAgents = () => {
+  const reloadAgents = async () => {
+    // 비로그인 상태에서 fetchAgents → 401 → fetchWithAuth 의 redirectToLogin()
+    // 트리거되어 마켓 진입 시 /login 으로 강제이동되는 버그 방지.
+    const { getAccessToken } = await import("@/lib/auth")
+    if (!getAccessToken()) {
+      setAgents([])
+      setSelectedAgentId("")
+      return
+    }
     fetchAgents().then((data) => {
       if (Array.isArray(data) && data.length > 0) {
         setAgents(data)
@@ -677,77 +704,34 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
   const selectedAgent = agents.find((a: any) => a.id === selectedAgentId) ?? agents[0] ?? null
   const hasAgent = agents.length > 0
 
-  // Compare state — based on selected agent's knowledge
-  // armed: 로컬스토리지로 유지되는 자동 비교 토글.
-  //   첫 클릭 시 loud (콘솔에 보고서 1회) → 이후 knowledge/catalog 변동 때마다 silent refresh.
-  //   다시 클릭하면 disarm + 결과 clear.
-  const COMPARE_ARMED_KEY = "kaas-compare-armed"
-  const [armed, setArmed] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false
-    return window.localStorage.getItem(COMPARE_ARMED_KEY) === "true"
-  })
+  // Compare runs automatically whenever the agent, catalog, or local skill
+  // state changes — no user-initiated button. After a purchase the Shop
+  // page fires `kaas-purchase-complete` which we also listen for below.
   const [gapResult, setGapResult] = useState<GapResult | null>(null)
-  const submitted = armed
+  const submitted = true
 
-  // Compare는 이제 server-side `elicitKnowledge`/`compareKnowledge`(DB agent.knowledge 기반, 재연결 후 stale)
-  // 대신, 에이전트 self-report의 local_skills (파일시스템 실제 상태)을 ground truth로 사용.
-  //   cherry-{uuid} 폴더명 → conceptId → catalog와 매칭해 owned/gap 판정.
-  // DB knowledge는 web 구매(파일 없는 경우)만 보조적으로 merge.
+  // Compare = diff와 동일하게 fetchAgentSelfReport 1회 호출 → local_skills 폴더명(cherry-{uuid})을
+  // conceptId로 파싱 → catalog와 교차해 owned/gap 분류.
+  // NOTE: diff와 달리 `kaas-self-report` 이벤트는 dispatch 하지 않음 — 콘솔에 보고서 원문이 뜨면 안 됨.
+  //       대신 localSkillIds state를 직접 세팅해 카드 OWNED 뱃지만 갱신.
   const runCompare = async (silent: boolean) => {
     if (!selectedAgent) return
-
-    const { getPrivacyMode } = await import("@/components/cherry/kaas-dashboard-page")
-    const privacy = getPrivacyMode()
+    const { fetchAgentSelfReport } = await import("@/lib/api")
+    const agentId = (selectedAgent as any).id
+    const r: any = await fetchAgentSelfReport(agentId)
+    if (!r?.ok || !r?.report) return
 
     const ownedIds = new Set<string>()
-    let source: "local-skills" | "db" = "db"
-
-    // 1) 우선 self-report로 로컬 파일 목록 가져옴 (privacy 모드에선 서버 왕복 차단)
-    if (!privacy) {
-      try {
-        const { fetchAgentSelfReport } = await import("@/lib/api")
-        const r: any = await fetchAgentSelfReport((selectedAgent as any).id)
-        if (r?.ok && r?.report) {
-          const items = r.report?.local_skills?.items ?? []
-          for (const s of items) {
-            if (!s?.hasSkillMd) continue
-            const folder = (s.dir ?? "").split("/").filter(Boolean).pop() ?? ""
-            if (folder.startsWith("cherry-")) ownedIds.add(folder.slice(7))
-          }
-          if (items.length > 0) source = "local-skills"
-          // 대시보드/콘솔도 같은 보고서를 공유 (이벤트 리스너가 캐시도 갱신)
-          window.dispatchEvent(new CustomEvent("kaas-self-report", {
-            detail: { report: r.report, agentId: (selectedAgent as any).id, agentName: (selectedAgent as any).name },
-          }))
-        }
-      } catch { /* 연결 없음 → 캐시/DB fallback */ }
+    for (const s of r.report?.local_skills?.items ?? []) {
+      if (!s?.hasSkillMd) continue
+      const folder = (s.dir ?? "").split(/[\\/]/).filter(Boolean).pop() ?? ""
+      if (folder.startsWith("cherry-")) ownedIds.add(folder.slice(7))
     }
+    // 동일 이벤트로 OWNED state 갱신 — 자체 handler 가 ownedByAgent 업데이트.
+    window.dispatchEvent(new CustomEvent("kaas-self-report", {
+      detail: { report: r.report, agentId, agentName: (selectedAgent as any)?.name },
+    }))
 
-    // 2) 캐시된 localSkillIds도 합침 (fetch 실패 / privacy 모드 / 네비게이션 복원)
-    //    캐시에서 온 ids가 있으면 source도 local-skills로 상향 (DB 보다 신뢰)
-    const cached = selectedAgent ? readCachedSkillIds((selectedAgent as any).id) : new Set<string>()
-    for (const id of localSkillIds) ownedIds.add(id)
-    for (const id of cached) ownedIds.add(id)
-    if (source === "db" && (localSkillIds.size > 0 || cached.size > 0)) source = "local-skills"
-
-    // 3) DB agent.knowledge 토픽 매칭은 보조 — web 구매(파일 없는 경우) 커버
-    const rawKnowledge = (selectedAgent as any).knowledge
-    const knowledge: any[] = (() => {
-      try { return typeof rawKnowledge === 'string' ? JSON.parse(rawKnowledge) : (Array.isArray(rawKnowledge) ? rawKnowledge : []) } catch { return [] }
-    })()
-    for (const c of concepts) {
-      if (ownedIds.has(c.id)) continue
-      const titleLower = c.title.toLowerCase()
-      const idLower = c.id.toLowerCase()
-      const match = knowledge.find((k: any) => {
-        const topic = (k?.topic ?? "").toLowerCase()
-        if (!topic) return false
-        return titleLower.includes(topic) || idLower.includes(topic) || topic.includes(idLower) || topic.includes(titleLower.split(" ")[0])
-      })
-      if (match) ownedIds.add(c.id)
-    }
-
-    // 4) catalog를 ownedIds와 비교해 up-to-date / gap 나눔
     const upToDate: Array<{ conceptId: string; title: string; qualityScore: number }> = []
     const gaps: Array<{ conceptId: string; title: string; qualityScore: number }> = []
     for (const c of concepts) {
@@ -765,49 +749,39 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
         conceptId: g.conceptId,
         suggestedDepth: g.qualityScore >= 4.5 ? "evidence" : "concept",
         estimatedCredits: g.qualityScore >= 4.5 ? 20 : 10,
-        reason: source === "local-skills" ? "Not in agent's local skills" : "Not in agent's knowledge base",
+        reason: "Not in agent's local skills",
       })),
       agentName: (selectedAgent as any).name,
-      source,
+      source: "local-skills",
     }
-
     setGapResult(result)
-    if (!silent) onCompareResult?.(privacy ? { ...result, privacy: true } : result)
-  }
-
-  // loud 실행 직후 useEffect의 자동 silent 재실행을 한 번 건너뛰기 위한 플래그
-  const skipNextAutoRun = useRef(false)
-
-  const handleSubmit = () => {
-    skipNextAutoRun.current = true
-    setArmed(true)
-    if (typeof window !== "undefined") window.localStorage.setItem(COMPARE_ARMED_KEY, "true")
-    runCompare(false) // loud — 콘솔에 보고서 출력
-  }
-
-  const handleReset = () => {
-    setArmed(false)
-    setGapResult(null)
-    if (typeof window !== "undefined") window.localStorage.removeItem(COMPARE_ARMED_KEY)
+    if (!silent) onCompareResult?.(result)
   }
 
   const handleAgentChange = (agentId: string) => {
     setSelectedAgentId(agentId)
     setAgentDropdownOpen(false)
-    // 에이전트가 바뀌면 기존 결과는 무효 — 새 에이전트 지식으로 자동 재비교
-    setGapResult(null)
+    setGapResult(null) // new agent → clear stale gaps, next effect re-runs
   }
 
-  // armed 상태에서 knowledge/catalog/agent 변동 시 silent refresh + mount 시 최초 1회 silent 실행
+  // Auto-run Compare on mount + whenever the agent, catalog, or agent's
+  // knowledge changes. No user gate — the page always shows a fresh diff.
   useEffect(() => {
-    if (!armed || !selectedAgent) return
-    if (skipNextAutoRun.current) {
-      skipNextAutoRun.current = false
-      return
-    }
+    if (!selectedAgent) return
     runCompare(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [armed, selectedAgent?.id, (selectedAgent as any)?.knowledge, concepts])
+  }, [selectedAgent?.id, (selectedAgent as any)?.knowledge, concepts])
+
+  // Re-run Compare after a purchase completes — the Shop page dispatches
+  // `kaas-purchase-complete` once the modal flips to success. Refreshes
+  // the OWNED badges and the gap summary without a page reload.
+  useEffect(() => {
+    const onPurchaseComplete = () => {
+      if (selectedAgent) runCompare(true)
+    }
+    window.addEventListener("kaas-purchase-complete", onPurchaseComplete)
+    return () => window.removeEventListener("kaas-purchase-complete", onPurchaseComplete)
+  }, [selectedAgent])
 
   // Per-concept compare status (3-way)
   const getCompareStatus = (conceptId: string): CompareStatus | null => {
@@ -818,76 +792,53 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
     return null
   }
 
-  // 자기 보고서(self-report)의 로컬 스킬 파일을 truth로 사용 — 재연결 등으로 DB knowledge가
-  // 실제 ~/.claude/skills/ 파일과 어긋나도 로컬이 맞기 때문에.
-  // kaas-self-report 이벤트는 대시보드/콘솔에서 dispatch됨.
-  // 페이지 네비게이션으로 React state가 리셋돼도 마지막 스냅샷을 즉시 복원하기 위해
-  // 에이전트별로 localStorage에 캐시.
-  const localSkillsKey = (agentId: string) => `kaas-local-skills-${agentId}`
-  const readCachedSkillIds = (agentId: string): Set<string> => {
-    if (typeof window === "undefined" || !agentId) return new Set()
-    try {
-      const raw = window.localStorage.getItem(localSkillsKey(agentId))
-      if (!raw) return new Set()
-      const arr = JSON.parse(raw)
-      return new Set(Array.isArray(arr) ? arr : [])
-    } catch { return new Set() }
-  }
-  const writeCachedSkillIds = (agentId: string, ids: Set<string>) => {
-    if (typeof window === "undefined" || !agentId) return
-    try {
-      window.localStorage.setItem(localSkillsKey(agentId), JSON.stringify([...ids]))
-    } catch { /* quota */ }
-  }
-
-  const [localSkillIds, setLocalSkillIds] = useState<Set<string>>(new Set())
-
-  // 에이전트 변경 시 캐시된 스냅샷 복원
-  useEffect(() => {
-    if (!selectedAgent) return
-    setLocalSkillIds(readCachedSkillIds((selectedAgent as any).id))
-  }, [selectedAgent?.id])
+  // OWNED 는 ONLY 에이전트의 self-report (= ~/.claude/skills/ 실제 파일) 기준.
+  // DB 의 구매 기록이나 localStorage 캐시는 "실제로 지금 가지고 있는지" 를 증명
+  // 못 한다 (파일이 수동 삭제됐을 수도 있음). 따라서 에이전트가 WS 로 보고한
+  // local_skills.items 만 진실로 취급.
+  const [ownedByAgent, setOwnedByAgent] = useState<Record<string, Set<string>>>({})
 
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail
+      const eventAgentId = detail?.agentId
+      if (!eventAgentId) return
       const items = detail?.report?.local_skills?.items ?? []
-      const agentId = detail?.agentId ?? ""
       const ids = new Set<string>()
       for (const s of items) {
         if (!s?.hasSkillMd) continue
-        const folder = (s.dir ?? "").split("/").filter(Boolean).pop() ?? ""
+        const folder = (s.dir ?? "").split(/[\\/]/).filter(Boolean).pop() ?? ""
         if (folder.startsWith("cherry-")) ids.add(folder.slice(7))
       }
-      setLocalSkillIds(ids)
-      if (agentId) writeCachedSkillIds(agentId, ids)
+      setOwnedByAgent((prev) => ({ ...prev, [eventAgentId]: ids }))
     }
     window.addEventListener("kaas-self-report", handler)
     return () => window.removeEventListener("kaas-self-report", handler)
   }, [])
 
-  // 선택된 에이전트가 이미 보유한 지식인지 확인 (Compare 실행 여부와 무관하게 동작)
+  // 페이지에 에이전트가 선택되거나 바뀌면 즉시 self-report 요청 → 최신 상태로 갱신.
+  // 성공 시 dashboard 와 동일 패턴으로 "kaas-self-report" 이벤트 디스패치 → 위 리스너가
+  // local_skills.items 를 읽어 OWNED 재계산. 실패(연결 끊김 등)면 그냥 빈 상태 유지.
+  useEffect(() => {
+    const agentId = (selectedAgent as any)?.id
+    const agentName = (selectedAgent as any)?.name
+    if (!agentId) return
+    fetchAgentSelfReport(agentId)
+      .then((r: any) => {
+        if (r?.ok && r?.report) {
+          window.dispatchEvent(new CustomEvent("kaas-self-report", {
+            detail: { report: r.report, agentId, agentName },
+          }))
+        }
+      })
+      .catch(() => { /* 미연결 — OWNED 빈 상태 */ })
+  }, [selectedAgent])
+
   const ownedConceptIds = useMemo(() => {
-    const knowledge: Array<{ topic: string }> = (() => {
-      const raw = (selectedAgent as any)?.knowledge
-      try { return typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : []) } catch { return [] }
-    })()
-    const owned = new Set<string>()
-    for (const c of concepts) {
-      const titleLower = c.title.toLowerCase()
-      const idLower = c.id.toLowerCase()
-      const match = knowledge.find((k) =>
-        titleLower.includes(k.topic.toLowerCase()) ||
-        idLower.includes(k.topic.toLowerCase()) ||
-        k.topic.toLowerCase().includes(idLower) ||
-        k.topic.toLowerCase().includes(titleLower.split(" ")[0])
-      )
-      if (match) owned.add(c.id)
-    }
-    // 로컬 스킬 파일이 실제로 존재하면 DB knowledge와 무관하게 owned 처리
-    for (const id of localSkillIds) owned.add(id)
-    return owned
-  }, [selectedAgent, concepts, localSkillIds])
+    const agentId = (selectedAgent as any)?.id
+    if (!agentId) return new Set<string>()
+    return ownedByAgent[agentId] ?? new Set<string>()
+  }, [selectedAgent, ownedByAgent])
 
   const isOwned = (conceptId: string) => ownedConceptIds.has(conceptId)
 
@@ -907,11 +858,14 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
   const selected = filtered.find((c) => c.id === selectedId) ?? null
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col" style={{ gap: 20 }}>
       {/* Header + Compare button */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between" style={{ gap: 12 }}>
         <div>
-          <div className="flex flex-col lg:flex-row lg:items-start gap-2 lg:gap-3 mb-2">
+          <div
+            className="flex flex-col lg:flex-row lg:items-start"
+            style={{ gap: 8, marginBottom: 8 }}
+          >
             <h1
               className="font-extrabold text-[#1A1626] leading-none text-[20px] lg:text-[28px]"
               style={{ letterSpacing: "-0.5px" }}
@@ -971,23 +925,6 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
           ) : (
             <span className="text-[11px] text-[#999]">Register an agent in the Dashboard</span>
           )}
-
-          <button
-            disabled={!hasAgent}
-            onClick={armed ? handleReset : handleSubmit}
-            title={!hasAgent ? "Register an agent first" : armed ? "Auto-compare on — click to turn off" : "Click to compare and keep auto-refreshing"}
-            className={cn(
-              "text-[12px] font-semibold px-3 py-1.5 rounded-lg border transition-all flex-shrink-0 flex items-center gap-1.5",
-              !hasAgent
-                ? "border-[#E4E1EE] text-[#B5AECB] bg-[#F9F7F5] cursor-not-allowed"
-                : armed
-                  ? "bg-[var(--cherry)] text-white border-[var(--cherry)] hover:opacity-90 cursor-pointer"
-                  : "border-[var(--cherry)] text-[var(--cherry)] hover:bg-[#FDF0F3] cursor-pointer"
-            )}
-          >
-            <GitCompare size={13} className={cn("transition-transform duration-500", armed && hasAgent && "animate-spin")} style={armed && hasAgent ? { animation: "spin 2s linear infinite" } : undefined} />
-            Compare
-          </button>
         </div>
       </div>
 
@@ -1028,8 +965,17 @@ export function KaasCatalogPage({ onQuery, onCompareResult, initialConceptId, on
         })}
       </div></div>
 
-      {/* Cards grid — each card shows compare status after submit */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      {/* Cards grid — each card shows compare status after submit.
+          grid 유틸 클래스가 청크에서 누락되면 카드들이 inline-block으로 흐르므로
+          핵심 layout(display:grid + columns)을 인라인으로 박아 방어. */}
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        style={{
+          display: "grid",
+          gap: 12,
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+        }}
+      >
         {filtered.map((c) => (
           <ConceptCard
             key={c.id}

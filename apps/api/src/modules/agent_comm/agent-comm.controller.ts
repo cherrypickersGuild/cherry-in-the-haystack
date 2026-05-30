@@ -27,7 +27,7 @@ export class AgentCommController {
   @ApiOperation({
     summary: '평가 실행 패키지 요청 (타입 + 버전 태그 → prompts + catalog + items)',
   })
-  @ApiQuery({ name: 'type', required: true, enum: ['ARTICLE_AI', 'NEWSLETTER'], description: '템플릿 타입' })
+  @ApiQuery({ name: 'type', required: true, enum: ['ARTICLE_AI', 'NEWSLETTER', 'CONCEPT_PAGE', 'REFINE'], description: '템플릿 타입' })
   @ApiQuery({ name: 'version_tags', required: true, type: String, description: '버전 태그 (쉼표 구분: A 또는 A,B)' })
   async askEvaluation(
     @Query('type') type: string,
@@ -35,6 +35,20 @@ export class AgentCommController {
   ) {
     const tags = versionTags.split(',').map((t) => t.trim()).filter(Boolean);
     return this.service.buildEvaluationPackage(type, tags);
+  }
+
+  @Get('get-prompts')
+  @ApiOperation({
+    summary: '프롬프트만 반환 (타입 + 버전 태그 → 템플릿 메타 + versions)',
+  })
+  @ApiQuery({ name: 'type', required: true, enum: ['ARTICLE_AI', 'NEWSLETTER', 'CONCEPT_PAGE', 'REFINE'], description: '템플릿 타입' })
+  @ApiQuery({ name: 'version_tags', required: true, type: String, description: '버전 태그 (쉼표 구분: A 또는 A,B,C)' })
+  async getPrompts(
+    @Query('type') type: string,
+    @Query('version_tags') versionTags: string,
+  ) {
+    const tags = versionTags.split(',').map((t) => t.trim()).filter(Boolean);
+    return this.service.getPrompts(type, tags);
   }
 
   @Post('finish-evaluation')

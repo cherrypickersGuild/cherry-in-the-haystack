@@ -7,6 +7,7 @@ export const PurchaseSchema = z.object({
   budget: z.number().min(1).optional(),
   chain: z.enum(['status', 'near', 'mock']).optional(),
   pre_signed_tx: z.string().optional(),
+  privacy_mode: z.boolean().optional(),
 });
 
 export class PurchaseDto {
@@ -26,4 +27,7 @@ export class PurchaseDto {
 
   @ApiProperty({ required: false, description: '유저 지갑이 이미 서명한 tx hash (NEAR 등). 제공되면 서버가 온체인 서명을 생략하고 DB에만 기록.' })
   pre_signed_tx?: string;
+
+  @ApiProperty({ required: false, description: 'TEE/Privacy 모드. true면 response_snapshot에 해시만 남김.' })
+  privacy_mode?: boolean;
 }

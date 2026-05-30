@@ -4,7 +4,7 @@ import { z } from 'zod';
 export class CreateTemplateDto {
   static schema = z.object({
     // ── 템플릿 메타
-    type: z.enum(['ARTICLE_AI', 'NEWSLETTER']),
+    type: z.enum(['ARTICLE_AI', 'NEWSLETTER', 'CONCEPT_PAGE', 'REFINE']),
     code: z.string().trim().min(1).max(100),
     name: z.string().trim().min(1).max(200),
     description: z.string().trim().max(500).optional(),
@@ -24,7 +24,7 @@ export class CreateTemplateDto {
 
   @ApiProperty({
     example: 'ARTICLE_AI',
-    enum: ['ARTICLE_AI', 'NEWSLETTER'],
+    enum: ['ARTICLE_AI', 'NEWSLETTER', 'CONCEPT_PAGE', 'REFINE'],
     description: '템플릿 유형',
   })
   type!: string;

@@ -6,6 +6,7 @@ export const FollowSchema = z.object({
   api_key: z.string().optional(),
   chain: z.enum(['status', 'near', 'mock']).optional(),
   pre_signed_tx: z.string().optional(),
+  privacy_mode: z.boolean().optional(),
 });
 
 export class FollowDto {
@@ -22,4 +23,7 @@ export class FollowDto {
 
   @ApiProperty({ required: false, description: '유저 지갑이 이미 서명한 tx hash (NEAR 등)' })
   pre_signed_tx?: string;
+
+  @ApiProperty({ required: false, description: 'TEE/Privacy 모드. true면 response_snapshot에 해시만 남김.' })
+  privacy_mode?: boolean;
 }

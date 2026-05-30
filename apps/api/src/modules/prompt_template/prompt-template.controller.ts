@@ -37,7 +37,7 @@ export class PromptTemplateController {
   }
 
   @ApiOperation({ summary: '템플릿 목록 조회 (type 기준, 버전 포함)' })
-  @ApiParam({ name: 'type', enum: ['ARTICLE_AI', 'NEWSLETTER'] })
+  @ApiParam({ name: 'type', enum: ['ARTICLE_AI', 'NEWSLETTER', 'CONCEPT_PAGE', 'REFINE'] })
   @Get('by-type/:type')
   getTemplatesByType(@Param('type') type: string) {
     return this.service.findByType(type);

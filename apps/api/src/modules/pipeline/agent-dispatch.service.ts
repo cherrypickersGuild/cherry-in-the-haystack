@@ -41,7 +41,7 @@ export class AgentDispatchService {
         AND aai.ai_status = 'PENDING'
         AND aai.agent_json_raw IS NULL
       ORDER BY ar.published_at DESC
-      LIMIT 50
+      LIMIT 200
     `, { systemUserId: SYSTEM_USER_ID });
 
     if (pending.rows.length === 0) {

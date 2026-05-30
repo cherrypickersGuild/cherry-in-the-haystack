@@ -178,11 +178,13 @@ const SKELETON_WIDTHS = [
 export function PatchNotesPage() {
   const [data, setData] = useState<PatchNotesResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [activeFilter, setActiveFilter] = useState("All")
 
   useEffect(() => {
     fetchPatchNotes()
-      .then(setData)
+      .then((d) => { setData(d); setError(null) })
+      .catch((e) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => setLoading(false))
   }, [])
 
@@ -216,7 +218,7 @@ export function PatchNotesPage() {
         </h1>
         <div className="text-[15px] text-text-muted leading-relaxed h-6 flex items-center">
           {loading ? <Bone w="w-48" h="h-4" /> : (
-            <>{data!.period.from} → {data!.period.to} &nbsp;·&nbsp; Weekly changelog</>
+            <>{data?.period?.from ?? "—"} → {data?.period?.to ?? "—"} &nbsp;·&nbsp; Weekly changelog</>
           )}
         </div>
       </div>
@@ -228,7 +230,7 @@ export function PatchNotesPage() {
           <div className="text-[10px] font-bold uppercase tracking-[0.8px] text-text-muted mb-4 h-4 flex items-center">
             {loading ? <Bone w="w-40" h="h-3" /> : (
               <>
-                {data!.stats.totalUpdates} UPDATES · {data!.areas} AREAS
+                {(data?.stats?.totalUpdates ?? 0)} UPDATES · {(data?.areas ?? 0)} AREAS
                 {unreadCount > 0 && ` · ${unreadCount} UNREAD`}
               </>
             )}
@@ -245,8 +247,16 @@ export function PatchNotesPage() {
               Array.from({ length: SKELETON_COUNT }).map((_, i) => (
                 <TimelineItem key={i} index={i} total={SKELETON_COUNT} onRead={() => {}} loading skeletonWidths={SKELETON_WIDTHS[i]} />
               ))
+            ) : error ? (
+              <div className="pl-6 text-[13px] py-8" style={{ color: "#C8301E" }}>
+                Couldn't load patch notes ({error}). Please refresh.
+              </div>
             ) : filteredItems.length === 0 ? (
-              <div className="pl-6 text-[13px] text-text-muted py-8">No items in this area.</div>
+              <div className="pl-6 text-[13px] text-text-muted py-8">
+                {(data?.items?.length ?? 0) === 0
+                  ? "No updates in the past week. New patch notes show up here every Monday."
+                  : "No items in this area."}
+              </div>
             ) : (
               filteredItems.map((item, index) => (
                 <TimelineItem key={item.id} item={item} index={index} total={filteredItems.length} onRead={handleRead} />
@@ -270,12 +280,12 @@ export function PatchNotesPage() {
                     {isAllRead ? "You're caught up" : `${unreadCount} left to read`}
                   </p>
                   <p className="text-[13px] text-text-muted mb-4">
-                    {data!.period.from} → {data!.period.to} · {isAllRead ? "All read" : `${data!.stats.totalUpdates - unreadCount} / ${data!.stats.totalUpdates} read`}
+                    {data?.period?.from ?? "—"} → {data?.period?.to ?? "—"} · {isAllRead ? "All read" : `${(data?.stats?.totalUpdates ?? 0) - unreadCount} / ${(data?.stats?.totalUpdates ?? 0)} read`}
                   </p>
                   <div className="flex items-center justify-center gap-6">
                     {[
-                      { label: `${data!.stats.totalUpdates} updates`, color: "#1A1626" },
-                      { label: `${data!.areas} areas`,                color: "#1A1626" },
+                      { label: `${(data?.stats?.totalUpdates ?? 0)} updates`, color: "#1A1626" },
+                      { label: `${(data?.areas ?? 0)} areas`,                color: "#1A1626" },
                       { label: isAllRead ? "Current" : "In progress", color: isAllRead ? "#C94B6E" : "#7B5EA7" },
                     ].map((stat) => (
                       <div key={stat.label} className="text-[12px] font-semibold" style={{ color: stat.color }}>
@@ -334,7 +344,7 @@ export function PatchNotesPage() {
                   {loading
                     ? <Bone w="w-6" h="h-4" />
                     : <span className="font-bold" style={{ color: stat.color }}>
-                        {String((data!.stats as any)[stat.key])}
+                        {String((data?.stats as any)?.[stat.key] ?? 0)}
                       </span>
                   }
                 </div>

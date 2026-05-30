@@ -9,6 +9,7 @@ import { StatsModule } from './modules/stats/stats.module';
 import { PromptTemplateModule } from './modules/prompt_template/prompt-template.module';
 import { AgentCommModule } from './modules/agent_comm/agent-comm.module';
 import { KaasModule } from './modules/kaas/kaas.module';
+import { BenchModule } from './modules/bench/bench.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { KaasModule } from './modules/kaas/kaas.module';
     PromptTemplateModule,
     AgentCommModule,
     KaasModule,
+    BenchModule,
   ],
   controllers: [],
   providers: [],

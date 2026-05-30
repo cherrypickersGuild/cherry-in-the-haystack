@@ -1,3 +1,8 @@
+// Force-load .env BEFORE Nest ConfigModule so values in .env win over any
+// empty shell-level overrides (e.g. some environments pre-set ANTHROPIC_API_KEY="").
+import { config as loadDotenv } from 'dotenv';
+loadDotenv({ override: true });
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
@@ -6,6 +11,7 @@ import { ZodResponseInterceptor } from './middleware/zod-response.interceptor';
 import { LoggingInterceptor } from 'src/middleware/logging.interceptor';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -36,6 +42,44 @@ async function bootstrap() {
     preflightContinue: false,
   });
   app.use(cookieParser());
+
+  // ── Rate limiting ────────────────────────────────────────────
+  // Global default: 120 req/min per IP. Tight enough to stop scrapers /
+  // mistakes, loose enough that a real demo doesn't trip it.
+  app.use(
+    rateLimit({
+      windowMs: 60_000,
+      limit: 120,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { code: 'RATE_LIMITED', message: 'Too many requests. Try again in a minute.' },
+      // Skip CORS preflight + WS upgrade — they're not user-facing.
+      skip: (req) => req.method === 'OPTIONS' || req.headers.upgrade === 'websocket',
+    }),
+  );
+
+  // Stricter limits on auth + purchase paths (brute force / abuse vectors).
+  app.use(
+    ['/api/app-user/login', '/api/app-user/signup'],
+    rateLimit({
+      windowMs: 60_000,
+      limit: 10,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { code: 'RATE_LIMITED_AUTH', message: 'Too many auth attempts.' },
+    }),
+  );
+  app.use(
+    ['/api/v1/kaas/shop/agents/skills/buy', '/api/v1/kaas/shop/buy-and-install', '/api/v1/kaas/credits/deposit'],
+    rateLimit({
+      windowMs: 60_000,
+      limit: 30,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { code: 'RATE_LIMITED_PURCHASE', message: 'Slow down — too many purchases.' },
+    }),
+  );
+
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalInterceptors(new ZodResponseInterceptor(reflector));
   app.setGlobalPrefix('api');

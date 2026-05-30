@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
+import { API_URL, setAccessToken } from "@/lib/auth"
 
 function LoginContent() {
   const router = useRouter()
@@ -13,6 +12,15 @@ function LoginContent() {
   const [email, setEmail] = useState("")
   const [step, setStep] = useState<"input" | "sent" | "verifying" | "error">("input")
   const [errorMsg, setErrorMsg] = useState("")
+
+  // 로그인 성공 후 돌아갈 경로 — /login?next=/start 로 들어오면 기억해둠
+  // 매직링크 이메일 왕복 시 URL 파라미터가 유실되므로 localStorage 에 저장
+  useEffect(() => {
+    const nextFromUrl = searchParams.get("next")
+    if (nextFromUrl && nextFromUrl.startsWith("/")) {
+      try { localStorage.setItem("cherry_login_next", nextFromUrl) } catch { /* noop */ }
+    }
+  }, [searchParams])
 
   // 매직링크 클릭 시 자동 로그인 처리
   useEffect(() => {
@@ -30,8 +38,16 @@ function LoginContent() {
         .then((res) => res.json())
         .then((data) => {
           if (data.accessToken) {
-            localStorage.setItem("accessToken", data.accessToken)
-            router.push("/")
+            setAccessToken(data.accessToken)
+            let dest = "/"
+            try {
+              const saved = localStorage.getItem("cherry_login_next")
+              if (saved && saved.startsWith("/")) {
+                dest = saved
+                localStorage.removeItem("cherry_login_next")
+              }
+            } catch { /* noop */ }
+            router.push(dest)
           } else {
             setErrorMsg(data.message ?? "로그인에 실패했습니다.")
             setStep("error")
@@ -52,7 +68,7 @@ function LoginContent() {
       const res = await fetch(`${API_URL}/api/app-user/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, from: "main" }),
       })
 
       if (res.ok) {
@@ -68,10 +84,10 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#FBFAF8" }}>
-      <div className="w-full max-w-md px-6">
+      <div className="w-full max-w-md" style={{ paddingLeft: 24, paddingRight: 24 }}>
         {/* 로고 */}
-        <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-2 mb-3">
+        <div className="text-center" style={{ marginBottom: 40 }}>
+          <div className="flex items-center justify-center" style={{ gap: 8, marginBottom: 12 }}>
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
               <circle cx="14" cy="14" r="14" fill="#C94B6E" />
               <circle cx="14" cy="11" r="5" fill="white" />

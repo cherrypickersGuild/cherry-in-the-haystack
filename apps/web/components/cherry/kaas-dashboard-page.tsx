@@ -1,13 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { cn } from "@/lib/utils"
 import {
   Coins, ExternalLink, Shield, Wallet, ArrowUpRight, ArrowDownRight,
   Copy, Check, Globe, UserPlus, Plus, X, Key,
 } from "lucide-react"
-import { KnowledgeCurationPanel } from "./kaas-admin-page"
+import { KnowledgeCurationPanel, ConceptPagePublishPanel } from "./kaas-admin-page"
 import { TemplateEditorBody } from "@/app/template/edit/page"
+import { KaasWorkshopPanel } from "./kaas-workshop-panel"
+import dash from "./dashboard.module.css"
 
 /* ═══════════════════════════════════════════════
    Privacy Mode Toggle (NEAR AI TEE)
@@ -102,22 +105,8 @@ export function SelfReportLog({
   generatedAt: string
   source: "agent" | "none"
 }) {
-  const addedTopics = new Set<string>(
-    (data?.timeline ?? []).filter((t: any) => t.action === "purchase").map((t: any) => t.conceptId),
-  )
-  const modifiedTopics = new Set<string>(
-    (data?.timeline ?? []).filter((t: any) => t.action === "follow").map((t: any) => t.conceptId),
-  )
-  const allKnowledge: Array<{ topic: string; lastUpdated: string }> = data?.currentKnowledge ?? []
-  const unchanged = allKnowledge.filter(
-    (k) => !addedTopics.has(k.topic) && !modifiedTopics.has(k.topic),
-  )
-  const categoryOf = (id: string) => {
-    if (["rag", "embeddings", "chain-of-thought"].includes(id)) return "basics"
-    if (["multi-agent", "agent-architectures", "fine-tuning"].includes(id)) return "advanced"
-    if (["evaluation", "prompt-engineering"].includes(id)) return "core"
-    return "misc"
-  }
+  // 보고서는 에이전트의 실제 상태(= ~/.claude/skills/ 파일) 기반.
+  // DB 구매 이력(timeline/currentKnowledge)은 영수증이므로 보고서에 쓰지 않음 — Queries 탭 전용.
   const fmtTime = (iso: string) => {
     if (!iso) return ""
     return new Date(iso).toLocaleString("ko-KR", {
@@ -125,13 +114,8 @@ export function SelfReportLog({
       hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
     })
   }
-  const timelineByConcept = new Map<string, any>()
-  ;(data?.timeline ?? []).forEach((t: any) => {
-    if (!timelineByConcept.has(t.conceptId)) timelineByConcept.set(t.conceptId, t)
-  })
 
-  // 에이전트가 보내준 timeline의 conceptTitle이 UUID 그대로일 때(구버전 에이전트 호환)
-  // 카탈로그에서 id→title 맵을 가져와 fallback으로 사용
+  // concept id → title 맵 (catalog에서 1회 로드). 파일 폴더명(cherry-{uuid})의 uuid로 title 조회용.
   const [titleMap, setTitleMap] = useState<Map<string, string>>(new Map())
   useEffect(() => {
     import("@/lib/api").then(({ fetchCatalog }) =>
@@ -142,13 +126,6 @@ export function SelfReportLog({
       }).catch(() => {})
     )
   }, [])
-  const resolveTitle = (t: any) => {
-    const raw = t?.conceptTitle ?? ""
-    const id = t?.conceptId ?? ""
-    const looksLikeId = raw === id || /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(raw)
-    if (looksLikeId) return titleMap.get(id) ?? raw ?? id
-    return raw || titleMap.get(id) || id
-  }
 
   return (
     <>
@@ -164,75 +141,7 @@ export function SelfReportLog({
         <span className="text-[#6B7280]">· {fmtTime(generatedAt)}</span>
       </div>
 
-      {/* Added */}
-      {addedTopics.size > 0 && (
-        <div className="mt-3">
-          <p className="text-[#27C93F]">+ ADDED ({addedTopics.size})</p>
-          {[...addedTopics].map((topic) => {
-            const t = timelineByConcept.get(topic)
-            if (!t) return null
-            return (
-              <div key={topic} className="mt-1.5 pl-1">
-                <p className="text-[#27C93F]">+ <span className="font-bold" title={t.conceptId}>{resolveTitle(t)}</span></p>
-                <div className="pl-4 text-[11px]">
-                  <p><span className="text-[#6B7280]">★ </span>{t.qualityScore}<span className="text-[#6B7280]"> · {fmtTime(t.at)} · </span><span className="text-[#F59E6A]">{t.action}</span> ({t.creditsConsumed}cr)</p>
-                  {t.onChainFailed ? (
-                    <p className="text-[#FFBD2E]">⚠ on-chain failed</p>
-                  ) : (
-                    <p>
-                      <span className={cn(t.chain === "status" || t.chain === "status-hoodi" ? "text-[#27C93F]" : "text-[#C7A7FF]")}>{t.chain}</span>
-                      {" · "}
-                      <a href={t.explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B9CE8] underline break-all">
-                        {t.txHash.slice(0, 12)}...{t.txHash.slice(-6)}
-                      </a>
-                    </p>
-                  )}
-                  {t.evidence?.length > 0 && t.evidence.map((e: any, ei: number) => (
-                    <p key={ei} className="text-[10px]">
-                      <span className="text-[#6B7280]">├─ </span>
-                      <span className="text-[#C7A7FF]">{e.source}</span>
-                      {e.curator && <span className="text-[#6B7280]"> ({e.curator}/{e.curatorTier})</span>}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-      {/* Modified */}
-      {modifiedTopics.size > 0 && (
-        <div className="mt-3">
-          <p className="text-[#FFBD2E]">~ MODIFIED ({modifiedTopics.size})</p>
-          {[...modifiedTopics].map((topic) => {
-            const t = timelineByConcept.get(topic)
-            if (!t) return null
-            return (
-              <div key={topic} className="mt-1 pl-1">
-                <p className="text-[#FFBD2E]">~ <span className="font-bold" title={t.conceptId}>{resolveTitle(t)}</span> <span className="text-[#6B7280]">(follow)</span></p>
-                <p className="pl-4 text-[11px] text-[#6B7280]">{fmtTime(t.at)} · {t.creditsConsumed}cr
-                  {!t.onChainFailed && t.explorerUrl && (
-                    <> · <a href={t.explorerUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B9CE8] underline break-all">{t.txHash.slice(0, 12)}...</a></>
-                  )}
-                </p>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-      {/* Unchanged */}
-      {unchanged.length > 0 && (
-        <div className="mt-3">
-          <p className="text-[#6B7280]">= UNCHANGED ({unchanged.length})</p>
-          {unchanged.map((k) => (
-            <p key={k.topic} className="text-[#6B7280] pl-1">= {k.topic} <span className="text-[#4A5160]">({k.lastUpdated})</span></p>
-          ))}
-        </div>
-      )}
-
-      {/* Local Skills — stdio MCP가 스캔한 ~/.claude/skills/ 실제 파일 목록 */}
+      {/* Local Skills — stdio MCP가 스캔한 ~/.claude/skills/ 실제 파일 목록 (보고서 본문) */}
       <div className="mt-3">
         <p className="text-[#6B9CE8]">
           📁 LOCAL SKILLS ({data?.localSkills?.count ?? 0})
@@ -257,7 +166,7 @@ export function SelfReportLog({
         ) : (
             data.localSkills.items.map((s: any) => {
               // dir 끝의 폴더명에서 conceptId 추출 (cherry-{uuid}) → DB title로 치환
-              const folderName = (s.dir ?? "").split("/").filter(Boolean).pop() ?? "unknown"
+              const folderName = (s.dir ?? "").split(/[\\/]/).filter(Boolean).pop() ?? "unknown"
               const extractedId = folderName.startsWith("cherry-") ? folderName.slice(7) : ""
               const resolvedTitle = extractedId ? titleMap.get(extractedId) : undefined
               const displayName = resolvedTitle ?? folderName
@@ -299,18 +208,10 @@ export function SelfReportLog({
           )}
       </div>
 
-      {/* Summary */}
+      {/* Summary — 파일 수 기준 (영수증 아님) */}
       <div className="mt-3 pt-2 border-t border-[#2A2F3B] text-[#7C8490]">
-        <span>total {allKnowledge.length} · </span>
-        <span className="text-[#27C93F]">+{addedTopics.size}</span>
-        <span> · spent </span>
-        <span className="text-[#D4854A]">{data.summary?.totalSpent ?? 0}cr</span>
-        {data?.localSkills && (
-          <>
-            <span> · </span>
-            <span className="text-[#6B9CE8]">{data.localSkills.items?.filter((s: any) => s.hasSkillMd).length ?? 0} skills</span>
-          </>
-        )}
+        <span className="text-[#6B9CE8]">{data?.localSkills?.items?.filter((s: any) => s.hasSkillMd).length ?? 0} skills</span>
+        <span className="text-[#6B7280]"> @ {data?.localSkills?.base_dir ?? "~/.claude/skills"}</span>
       </div>
     </>
   )
@@ -386,7 +287,6 @@ function KnowledgeDiffModal({ agentId, agentName, onClose }: { agentId: string; 
 
   useEffect(() => { loadReport() }, [agentId])
 
-  // ─── 데이터 조합: added / modified / unchanged ───
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
       <div
@@ -666,9 +566,9 @@ const TIER_COLOR: Record<string, string> = { Silver: "#D4854A", Gold: "#D4854A",
    Left Panel — Agent List + Detail
 ═══════════════════════════════════════════════ */
 function AgentPanel({
-  agents, selectedId, onSelect, onAdd, onDelete, onUpdate,
+  agents, selectedId, onSelect, onAdd, onDelete, onUpdate, onWorkshopOpen,
 }: {
-  agents: Agent[]; selectedId: string; onSelect: (id: string) => void; onAdd: () => void; onDelete: (id: string) => void; onUpdate: (id: string, patch: Partial<Agent>) => void
+  agents: Agent[]; selectedId: string; onSelect: (id: string) => void; onAdd: () => void; onDelete: (id: string) => void; onUpdate: (id: string, patch: Partial<Agent>) => void; onWorkshopOpen: (id: string) => void
 }) {
   const selected = agents.find((a) => a.id === selectedId) ?? agents[0]
   const [cmdCopied, setCmdCopied] = useState(false)
@@ -747,6 +647,17 @@ function AgentPanel({
                 <div className="flex-1 min-w-0">
                   <p className="text-[12px] font-semibold text-[#1A1626] truncate">{a.name}</p>
                 </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onSelect(a.id)
+                    onWorkshopOpen(a.id)
+                  }}
+                  title="Open Workshop — equip skills, MCP tools, memory"
+                  className="text-[10px] font-semibold px-2 py-1 rounded border border-[#4A5FA0] text-[#2D3B66] bg-white hover:bg-[#EEF0F7] hover:border-[#2D3B66] cursor-pointer flex-shrink-0 transition-colors"
+                >
+                  Workshop
+                </button>
                 <button
                   onClick={async (e) => {
                     e.stopPropagation()
@@ -1102,30 +1013,30 @@ function RegisterForm({ onComplete, onCancel }: { onComplete: (agent: Agent) => 
 
       <div>
         <p className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#6B727E] mb-1.5">Wallet Type</p>
-        <div className="inline-flex p-0.5 bg-[#F9F7F5] rounded-lg border border-[#E4E1EE] mb-2">
-          <button
-            type="button"
-            onClick={() => { if (!walletConnected) setWalletType("evm") }}
-            disabled={walletConnected}
-            className={cn(
-              "text-[11px] font-semibold px-3 py-1 rounded-md transition-colors",
-              walletType === "evm" ? "bg-white text-[#D4854A] shadow-sm" : "text-[#6B727E]",
-              walletConnected && "opacity-60 cursor-not-allowed",
-            )}
-          >
-            MetaMask
-          </button>
+        <div className="flex w-full p-0.5 bg-[#F9F7F5] rounded-lg border border-[#E4E1EE] mb-2">
           <button
             type="button"
             onClick={() => { if (!walletConnected) setWalletType("near") }}
             disabled={walletConnected}
             className={cn(
-              "text-[11px] font-semibold px-3 py-1 rounded-md transition-colors",
-              walletType === "near" ? "bg-white text-[#7B5EA7] shadow-sm" : "text-[#6B727E]",
+              "flex-1 text-[12px] font-semibold px-3 py-1.5 rounded-md transition-all",
+              walletType === "near" ? "bg-white text-[#7B5EA7] shadow-sm" : "text-[#6B727E] hover:text-[#3D3652]",
               walletConnected && "opacity-60 cursor-not-allowed",
             )}
           >
             NEAR
+          </button>
+          <button
+            type="button"
+            onClick={() => { if (!walletConnected) setWalletType("evm") }}
+            disabled={walletConnected}
+            className={cn(
+              "flex-1 text-[12px] font-semibold px-3 py-1.5 rounded-md transition-all",
+              walletType === "evm" ? "bg-white text-[#D4854A] shadow-sm" : "text-[#6B727E] hover:text-[#3D3652]",
+              walletConnected && "opacity-60 cursor-not-allowed",
+            )}
+          >
+            MetaMask
           </button>
         </div>
 
@@ -1239,7 +1150,7 @@ function DepositWithdrawButtons({ agent, onDeposited, pendingAmount, curatorName
 
   return (
     <div className="flex flex-col gap-2">
-      {result && (
+      {false && result && (
         <div className={cn("text-[11px] px-3 py-1.5 rounded-lg flex items-center gap-2 flex-wrap", result.ok ? "text-[#2D7A5E] bg-[#EFF7F3]" : "text-red-500 bg-red-50")}>
           <span>{result.msg}</span>
           {result.tx && (
@@ -1620,11 +1531,13 @@ function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefr
 /* ═══════════════════════════════════════════════
    Main — 2 panel layout
 ═══════════════════════════════════════════════ */
-export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: boolean; onTabChange?: (tab: "dashboard" | "curation" | "template") => void }) {
+export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: boolean; onTabChange?: (tab: "dashboard" | "curation" | "concept-page" | "template") => void }) {
   const [agents, setAgents] = useState<Agent[]>([])
   const [selectedAgentId, setSelectedAgentId] = useState("")
   const [showRegister, setShowRegister] = useState(false)
-  const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "template">("dashboard")
+  const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "concept-page" | "template">("dashboard")
+  // Workshop 은 별도 팝업 — 특정 에이전트 카드에서 🔧 Workshop 버튼 눌러 열기
+  const [workshopOpenId, setWorkshopOpenId] = useState<string | null>(null)
 
   // Karma state — 상위에서 관리하여 좌측(AgentPanel) + 우측(WalletPanel) 양쪽 접근 가능
   const [onchainKarma, setOnchainKarma] = useState<import("@/lib/api").OnchainKarma | null>(null)
@@ -1733,49 +1646,45 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
     { key: "dashboard" as const, label: "Dashboard" },
     { key: "curation" as const, label: "Knowledge Curation" },
     ...(isAdmin ? [
+      { key: "concept-page" as const, label: "Concept Page" },
       { key: "template" as const, label: "Prompt Templates" },
     ] : []),
   ]
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className={dash.root}>
       {/* Header + Tabs */}
-      <div className="shrink-0 border-b border-[#E4E1EE] bg-white px-4 lg:px-6 pt-4 lg:pt-5 pb-0">
-        <h2 className="text-[16px] lg:text-[18px] font-extrabold text-[#1A1626] mb-2 lg:mb-3" style={{ letterSpacing: "-0.3px" }}>
+      <div className={dash.header}>
+        <h2 className={dash.headerTitle}>
           Dashboard
         </h2>
-        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between lg:gap-4">
+        <div className={dash.tabRow}>
           {tabs.length > 1 ? (
-            <div className="flex gap-0 overflow-x-auto">
+            <div className={dash.tabBar}>
               {tabs.map((t) => (
                 <button
                   key={t.key}
                   onClick={() => setActiveTab(t.key)}
-                  className={cn(
-                    "border-b-2 px-3 lg:px-4 py-2 lg:py-2.5 text-[12px] lg:text-[13px] font-semibold transition-colors whitespace-nowrap",
-                    activeTab === t.key
-                      ? "border-[var(--cherry)] text-[#1A1626]"
-                      : "border-transparent text-[#9E97B3] hover:text-[#3D3652]",
-                  )}
+                  className={cn(dash.tab, activeTab === t.key && dash.tabActive)}
                 >
                   {t.label}
                 </button>
               ))}
             </div>
           ) : <div />}
-          <div className="flex-shrink-0 pb-2 lg:pb-0">
+          <div className={dash.tabRowEnd}>
             <CompactPrivacyToggle />
           </div>
         </div>
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-hidden">
+      <div className={dash.tabContent}>
         {activeTab === "dashboard" && (
-          <div className="h-full overflow-y-auto p-4 lg:p-6">
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-5 lg:h-full">
+          <div className={dash.dashboardTab}>
+            <div className={dash.panelRow}>
               {/* Left — Agent List + Detail */}
-              <div className="lg:w-[340px] flex-shrink-0 rounded-xl border border-[#E4E1EE] bg-white p-4">
+              <div className={dash.leftPanel}>
                 {showRegister || showRegisterAuto ? (
                   <RegisterForm
                     onComplete={(newAgent) => {
@@ -1803,11 +1712,12 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
                       await loadAgents()
                       window.dispatchEvent(new Event("kaas-agents-changed"))
                     }}
+                    onWorkshopOpen={(id) => setWorkshopOpenId(id)}
                   />
                 ) : null}
               </div>
               {/* Right — Wallet & Rewards */}
-              <div className="flex-1 rounded-xl border border-[#E4E1EE] bg-white p-4 lg:p-5 min-w-0 overflow-y-auto">
+              <div className={dash.rightPanel}>
                 {selectedAgent ? <WalletPanel agent={selectedAgent} onRefresh={loadAgents} karma={onchainKarma} karmaLoading={karmaLoading} karmaError={karmaError} onRefreshKarma={refreshOnchainKarma} isAdmin={isAdmin} /> : (
                   <div className="flex items-center justify-center h-full text-[13px] text-[#999]">Register an agent</div>
                 )}
@@ -1816,16 +1726,75 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
           </div>
         )}
         {activeTab === "curation" && (
-          <div className="h-full flex flex-col lg:flex-row overflow-hidden bg-[#FAFAFA]">
+          <div className={dash.subTab}>
             <KnowledgeCurationPanel isAdmin={isAdmin} />
           </div>
         )}
+        {activeTab === "concept-page" && (
+          <div className={dash.subTab}>
+            <ConceptPagePublishPanel />
+          </div>
+        )}
         {activeTab === "template" && (
-          <div className="h-full flex flex-col lg:flex-row overflow-hidden bg-[#FAFAFA]">
+          <div className={dash.subTab}>
             <TemplateEditorBody />
           </div>
         )}
       </div>
+
+      {/* Workshop popup — opened from Workshop button on an agent row.
+          Rendered via Portal to document.body so it escapes the Dashboard modal's
+          containing block (which has `animate-in zoom-in-95` — transforms create
+          a containing block for `fixed` descendants, causing clipping). */}
+      {workshopOpenId && typeof document !== "undefined" && (() => {
+        const workshopAgent = agents.find((a) => a.id === workshopOpenId)
+        if (!workshopAgent) return null
+        const apiKey = (workshopAgent as unknown as { apiKey?: string; api_key?: string }).apiKey
+          ?? (workshopAgent as unknown as { apiKey?: string; api_key?: string }).api_key
+        return createPortal(
+          <div
+            className="fixed inset-0 z-[60] flex items-center justify-center p-1.5"
+            onClick={() => setWorkshopOpenId(null)}
+          >
+            <div className="absolute inset-0 bg-black/55" />
+            <div
+              className="relative bg-white rounded-lg shadow-[0_20px_60px_rgba(0,0,0,0.35)] w-full max-w-[1200px] h-[calc(100vh-12px)] flex flex-col overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header — white bg matching Dashboard style */}
+              <div className="flex-shrink-0 flex items-center justify-between border-b border-[#E4E1EE] bg-white px-6 py-4">
+                <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-[18px] font-extrabold text-[#1A1626]" style={{ letterSpacing: "-0.3px" }}>
+                        Workshop
+                      </h2>
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6480] px-2 py-0.5 rounded bg-gray-100 border border-[#E4E1EE]">
+                        Agent Assembly
+                      </span>
+                    </div>
+                    <div className="text-[12px] text-[#6B6480] mt-0.5">
+                      Editing <span className="font-semibold text-[#1A1626]">{workshopAgent.name}</span>
+                    </div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setWorkshopOpenId(null)
+                  }}
+                  className="p-1.5 rounded-md hover:bg-gray-100 cursor-pointer transition-colors"
+                  aria-label="Close Workshop"
+                >
+                  <span className="text-[#6B6480] text-[18px] leading-none">×</span>
+                </button>
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <KaasWorkshopPanel currentAgent={workshopAgent} currentAgentApiKey={apiKey} />
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      })()}
     </div>
   )
 }

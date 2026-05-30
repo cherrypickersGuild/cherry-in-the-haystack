@@ -106,7 +106,7 @@ export class AgentCommService {
     return { prompts, catalog, items };
   }
 
-  private async getPrompts(type: string, versionTags: string[]) {
+  async getPrompts(type: string, versionTags: string[]) {
     const row = await this.knex.raw(
       `
       SELECT

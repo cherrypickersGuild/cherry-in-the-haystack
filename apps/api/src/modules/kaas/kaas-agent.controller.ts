@@ -7,7 +7,7 @@ import { KaasAgentService } from './kaas-agent.service';
 import { KaasCreditService } from './kaas-credit.service';
 import { RegisterAgentDto } from './input-dto/register-agent.dto';
 
-const WELCOME_CREDITS = 200;
+const WELCOME_CREDITS = 1000;
 
 @Controller('v1/kaas/agents')
 @ApiTags('KaaS — Agent')

@@ -1,0 +1,272 @@
+[
+  {
+    "id": "gram-01",
+    "title": "LG Gram 16\" 2024 — Sealed",
+    "price": 590,
+    "seller": "techresale_seoul",
+    "posted_at": "2026-04-22T03:14:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-02",
+    "title": "LG Gram 16\" 2024 — Sealed",
+    "price": 625,
+    "seller": "btc_fan_kr",
+    "posted_at": "2026-04-22T11:02:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-03",
+    "title": "LG Gram 16\" 2023 — Sealed",
+    "price": 648,
+    "seller": "han_seller",
+    "posted_at": "2026-04-21T22:48:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-04",
+    "title": "LG Gram 16\" 2024 i7 — Sealed",
+    "price": 675,
+    "seller": "electro_outlet",
+    "posted_at": "2026-04-20T08:30:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-05",
+    "title": "LG Gram 16\" 2023 i5 — Sealed",
+    "price": 690,
+    "seller": "kim_laptop",
+    "posted_at": "2026-04-19T14:00:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-06",
+    "title": "LG Gram 16\" 2022 — Opened box",
+    "price": 540,
+    "seller": "quickresale",
+    "posted_at": "2026-04-22T09:15:00Z",
+    "sealed": false,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-07",
+    "title": "LG Gram 16\" 2024 — Sealed (Premium)",
+    "price": 720,
+    "seller": "lg_certified_kr",
+    "posted_at": "2026-04-21T10:00:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-08",
+    "title": "LG Gram 14\" 2024 — Sealed",
+    "price": 595,
+    "seller": "notebook_hub",
+    "posted_at": "2026-04-22T05:22:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 14"
+  },
+  {
+    "id": "gram-09",
+    "title": "LG Gram 17\" 2024 — Sealed",
+    "price": 760,
+    "seller": "bigscreen_deals",
+    "posted_at": "2026-04-20T18:40:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 17"
+  },
+  {
+    "id": "mac-01",
+    "title": "MacBook Air 13\" M3 — Sealed",
+    "price": 899,
+    "seller": "apple_resale",
+    "posted_at": "2026-04-22T01:00:00Z",
+    "sealed": true,
+    "brand": "Apple",
+    "model": "MacBook Air 13"
+  },
+  {
+    "id": "mac-02",
+    "title": "MacBook Pro 14\" M3 — Sealed",
+    "price": 1450,
+    "seller": "mac_certified",
+    "posted_at": "2026-04-21T13:20:00Z",
+    "sealed": true,
+    "brand": "Apple",
+    "model": "MacBook Pro 14"
+  },
+  {
+    "id": "mac-03",
+    "title": "MacBook Air 15\" M2 — Opened box",
+    "price": 680,
+    "seller": "quickresale",
+    "posted_at": "2026-04-22T16:50:00Z",
+    "sealed": false,
+    "brand": "Apple",
+    "model": "MacBook Air 15"
+  },
+  {
+    "id": "tp-01",
+    "title": "ThinkPad X1 Carbon Gen 11 — Sealed",
+    "price": 1090,
+    "seller": "business_laptop_kr",
+    "posted_at": "2026-04-21T11:10:00Z",
+    "sealed": true,
+    "brand": "Lenovo",
+    "model": "ThinkPad X1 Carbon"
+  },
+  {
+    "id": "tp-02",
+    "title": "ThinkPad T14 Gen 4 — Sealed",
+    "price": 780,
+    "seller": "kim_laptop",
+    "posted_at": "2026-04-20T09:00:00Z",
+    "sealed": true,
+    "brand": "Lenovo",
+    "model": "ThinkPad T14"
+  },
+  {
+    "id": "tp-03",
+    "title": "ThinkPad E14 — Opened box",
+    "price": 460,
+    "seller": "budget_pc",
+    "posted_at": "2026-04-22T07:45:00Z",
+    "sealed": false,
+    "brand": "Lenovo",
+    "model": "ThinkPad E14"
+  },
+  {
+    "id": "dell-01",
+    "title": "Dell XPS 13 Plus — Sealed",
+    "price": 950,
+    "seller": "dell_outlet_kr",
+    "posted_at": "2026-04-21T20:00:00Z",
+    "sealed": true,
+    "brand": "Dell",
+    "model": "XPS 13 Plus"
+  },
+  {
+    "id": "dell-02",
+    "title": "Dell Inspiron 15 — Sealed",
+    "price": 520,
+    "seller": "pc_direct",
+    "posted_at": "2026-04-22T14:30:00Z",
+    "sealed": true,
+    "brand": "Dell",
+    "model": "Inspiron 15"
+  },
+  {
+    "id": "asus-01",
+    "title": "ASUS ZenBook 14 OLED — Sealed",
+    "price": 740,
+    "seller": "asus_store_kr",
+    "posted_at": "2026-04-20T12:00:00Z",
+    "sealed": true,
+    "brand": "ASUS",
+    "model": "ZenBook 14"
+  },
+  {
+    "id": "asus-02",
+    "title": "ASUS ROG Zephyrus G14 — Opened box",
+    "price": 1200,
+    "seller": "gaming_deals",
+    "posted_at": "2026-04-19T22:15:00Z",
+    "sealed": false,
+    "brand": "ASUS",
+    "model": "ROG Zephyrus G14"
+  },
+  {
+    "id": "hp-01",
+    "title": "HP Pavilion 15 — Sealed",
+    "price": 610,
+    "seller": "hp_certified",
+    "posted_at": "2026-04-21T15:50:00Z",
+    "sealed": true,
+    "brand": "HP",
+    "model": "Pavilion 15"
+  },
+  {
+    "id": "hp-02",
+    "title": "HP Spectre x360 14 — Sealed",
+    "price": 1080,
+    "seller": "hp_store",
+    "posted_at": "2026-04-20T06:00:00Z",
+    "sealed": true,
+    "brand": "HP",
+    "model": "Spectre x360 14"
+  },
+  {
+    "id": "acer-01",
+    "title": "Acer Swift 3 — Sealed",
+    "price": 490,
+    "seller": "acer_outlet",
+    "posted_at": "2026-04-22T02:30:00Z",
+    "sealed": true,
+    "brand": "Acer",
+    "model": "Swift 3"
+  },
+  {
+    "id": "ms-01",
+    "title": "Surface Laptop 5 13.5\" — Sealed",
+    "price": 820,
+    "seller": "ms_resale",
+    "posted_at": "2026-04-21T17:25:00Z",
+    "sealed": true,
+    "brand": "Microsoft",
+    "model": "Surface Laptop 5"
+  },
+  {
+    "id": "fw-01",
+    "title": "Framework Laptop 13 — Sealed",
+    "price": 980,
+    "seller": "framework_direct",
+    "posted_at": "2026-04-20T11:40:00Z",
+    "sealed": true,
+    "brand": "Framework",
+    "model": "Laptop 13"
+  },
+  {
+    "id": "gram-06",
+    "title": "LG Gram 16\" 2024 — Sealed (Open-box)",
+    "price": 555,
+    "seller": "refurb_hub",
+    "posted_at": "2026-04-22T09:00:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-07",
+    "title": "LG Gram 16\" 2023 — Sealed",
+    "price": 599,
+    "seller": "used_gear_store",
+    "posted_at": "2026-04-22T14:30:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  },
+  {
+    "id": "gram-08",
+    "title": "LG Gram 16\" 2024 — Sealed",
+    "price": 610,
+    "seller": "refurb_paradise",
+    "posted_at": "2026-04-21T18:15:00Z",
+    "sealed": true,
+    "brand": "LG",
+    "model": "Gram 16"
+  }
+]

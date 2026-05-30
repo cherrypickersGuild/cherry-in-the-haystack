@@ -41,7 +41,9 @@ export class KaasProvenanceService {
 
   /** 쿼리 로그 기록 + 온체인 프로비넌스 기록 (동기)
    *  chainOverride: 요청별로 체인 지정 ('status' | 'near' | 'mock'). 미지정 시 env 기본값
-   *  preSigned: 유저 지갑이 직접 서명한 tx hash가 있으면 온체인 호출을 건너뛰고 그 hash를 그대로 저장. */
+   *  preSigned: 유저 지갑이 직접 서명한 tx hash가 있으면 온체인 호출을 건너뛰고 그 hash를 그대로 저장.
+   *  opts.privacy: TEE 모드. true면 response_snapshot에 평문 대신 hash만 남김 → 서버/DB 관리자에게 내용 불가시.
+   *    일반 purchase/follow는 평문 유지해야 demo 상 TEE와 대비가 보임. */
   async recordQuery(
     agentId: string,
     conceptId: string,
@@ -50,6 +52,7 @@ export class KaasProvenanceService {
     responseData: Record<string, unknown>,
     chainOverride?: ChainName,
     preSigned?: { txHash: string; chain: ChainName; explorerUrl?: string },
+    opts?: { privacy?: boolean },
   ): Promise<{ queryLogId: string; provenanceHash: string | null; explorerUrl: string | null; onChain: boolean; chain: string; error?: string }> {
     // 매 구매마다 고유한 hash 생성
     const uniqueData = {
@@ -61,6 +64,18 @@ export class KaasProvenanceService {
     const localHash = this.generateHash(uniqueData);
     const chain = preSigned?.chain ?? chainOverride ?? (process.env.CHAIN_ADAPTER as ChainName) ?? 'mock';
 
+    // TEE/privacy 모드면 response_snapshot에 해시만. 평문 responseData는 함수 스코프 벗어나면 GC됨.
+    const snapshotPayload = opts?.privacy
+      ? { _redacted: true, _hash: localHash, _action: actionType, _at: new Date().toISOString() }
+      : responseData;
+
+    // 데모용 로그 — TEE 보안 차이를 런타임에서 확인 가능
+    if (opts?.privacy) {
+      this.logger.log(`[snapshot:REDACTED] agent=${agentId} action=${actionType} hash=${localHash} (server cannot see content)`);
+    } else {
+      this.logger.log(`[snapshot:PLAINTEXT] agent=${agentId} action=${actionType} payload=${JSON.stringify(responseData).slice(0, 500)}`);
+    }
+
     // 1차: 로컬 해시로 DB 선저장
     const [log] = await this.knex('kaas.query_log')
       .insert({
@@ -70,7 +85,7 @@ export class KaasProvenanceService {
         credits_consumed: creditsConsumed,
         provenance_hash: localHash,
         chain,
-        response_snapshot: JSON.stringify(responseData),
+        response_snapshot: JSON.stringify(snapshotPayload),
       })
       .returning('*');
 

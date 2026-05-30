@@ -141,7 +141,7 @@ export const EMAIL_TEMPLATE = (
       <td align="center" style="padding: 30px 15px; font-size: 12px; color: #666;">
         <p style="margin-bottom: 10px;">All rights reserved. ⓒ Cherry in the Haystack</p>
         <p style="margin-bottom: 10px;">
-          <a href="${process.env.FRONTEND_URL ?? 'http://localhost:3000'}" style="color: #3FA0EF; margin: 0 10px;">홈으로</a>
+          <a href="${process.env.FRONTEND_URL ?? 'http://localhost:3000'}/start" style="color: #3FA0EF; margin: 0 10px;">Home</a>
         </p>
  
       </td>

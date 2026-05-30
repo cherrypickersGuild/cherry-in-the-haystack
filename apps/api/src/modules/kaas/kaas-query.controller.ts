@@ -173,6 +173,7 @@ export class KaasQueryController {
         agent.id, dto.concept_id, 'purchase', consumed, responseData,
         chainOverride,
         preSignedTx && chainOverride ? { txHash: preSignedTx, chain: chainOverride } : undefined,
+        { privacy: (dto as any).privacy_mode === true },
       );
 
       // 큐레이터 보상 40% 자동 지급 (비동기)
@@ -262,6 +263,7 @@ export class KaasQueryController {
       agent.id, dto.concept_id, 'follow', consumed, responseData,
       chainOverride,
       preSignedTx && chainOverride ? { txHash: preSignedTx, chain: chainOverride } : undefined,
+      { privacy: (dto as any).privacy_mode === true },
     );
 
     // 큐레이터 보상 40% 자동 지급 (비동기)
@@ -340,6 +342,8 @@ Rules (strict):
               agent.id, '_tee', 'tee-chat', 0,
               { question: body.question, reply, provider: 'near' },
               'near',
+              undefined,
+              { privacy: true },
             );
             provenance = {
               hash: prov.provenanceHash,

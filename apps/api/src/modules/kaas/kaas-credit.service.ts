@@ -133,6 +133,30 @@ export class KaasCreditService {
     return { consumed: finalAmount, remaining, txHash: opts.preSignedTxHash, onChain: true };
   }
 
+  /** 환불 (DB 전용). Shop 세트 구매 실패/부분 실패 시 사용.
+   *  ledger 에 type='deposit' + description 'REFUND: ...' 로 기록.
+   *  온체인 역트랜잭션은 하지 않음 (consume 자체가 DB 기준이므로 대칭). */
+  async refundDbOnly(
+    agentId: string,
+    amount: number,
+    reason: string,
+  ): Promise<{ balance: number }> {
+    if (amount <= 0) return this.getBalance(agentId).then(({ balance }) => ({ balance }));
+    await this.knex('kaas.credit_ledger').insert({
+      agent_id: agentId,
+      amount,
+      type: 'deposit',
+      description: `REFUND: ${reason}`,
+      tx_hash: null,
+      chain: null,
+    });
+    const { balance } = await this.getBalance(agentId);
+    this.logger.log(
+      `Credit refunded: agent=${agentId}, amount=${amount}, reason=${reason}, balance=${balance}`,
+    );
+    return { balance };
+  }
+
   /** Ledger 내역 조회 (deposit + consume 모두) */
   async getLedger(agentId: string, limit = 50): Promise<any[]> {
     return this.knex('kaas.credit_ledger')

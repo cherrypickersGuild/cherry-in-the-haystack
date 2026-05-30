@@ -26,6 +26,9 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // request_id → pending save_skill resolve/reject (웹소켓 save_skill_ack 대기)
   private pendingSaveSkills = new Map<string, { resolve: (ack: SaveSkillAck) => void; reject: (err: Error) => void; timer: NodeJS.Timeout }>();
 
+  // request_id → pending delete_skill resolve/reject (install-build 고아 정리용)
+  private pendingDeleteSkills = new Map<string, { resolve: (ack: DeleteSkillAck) => void; reject: (err: Error) => void; timer: NodeJS.Timeout }>();
+
   constructor(
     private readonly agentService: KaasAgentService,
     private readonly knowledge: KaasKnowledgeService,
@@ -108,6 +111,8 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
           agentId, '_tee', 'tee-submit', 0,
           { topicCount: topics.length, topics: topics.map(t => t.topic) },
           'near',
+          undefined,
+          { privacy: true },
         );
         provenance = {
           hash: prov.provenanceHash,
@@ -235,6 +240,18 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { reply, agentName: socket.data.agentName };
   }
 
+  /** 특정 에이전트 소켓에 이벤트 푸시 (A2A용) */
+  pushToAgent(agentId: string, event: string, payload: any): boolean {
+    const socket = this.agentSockets.get(agentId);
+    if (!socket) {
+      this.logger.warn(`pushToAgent: agent=${agentId} not connected (event=${event})`);
+      return false;
+    }
+    socket.emit(event, payload);
+    this.logger.log(`pushToAgent: agent=${agentId} event=${event} ok`);
+    return true;
+  }
+
   /** 특정 agentId가 현재 웹소켓 접속 중인지 확인 (구매 Preflight용) */
   isAgentConnected(agentId: string): boolean {
     const has = this.agentSockets.has(agentId);
@@ -296,6 +313,56 @@ export class KaasWsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     clearTimeout(pending.timer);
     this.pendingSaveSkills.delete(err.request_id);
     pending.reject(new Error(`SAVE_FAILED: ${err.message}`));
+  }
+
+  /**
+   * 서버 → 에이전트: ~/.claude/skills/<target_dir> 디렉토리 삭제 요청.
+   * install-build 에서 Build A → B 전환 시 고아 cherry-* 디렉토리 정리에 사용.
+   * target_dir 은 반드시 `~/.claude/skills/cherry-*` 형태 (path traversal 방어).
+   */
+  async requestDeleteSkill(
+    agentId: string,
+    payload: DeleteSkillRequestPayload,
+    timeoutMs: number = 10000,
+  ): Promise<DeleteSkillAck> {
+    const socket = this.agentSockets.get(agentId);
+    if (!socket) {
+      this.logger.warn(`[delete_skill] requestDeleteSkill: no socket for agent=${agentId}`);
+      throw new Error('NO_AGENT_CONNECTED');
+    }
+
+    // 방어: target_dir 이 cherry-* 로 끝나는 서브디렉토리인지 검증
+    if (!/\/\.claude\/skills\/cherry-[a-z0-9-]+\/?$/.test(payload.target_dir)) {
+      this.logger.warn(`[delete_skill] unsafe target_dir rejected: ${payload.target_dir}`);
+      throw new Error('UNSAFE_TARGET_DIR');
+    }
+
+    this.logger.log(`[delete_skill] 📤 emitting delete_skill_request → agent=${agentId} socket=${socket.id} request=${payload.request_id} target=${payload.target_dir}`);
+
+    return new Promise<DeleteSkillAck>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.pendingDeleteSkills.delete(payload.request_id);
+        this.logger.warn(`[delete_skill] ⏱ TIMEOUT — agent=${agentId} never sent delete_skill_ack for request=${payload.request_id}`);
+        reject(new Error('DELETE_TIMEOUT'));
+      }, timeoutMs);
+
+      this.pendingDeleteSkills.set(payload.request_id, { resolve, reject, timer });
+      socket.emit('delete_skill_request', payload);
+    });
+  }
+
+  /** 에이전트가 디렉토리 삭제 완료 후 ack 발송 */
+  @SubscribeMessage('delete_skill_ack')
+  handleDeleteSkillAck(@ConnectedSocket() socket: Socket, @MessageBody() ack: DeleteSkillAck) {
+    this.logger.log(`[delete_skill] 📥 received delete_skill_ack from socket=${socket.id} request=${ack.request_id} deleted=${ack.deleted} path=${ack.removed_path ?? '(none)'}`);
+    const pending = this.pendingDeleteSkills.get(ack.request_id);
+    if (!pending) {
+      this.logger.warn(`[delete_skill] stale ack ignored: ${ack.request_id}`);
+      return;
+    }
+    clearTimeout(pending.timer);
+    this.pendingDeleteSkills.delete(ack.request_id);
+    pending.resolve(ack);
   }
 
   /** 연결된 에이전트 목록 */
@@ -425,4 +492,18 @@ export type SaveSkillAck = {
   request_id: string;
   saved_path: string;
   size_bytes: number;
+};
+
+/** 서버 → 에이전트: ~/.claude/skills/<target_dir> 디렉토리 삭제 요청. install-build 고아 정리용. */
+export type DeleteSkillRequestPayload = {
+  request_id: string;
+  target_dir: string; // 반드시 "~/.claude/skills/cherry-<short>" 형태
+};
+
+/** 에이전트 → 서버: 삭제 결과 ack (존재하지 않아도 deleted=false 로 정상 반환) */
+export type DeleteSkillAck = {
+  request_id: string;
+  deleted: boolean;
+  removed_path?: string;
+  error_reason?: string;
 };

@@ -8,12 +8,14 @@ import { PageHeader } from "@/components/cherry/page-header"
 import { CategoryTreemap } from "@/components/cherry/buzz-treemap"
 import { PatchNotesPage } from "@/components/cherry/patch-notes-page"
 import { fetchLanding, fetchLandingArticles, LandingResponse, LandingTopArticle } from "@/lib/api"
+import { useAuthTick, getAccessToken, decodeToken, clearAccessToken } from "@/lib/auth"
 import { NDFrameworksPage } from "@/components/cherry/nd-frameworks-page"
 import { NDModelUpdatesPage } from "@/components/cherry/nd-model-updates-page"
 import { NDCaseStudiesPage } from "@/components/cherry/nd-case-studies-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
 import { HandbookPlaceholder } from "@/components/cherry/handbook-placeholder"
 import { KaasCatalogPage } from "@/components/cherry/kaas-catalog-page"
+import { KaasArenaPage } from "@/components/cherry/kaas-arena-page"
 import { KaasDashboardPage } from "@/components/cherry/kaas-dashboard-page"
 // KaasAdminPage는 KaasDashboardPage 내부 탭으로 통합됨
 import { KaasConsole, KaasConsoleRef } from "@/components/cherry/kaas-console"
@@ -26,48 +28,39 @@ const STATIC_MOMENTUM = [
   { entityId: "s3", entityName: "Gemini 2.0", categoryName: "Google Family", page: "MODEL_UPDATES", thisWeekCount: 8, prevWeekCount: 3, changePct: 166 },
 ]
 
-/** JWT payload에서 role 추출 (검증 없이 디코딩만) */
-function parseJwtRole(token: string): string | null {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]))
-    return payload.role ?? null
-  } catch {
-    return null
-  }
-}
-
 export default function CherryApp() {
   const [activeNav, setActiveNav] = useState("highlight")
-  const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "template">("dashboard")
+  const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "concept-page" | "template">("dashboard")
   const [marketConceptId, setMarketConceptId] = useState<string | null>(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userRole, setUserRole] = useState<string | null>(null)
   const [landing, setLanding] = useState<LandingResponse | null>(null)
   const [topArticles, setTopArticles] = useState<LandingTopArticle[]>([])
   const router = useRouter()
   const consoleRef = useRef<KaasConsoleRef>(null)
   const [showDashboard, setShowDashboard] = useState(false)
 
+  // Subscribe to auth change events for re-render; read the token fresh below.
+  useAuthTick()
+  // Hydration mismatch 방지: 서버는 localStorage 못 보니 token=null 로 SSR 함.
+  // 클라이언트도 hydration 끝날 때까진 token=null 로 동일하게 렌더해야 React 가
+  // 트리 통째로 버리고 재렌더하는 사고(error #418) 안 남. mounted 후에 진짜 token 읽음.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+  const token = mounted ? getAccessToken() : null
+  const isAdmin = decodeToken(token)?.role === "ADMIN"
+
   useEffect(() => {
-    const token = localStorage.getItem("accessToken")
-    setIsLoggedIn(!!token)
-    if (token) setUserRole(parseJwtRole(token))
-    // 통계(treemap+momentum)와 기사 목록 동시에 fetch
     fetchLanding().then(setLanding).catch(() => {})
     fetchLandingArticles().then((r) => setTopArticles(r.items)).catch(() => {})
   }, [])
 
   const handleAuthClick = () => {
-    if (isLoggedIn) {
-      localStorage.removeItem("accessToken")
-      setIsLoggedIn(false)
-      setUserRole(null)
+    // Re-check at click time — don't rely on stale render-time value.
+    if (getAccessToken()) {
+      clearAccessToken()
     } else {
       router.push("/login")
     }
   }
-
-  const isAdmin = userRole === "ADMIN"
 
   /* ─────────────────────────────────────────────
      Route content based on active nav
@@ -104,6 +97,9 @@ export default function CherryApp() {
             consoleRef.current?.notify(`📊 Compare (${result.source ?? "db"}) — ${result.agentName ?? "agent"}\n${topics}\n\nup-to-date: ${upToDate} | outdated: ${outdated} | gaps: ${gaps}`, !!result.privacy, result.provenance ?? null)
           }}
         />
+
+      case "kaas-arena":
+        return <KaasArenaPage />
 
       case "concept-reader":
         return <ConceptReaderPage onBuyOnMarket={(conceptId) => {
@@ -270,7 +266,7 @@ export default function CherryApp() {
             <p className="text-[10px] text-text-muted font-medium">for AI Engineers</p>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            {isLoggedIn && (
+            {token && (
               <button
                 onClick={() => setShowDashboard(true)}
                 className="px-3 py-1.5 rounded-lg text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
@@ -283,56 +279,74 @@ export default function CherryApp() {
               onClick={handleAuthClick}
               className="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors"
             >
-              {isLoggedIn ? "Logout" : "Login"}
+              {token ? "Logout" : "Login"}
             </button>
             <MobileSidebar active={activeNav} onSelect={setActiveNav} />
           </div>
         </header>
 
         {/* Desktop top bar */}
-        <div className="hidden lg:flex items-center justify-end gap-2 px-10 py-4 border-b border-[#E4E1EE] bg-white flex-shrink-0">
-          {isLoggedIn && (
+        <div
+          className="hidden lg:flex items-center justify-end border-b border-[#E4E1EE] bg-white flex-shrink-0"
+          style={{ gap: 8, paddingLeft: 40, paddingRight: 40, paddingTop: 16, paddingBottom: 16 }}
+        >
+          {token && (
             <button
               onClick={() => setShowDashboard(true)}
-              className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-white transition-opacity hover:opacity-90 cursor-pointer"
-              style={{ backgroundColor: "#C94B6E" }}
+              className="text-[12px] font-semibold text-white transition-opacity hover:opacity-90 cursor-pointer"
+              style={{
+                backgroundColor: "#C94B6E",
+                paddingLeft: 12, paddingRight: 12, paddingTop: 6, paddingBottom: 6,
+                borderRadius: 8,
+              }}
             >
               Dashboard
             </button>
           )}
           <button
             onClick={handleAuthClick}
-            className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors cursor-pointer"
+            className="text-[12px] font-medium border border-[#E4E1EE] text-[#7B7599] bg-white hover:border-[#C94B6E] hover:text-[#C94B6E] transition-colors cursor-pointer"
+            style={{
+              paddingLeft: 12, paddingRight: 12, paddingTop: 6, paddingBottom: 6,
+              borderRadius: 8,
+            }}
           >
-            {isLoggedIn ? "Logout" : "Login"}
+            {token ? "Logout" : "Login"}
           </button>
         </div>
 
-        {/* Main scrollable content */}
+        {/* Main scrollable content — constrain inner page to 1200px,
+            left-aligned (no mx-auto) so content sits flush with the sidebar. */}
         <main
           className="flex-1 overflow-y-auto px-4 py-4 lg:px-10 lg:py-8"
           style={{ backgroundColor: "#FBFAF8" }}
           id="main-content"
         >
-          {renderContent()}
+          <div className="w-full max-w-[1000px]">
+            {renderContent()}
+          </div>
         </main>
       </div>
 
-      {/* Floating Cherry Console — visible on all pages.
-          When the Dashboard modal is open, surface the active sub-tab so the LLM
-          can answer page-specific questions (Dashboard / Knowledge Curation / Prompt Templates). */}
-      <KaasConsole
-        ref={consoleRef}
-        currentPage={
-          showDashboard
-            ? dashboardTab === "curation"
-              ? "Dashboard › Knowledge Curation"
-              : dashboardTab === "template"
-              ? "Dashboard › Prompt Templates"
-              : "Dashboard"
-            : activeNav
-        }
-      />
+      {/* Floating Cherry Console — 로그인된 사용자에게만 노출.
+          비로그인 시 콘솔이 보호된 엔드포인트를 호출해서 401 → /login 자동이동
+          되는 부작용 방지. */}
+      {token && (
+        <KaasConsole
+          ref={consoleRef}
+          currentPage={
+            showDashboard
+              ? dashboardTab === "curation"
+                ? "Dashboard › Knowledge Curation"
+                : dashboardTab === "concept-page"
+                ? "Dashboard › Concept Page"
+                : dashboardTab === "template"
+                ? "Dashboard › Prompt Templates"
+                : "Dashboard"
+              : activeNav
+          }
+        />
+      )}
 
       {/* Dashboard modal (통합: Dashboard + 지식 큐레이팅 + 프롬프트 템플릿) */}
       {showDashboard && (
