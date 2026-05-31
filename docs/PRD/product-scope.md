@@ -102,8 +102,16 @@ Curated Text Sources → Evidence Layer Storage → Ontology Building → Writer
 | Tag | EN | KR | Examples |
 |-----|----|----|----------|
 | `frameworks` | Development frameworks, SDKs, API libraries, releases, deprecation notices, major dependency updates | 개발 프레임워크, SDK, API 라이브러리, 릴리스, 사용 중단 공지, 주요 의존성 업데이트 | LangChain v0.3, new SDK release, PEFT update, ecosystem landscape digest, stable/beta release notice |
-| `tools` | Productivity tools, monitoring, debugging, testing services, tool directories, Hall of Fame tools | 개발자 생산성 도구, 모니터링, 디버깅, 테스트 서비스, 도구 디렉토리, 명예의 전당 | New dev tool launch, monitoring service, "Mini Product Hunt" entry, proven Hall of Fame tool |
+| `dev-tools` | Productivity tools, monitoring, debugging, testing services, tool directories, Hall of Fame tools | 개발자 생산성 도구, 모니터링, 디버깅, 테스트 서비스, 도구 디렉토리, 명예의 전당 | New dev tool launch, monitoring service, "Mini Product Hunt" entry, proven Hall of Fame tool |
 | `building-blocks` | Shared prompts, templates, code snippets, orchestration patterns, MCP implementations, agent configurations — grab a piece, combine, build your thing | 공유 프롬프트, 템플릿, 코드 스니펫, 오케스트레이션 패턴, MCP 구현, 에이전트 구성 — 필요한 조각을 가져다 조립 | Prompt engineering pattern, workflow orchestration, MCP server implementation, agent architecture |
+
+> **Sub-tags:** `building-blocks` has been categorized preemptively into sub-tags for finer classification, but all sub-tags render on the same Building Blocks page:
+> - `building-blocks-mixed` — default tag for mixed/general building block content. All building-blocks sources default to this tag.
+> - `agents` — agent architectures, multi-agent orchestration, agent configurations
+> - `mcp` — MCP server implementations, MCP tool integrations
+> - `prompt` — prompt engineering patterns, prompt templates, prompting techniques
+>
+> Sources tagged with any of these sub-tags appear on the Building Blocks page. When in doubt, use `building-blocks-mixed`.
 
 #### Cases / 산업·사례 ⭐ (Priority)
 
@@ -120,6 +128,7 @@ Curated Text Sources → Evidence Layer Storage → Ontology Building → Writer
 | `regulations-policy-compliance` | AI policy, regulation, compliance, legal precedents, standards (ISO/IEC) | AI 정책, 규제, 컴플라이언스, 법적 선례, 표준 (ISO/IEC) | EU AI Act, FTC guidelines, privacy law amendment, industry-specific regulation, court case, audit report |
 | `community` | People, events, meetups, open-source milestones, contributor spotlights | 사람, 이벤트, 밋업, 오픈소스 마일스톤, 기여자 스포트라이트 | Conference highlight, meetup recap, open-source release, contributor initiative, community best practices |
 | `big-tech-trends` | Big tech strategic moves — excluding model updates (→ `model-updates`) and investment news (→ `market-investment`) | 빅테크 전략적 움직임 — 모델 업데이트 제외, 투자 소식 제외 | Amazon buys small nuclear reactors, Google restructures AI division, Meta open-source strategy shift, Apple device-level AI bet |
+| `insights-opinions` | Thought leadership and opinion pieces shaping the field, emerging patterns and trends, predictions and forward-looking analysis | 오피니언 리더십, 새로운 패턴, 예측, 트렌드 분석 | "Why RAG won't scale", emerging paradigm prediction, opinion piece on AI engineering direction, thought leadership essay |
 | `market-investment` | Venture funding, M&A, sponsorship, money flowing in and out of the AI industry | 벤처 투자, M&A, 후원, AI 산업 자금 흐름 | LLM startup Series A, AI company acquisition, government AI fund, corporate AI lab sponsorship |
 | `technical-deep-dives` | Long-form engineering articles, system design breakdowns, performance analysis, comparative evaluations | 롱폼 기술 아티클, 시스템 설계 분석, 성능 분석, 비교 평가 | Architecture breakdown, optimization study, benchmark deep dive, system design analysis |
 
