@@ -85,111 +85,55 @@ Curated Text Sources → Evidence Layer Storage → Ontology Building → Writer
 
 **Purpose:** Fresh, high-value content from the rapidly evolving LLM ecosystem
 
-**Categories** (evolving taxonomy):
+**Content Tags** (flat tag system — every article gets one or more tags):
 
-**1. Research & Models (연구·모델)**
+#### Research & Models / 연구·모델
 
-Tracks foundational research, model releases, and evaluation resources.
+| Tag | EN | KR | Examples |
+|-----|----|----|----------|
+| `model-releases` | New model launches, API updates, version changes, pricing, protocol changes | 신규 모델 출시, API 업데이트, 버전 변경, 가격 변경, 프로토콜 변경 | GPT-4.5 launch, Claude 4 API update, LLaMA3 architecture, token limit change, function calling endpoint |
+| `research-papers` | Conference papers, academic breakthroughs, novel techniques (link out only — don't curate directly) | 학회 논문, 학계 연구 돌파구, 새로운 기법 (외부 링크 연결, 직접 큐레이션하지 않음) | NeurIPS paper, ICML spotlight, ACL workshop, academic-industry collaboration |
+| `benchmarks-datasets` | Benchmark results, new public datasets, evaluation tools, leaderboards (curated links only) | 벤치마크 결과, 신규 공개 데이터셋, 평가 도구, 리더보드 (큐레이션 링크) | MMLU score update, new Wikipedia dump, LM-eval-harness release, paperswithcode ranking change |
 
-**1a. Model Releases & API Updates**
+#### Engineering & Tooling / 엔지니어링·툴링
 
-- New model releases and architectures (GPT-4.5, LLaMA3, Claude 4, etc.)
-- Performance improvements and benchmarking results
-- Version changes: model size, token limits, inference speed
-- API updates: features, pricing, endpoints (function calling, embeddings)
-- Protocol/auth changes (one-liner + external link)
+| Tag | EN | KR | Examples |
+|-----|----|----|----------|
+| `frameworks-sdks` | Development frameworks, SDKs, API libraries, releases, deprecation notices, major dependency updates | 개발 프레임워크, SDK, API 라이브러리, 릴리스, 사용 중단 공지, 주요 의존성 업데이트 | LangChain v0.3, new SDK release, PEFT update, ecosystem landscape digest, stable/beta release notice |
+| `developer-tools` | Productivity tools, monitoring, debugging, testing services, tool directories, Hall of Fame tools | 개발자 생산성 도구, 모니터링, 디버깅, 테스트 서비스, 도구 디렉토리, 명예의 전당 | New dev tool launch, monitoring service, "Mini Product Hunt" entry, proven Hall of Fame tool |
+| `patterns-implementations` | Shared prompts, templates, code snippets, orchestration patterns, MCP implementations, agent configurations | 공유 프롬프트, 템플릿, 코드 스니펫, 오케스트레이션 패턴, MCP 구현, 에이전트 구성 | Prompt engineering pattern, workflow orchestration, MCP server implementation, agent architecture |
 
-**1b. Research & Papers** (External service connections — link out, don't directly curate)
+#### Industry & Business / 산업·비즈니스 ⭐ (Priority)
 
-- NeurIPS, ICML, ACL, and other major conference papers
-- Research breakthroughs and novel techniques from academia
-- Spotlight sessions, workshop topics, presentation materials
-- Tutorial and panel discussion trends
-- Academic-industry collaboration results
+| Tag | EN | KR | Examples |
+|-----|----|----|----------|
+| `case-studies` | Domain-specific use cases, conference presentations, ROI analysis, company product launches, success/failure stories | 도메인 특화 유스케이스, 컨퍼런스 발표, ROI 분석, 기업 제품 출시, 성공/실패 사례 | Baemin's text-to-SQL, company chatbot launch, productivity research, adoption strategy, lessons learned |
 
-**1c. Benchmarks & Datasets** (Curated links — not direct implementation)
+#### Discourse / 담론
 
-- BIG-Bench, HELM, MMLU, and other benchmark latest results
-- Paper-based leaderboards (paperswithcode.com) major ranking changes
-- Open-source evaluation tools updates (Guardrails, LM-eval-harness)
-- New public datasets (web crawling, domain-specific): name, scale, license
-- Dataset updates (e.g., latest Wikipedia dumps)
-- High-quality annotation/labeling service launches
+| Tag | EN | KR | Examples |
+|-----|----|----|----------|
+| `regulation-governance` | AI policy, regulation, compliance, legal precedents, standards (ISO/IEC) | AI 정책, 규제, 컴플라이언스, 법적 선례, 표준 (ISO/IEC) | EU AI Act, FTC guidelines, privacy law amendment, industry-specific regulation, court case, audit report |
+| `community` | People, events, meetups, open-source milestones, contributor spotlights | 사람, 이벤트, 밋업, 오픈소스 마일스톤, 기여자 스포트라이트 | Conference highlight, meetup recap, open-source release, contributor initiative, community best practices |
+| `insights-opinions` | Big tech strategy (beyond model releases), thought leadership, emerging patterns, predictions, trend analysis | 빅테크 전략 (모델 출시를 넘어선), 오피니언 리더십, 새로운 패턴, 예측, 트렌드 분석 | Org reshuffle, platform bet, open-source strategy, opinion piece, trend analysis, forward-looking prediction |
+| `technical-deep-dives` | Long-form engineering articles, system design breakdowns, performance analysis, comparative evaluations | 롱폼 기술 아티클, 시스템 설계 분석, 성능 분석, 비교 평가 | Architecture breakdown, optimization study, benchmark deep dive, system design analysis |
 
-**2. Engineering & Tooling (엔지니어링·툴링)**
+#### Pipeline-Specific Tags
 
-Tools, frameworks, and patterns for building and shipping AI applications.
+| Tag | EN | KR | Pipeline Behavior |
+|-----|----|----|-------------------|
+| `news-collect` | Newsletter digests and curated collections — dismantle into separate news rows | 뉴스레터 다이제스트, 큐레이션 컬렉션 — 개별 뉴스 행으로 분해 | Input: newsletter/digest → Output: individual article rows, each re-tagged with appropriate content tags above |
+| `ai-education` | Educational content suitable for structured knowledge extraction — feeds into idea extraction → ontology pipeline | 구조화된 지식 추출에 적합한 교육 콘텐츠 — 아이디어 추출 → 온톨로지 파이프라인으로 입력 | Input: article from news collector → Feed into existing idea extraction → ontology pipeline (same pipeline that processes books). These articles become evidence for concept pages. |
+| `how-people-use-ai` | Real-world AI usage patterns and adoption stories — valuable but not surfaced in Cherry (placement TBD) | 실제 AI 사용 패턴 및 도입 사례 — 가치 있지만 Cherry에 표시되지 않음 (배치 미정) | Collected and stored. Not displayed in Cherry UI. Available for future use. |
 
-**2a. Frameworks & SDKs** (AI Development Programs)
+**Tag Application Rules:**
 
-- Development frameworks, SDKs, APIs
-- Ecosystem landscape map (4-6 key tools, digest format)
-- Link to comprehensive landscape: https://malywut.github.io/ai-engineering-landscape/
-- Update cards: 1-2 line summaries of key changes
-- Stable/Beta releases and deprecation notices
-- Major dependency updates (Accelerate, PEFT, etc.)
-
-**2b. Developer Tools & Services** (Programs that make AI developers' lives easier)
-
-- Newly emerged developer tools
-- Productivity enhancements for AI engineering
-- Monitoring, debugging, and testing services
-- "Our Mini Product Hunt" — curated tool directory
-- **Hall of Fame:** Proven tools that enhance AI development
-
-**2c. Patterns & Implementations** (Community contributions)
-
-- Shared prompts, templates, and prompt engineering patterns
-- Code snippets and reference implementations
-- Workflows and orchestration patterns
-- MCP (Model Context Protocol) implementations
-- Agent configurations and architectures
-
-**3. Industry & Business (산업·비즈니스)** ⭐ (Priority)
-
-Real-world applications and market landscape.
-
-**3a. Case Studies & Implementations**
-
-- Domain-specific use cases with architecture details
-- Conference presentations (e.g., Baemin's text-to-SQL implementation)
-- Company product launches (chatbots, document automation, etc.)
-- ROI analysis and adoption strategies
-- Success and failure stories with lessons learned
-- Productivity research results (3-line summary + references)
-
-**4. Discourse (담론)**
-
-AI governance, community, and thought leadership.
-
-**4a. Regulation & Governance** (Policy, regulation, and compliance)
-
-- EU AI Act, US FTC guidelines, domestic privacy law amendments
-- Industry-specific AI regulations (healthcare, finance, etc.)
-- Audit and risk assessment reports
-- Standardization organization (ISO/IEC) publications
-- Major court cases and legal precedents
-
-**4b. Community** (People, events, and shared resources)
-
-- Community best practices and lessons learned
-- Conference and meetup highlights
-- Open-source community milestones
-- Contributor spotlights and community initiatives
-
-**4c. Insights & Opinions** (Big Tech direction & thought leadership)
-
-- Major tech company strategic moves and direction (beyond model releases — org changes, pivots, platform bets, open-source strategy)
-- Thought leadership and opinion pieces shaping the field
-- Emerging patterns and trends in AI engineering
-- Predictions and forward-looking analysis
-
-**4d. Technical Deep Dives** (In-depth engineering analysis)
-
-- Long-form technical articles on AI development practices
-- Architectural discussions and system design breakdowns
-- Performance analysis and optimization studies
-- Comparative evaluations and benchmarking deep dives
+1. Every article must have at least one tag from the content tags or pipeline-specific tags above
+2. Multiple tags are allowed — an article about a new framework with a use case gets both `frameworks-sdks` and `case-studies`
+3. `news-collect` is a pre-processing tag — it marks content for dismantling. After dismantling, individual rows lose `news-collect` and get their actual content tags
+4. `ai-education` feeds the ontology pipeline — these articles enter the same extraction flow as books (text extraction → idea extraction → concept mapping)
+5. `how-people-use-ai` is collected but not surfaced — stored for future use, not displayed in Cherry
+6. Tagging is done by the AI classifier in the daily publication pipeline, with manual override by Knowledge Team during review
 
 **Content Pipeline:**
 
@@ -472,6 +416,20 @@ Content Ingestion Pipeline → Deduplication → AI Agent Scoring (1-5) → Know
 - Community contribution metrics dashboard
 - Impact tracking (references, citations, social shares)
 - User engagement heatmaps
+
+---
+
+## Sub-Projects
+
+### KaaS (Knowledge-as-a-Service)
+
+KaaS is a **separate sub-project** within the cherry-in-the-haystack repository. It provides a blockchain-powered API platform enabling AI agents to discover, query, and subscribe to human-curated knowledge.
+
+- **Own PRD:** `docs/KaaS/prd.md`
+- **Own Epics:** `docs/KaaS/epics.md`
+- **Own Architecture:** `docs/KaaS/architecture.md`
+
+Main product epics 1-7 do **NOT** include KaaS work. KaaS has its own lifecycle, status tracking, and scope. See `docs/README.md` for the full boundary definition.
 
 ---
 
