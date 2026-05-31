@@ -1,149 +1,198 @@
-# Writer Agent DoD Setup
+# Writer Agent
 
-## Goal
-Implement a Writer Agent that queries GraphDB + Evidence DB and generates a Cherry
-page in the same format as the existing template.
+`writer_agent` builds a Concept Reader page from GraphDB ontology data and the local evidence Postgres DB.
 
-## DoD-driven setup checklist
-- [ ] Manually rebuild ontology (book ch.3-4) and map instances to the tree.
-- [ ] GraphDB query succeeds for 1 topic and returns related concepts/relations.
-- [ ] Evidence DB query succeeds and returns >= `EVIDENCE_DB_MIN_RESULTS` chunks.
-- [ ] Writer Agent runs end-to-end once (topic -> query -> draft -> output).
-- [ ] Output matches template sections (Overview, Key Concepts, Details, References).
-- [ ] References: no duplicates; B includes content not already in A.
-- [ ] Run 3 tests (easy, ambiguous, evidence-rich) and share results.
-- [ ] Write 1 real page using the agent after tests pass.
+## What It Does
 
-## Local config (.env)
-Fill in `dev/apps/agent/writer_agent/.env` with:
-- GraphDB endpoint
-- Evidence DB connection URL
-- OpenAI key (vector DB initialization when description is missing)
-- Evidence query minimum result count
-- Evidence query template (optional override)
+- Resolves a focus concept from GraphDB.
+- Pulls parent/child and related concepts from GraphDB.
+- Pulls evidence chunks and key-idea style support from the local evidence DB.
+- Generates a 4-section Concept Reader JSON with Claude:
+  - `overview`
+  - `cherries`
+  - `child_concepts`
+  - `progressive_references`
+- Converts the output into frontend-friendly payloads and a local HTML preview.
 
-## GraphDB setup
-From the ontology package:
+## Required Environment
+
+Create `python_services/packages/agent/writer_agent/.env` with:
+
 ```bash
-cd dev/packages/ontology
-uv sync
-./setup_graphdb.sh
+GRAPHDB_ENDPOINT=http://localhost:7200/repositories/llm-ontology
+GRAPHDB_NAMESPACE=http://example.org/llm-ontology#
+
+LOCAL_DB_HOST=...
+LOCAL_DB_PORT=5432
+LOCAL_DB_USER=...
+LOCAL_DB_PASSWORD=...
+LOCAL_DB_NAME=...
+LOCAL_DB_SSLMODE=require
+
+ANTHROPIC_API_KEY=...
+ANTHROPIC_MODEL=...
+ANTHROPIC_MAX_OUTPUT_TOKENS=4096
+ANTHROPIC_TEMPERATURE=0
 ```
+
+`DATABASE_URL` is still supported as a fallback, but `LOCAL_DB_*` is the primary path.
+
+## Dependencies
+
+Install the Python dependencies used by the agent, plus the runtime packages required in the current setup:
+
+```bash
+pip3 install --user anthropic psycopg2-binary SPARQLWrapper
+```
+
+GraphDB is expected to come from `python_services/packages/idea_to_graph_ontology`.
+
+## GraphDB Setup
+
+```bash
+cd python_services/packages/idea_to_graph_ontology
+bash setup_graphdb.sh
+```
+
+Useful endpoints:
 
 - GraphDB UI: `http://localhost:7200`
-- SPARQL endpoint: `http://localhost:7200/repositories/llm-ontology`
+- Repository endpoint: `http://localhost:7200/repositories/llm-ontology`
 
-Vector DB init (loads TTL and fills missing descriptions with LLM):
-```bash
-python src/scripts/initialize_vector_db.py
-```
+## Connection Checks
 
-Container lifecycle:
-```bash
-docker stop graphdb-ontology
-docker start graphdb-ontology
-docker rm -f graphdb-ontology
-```
-
-### Evidence DB via SSH tunnel
-Create a local tunnel to the remote Postgres:
-```bash
-ssh -N -L 5433:localhost:5432 cherry@13.239.18.76
-```
-
-Then set:
-```
-DATABASE_URL=postgresql://postgres:cherry251110!@localhost:5433/cherry_db
-```
-
-Check tunnel:
-```bash
-lsof -nP -iTCP:5433 -sTCP:LISTEN
-```
-
-Stop tunnel:
-```bash
-ps aux | rg "ssh -N -L 5433"
-kill <PID>
-```
-
-## DB connection tests
 GraphDB:
+
 ```bash
-python dev/apps/agent/writer_agent/test_graphdb_connection.py
+python3 python_services/packages/agent/writer_agent/test_graphdb_connection.py
 ```
 
 Evidence DB:
+
 ```bash
-python dev/apps/agent/writer_agent/test_evidence_db_connection.py
+python3 python_services/packages/agent/writer_agent/test_evidence_db_connection.py
 ```
 
-## GraphDB structure inspection
+Optional inspection helpers:
+
 ```bash
-python dev/apps/agent/writer_agent/inspect_graphdb.py
+python3 python_services/packages/agent/writer_agent/inspect_graphdb.py
+python3 python_services/packages/agent/writer_agent/inspect_evidence_db.py
+python3 python_services/packages/agent/writer_agent/print_graphdb_tree.py
 ```
 
-## Agents SDK multi-agent run
-This setup uses three agents:
-- Writer (Cherry page generator)
-- OntologyJudge (concept selection from GraphDB)
-- EvidenceSummarizer (evidence synthesis)
+## Run The Agent
 
-Run:
+Run a concept directly:
+
 ```bash
-python dev/apps/agent/writer_agent/run_writer_agent.py "LLM twin"
+python3 python_services/packages/agent/writer_agent/run_writer_agent.py "RAG"
 ```
 
-Optional env:
-- `OPENAI_MODEL` (default: `gpt-4.1-mini`)
-- `WRITER_OUTPUT_DIR` to save `topic.md` + `topic.json`
-- `EVIDENCE_QUERY_TEMPLATE` to override the default SQL
+Save outputs to a custom directory:
 
-## JSON output schema (draft)
+```bash
+env WRITER_OUTPUT_DIR=/private/tmp/writer_smoke_output \
+python3 python_services/packages/agent/writer_agent/run_writer_agent.py "RAG"
+```
+
+The current smoke-test example was written to:
+
+```text
+/private/tmp/writer_smoke_output/RAG_20260531_165604.json
+```
+
+## Output Schema
+
+The main output is JSON in this shape:
+
 ```json
 {
-  "topic": "LLM twin",
-  "summary": "...",
-  "why_it_matters": "...",
-  "evidence": [
+  "topic": "RAG",
+  "section": "Basics",
+  "overview": {
+    "title": "Retrieval-Augmented Generation",
+    "summary": "...",
+    "why_it_matters": "..."
+  },
+  "cherries": [
     {
-      "chunk_id": 1,
-      "body_text": "...",
-      "book_id": 1,
-      "book_title": "LLM Engineers Handbook",
-      "book_author": "Unknown",
-      "page_number": null,
-      "chapter_id": 1,
-      "section_id": null
+      "source": "Designing Machine Learning Systems (Chip Huyen, 2022)",
+      "insights": [
+        {
+          "claim": "...",
+          "evidence_id": "chunk_42",
+          "excerpt": "..."
+        }
+      ]
     }
   ],
-  "related_concepts": [
-    "Agent",
-    "RAG"
-  ],
-  "references": [
+  "child_concepts": [
     {
-      "source": "LLM Engineers Handbook",
-      "claims": [
-        "..."
-      ]
+      "label": "Vector Databases",
+      "relation_type": "child",
+      "description": "..."
+    }
+  ],
+  "progressive_references": [
+    {
+      "order": 1,
+      "title": "Designing Machine Learning Systems, Ch. 6",
+      "what_it_teaches": "...",
+      "why_next": "...",
+      "source": {
+        "book_title": "Designing Machine Learning Systems",
+        "book_author": "Chip Huyen"
+      }
     }
   ]
 }
 ```
 
-## Manual ontology workflow (current constraint)
-1) Read core ideas from Evidence DB exports.
-2) Extract repeated key concepts.
-3) Build a tree (Evaluation -> subtopics -> leaf concepts).
-4) Map new instances to the tree when evidence grows.
+## Frontend Transform
 
-## Output artifacts (per run)
-- Cherry page markdown
-- Related concept list (graph query)
-- Evidence list (chunks + metadata)
-- References list (deduped, unique points per source)
+Convert a writer output JSON into a frontend payload:
 
-## Notes
-- Ontology is currently unreliable; prioritize manual tree over auto graph links.
-- Keep citations and paraphrasing explicit in generated sections.
+```bash
+python3 python_services/packages/agent/writer_agent/format_for_frontend.py \
+  /private/tmp/writer_smoke_output/RAG_20260531_165604.json
+```
+
+Build a local preview HTML:
+
+```bash
+python3 python_services/packages/agent/writer_agent/build_front_preview.py \
+  /private/tmp/writer_smoke_output/RAG_20260531_165604.json
+```
+
+The transformed payload includes:
+
+- `cherry_cards`
+- `child_concept_groups`
+- `progressive_reading_list`
+- `learning_roadmap`
+- `meta`
+- `content_md`
+
+`new_in_digest` and `knowledge_team` are currently left empty.
+
+## Current Data Flow
+
+1. Resolve the focus concept from GraphDB.
+2. Read hierarchy from GraphDB:
+   - `rdfs:subClassOf` parent -> `parent`
+   - `rdfs:subClassOf` child -> `child`
+   - `llm:related` currently collapses into `child`
+3. Pull GraphDB concept instances if they exist.
+4. Pull evidence from the local DB, prioritizing key-idea style retrieval and chunk joins.
+5. Ask Claude to synthesize the 4-section page.
+6. Build frontend payloads and preview output.
+
+## Main Files
+
+- `run_writer_agent.py`: main pipeline
+- `db_utils.py`: env loading and DB URL resolution
+- `format_for_frontend.py`: frontend payload transform
+- `build_front_preview.py`: static preview generator
+- `test_graphdb_connection.py`: GraphDB smoke check
+- `test_evidence_db_connection.py`: Postgres smoke check
