@@ -87,36 +87,40 @@ Curated Text Sources → Evidence Layer Storage → Ontology Building → Writer
 
 **Content Tags** (flat tag system — every article gets one or more tags):
 
+> **Terminology note:** "Tag" and "Cherry page name" refer to the same thing. Each tag corresponds 1:1 to a page in the Cherry app (e.g., the `model-updates` tag = the Model Updates page). This dual naming is a known source of confusion. When this doc says "tag a source with X," it means "this source's articles appear on the X page."
+
 #### Research & Models / 연구·모델
 
 | Tag | EN | KR | Examples |
 |-----|----|----|----------|
-| `model-releases` | New model launches, API updates, version changes, pricing, protocol changes | 신규 모델 출시, API 업데이트, 버전 변경, 가격 변경, 프로토콜 변경 | GPT-4.5 launch, Claude 4 API update, LLaMA3 architecture, token limit change, function calling endpoint |
-| `research-papers` | Conference papers, academic breakthroughs, novel techniques (link out only — don't curate directly) | 학회 논문, 학계 연구 돌파구, 새로운 기법 (외부 링크 연결, 직접 큐레이션하지 않음) | NeurIPS paper, ICML spotlight, ACL workshop, academic-industry collaboration |
-| `benchmarks-datasets` | Benchmark results, new public datasets, evaluation tools, leaderboards (curated links only) | 벤치마크 결과, 신규 공개 데이터셋, 평가 도구, 리더보드 (큐레이션 링크) | MMLU score update, new Wikipedia dump, LM-eval-harness release, paperswithcode ranking change |
+| `model-updates` | New model launches, API updates, version changes, pricing, protocol changes | 신규 모델 출시, API 업데이트, 버전 변경, 가격 변경, 프로토콜 변경 | GPT-4.5 launch, Claude 4 API update, LLaMA3 architecture, token limit change, function calling endpoint |
+| `papers-benchmarks` | Conference papers, academic breakthroughs, benchmark results, new datasets, evaluation tools, leaderboards | 학회 논문, 학계 연구 돌파구, 벤치마크 결과, 신규 데이터셋, 평가 도구, 리더보드 | NeurIPS paper, ICML spotlight, MMLU score update, new Wikipedia dump, LM-eval-harness release, paperswithcode ranking change |
 
 #### Engineering & Tooling / 엔지니어링·툴링
 
 | Tag | EN | KR | Examples |
 |-----|----|----|----------|
-| `frameworks-sdks` | Development frameworks, SDKs, API libraries, releases, deprecation notices, major dependency updates | 개발 프레임워크, SDK, API 라이브러리, 릴리스, 사용 중단 공지, 주요 의존성 업데이트 | LangChain v0.3, new SDK release, PEFT update, ecosystem landscape digest, stable/beta release notice |
-| `developer-tools` | Productivity tools, monitoring, debugging, testing services, tool directories, Hall of Fame tools | 개발자 생산성 도구, 모니터링, 디버깅, 테스트 서비스, 도구 디렉토리, 명예의 전당 | New dev tool launch, monitoring service, "Mini Product Hunt" entry, proven Hall of Fame tool |
-| `patterns-implementations` | Shared prompts, templates, code snippets, orchestration patterns, MCP implementations, agent configurations | 공유 프롬프트, 템플릿, 코드 스니펫, 오케스트레이션 패턴, MCP 구현, 에이전트 구성 | Prompt engineering pattern, workflow orchestration, MCP server implementation, agent architecture |
+| `frameworks` | Development frameworks, SDKs, API libraries, releases, deprecation notices, major dependency updates | 개발 프레임워크, SDK, API 라이브러리, 릴리스, 사용 중단 공지, 주요 의존성 업데이트 | LangChain v0.3, new SDK release, PEFT update, ecosystem landscape digest, stable/beta release notice |
+| `tools` | Productivity tools, monitoring, debugging, testing services, tool directories, Hall of Fame tools | 개발자 생산성 도구, 모니터링, 디버깅, 테스트 서비스, 도구 디렉토리, 명예의 전당 | New dev tool launch, monitoring service, "Mini Product Hunt" entry, proven Hall of Fame tool |
+| `shared-resources` | Shared prompts, templates, code snippets, orchestration patterns, MCP implementations, agent configurations | 공유 프롬프트, 템플릿, 코드 스니펫, 오케스트레이션 패턴, MCP 구현, 에이전트 구성 | Prompt engineering pattern, workflow orchestration, MCP server implementation, agent architecture |
 
-#### Industry & Business / 산업·비즈니스 ⭐ (Priority)
+#### Cases / 산업·사례 ⭐ (Priority)
 
 | Tag | EN | KR | Examples |
 |-----|----|----|----------|
-| `case-studies` | Domain-specific use cases, conference presentations, ROI analysis, company product launches, success/failure stories | 도메인 특화 유스케이스, 컨퍼런스 발표, ROI 분석, 기업 제품 출시, 성공/실패 사례 | Baemin's text-to-SQL, company chatbot launch, productivity research, adoption strategy, lessons learned |
+| `domain-applications` | Domain-specific AI solutions, improved prompts/workflows per industry, short news on AI adoption in specific fields | 도메인별 개선된 솔루션/프롬프트/워크플로 소개, 도메인별 AI 활용 짤막한 뉴스 | Content creation substack, school domain "AI chat usage increased", mental health "suicide after chatbot conversation", legal AI drafting |
+| `case-studies` | Domain-specific use cases with ROI analysis, adoption strategies, success/failure stories, conference presentations | 도메인 특화 유스케이스, ROI 분석, 도입 전략, 성공/실패 사례, 컨퍼런스 발표 | Baemin's text-to-SQL, company chatbot launch, productivity research, adoption strategy, lessons learned |
+| `product-discovery` | AI-powered products solving real-life problems (not dev productivity — that goes to `tools`) | AI를 활용한 실생활 문제 해결 솔루션 (개발자 생산성 제외 → `tools`) | AI-powered resume builder, legal document analyzer, medical image screener, AI tutoring platform |
 
 #### Discourse / 담론
 
 | Tag | EN | KR | Examples |
 |-----|----|----|----------|
-| `regulation-governance` | AI policy, regulation, compliance, legal precedents, standards (ISO/IEC) | AI 정책, 규제, 컴플라이언스, 법적 선례, 표준 (ISO/IEC) | EU AI Act, FTC guidelines, privacy law amendment, industry-specific regulation, court case, audit report |
+| `regulations` | AI policy, regulation, compliance, legal precedents, standards (ISO/IEC) | AI 정책, 규제, 컴플라이언스, 법적 선례, 표준 (ISO/IEC) | EU AI Act, FTC guidelines, privacy law amendment, industry-specific regulation, court case, audit report |
 | `community` | People, events, meetups, open-source milestones, contributor spotlights | 사람, 이벤트, 밋업, 오픈소스 마일스톤, 기여자 스포트라이트 | Conference highlight, meetup recap, open-source release, contributor initiative, community best practices |
-| `insights-opinions` | Big tech strategy (beyond model releases), thought leadership, emerging patterns, predictions, trend analysis | 빅테크 전략 (모델 출시를 넘어선), 오피니언 리더십, 새로운 패턴, 예측, 트렌드 분석 | Org reshuffle, platform bet, open-source strategy, opinion piece, trend analysis, forward-looking prediction |
-| `technical-deep-dives` | Long-form engineering articles, system design breakdowns, performance analysis, comparative evaluations | 롱폼 기술 아티클, 시스템 설계 분석, 성능 분석, 비교 평가 | Architecture breakdown, optimization study, benchmark deep dive, system design analysis |
+| `big-tech-trends` | Big tech strategic moves — excluding model updates (→ `model-updates`) and investment news (→ `market-investment`) | 빅테크 전략적 움직임 — 모델 업데이트 제외, 투자 소식 제외 | Amazon buys small nuclear reactors, Google restructures AI division, Meta open-source strategy shift, Apple device-level AI bet |
+| `market-investment` | Venture funding, M&A, sponsorship, money flowing in and out of the AI industry | 벤처 투자, M&A, 후원, AI 산업 자금 흐름 | LLM startup Series A, AI company acquisition, government AI fund, corporate AI lab sponsorship |
+| `this-weeks-posts` | Long-form engineering articles, system design breakdowns, performance analysis, comparative evaluations | 롱폼 기술 아티클, 시스템 설계 분석, 성능 분석, 비교 평가 | Architecture breakdown, optimization study, benchmark deep dive, system design analysis |
 
 #### Pipeline-Specific Tags
 
@@ -126,14 +130,25 @@ Curated Text Sources → Evidence Layer Storage → Ontology Building → Writer
 | `ai-education` | Educational content suitable for structured knowledge extraction — feeds into idea extraction → ontology pipeline | 구조화된 지식 추출에 적합한 교육 콘텐츠 — 아이디어 추출 → 온톨로지 파이프라인으로 입력 | Input: article from news collector → Feed into existing idea extraction → ontology pipeline (same pipeline that processes books). These articles become evidence for concept pages. |
 | `how-people-use-ai` | Real-world AI usage patterns and adoption stories — valuable but not surfaced in Cherry (placement TBD) | 실제 AI 사용 패턴 및 도입 사례 — 가치 있지만 Cherry에 표시되지 않음 (배치 미정) | Collected and stored. Not displayed in Cherry UI. Available for future use. |
 
-**Tag Application Rules:**
+**Tag Scope & Application Rules:**
 
-1. Every article must have at least one tag from the content tags or pipeline-specific tags above
-2. Multiple tags are allowed — an article about a new framework with a use case gets both `frameworks-sdks` and `case-studies`
-3. `news-collect` is a pre-processing tag — it marks content for dismantling. After dismantling, individual rows lose `news-collect` and get their actual content tags
-4. `ai-education` feeds the ontology pipeline — these articles enter the same extraction flow as books (text extraction → idea extraction → concept mapping)
-5. `how-people-use-ai` is collected but not surfaced — stored for future use, not displayed in Cherry
-6. Tagging is done by the AI classifier in the daily publication pipeline, with manual override by Knowledge Team during review
+These tags apply across three Notion databases and their PostgreSQL (Supabase) sync/backup counterparts:
+
+| Notion DB | Tag Cardinality | Who Tags | Notes |
+|-----------|----------------|----------|-------|
+| **Data Source Candidates** | Exactly 1 tag | Discovery agent proposes; KT confirms | Candidate sources get tagged during discovery review |
+| **All Data Sources** | Exactly 1 tag | Carried from candidate on approval; KT can reassign | Every approved source has one and only one content tag |
+| **News DB** (articles) | 1+ tags (multiple allowed) | AI classifier assigns; KT overrides during review | Default: inherits the tag of its source. Additional tags added by classifier |
+
+**Rules:**
+
+1. **Sources get exactly one tag.** When a source is approved from candidates → all data sources, it carries its tag. This tag cannot be removed — only reassigned by KT
+2. **News articles inherit their source's tag by default.** If a `frameworks` source publishes an article, that article starts with `frameworks`
+3. **News articles may have additional tags.** The AI classifier can add extra tags — e.g., a `frameworks` source article about a real-world use case also gets `case-studies`
+4. `news-collect` is a pre-processing tag — it marks content for dismantling. After dismantling, individual rows lose `news-collect` and get their actual content tags
+5. `ai-education` feeds the ontology pipeline — these articles enter the same extraction flow as books (text extraction → idea extraction → concept mapping)
+6. `how-people-use-ai` is collected but not surfaced — stored for future use, not displayed in Cherry
+7. Tagging is done by the AI classifier in the daily publication pipeline, with manual override by Knowledge Team during review
 
 **Content Pipeline:**
 
