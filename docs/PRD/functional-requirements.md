@@ -118,6 +118,8 @@ Organized by user-facing capabilities, each requirement connects to the core pro
   - No concept should fit in multiple categories
   - All LLM engineering topics covered (95% coverage target)
   - Taxonomy evolves based on emerging topics
+  - **Content tag system reference:** `docs/PRD/product-scope.md` (Newly Discovered Section → Content Tags) — 16 flat tags: model-updates, papers, benchmarks-datasets, frameworks, tools, shared-resources, domain-applications, case-studies, product-discovery, regulations-policy-compliance, community, big-tech-trends, market-investment, technical-deep-dives, news-collect, ai-education, how-people-use-ai
+  - **Tag cardinality:** Sources (Data Source Candidates, All Data Sources) must have exactly one tag. News articles may have multiple tags; default inherits the source's tag. See `docs/PRD/product-scope.md` → Tag Scope & Application Rules
 
 **FR-4.2: Writer Agent for Page Generation**
 
@@ -209,6 +211,7 @@ Organized by user-facing capabilities, each requirement connects to the core pro
   - Sources include: Twitter accounts, Discord channels, GitHub orgs, RSS feeds, blogs
   - Per-source enable/disable toggle
   - Source health monitoring (last successful pull, error rate)
+  - Every source must be assigned exactly one content tag from the flat tag system (see `docs/PRD/product-scope.md` → Content Tags). This tag is inherited by default by articles from that source
 
 **FR-7.2: Curated Text Management for Basics/Advanced**
 

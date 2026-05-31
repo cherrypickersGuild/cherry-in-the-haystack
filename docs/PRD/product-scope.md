@@ -94,7 +94,8 @@ Curated Text Sources → Evidence Layer Storage → Ontology Building → Writer
 | Tag | EN | KR | Examples |
 |-----|----|----|----------|
 | `model-updates` | New model launches, API updates, version changes, pricing, protocol changes | 신규 모델 출시, API 업데이트, 버전 변경, 가격 변경, 프로토콜 변경 | GPT-4.5 launch, Claude 4 API update, LLaMA3 architecture, token limit change, function calling endpoint |
-| `papers-benchmarks` | Conference papers, academic breakthroughs, benchmark results, new datasets, evaluation tools, leaderboards | 학회 논문, 학계 연구 돌파구, 벤치마크 결과, 신규 데이터셋, 평가 도구, 리더보드 | NeurIPS paper, ICML spotlight, MMLU score update, new Wikipedia dump, LM-eval-harness release, paperswithcode ranking change |
+| `papers` | Conference papers, academic breakthroughs, novel techniques (link out only — don't curate directly) | 학회 논문, 학계 연구 돌파구, 새로운 기법 (외부 링크 연결, 직접 큐레이션하지 않음) | NeurIPS paper, ICML spotlight, ACL workshop, academic-industry collaboration |
+| `benchmarks-datasets` | Benchmark results, new public datasets, evaluation tools, leaderboards (curated links only) | 벤치마크 결과, 신규 공개 데이터셋, 평가 도구, 리더보드 (큐레이션 링크) | MMLU score update, new Wikipedia dump, LM-eval-harness release, paperswithcode ranking change |
 
 #### Engineering & Tooling / 엔지니어링·툴링
 
@@ -116,11 +117,11 @@ Curated Text Sources → Evidence Layer Storage → Ontology Building → Writer
 
 | Tag | EN | KR | Examples |
 |-----|----|----|----------|
-| `regulations` | AI policy, regulation, compliance, legal precedents, standards (ISO/IEC) | AI 정책, 규제, 컴플라이언스, 법적 선례, 표준 (ISO/IEC) | EU AI Act, FTC guidelines, privacy law amendment, industry-specific regulation, court case, audit report |
+| `regulations-policy-compliance` | AI policy, regulation, compliance, legal precedents, standards (ISO/IEC) | AI 정책, 규제, 컴플라이언스, 법적 선례, 표준 (ISO/IEC) | EU AI Act, FTC guidelines, privacy law amendment, industry-specific regulation, court case, audit report |
 | `community` | People, events, meetups, open-source milestones, contributor spotlights | 사람, 이벤트, 밋업, 오픈소스 마일스톤, 기여자 스포트라이트 | Conference highlight, meetup recap, open-source release, contributor initiative, community best practices |
 | `big-tech-trends` | Big tech strategic moves — excluding model updates (→ `model-updates`) and investment news (→ `market-investment`) | 빅테크 전략적 움직임 — 모델 업데이트 제외, 투자 소식 제외 | Amazon buys small nuclear reactors, Google restructures AI division, Meta open-source strategy shift, Apple device-level AI bet |
 | `market-investment` | Venture funding, M&A, sponsorship, money flowing in and out of the AI industry | 벤처 투자, M&A, 후원, AI 산업 자금 흐름 | LLM startup Series A, AI company acquisition, government AI fund, corporate AI lab sponsorship |
-| `this-weeks-posts` | Long-form engineering articles, system design breakdowns, performance analysis, comparative evaluations | 롱폼 기술 아티클, 시스템 설계 분석, 성능 분석, 비교 평가 | Architecture breakdown, optimization study, benchmark deep dive, system design analysis |
+| `technical-deep-dives` | Long-form engineering articles, system design breakdowns, performance analysis, comparative evaluations | 롱폼 기술 아티클, 시스템 설계 분석, 성능 분석, 비교 평가 | Architecture breakdown, optimization study, benchmark deep dive, system design analysis |
 
 #### Pipeline-Specific Tags
 
