@@ -35,6 +35,7 @@ def _is_number_between(value: Any, minimum: float, maximum: float) -> bool:
 def validate_article_assessment_contract(
     payload: Dict[str, Any],
     *,
+    expected_idempotency_key: str | None = None,
     user_article_state_id: str | None = None,
     allowed_entities: List[Dict[str, Any]] | None = None,
     allowed_side_categories: List[Dict[str, Any]] | None = None,
@@ -51,11 +52,16 @@ def validate_article_assessment_contract(
     if errors:
         return errors
 
-    if user_article_state_id:
-        expected_idempotency_key = f"uas:{user_article_state_id.lower()}"
-        if _as_text(payload.get("idempotency_key")) != expected_idempotency_key:
+    if expected_idempotency_key:
+        if _as_text(payload.get("idempotency_key")) != _as_text(expected_idempotency_key):
             errors.append(
-                f"idempotency_key mismatch: expected {expected_idempotency_key}, got {_as_text(payload.get('idempotency_key'))}"
+                f"idempotency_key mismatch: expected {_as_text(expected_idempotency_key)}, got {_as_text(payload.get('idempotency_key'))}"
+            )
+    elif user_article_state_id:
+        legacy_expected_idempotency_key = f"uas:{user_article_state_id.lower()}"
+        if _as_text(payload.get("idempotency_key")) != legacy_expected_idempotency_key:
+            errors.append(
+                f"idempotency_key mismatch: expected {legacy_expected_idempotency_key}, got {_as_text(payload.get('idempotency_key'))}"
             )
 
     if _as_text(payload.get("version")) != expected_version:

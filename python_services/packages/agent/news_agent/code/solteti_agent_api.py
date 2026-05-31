@@ -157,6 +157,7 @@ def build_article_input_from_package(
                 version_tag = first.get("version_tag")
 
     return {
+        "idempotency_key": idempotency_key,
         "user_article_state_id": user_article_state_id,
         "version": "0.3",
         "article": {

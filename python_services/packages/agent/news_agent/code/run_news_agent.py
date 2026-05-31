@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import csv
 import json
@@ -17,6 +19,9 @@ except ImportError:
     from solteti_agent_api import ask_evaluation, build_article_input_from_package, finish_evaluation
 
 
+NEWS_AGENT_CATEGORY_GUIDE_PATH = Path(__file__).resolve().parent.parent / "NEWS_AGENT_CATEGORY_CLASSIFICATION.md"
+
+
 def load_env_file(env_path: Path) -> None:
     if not env_path.exists():
         return
@@ -26,6 +31,39 @@ def load_env_file(env_path: Path) -> None:
             continue
         key, value = line.split("=", 1)
         os.environ.setdefault(key.strip(), value.strip())
+
+
+def load_news_agent_category_guide_text() -> str:
+    if not NEWS_AGENT_CATEGORY_GUIDE_PATH.exists():
+        return ""
+    return NEWS_AGENT_CATEGORY_GUIDE_PATH.read_text(encoding="utf-8").strip()
+
+
+def append_category_guide_to_prompt(prompt: str, *, include_contract_rules: bool = False) -> str:
+    guide = load_news_agent_category_guide_text()
+    if not guide:
+        return prompt
+    appendix = [
+        prompt,
+        "",
+        "Additional classification guide:",
+        "Respect the page/category/entity conventions in the attached markdown guide.",
+        "When the guide and free-form intuition conflict, prefer the guide and the provided catalog.",
+    ]
+    if include_contract_rules:
+        appendix.extend(
+            [
+                "",
+                "Contract-critical rules:",
+                "- representative_entity.id must come from allowed_entities.",
+                "- representative_entity.page/category_id/category_name/name must match that id exactly.",
+                "- Never invent ids, categories, pages, or names outside the provided catalog.",
+                "- Keep the ask-evaluation idempotency_key unchanged in the final output.",
+                "- side_category_code must be one of allowed_side_categories.",
+            ]
+        )
+    appendix.extend(["", guide])
+    return "\n".join(appendix)
 
 
 def get_database_url() -> str:
@@ -1311,6 +1349,7 @@ def normalize_article_assessment_output(
     allowed_entities = normalize_allowed_entities(safe_list(article_input.get("allowed_entities")))
     allowed_side_categories = safe_list(article_input.get("allowed_side_categories"))
     article = article_input.get("article") if isinstance(article_input.get("article"), dict) else article_input
+    idempotency_key = as_text(article_input.get("idempotency_key"))
 
     representative_entity = resolve_representative_entity(
         qa_output.get("representative_entity") or entity_output.get("representative_entity"),
@@ -1366,7 +1405,7 @@ def normalize_article_assessment_output(
         risk_notes = risk_notes[:1]
 
     return {
-        "idempotency_key": f"uas:{user_article_state_id.lower()}",
+        "idempotency_key": idempotency_key or f"uas:{user_article_state_id}",
         "version": as_text(article_input.get("version"), "0.3") or "0.3",
         "representative_entity": representative_entity,
         "ai_summary": ai_summary,
@@ -1865,6 +1904,14 @@ def run_article_assessment_debug(
         for key, value in prompt_overrides.items():
             if isinstance(value, str) and value.strip():
                 prompts[key] = value.strip()
+    prompts["entity_classifier"] = append_category_guide_to_prompt(
+        prompts["entity_classifier"],
+        include_contract_rules=True,
+    )
+    prompts["assessment_qa"] = append_category_guide_to_prompt(
+        prompts["assessment_qa"],
+        include_contract_rules=True,
+    )
 
     article = article_input.get("article") if isinstance(article_input.get("article"), dict) else article_input
     meta = article_input.get("meta") if isinstance(article_input.get("meta"), dict) else {}
@@ -1888,6 +1935,7 @@ def run_article_assessment_debug(
     )
 
     normalized_input = {
+        "idempotency_key": as_text(article_input.get("idempotency_key")) or f"uas:{as_text(article_input.get('user_article_state_id'))}",
         "user_article_state_id": as_text(article_input.get("user_article_state_id")),
         "version": as_text(article_input.get("version"), "0.3") or "0.3",
         "prompt_template_version_id": article_input.get("prompt_template_version_id") or meta.get("prompt_template_version_id"),
@@ -2015,6 +2063,7 @@ def run_article_assessment_debug(
     }
     contract_errors = validate_article_assessment_contract(
         final_output,
+        expected_idempotency_key=normalized_input["idempotency_key"],
         user_article_state_id=normalized_input["user_article_state_id"],
         allowed_entities=normalized_input["allowed_entities"],
         allowed_side_categories=normalized_input["allowed_side_categories"],
@@ -2091,7 +2140,7 @@ def run_article_assessment_from_solteti(
         except Exception as exc:
             runs.append(
                 {
-                    "idempotency_key": f"uas:{article_input.get('user_article_state_id')}",
+                    "idempotency_key": article_input.get("idempotency_key") or f"uas:{article_input.get('user_article_state_id')}",
                     "input": article_input,
                     "skipped": True,
                     "skip_reason": str(exc),
