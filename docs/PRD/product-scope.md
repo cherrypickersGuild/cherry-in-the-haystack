@@ -103,7 +103,7 @@ Curated Text Sources → Evidence Layer Storage → Ontology Building → Writer
 |-----|----|----|----------|
 | `frameworks` | Development frameworks, SDKs, API libraries, releases, deprecation notices, major dependency updates | 개발 프레임워크, SDK, API 라이브러리, 릴리스, 사용 중단 공지, 주요 의존성 업데이트 | LangChain v0.3, new SDK release, PEFT update, ecosystem landscape digest, stable/beta release notice |
 | `tools` | Productivity tools, monitoring, debugging, testing services, tool directories, Hall of Fame tools | 개발자 생산성 도구, 모니터링, 디버깅, 테스트 서비스, 도구 디렉토리, 명예의 전당 | New dev tool launch, monitoring service, "Mini Product Hunt" entry, proven Hall of Fame tool |
-| `shared-resources` | Shared prompts, templates, code snippets, orchestration patterns, MCP implementations, agent configurations | 공유 프롬프트, 템플릿, 코드 스니펫, 오케스트레이션 패턴, MCP 구현, 에이전트 구성 | Prompt engineering pattern, workflow orchestration, MCP server implementation, agent architecture |
+| `building-blocks` | Shared prompts, templates, code snippets, orchestration patterns, MCP implementations, agent configurations — grab a piece, combine, build your thing | 공유 프롬프트, 템플릿, 코드 스니펫, 오케스트레이션 패턴, MCP 구현, 에이전트 구성 — 필요한 조각을 가져다 조립 | Prompt engineering pattern, workflow orchestration, MCP server implementation, agent architecture |
 
 #### Cases / 산업·사례 ⭐ (Priority)
 
