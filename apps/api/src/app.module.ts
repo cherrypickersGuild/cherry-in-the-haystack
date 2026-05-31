@@ -9,7 +9,7 @@ import { StatsModule } from './modules/stats/stats.module';
 import { PromptTemplateModule } from './modules/prompt_template/prompt-template.module';
 import { AgentCommModule } from './modules/agent_comm/agent-comm.module';
 import { KaasModule } from './modules/kaas/kaas.module';
-import { BenchModule } from './modules/bench/bench.module';
+import { WriterAgentModule } from './modules/writer_agent/writer-agent.module';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { BenchModule } from './modules/bench/bench.module';
     PromptTemplateModule,
     AgentCommModule,
     KaasModule,
-    BenchModule,
+    WriterAgentModule,
   ],
   controllers: [],
   providers: [],

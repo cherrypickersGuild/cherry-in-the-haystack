@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Agent API 스펙 — writer_agent 통합 가이드</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    max-width: 920px; margin: 32px auto; padding: 0 24px;
+    color: #1f2328; line-height: 1.55;
+    background: #fafbfc;
+  }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .lede { color: #656d76; font-size: 14px; margin-bottom: 28px; }
+  h2 {
+    font-size: 18px; margin: 40px 0 14px;
+    padding-bottom: 6px; border-bottom: 2px solid #1f2328;
+  }
+  h3 { font-size: 14px; margin: 18px 0 8px; }
+  code, pre {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+  }
+  pre {
+    background: #0d1117; color: #e6edf3;
+    padding: 14px 16px; border-radius: 6px;
+    overflow-x: auto; line-height: 1.5;
+  }
+  pre .key   { color: #79c0ff; }
+  pre .str   { color: #a5d6ff; }
+  pre .num   { color: #ffa657; }
+  pre .bool  { color: #ff7b72; }
+  pre .null  { color: #8b949e; }
+  pre .cmt   { color: #8b949e; font-style: italic; }
+  code.inline {
+    background: #f6f8fa; padding: 1px 6px;
+    border-radius: 3px; color: #82071e;
+  }
+
+  .endpoint {
+    background: #fff; border: 1px solid #d0d7de; border-radius: 8px;
+    padding: 14px 18px; margin: 10px 0;
+  }
+  .method {
+    display: inline-block; padding: 3px 10px; border-radius: 4px;
+    font-weight: 700; font-size: 12px; letter-spacing: 0.5px;
+    margin-right: 8px;
+    font-family: ui-monospace, monospace;
+  }
+  .method.get  { background: #ddf4ff; color: #0969da; }
+  .method.post { background: #dafbe1; color: #0d4429; }
+  .endpoint .path {
+    font-family: ui-monospace, monospace; font-size: 14px; font-weight: 600;
+  }
+  .endpoint .desc {
+    margin: 6px 0 0; font-size: 13px; color: #656d76;
+  }
+  .new-tag {
+    display: inline-block; margin-left: 8px;
+    padding: 1px 7px; border-radius: 10px;
+    background: #fff8c5; color: #4a3a08;
+    font-size: 10px; font-weight: 700;
+  }
+
+  table.fields {
+    width: 100%; border-collapse: collapse;
+    background: #fff; border: 1px solid #d0d7de;
+    border-radius: 8px; overflow: hidden;
+    margin: 12px 0;
+  }
+  table.fields th, table.fields td {
+    padding: 8px 12px; text-align: left;
+    border-bottom: 1px solid #eaeef2;
+    font-size: 13px;
+  }
+  table.fields th {
+    background: #f6f8fa; font-weight: 600;
+    font-size: 12px; text-transform: uppercase;
+    letter-spacing: 0.5px; color: #656d76;
+  }
+  table.fields tr:last-child td { border-bottom: none; }
+  table.fields .type {
+    font-family: ui-monospace, monospace; font-size: 12px; color: #0969da;
+  }
+  table.fields .req {
+    background: #ffebe9; color: #82071e;
+    padding: 1px 6px; border-radius: 3px; font-size: 11px;
+    font-weight: 600;
+  }
+  table.fields .opt {
+    background: #f6f8fa; color: #656d76;
+    padding: 1px 6px; border-radius: 3px; font-size: 11px;
+  }
+
+  .flow {
+    background: #fff; border: 1px solid #d0d7de; border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .flow-step {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 1px dashed #eaeef2;
+  }
+  .flow-step:last-child { border-bottom: none; }
+  .flow-step .num {
+    flex-shrink: 0; width: 24px; height: 24px;
+    border-radius: 50%; background: #0969da; color: #fff;
+    font-size: 12px; font-weight: 700;
+    text-align: center; line-height: 24px;
+  }
+  .flow-step .content { flex: 1; font-size: 13px; }
+  .flow-step .content strong { font-size: 14px; }
+
+  .callout {
+    padding: 12px 16px; border-radius: 6px;
+    font-size: 13px; margin: 12px 0;
+  }
+  .callout.warn {
+    background: #fff8c5; border-left: 3px solid #d4a72c;
+    color: #4a3a08;
+  }
+  .callout.info {
+    background: #ddf4ff; border-left: 3px solid #0969da;
+    color: #0a3069;
+  }
+  .callout.good {
+    background: #dafbe1; border-left: 3px solid #1f883d;
+    color: #0d4429;
+  }
+</style>
+</head>
+<body>
+
+<h1>Agent API 스펙</h1>
+<p class="lede">기준일 2026-05-02 · writer_agent / news_agent 통합 가이드 · handbook v2 반영</p>
+
+<h2>1. 한눈에 — 사용 가능한 endpoint</h2>
+
+<p style="font-size:13px; color:#656d76; margin-bottom:8px;">
+  베이스 URL: <code class="inline">https://api.cherryinthehaystack.com/api/v1/agent</code><br>
+  인증: <code class="inline">x-agent-api-key</code> 헤더 필수
+</p>
+
+<div class="endpoint">
+  <span class="method post">POST</span>
+  <span class="path">/agent/insert-article</span>
+  <p class="desc">기사 한 건 삽입 (URL 중복 자동 스킵, source 자동 생성). news_agent / scraper 가 사용.</p>
+</div>
+
+<div class="endpoint">
+  <span class="method get">GET</span>
+  <span class="path">/agent/ask-evaluation?type=&version_tags=</span>
+  <p class="desc">평가 패키지 한 번에 받기 — <b>prompts + catalog + items</b>. news_agent 가 평가 작업 시작 시 호출.</p>
+</div>
+
+<div class="endpoint">
+  <span class="method get">GET</span>
+  <span class="path">/agent/get-prompts?type=&version_tags=</span>
+  <span class="new-tag">NEW</span>
+  <p class="desc">프롬프트만 따로 받기 — A/B/C 같은 여러 버전을 한 번에. writer_agent 등 평가 외 용도.</p>
+</div>
+
+<div class="endpoint">
+  <span class="method post">POST</span>
+  <span class="path">/agent/finish-evaluation</span>
+  <p class="desc">평가 결과 저장 — agent 가 LLM 호출 끝낸 결과 JSON 을 백엔드로 반환.</p>
+</div>
+
+<h2>2. <code>GET /agent/get-prompts</code> — 신규 endpoint 상세</h2>
+
+<h3>요청 (Query parameters)</h3>
+<table class="fields">
+  <thead><tr><th>이름</th><th>타입</th><th>필수</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>type</code></td>
+      <td class="type">enum</td>
+      <td><span class="req">필수</span></td>
+      <td><code>ARTICLE_AI</code> / <code>NEWSLETTER</code> / <code>CONCEPT_PAGE</code> / <code>REFINE</code> 중 하나</td>
+    </tr>
+    <tr>
+      <td><code>version_tags</code></td>
+      <td class="type">string</td>
+      <td><span class="req">필수</span></td>
+      <td>버전 태그 쉼표 구분 (예: <code>A</code> 또는 <code>A,B,C</code>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>예시 호출</h3>
+<pre>curl "https://api.cherryinthehaystack.com/api/v1/agent/get-prompts?type=REFINE&version_tags=A,B,C" \
+     -H "x-agent-api-key: $AGENT_KEY"</pre>
+
+<h3>응답</h3>
+<pre>{
+  <span class="key">"template_id"</span>: <span class="str">"0192b4c0-...-uuid"</span>,
+  <span class="key">"template_name"</span>: <span class="str">"Article Refine"</span>,
+  <span class="key">"tone_text"</span>: <span class="str">"Refine the article to improve quality..."</span>,
+  <span class="key">"versions"</span>: [
+    {
+      <span class="key">"version_id"</span>: <span class="str">"0192b4c0-...-uuid"</span>,
+      <span class="key">"version_tag"</span>: <span class="str">"A"</span>,
+      <span class="key">"prompt_text"</span>: <span class="str">"You are a senior editor..."</span>,
+      <span class="key">"few_shot_examples"</span>: <span class="null">null</span>,
+      <span class="key">"parameters_json"</span>: { <span class="key">"temperature"</span>: <span class="num">0.3</span> }
+    },
+    { <span class="key">"version_tag"</span>: <span class="str">"B"</span>, <span class="cmt">/* ... */</span> },
+    { <span class="key">"version_tag"</span>: <span class="str">"C"</span>, <span class="cmt">/* ... */</span> }
+  ]
+}</pre>
+
+<h2>3. writer_agent 입력 JSON (백엔드 패딩 결과)</h2>
+
+<p style="font-size:13px; color:#656d76;">
+  writer_agent 가 글 생성을 시작할 때 백엔드가 만들어 보내주는 입력. 에이전트는 DB 조회 안 함.
+</p>
+
+<h3>입력 JSON 구조 (TO-BE)</h3>
+<pre>{
+  <span class="key">"version"</span>: <span class="str">"0.2"</span>,
+  <span class="key">"topic"</span>: <span class="str">"RAG evaluation"</span>,
+
+  <span class="key">"graph_context"</span>: {
+    <span class="key">"mode"</span>: <span class="str">"direct_graphdb"</span>,
+    <span class="key">"focus_concepts"</span>: [],
+    <span class="key">"related_concepts"</span>: []
+  },
+
+  <span class="key">"evidence_rows"</span>: [
+    {
+      <span class="key">"chunk_id"</span>: <span class="str">"0192b4c0-...-uuid"</span>,
+      <span class="key">"body_text"</span>: <span class="str">"..."</span>,
+      <span class="key">"page_number"</span>: <span class="num">173</span>,
+      <span class="key">"paragraph_index"</span>: <span class="num">2</span>,
+      <span class="key">"chapter_paragraph_index"</span>: <span class="num">5</span>,
+      <span class="key">"chapter_id"</span>: <span class="str">"...uuid"</span>,
+      <span class="key">"section_id"</span>: <span class="null">null</span>,
+      <span class="key">"book_id"</span>: <span class="str">"...uuid"</span>,
+      <span class="key">"book_title"</span>: <span class="str">"AI Engineering"</span>,
+      <span class="key">"book_author"</span>: <span class="str">"Chip Huyen"</span>,
+      <span class="key">"concept_id"</span>: <span class="str">"...uuid"</span>,
+      <span class="key">"concept_name"</span>: <span class="str">"RAG evaluation"</span>,
+      <span class="key">"is_primary"</span>: <span class="bool">true</span>,
+      <span class="key">"extraction_confidence"</span>: <span class="num">0.92</span>,
+      <span class="key">"extract_type"</span>: <span class="str">"METRIC"</span>,
+      <span class="key">"handbook_topic"</span>: <span class="str">"Retrieval Systems"</span>,
+      <span class="key">"handbook_subtopic"</span>: <span class="str">"RAG"</span>,
+      <span class="key">"judge_originality"</span>: <span class="num">0.78</span>,
+      <span class="key">"judge_depth"</span>: <span class="num">0.85</span>,
+      <span class="key">"judge_technical_accuracy"</span>: <span class="num">0.95</span>
+    }
+  ],
+
+  <span class="key">"update_payload"</span>: {
+    <span class="key">"title"</span>: <span class="str">"What changed this week"</span>,
+    <span class="key">"body"</span>: <span class="str">"..."</span>
+  },
+
+  <span class="key">"meta"</span>: {
+    <span class="key">"source"</span>: <span class="str">"backend"</span>,
+    <span class="key">"generated_at"</span>: <span class="str">"2026-05-02T12:00:00Z"</span>,
+    <span class="key">"schema_version"</span>: <span class="str">"handbook-v2"</span>
+  },
+
+  <span class="key">"errors"</span>: []
+}</pre>
+
+<h3>주요 필드 — 한눈에</h3>
+<table class="fields">
+  <thead><tr><th>필드</th><th>타입</th><th>변경 여부</th><th>비고</th></tr></thead>
+  <tbody>
+    <tr><td><code>chunk_id</code></td><td class="type">uuid string</td><td><span class="opt">타입만 변경</span></td><td>전: int → 후: UUID 문자열</td></tr>
+    <tr><td><code>book_id / chapter_id / section_id</code></td><td class="type">uuid string</td><td><span class="opt">타입만 변경</span></td><td>모두 UUID</td></tr>
+    <tr><td><code>concept_name</code></td><td class="type">string</td><td><span class="opt">출처 변경</span></td><td>이제 정식 명칭(canonical_name) 만 옴</td></tr>
+    <tr><td><code>extract_type</code></td><td class="type">enum</td><td><span class="req">이름+값 변경</span></td><td>전: <code>comment_type</code> 자유텍스트<br>후: <code>extract_type</code> ENUM 9종 (DEFINITION/EXAMPLE/CASE_STUDY/METRIC/PROCEDURE/PRINCIPLE/COMPARISON/WARNING/OTHER)</td></tr>
+    <tr><td><code>concept_id</code></td><td class="type">uuid string</td><td><span class="req">신규</span></td><td>그래프 호출 시 사용</td></tr>
+    <tr><td><code>extraction_confidence</code></td><td class="type">float (0~1)</td><td><span class="req">신규</span></td><td>매핑 신뢰도. 낮은 거 필터링 가능</td></tr>
+    <tr><td><code>handbook_topic / subtopic</code></td><td class="type">string?</td><td><span class="req">신규</span></td><td>분류 마스터에서 옴 (NULL 가능)</td></tr>
+    <tr><td><code>judge_originality / depth / technical_accuracy</code></td><td class="type">float (0~1)</td><td><span class="opt">출처 변경</span></td><td>전: evidence_metadata 별도 테이블<br>후: paragraph_chunk 컬럼 직접</td></tr>
+  </tbody>
+</table>
+
+<h2>4. Topic 매칭 흐름</h2>
+
+<div class="flow">
+  <div class="flow-step">
+    <div class="num">1</div>
+    <div class="content">
+      <strong>사용자 topic 입력</strong> → 백엔드 수신
+      <div style="margin-top:4px; color:#656d76;">예: <code>"RAG"</code>, <code>"검색 증강 생성"</code>, <code>"Retrieval-Augmented Generation"</code></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="num">2</div>
+    <div class="content">
+      <strong>canonical_name 정확 매칭 시도</strong> (case-insensitive)
+      <div style="margin-top:4px; color:#656d76;"><code>handbook.concept.canonical_name</code> 과 비교</div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="num">3</div>
+    <div class="content">
+      <strong>실패 시 → alias 매칭 시도</strong>
+      <div style="margin-top:4px; color:#656d76;"><code>handbook.concept_alias.alias_text</code> 와 비교 → 매칭된 <code>concept_id</code> 획득</div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="num">4</div>
+    <div class="content">
+      <strong>concept_id 로 paragraph_concept_link → paragraph_chunk JOIN</strong>
+      <div style="margin-top:4px; color:#656d76;">결과를 <code>evidence_rows[]</code> 에 패딩 → 에이전트로 전달</div>
+    </div>
+  </div>
+</div>
+
+<div class="callout info">
+  <b>왜 alias 가 중요한가</b>: 사용자가 "RAG" 입력해도, "rag" 입력해도, "검색 증강 생성" 입력해도 → 모두 같은 concept 의 evidence 받음. 운영자가 alias 만 잘 등록해두면 됨.
+</div>
+
+<h2>5. 에이전트 작업자 적응 가이드</h2>
+
+<h3>코드 변경 불필요</h3>
+<p style="font-size:13px;">
+  <code class="inline">body_text</code>,
+  <code class="inline">page_number</code>,
+  <code class="inline">paragraph_index</code>,
+  <code class="inline">book_title</code>,
+  <code class="inline">book_author</code>,
+  <code class="inline">is_primary</code>,
+  <code class="inline">judge_*</code> — 그대로 사용
+</p>
+
+<h3>최소 적응 필요</h3>
+<table class="fields">
+  <thead><tr><th>변경</th><th>대응</th></tr></thead>
+  <tbody>
+    <tr><td>ID 가 정수 → UUID 문자열</td><td>산술 연산 없음. string 비교/전달만 함</td></tr>
+    <tr><td><code>comment_type</code> → <code>extract_type</code></td><td>코드에서 필드 이름 교체. 값 비교 시 ENUM 9종 (대문자) 가정</td></tr>
+  </tbody>
+</table>
+
+<h3>옵션 활용 (무시해도 OK)</h3>
+<table class="fields">
+  <thead><tr><th>필드</th><th>활용</th></tr></thead>
+  <tbody>
+    <tr><td><code>handbook_topic / subtopic</code></td><td>글에 카테고리 표시</td></tr>
+    <tr><td><code>extraction_confidence</code></td><td>낮은 매핑 제외 필터링</td></tr>
+    <tr><td><code>concept_id</code></td><td>그래프 호출에 사용</td></tr>
+  </tbody>
+</table>
+
+<div class="callout good">
+  <b>호환성 보장</b>: writer_agent 가 반환하는 output JSON 형식 (<code>summary</code>, <code>why_it_matters</code>, <code>evidence[]</code>, <code>related_concepts[]</code>, <code>references[]</code>, <code>updates[]</code>, <code>patch_notes[]</code>) 은 변경 없음. 기존 클라이언트와 호환.
+</div>
+
+<div class="callout warn">
+  <b>합의 필요 사항</b>: ① GraphDB 직접 조회 유지 여부, ② <code>evidence_verification.verdict = 'verified'</code> 필터 적용 여부, ③ Update Payload 출처 테이블 결정.
+</div>
+
+</body>
+</html>

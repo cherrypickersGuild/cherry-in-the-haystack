@@ -1,0 +1,26 @@
+name: Dokploy Auto-Deploy
+
+# Trigger on push to the deploy branch (or change to main if that's your prod branch).
+# Dokploy doesn't auto-receive GitHub webhooks when using the Git (SSH) provider,
+# so we explicitly hit its REST API after every push.
+on:
+  push:
+    branches: [deploy]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger web service deploy
+        run: |
+          curl -fsS -X POST "${{ secrets.DOKPLOY_URL }}/api/application.deploy" \
+            -H "x-api-key: ${{ secrets.DOKPLOY_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"applicationId":"${{ secrets.DOKPLOY_WEB_APP_ID }}"}'
+
+      - name: Trigger API service deploy
+        run: |
+          curl -fsS -X POST "${{ secrets.DOKPLOY_URL }}/api/application.deploy" \
+            -H "x-api-key: ${{ secrets.DOKPLOY_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"applicationId":"${{ secrets.DOKPLOY_API_APP_ID }}"}'

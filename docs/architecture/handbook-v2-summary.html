@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Handbook v2 변경 — 한눈에</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    max-width: 920px; margin: 32px auto; padding: 0 24px;
+    color: #1f2328; line-height: 1.55;
+    background: #fafbfc;
+  }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .lede { color: #656d76; font-size: 14px; margin-bottom: 28px; }
+  h2 {
+    font-size: 18px; margin: 40px 0 14px;
+    padding-bottom: 6px; border-bottom: 2px solid #1f2328;
+  }
+
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin: 16px 0 8px;
+  }
+  .col {
+    background: #fff; border: 1px solid #d0d7de; border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .col h3 {
+    font-size: 13px; margin: 0 0 12px;
+    color: #656d76; text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .col h3 .tag {
+    display: inline-block; margin-left: 6px; padding: 1px 7px;
+    border-radius: 10px; font-size: 11px; font-weight: 600;
+    vertical-align: middle;
+  }
+  .col.before h3 .tag { background: #f0f0f0; color: #555; }
+  .col.after h3 .tag  { background: #ddf4ff; color: #0969da; }
+
+  ul.tables { list-style: none; margin: 0; padding: 0; }
+  ul.tables li {
+    padding: 6px 10px; margin: 3px 0; border-radius: 5px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+  }
+  .keep { background: #f6f8fa; color: #1f2328; }
+  .removed {
+    background: #ffebe9; color: #82071e;
+    text-decoration: line-through;
+  }
+  .removed::after {
+    content: " ✕"; text-decoration: none;
+    color: #d1242f; font-weight: 700;
+  }
+  .added {
+    background: #dafbe1; color: #0d4429;
+    font-weight: 600;
+  }
+  .added::after { content: " ⭐"; font-size: 12px; }
+  .changed { background: #ddf4ff; color: #0969da; }
+  .changed::after { content: " ↻"; color: #0969da; }
+
+  .legend {
+    margin: 8px 0 0; font-size: 12px; color: #656d76;
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .legend .dot {
+    width: 10px; height: 10px; border-radius: 2px;
+    display: inline-block;
+  }
+  .dot.k { background: #f6f8fa; border: 1px solid #d0d7de; }
+  .dot.r { background: #ffebe9; }
+  .dot.a { background: #dafbe1; }
+  .dot.c { background: #ddf4ff; }
+
+  .detail {
+    background: #fff; border: 1px solid #d0d7de; border-radius: 8px;
+    padding: 14px 18px; margin: 10px 0;
+  }
+  .detail h4 {
+    margin: 0 0 6px; font-size: 14px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .detail h4 .badge {
+    margin-left: 8px; padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+    font-family: -apple-system, sans-serif;
+  }
+  .badge.bad  { background: #ffebe9; color: #82071e; }
+  .badge.good { background: #dafbe1; color: #0d4429; }
+  .badge.warn { background: #ddf4ff; color: #0969da; }
+  .detail p { margin: 6px 0 0; font-size: 13px; color: #444; }
+
+  .footer-note {
+    margin-top: 28px; padding: 12px 16px;
+    background: #fff8c5; border-left: 3px solid #d4a72c;
+    font-size: 13px; color: #4a3a08;
+  }
+
+  /* 5가지 특징 카드 */
+  .feature {
+    background: #fff; border: 1px solid #d0d7de; border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .feature .num {
+    display: inline-block; width: 26px; height: 26px;
+    border-radius: 50%; background: #1f2328; color: #fff;
+    font-size: 13px; font-weight: 700;
+    text-align: center; line-height: 26px;
+    margin-right: 8px; vertical-align: middle;
+  }
+  .feature h3 {
+    margin: 0 0 4px; font-size: 16px; display: inline-block;
+    vertical-align: middle;
+  }
+  .feature .one-line {
+    margin: 0 0 14px; color: #656d76; font-size: 13px;
+    padding-left: 34px;
+  }
+  .ba-grid {
+    display: grid; grid-template-columns: 1fr 28px 1fr;
+    gap: 0; align-items: center;
+  }
+  .ba-box {
+    padding: 10px 12px; border-radius: 6px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px; line-height: 1.5;
+  }
+  .ba-box.before { background: #ffebe9; color: #82071e; }
+  .ba-box.after  { background: #dafbe1; color: #0d4429; }
+  .ba-box .label {
+    font-family: -apple-system, sans-serif;
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.5px; opacity: 0.7;
+    margin-bottom: 4px; display: block;
+  }
+  .ba-arrow {
+    text-align: center; font-size: 18px; color: #888;
+  }
+  .feature .effect {
+    margin: 12px 0 0; padding: 8px 12px;
+    background: #f6f8fa; border-radius: 6px;
+    font-size: 13px;
+  }
+  .feature .effect b { color: #0d4429; }
+</style>
+</head>
+<body>
+
+<h1>Handbook 스키마 v2 변경</h1>
+<p class="lede">기준일 2026-05-02 · writer_agent 작업자용</p>
+
+<h2>1. 한눈에 — 테이블 비교</h2>
+
+<div class="compare-grid">
+  <div class="col before">
+    <h3>v1 (기존) <span class="tag">11 tables</span></h3>
+    <ul class="tables">
+      <li class="keep">book</li>
+      <li class="keep">chapter</li>
+      <li class="keep">section</li>
+      <li class="keep">paragraph_chunk</li>
+      <li class="keep">paragraph_concept_link</li>
+      <li class="keep">paragraph_embedding</li>
+      <li class="keep">processing_progress</li>
+      <li class="keep">knowledge_verification_contributor</li>
+      <li class="removed">idea_group</li>
+      <li class="removed">evidence_metadata</li>
+      <li class="removed">key_idea</li>
+    </ul>
+  </div>
+
+  <div class="col after">
+    <h3>v2 (신규) <span class="tag">13 tables</span></h3>
+    <ul class="tables">
+      <li class="keep">book</li>
+      <li class="keep">chapter</li>
+      <li class="keep">section</li>
+      <li class="keep">paragraph_chunk</li>
+      <li class="keep">paragraph_concept_link</li>
+      <li class="keep">paragraph_embedding</li>
+      <li class="keep">processing_progress</li>
+      <li class="changed">knowledge_verification_contributor</li>
+      <li class="added">concept</li>
+      <li class="added">concept_alias</li>
+      <li class="added">topic</li>
+      <li class="added">subtopic</li>
+      <li class="added">evidence_verification</li>
+    </ul>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="dot k"></span> 유지</span>
+  <span><span class="dot r"></span> 폐기 ✕</span>
+  <span><span class="dot a"></span> 신규 ⭐</span>
+  <span><span class="dot c"></span> 재설계 ↻</span>
+</div>
+
+<h2>2. 빠진 것</h2>
+
+<div class="detail">
+  <h4>idea_group <span class="badge bad">폐기</span></h4>
+  <p>같은 의미 그룹인데 매핑 테이블의 <code>extracted_concept</code> 텍스트가 행마다 달라 정규화 의미 무력화. → <code>concept</code> 로 단일화.</p>
+</div>
+
+<div class="detail">
+  <h4>evidence_metadata <span class="badge bad">폐기</span></h4>
+  <p>점수가 paragraph 와 1:1 관계인데 별도 테이블이라 JOIN 만 늘어남. → <code>paragraph_chunk</code> 컬럼으로 흡수.</p>
+</div>
+
+<div class="detail">
+  <h4>key_idea <span class="badge bad">폐기</span></h4>
+  <p>코드에서 사용 흔적 없음.</p>
+</div>
+
+<h2>3. 추가된 것</h2>
+
+<div class="detail">
+  <h4>concept <span class="badge good">신규</span></h4>
+  <p>표제어 1개 = DB 1행. 정규화 본질 회복. <code>idea_group</code> 의 대체.</p>
+</div>
+
+<div class="detail">
+  <h4>concept_alias <span class="badge good">신규</span></h4>
+  <p>"RAG" / "rag" / "검색 증강 생성" / 오타 등 변형을 같은 <code>concept_id</code> 로 매핑. 검색어 흔들려도 같은 결과.</p>
+</div>
+
+<div class="detail">
+  <h4>topic <span class="badge good">신규</span></h4>
+  <p>큰 분류 마스터 (예: "Retrieval Systems"). 자유 텍스트 컬럼 <code>handbook_topic</code> 을 대체.</p>
+</div>
+
+<div class="detail">
+  <h4>subtopic <span class="badge good">신규</span></h4>
+  <p>topic 하위 분류 (예: "RAG", "Hybrid Search"). 두 단계 hierarchy 제공.</p>
+</div>
+
+<div class="detail">
+  <h4>evidence_verification <span class="badge good">신규</span></h4>
+  <p>사람이 evidence 품질을 검증한 기록 (verdict: verified / flagged / rejected / needs_review). writer 가 검증된 것만 쓰도록 필터링 가능.</p>
+</div>
+
+<h2>4. 재설계된 것</h2>
+
+<div class="detail">
+  <h4>knowledge_verification_contributor <span class="badge warn">재설계</span></h4>
+  <p>BIGSERIAL → UUID, <code>app_user</code> 와 FK 연결 가능, <code>evidence_verification</code> 과 매핑되어 고립 해소.</p>
+</div>
+
+<h2>5. 유지되는 것 (구조 동일, FK 정책만 강화)</h2>
+
+<div class="detail">
+  <p style="font-family: ui-monospace, monospace; font-size: 13px;">
+    book · chapter · section · paragraph_chunk · paragraph_concept_link · paragraph_embedding · processing_progress
+  </p>
+  <p>모든 FK <code>ON DELETE RESTRICT</code> + soft delete (<code>revoked_at</code>) 적용. CASCADE 폭발 삭제 방지.</p>
+</div>
+
+<h2>6. v2 의 5가지 핵심 변화</h2>
+<p style="color:#656d76; font-size:13px; margin:0 0 16px;">테이블이 왜 빠지고 추가됐는지의 배경 — 5가지 설계 원칙으로 정리.</p>
+
+<div class="feature">
+  <span class="num">1</span><h3>표제어를 별도 테이블로 명시화</h3>
+  <p class="one-line">"같은 개념 = DB 한 행" 보장</p>
+  <div class="ba-grid">
+    <div class="ba-box before">
+      <span class="label">Before</span>
+      paragraph_concept_link.extracted_concept (텍스트)<br>
+      → 매핑 행마다 다른 표면 표현
+    </div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-box after">
+      <span class="label">After</span>
+      concept.canonical_name (UNIQUE)<br>
+      매핑은 concept_id (UUID) FK 만
+    </div>
+  </div>
+  <p class="effect"><b>효과</b> · "Retrieval-Augmented Generation" 이라는 개념이 DB 에 단 1행. 검색 키 단일화.</p>
+</div>
+
+<div class="feature">
+  <span class="num">2</span><h3>Alias 로 변형을 사전 등록</h3>
+  <p class="one-line">표제어의 다양한 표현을 한 concept 으로 모음</p>
+  <div class="ba-grid">
+    <div class="ba-box before">
+      <span class="label">Before</span>
+      변형 처리 없음<br>
+      "RAG" 와 "Retrieval-Augmented Generation" 이 별개 텍스트로 저장
+    </div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-box after">
+      <span class="label">After</span>
+      concept_alias 테이블<br>
+      "RAG", "rag", "검색 증강 생성", 오타 등<br>
+      모두 같은 concept_id 가리킴
+    </div>
+  </div>
+  <p class="effect"><b>효과</b> · 사용자가 어떤 표현으로 검색해도 같은 concept 결과. 운영자가 alias 등록만 하면 됨.</p>
+</div>
+
+<div class="feature">
+  <span class="num">3</span><h3>링크 테이블에서 표제어 제거 (정규화 회복)</h3>
+  <p class="one-line">매핑 테이블은 순수 매핑만 — 텍스트 0</p>
+  <div class="ba-grid">
+    <div class="ba-box before">
+      <span class="label">Before</span>
+      paragraph_concept_link:<br>
+      • idea_group_id<br>
+      • <s>extracted_concept (텍스트)</s>
+    </div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-box after">
+      <span class="label">After</span>
+      paragraph_concept_link:<br>
+      • paragraph_chunk_id<br>
+      • concept_id (FK)<br>
+      • is_primary, extraction_confidence
+    </div>
+  </div>
+  <p class="effect"><b>효과</b> · 같은 (paragraph, concept) 쌍에 한 행만. UNIQUE 제약으로 중복 차단. 검색은 무조건 concept_id 기준.</p>
+</div>
+
+<div class="feature">
+  <span class="num">4</span><h3>Topic / Subtopic 마스터 테이블</h3>
+  <p class="one-line">분류를 자유 텍스트 → 정해진 집합</p>
+  <div class="ba-grid">
+    <div class="ba-box before">
+      <span class="label">Before</span>
+      handbook_topic VARCHAR(100)<br>
+      → 같은 의미 다른 표기 ("RAG" vs "rag" vs "검색")
+    </div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-box after">
+      <span class="label">After</span>
+      topic + subtopic 마스터 테이블<br>
+      concept.topic_id / subtopic_id FK<br>
+      (둘 다 NULL 허용)
+    </div>
+  </div>
+  <p class="effect"><b>효과</b> · 분류 값이 정해진 집합 안에서만 쓰임. topic 만 / topic+subtopic / 둘 다 NULL 모두 가능.</p>
+</div>
+
+<div class="feature">
+  <span class="num">5</span><h3>CASCADE 제거 + Soft Delete</h3>
+  <p class="one-line">실수 한 번에 데이터 폭발 삭제 사고 차단</p>
+  <div class="ba-grid">
+    <div class="ba-box before">
+      <span class="label">Before</span>
+      ON DELETE CASCADE / SET NULL<br>
+      → book 1행 삭제 시 chapter, section,<br>
+      paragraph_chunk 수천 행 폭발 삭제
+    </div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-box after">
+      <span class="label">After</span>
+      ON DELETE RESTRICT (전부)<br>
+      revoked_at TIMESTAMPTZ NULL<br>
+      (실제 삭제 대신 표시)
+    </div>
+  </div>
+  <p class="effect"><b>효과</b> · 자식 있으면 부모 삭제 막힘. 잘못 지웠어도 <code>UPDATE ... SET revoked_at = NULL</code> 로 복구 가능.</p>
+</div>
+
+<div class="footer-note">
+  💡 <b>에이전트 작업자에게</b>: DB 구조는 크게 바뀌었지만 받는 JSON 형태는 그대로. 핵심 변경은 <code>chunk_id</code> 등 ID 가 정수 → UUID 문자열, <code>comment_type</code> → <code>extract_type</code> (ENUM 9종), 그리고 신규 옵션 필드 (<code>concept_id</code>, <code>handbook_topic</code>, <code>handbook_subtopic</code>) 정도.
+</div>
+
+</body>
+</html>

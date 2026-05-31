@@ -52,6 +52,12 @@ const config = {
 
 const env = process.env.ENVIRONMENT || 'local';
 
+// GraphDB (온톨로지) — 기본값은 Tailscale 상의 kyulai 서버
+export const GRAPHDB = {
+  url: process.env.GRAPHDB_URL || 'http://100.102.45.81:7200',
+  repository: process.env.GRAPHDB_REPO || 'llm-ontology',
+};
+
 // Operation Standard Filters
 export const BOARD_OPERATION_STANDARDS = (
   process.env.BOARD_OPERATION_STANDARDS || '정상판매,운영중단'

@@ -357,6 +357,10 @@ CREATE TABLE handbook.paragraph_chunk (
     chapter_paragraph_index  INTEGER NULL,
 
     body_text                TEXT NOT NULL,
+    -- 청크 한 줄 요약(one-liner). 구 public.key_ideas.core_idea_text 흡수(동일 컬럼명).
+    -- 청크당 1개(1:1). NOTE: 라이브 DB에는 ALTER ADD 로 맨 끝에 추가되어 물리 컬럼 순서는
+    -- 여기와 다름(기능 무관). DDL은 논리적 위치(body_text 옆)로 정의.
+    core_idea_text           TEXT NULL,
     paragraph_hash           BYTEA GENERATED ALWAYS AS
                                  (decode(md5(body_text), 'hex')) STORED,
     simhash64                BIGINT NULL,
