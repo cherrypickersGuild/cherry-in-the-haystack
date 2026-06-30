@@ -77,9 +77,33 @@ def _get_pool() -> asyncpg.Pool:
     return _pool
 
 
+def _parse_jsonb(value: object) -> dict:
+    """
+    Normalise a JSONB column value to a dict.
+    asyncpg returns JSONB as a raw JSON string (no codec registered), but some
+    configurations return a dict — handle both.
+    """
+    if isinstance(value, str):
+        return json.loads(value)
+    return dict(value)  # type: ignore[arg-type]
+
+
 # ---------------------------------------------------------------------------
 # crawler_analysis
 # ---------------------------------------------------------------------------
+
+async def get_source(source_id: UUID) -> Optional[dict]:
+    """Return {id, url_handle} for the source, or None if it does not exist."""
+    pool = _get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT id, url_handle FROM content.source WHERE id = $1",
+            source_id,
+        )
+    if row is None:
+        return None
+    return {"id": row["id"], "url_handle": row["url_handle"]}
+
 
 async def get_crawler_analysis(source_id: UUID) -> Optional[dict]:
     """Return existing analysis row for source_id, or None if absent."""
@@ -91,7 +115,7 @@ async def get_crawler_analysis(source_id: UUID) -> Optional[dict]:
         )
     if row is None:
         return None
-    return {"id": row["id"], "analysis_json": dict(row["analysis_json"])}
+    return {"id": row["id"], "analysis_json": _parse_jsonb(row["analysis_json"])}
 
 
 async def upsert_crawler_analysis(
@@ -213,8 +237,10 @@ async def get_or_create_prompt_version(
                 prompt_content,
             )
             return new_id
-        except asyncpg.UndefinedTableError:
-            # Table may not exist in this environment; FK will be NULL
+        except (asyncpg.UndefinedTableError, asyncpg.UndefinedColumnError):
+            # Table missing OR its schema differs from what this code expects
+            # (prompt_template_version is a normalized table in this DB).
+            # prompt_template_version_id is a nullable audit FK, so fall back to NULL.
             return None
 
 
@@ -232,7 +258,7 @@ async def get_crawler_analysis_by_id(analysis_id: UUID) -> Optional[dict]:
         )
     if row is None:
         return None
-    return {"id": row["id"], "analysis_json": dict(row["analysis_json"])}
+    return {"id": row["id"], "analysis_json": _parse_jsonb(row["analysis_json"])}
 
 
 async def insert_crawler_registry(
@@ -273,7 +299,7 @@ async def get_active_crawler_registry(source_id: UUID) -> Optional[dict]:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
-            SELECT r.id, r.generated_code, s.url AS source_url
+            SELECT r.id, r.generated_code, s.url_handle AS source_url
             FROM content.crawler_registry r
             JOIN content.source s ON s.id = r.source_id
             WHERE r.source_id = $1 AND r.status = 'active'

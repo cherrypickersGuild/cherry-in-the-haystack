@@ -23,7 +23,7 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 from fastapi import FastAPI
 
 from .db.client import close_pool, init_pool
-from .routers import crawler
+from .routers import crawler, run_all
 
 
 @asynccontextmanager
@@ -37,3 +37,4 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="browser-agent crawler service", lifespan=lifespan)
 app.include_router(crawler.router)
+app.include_router(run_all.router)

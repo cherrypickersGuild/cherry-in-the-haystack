@@ -29,10 +29,19 @@ class AnalysisJson(BaseModel):
     # FR-2.4 required selectors
     content_selector: str
     title_selector: str
-    date_selector: str
-    author_selector: str
+    # date/author are optional in the real world — many listing pages omit them.
+    # Allowed to be empty ("") so analysis of such pages doesn't fail validation.
+    date_selector: str = ""
+    author_selector: str = ""
     url_selector: str
-    body_selector: str
+    # body_selector = the body/summary text ON THE LISTING page. May be empty when the
+    # full body lives on a linked detail page (see body_on_detail below).
+    body_selector: str = ""
+    # Two-step crawling: when the full article body is only on the linked detail page,
+    # set body_on_detail=true and provide detail_body_selector (CSS for the body element
+    # ON THE DETAIL PAGE). The executor then follows url_selector links to fetch the body.
+    body_on_detail: bool = False
+    detail_body_selector: str = ""
     # FR-2.4 required behavioral fields
     pagination_type: Literal["none", "click", "scroll"]
     dynamic_load: bool
@@ -42,8 +51,8 @@ class AnalysisJson(BaseModel):
     js_code: Optional[str] = None
     magic_mode: bool = False
 
-    @field_validator("content_selector", "title_selector", "date_selector",
-                     "author_selector", "url_selector", "body_selector", mode="before")
+    @field_validator("content_selector", "title_selector",
+                     "url_selector", mode="before")
     @classmethod
     def _non_empty_selector(cls, v: object) -> object:
         if isinstance(v, str) and not v.strip():

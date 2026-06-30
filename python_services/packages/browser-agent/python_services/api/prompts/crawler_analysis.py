@@ -1,5 +1,5 @@
 PROMPT_NAME = "CRAWLER_ANALYSIS"
-PROMPT_VERSION = "1.1.0"
+PROMPT_VERSION = "1.2.0"
 
 # Instruct browser-use to navigate the target page and return a structured JSON
 # object encoding all selectors and crawl4ai execution hints needed by /crawler/generate.
@@ -17,8 +17,10 @@ The JSON must contain exactly these fields:
   "title_selector":   "<CSS selector targeting individual article title elements>",
   "date_selector":    "<CSS selector targeting publication date elements>",
   "author_selector":  "<CSS selector targeting author name elements>",
-  "url_selector":     "<CSS selector targeting the article link <a> elements>",
-  "body_selector":    "<CSS selector targeting the article body/summary text within each item>",
+  "url_selector":     "<CSS selector targeting the article link <a> element>",
+  "body_selector":    "<CSS selector for body/summary text shown ON THE LISTING page, or empty string>",
+  "body_on_detail":   <true if the full body is only on the linked detail page, not the listing>,
+  "detail_body_selector": "<CSS selector for the main body element ON THE DETAIL page, or empty string>",
   "pagination_type":  "<one of: none | click | scroll>",
   "dynamic_load":     <true if content loads asynchronously after DOM ready, else false>,
   "notes":            "<brief description of the page structure, notable quirks, or empty string>",
@@ -34,11 +36,27 @@ content_selector
   not the outer list wrapper). Used as crawl4ai's baseSelector.
   Example: ".post-list .post", "ul.articles li", "div[data-feed] article"
 
+url_selector
+  The CSS selector for the <a> link that leads to the full article. Evaluated relative to
+  each content_selector element. If the repeating item element IS the <a> itself (i.e.
+  content_selector already targets an anchor), set url_selector to the SAME selector as
+  content_selector — the executor will read the href from the item element directly.
+
 body_selector
-  The CSS selector for the article body or summary text element, evaluated relative to each
-  content_selector element. Use a child/descendant selector that targets only the text
-  content, not the entire item.
+  The CSS selector for body/summary text VISIBLE ON THE LISTING page, relative to each
+  content_selector element. Many listing pages (card grids, link lists) only show a title
+  and NO body here — in that case return an empty string "" and set body_on_detail=true.
   Example: ".post-body", "p.summary", ".article-excerpt"
+
+body_on_detail + detail_body_selector
+  IMPORTANT: decide where the full article text actually lives.
+  - If each listing item already contains the full body/summary text → body_on_detail=false,
+    fill body_selector, leave detail_body_selector "".
+  - If the listing only shows titles/links and the real content is on each article's own
+    page → set body_on_detail=true. To find detail_body_selector, OPEN ONE article by
+    following its link, inspect the detail page, and return the CSS selector for the main
+    article body container there (e.g. "article .prose", "div.post-content", "main article").
+    Then NAVIGATE BACK so your analysis still describes the listing page.
 
 pagination_type
   "none"   — single page, all content visible without interaction
