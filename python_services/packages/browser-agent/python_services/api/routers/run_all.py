@@ -189,6 +189,26 @@ async def run_all(req: RunAllRequest, request: Request) -> JSONResponse:
     return JSONResponse(content=payload)
 
 
+def _main_content(crawl_result) -> str:
+    """
+    Best-effort main-article text from a crawl4ai result.
+    Prefers fit_markdown (readability-filtered) → raw_markdown → cleaned_html text.
+    """
+    md = getattr(crawl_result, "markdown", None)
+    if md is not None:
+        for attr in ("fit_markdown", "raw_markdown"):
+            val = getattr(md, attr, None)
+            if val:
+                return val.strip()
+        if isinstance(md, str) and md.strip():
+            return md.strip()
+    cleaned = getattr(crawl_result, "cleaned_html", None)
+    if cleaned:
+        from bs4 import BeautifulSoup
+        return BeautifulSoup(cleaned, "html.parser").get_text(" ", strip=True)
+    return ""
+
+
 async def _execute_two_step(analysis: dict, listing_url: str, browser_config) -> list[dict]:
     """
     Two-step crawl driven by the analysis selectors:
@@ -205,6 +225,8 @@ async def _execute_two_step(analysis: dict, listing_url: str, browser_config) ->
 
     from bs4 import BeautifulSoup
     from crawl4ai import AsyncWebCrawler, CrawlerRunConfig
+    from crawl4ai.content_filter_strategy import PruningContentFilter
+    from crawl4ai.markdown_generation_strategy import DefaultMarkdownGenerator
 
     content_sel = analysis["content_selector"]
     title_sel = analysis.get("title_selector") or ""
@@ -235,7 +257,16 @@ async def _execute_two_step(analysis: dict, listing_url: str, browser_config) ->
         return a["href"] if a else ""
 
     listing_cfg = CrawlerRunConfig(cache_mode="bypass", wait_for=wait_for)
-    detail_cfg = CrawlerRunConfig(cache_mode="bypass")
+    # Detail pages: strip site chrome and run readability pruning so fit_markdown is clean.
+    detail_cfg = CrawlerRunConfig(
+        cache_mode="bypass",
+        excluded_tags=["nav", "footer", "header", "form", "aside"],
+        exclude_external_links=True,
+        word_count_threshold=10,
+        markdown_generator=DefaultMarkdownGenerator(
+            content_filter=PruningContentFilter(threshold=0.48, threshold_type="fixed"),
+        ),
+    )
 
     async with AsyncWebCrawler(config=browser_config) as ac:
         res = await ac.arun(url=listing_url, config=listing_cfg)
@@ -261,16 +292,27 @@ async def _execute_two_step(analysis: dict, listing_url: str, browser_config) ->
             )
 
         # Step 2: follow links for the real body when it lives on the detail page.
-        if body_on_detail and detail_body_sel:
+        # Prefer detail_body_selector if the analysis provided one; otherwise fall back to
+        # crawl4ai's built-in main-content (readability) extraction — robust for any article.
+        if body_on_detail:
             for it in items[:_MAX_DETAIL_PAGES]:
                 if not it["url"]:
                     it["body"] = ""
                     continue
                 d = await ac.arun(url=it["url"], config=detail_cfg)
-                if d.success:
-                    it["body"] = _text(BeautifulSoup(d.html, "html.parser"), detail_body_sel)
-                else:
+                if not d.success:
                     it["body"] = ""
+                    continue
+                dsoup = BeautifulSoup(d.html, "html.parser")
+                # The detail page <h1> is the full article title — more reliable than the
+                # listing card's <h2> (which is often just the company/short name).
+                h1 = dsoup.select_one("h1")
+                if h1 and h1.get_text(strip=True):
+                    it["title"] = h1.get_text(" ", strip=True)
+                body = _text(dsoup, detail_body_sel) if detail_body_sel else ""
+                if not body:
+                    body = _main_content(d)
+                it["body"] = body
             for it in items[_MAX_DETAIL_PAGES:]:
                 it["body"] = it.get("summary", "")
         else:

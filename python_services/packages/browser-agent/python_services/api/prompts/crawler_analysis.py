@@ -49,14 +49,14 @@ body_selector
   Example: ".post-body", "p.summary", ".article-excerpt"
 
 body_on_detail + detail_body_selector
-  IMPORTANT: decide where the full article text actually lives.
-  - If each listing item already contains the full body/summary text → body_on_detail=false,
+  Judge this from the LISTING page only — do NOT navigate away or open articles.
+  - If each listing item already shows the full body/summary text → body_on_detail=false,
     fill body_selector, leave detail_body_selector "".
-  - If the listing only shows titles/links and the real content is on each article's own
-    page → set body_on_detail=true. To find detail_body_selector, OPEN ONE article by
-    following its link, inspect the detail page, and return the CSS selector for the main
-    article body container there (e.g. "article .prose", "div.post-content", "main article").
-    Then NAVIGATE BACK so your analysis still describes the listing page.
+  - If the listing only shows titles/links (card grids, headline lists) and the real
+    article text clearly lives on each item's own page → set body_on_detail=true and leave
+    detail_body_selector "" (the crawler extracts the detail-page body automatically).
+    Optionally, if you already know the CMS and a reliable body container selector, you may
+    provide detail_body_selector, but it is NOT required.
 
 pagination_type
   "none"   — single page, all content visible without interaction
