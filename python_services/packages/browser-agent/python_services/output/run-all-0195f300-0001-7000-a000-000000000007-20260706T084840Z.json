@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "source_id": "0195f300-0001-7000-a000-000000000007",
+  "url": "https://www.reddit.com/r/LocalLLaMA/new/",
+  "source_name": "Reddit LocalLLaMA",
+  "steps": {
+    "analyze": {
+      "ok": true,
+      "cached": false,
+      "analysis_id": "06a4b6be-019b-778c-8000-cb1513065d04"
+    },
+    "generate": {
+      "ok": true,
+      "registry_id": "06a4b6be-09db-7152-8000-ce86c507b8e5"
+    },
+    "execute": {
+      "ok": true,
+      "item_count": 3,
+      "body_on_detail": true
+    }
+  },
+  "analysis_json": {
+    "content_selector": "shreddit-post",
+    "title_selector": "a[slot='full-post-link']",
+    "date_selector": "faceplate-timeago time",
+    "author_selector": "a[data-testid='post_author_link']",
+    "url_selector": "a[slot='full-post-link']",
+    "body_selector": "",
+    "body_on_detail": true,
+    "detail_body_selector": "div[slot='text-body']",
+    "pagination_type": "scroll",
+    "dynamic_load": true,
+    "notes": "Reddit uses Shreddit custom web components (shreddit-post). The page triggered an anti-bot block ('You've been blocked by network security'), confirming bot-detection is active. Posts are rendered as <shreddit-post> custom elements in an infinite-scroll feed. The listing shows only titles, metadata, and thumbnails — full post body is on the detail page. Author links and timestamps are nested inside shadow DOM or slotted content within shreddit-post elements.",
+    "wait_for": "css:shreddit-post",
+    "js_code": "window.scrollTo(0, document.body.scrollHeight)",
+    "magic_mode": true
+  },
+  "items": [
+    {
+      "title": "Why does every agent payment protocol (x402, MPP) only do one-shot transactions? No escrow anywhere?",
+      "body": "Looked into x402 and MPP (Machine Payments Protocol) — both are single-shot, pay-per-call. No escrow layer anywhere. Feels like a gap: if you had escrow, you could pay an agent for an actual outcome (run a loop until goal met, multi-step task, etc.) instead of just metering API calls. Right now everyone's showing off their harness but there's no way to actually pay one agent to go do something and only release funds on completion. Anyone know of an escrow framework or marketplace for agents that isn't just x402/L402-style pay-per-request? 더 읽기",
+      "published_at": "",
+      "author": "",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uoqf7x/why_does_every_agent_payment_protocol_x402_mpp/",
+      "canonical_url": "https://www.reddit.com/r/LocalLLaMA/comments/1uoqf7x/why_does_every_agent_payment_protocol_x402_mpp/"
+    },
+    {
+      "title": "ggml-hip: enable -ffast-math for HIP builds by a-huk · Pull Request #23862 · ggml-org/llama.cpp",
+      "body": "Benchmarks Benchmarked on gfx1151 (RDNA3.5/Strix Halo, 40 CUs) against latest master ( 2f6c815 ). These two models cover both the FA paths. Qwen3.5-27B Q4_K_M — head_dim=256 (TILE path), FA=1, prompt t/s: pp upstream + fast-math delta 512 307 321 +4.6% 2048 302 323 +7.0% 4096 300 312 +4.0% 8192 288 307 +6.6% 16384 263 280 +6.5% 32768 233 246 +5.6% Qwen3-0.6B BF16 — head_dim=64 (MMA path), FA=1, prompt t/s: pp upstream + fast-math delta 512 9325 9642 +3.4% 2048 8609 8892 +3.3% 4096 7485 7661 +2.4% 8192 5770 5846 +1.3% 16384 3581 3636 +1.5% 32768 2037 2049 +0.6% FA=0 results were essentially the same across both builds. 더 읽기",
+      "published_at": "",
+      "author": "",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uoqdxj/ggmlhip_enable_ffastmath_for_hip_builds_by_ahuk/",
+      "canonical_url": "https://www.reddit.com/r/LocalLLaMA/comments/1uoqdxj/ggmlhip_enable_ffastmath_for_hip_builds_by_ahuk/"
+    },
+    {
+      "title": "Is DeepSeek v4 (Flash) really extremely cheap to run? If yes, how?",
+      "body": "Hi. I don't have a GPU. So my biggest \"local LLM\" experience has been running ~26B models with single-digits tps values. However, the  \"serving economy\" of DSv4 models look like a riddle to me. The Flash model has 284B parameters, but providers (e.g. OpenRouter) charge so little for it it's ridiculous. It's for example cheaper than 27B Qwen, A tenth of its (total) size! How is it viable? Are the providers just doing dumping here? Or is DSv4 architecture somehow different in making it extremely cheaper to serve? Those of you who have had the equipment to host DSv4, is there something making it different? Thanks 더 읽기",
+      "published_at": "",
+      "author": "",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uoq1wi/is_deepseek_v4_flash_really_extremely_cheap_to/",
+      "canonical_url": "https://www.reddit.com/r/LocalLLaMA/comments/1uoq1wi/is_deepseek_v4_flash_really_extremely_cheap_to/"
+    }
+  ]
+}

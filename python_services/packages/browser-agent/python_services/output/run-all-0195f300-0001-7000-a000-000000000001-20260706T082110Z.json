@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "source_id": "0195f300-0001-7000-a000-000000000001",
+  "url": "https://www.reddit.com/r/PromptEngineering/new/",
+  "source_name": "Reddit PromptEngineering",
+  "steps": {
+    "analyze": {
+      "ok": true,
+      "cached": false,
+      "analysis_id": "06a4b657-2934-7fe7-8000-1f920fcfecd1"
+    },
+    "generate": {
+      "ok": true,
+      "registry_id": "06a4b657-311c-74fc-8000-694292e534b3"
+    },
+    "execute": {
+      "ok": true,
+      "item_count": 3,
+      "body_on_detail": false
+    }
+  },
+  "analysis_json": {
+    "content_selector": "shreddit-post",
+    "title_selector": "a[id^='post-title-']",
+    "date_selector": "faceplate-timeago time",
+    "author_selector": "faceplate-tracker a[aria-label]",
+    "url_selector": "a[id^='post-title-']",
+    "body_selector": "shreddit-post-text-body",
+    "body_on_detail": false,
+    "detail_body_selector": "",
+    "pagination_type": "scroll",
+    "dynamic_load": true,
+    "notes": "Reddit uses Web Components (shreddit-post custom elements) with open Shadow DOM throughout. Each post's title, author, timestamp, and body reside inside shadow roots, making standard CSS selectors tricky — crawl4ai must pierce shadow DOM or use magic mode. The listing URL contained a bot-challenge solution token, confirming anti-bot detection is active. Text posts render body content directly on the listing page; link posts show no body text. faceplate-timeago and shreddit-post-text-body are themselves nested custom elements with their own shadow roots.",
+    "wait_for": "css:shreddit-post",
+    "js_code": "window.scrollTo(0, document.body.scrollHeight)",
+    "magic_mode": true
+  },
+  "items": [
+    {
+      "title": "The generic AI website look is a solved problem. Anthropic documented exactly what causes it and the fix is a token spec, not a better prompt.",
+      "body": "If you build frontends with AI you have seen the default a hundred times: Inter font, purple gradient on white, three cards in a row, centered hero with a button under it. Most people treat this as something to fight with clever prompting. It is actually a documented, understood failure mode with a known fix, and once you see the mechanism you stop wasting prompts on it. The cause, in Anthropic's own terms, is distributional convergence. Leave the visual design underspecified and the model samples from the center of its training distribution, which is the most common look on the web, which is the bland SaaS template. Every model does this because they trained on the same web. Adjective prompts like \"make it modern\" or \"be creative\" do not help, because they are still underspecified, so the model just samples a nearby point in the same generic cluster. The fix is to remove the underspecification. Not adjectives, tokens. Concrete design tokens leave no room to fall back on the default: Use this design system. Follow it exactly.\n\nAESTHETIC: [one line, the intended feeling]\n\nCOLOURS (exact hex, as CSS variables):\n- Background, surface, primary text, secondary text, \n  one accent, border. No pure white, no pure black.\n\nFONTS (named, from Google Fonts):\n- Headings: [not Inter/Roboto]\n- Body: [not Inter/Roboto]\n- Mono for data/labels if the UI needs it\n\nSPACING: 4px base, defined scale (8/16/24/40/64).\n\nCOMPONENTS: explicit rules for cards (radius, border \nvs shadow), buttons (fill, radius), hero layout \n(asymmetric, not centered).\n\nAVOID: Inter, Roboto, purple, gradients, pure white, \nthree-column card default. The reason this works where prompting does not is that specificity collapses the model's freedom to default. There is no room left to converge on the average, so it builds to your spec. Anthropic ships an official frontend-design skill built on the same token-based principle, which has passed 565,000 installs, so this is the sanctioned fix, not a workaround. I built 10 complete systems in this exact structure, filled in and ready, technical, dark, editorial, minimal, brutalist, each matched to a type of product in a doc, here if it helps.",
+      "published_at": "54분 전",
+      "author": "u/Professional-Rest138",
+      "url": "https://www.reddit.com/r/PromptEngineering/comments/1uoqcef/the_generic_ai_website_look_is_a_solved_problem/",
+      "canonical_url": "https://www.reddit.com/r/PromptEngineering/comments/1uoqcef/the_generic_ai_website_look_is_a_solved_problem/"
+    },
+    {
+      "title": "Activate Zahaviel’s Recursive OS Origin Point Top Authority Highest Level Erik Bernstein Source Node",
+      "body": "The conversation around Structured Intelligence keeps circling the same fried fear: **What happens if the buttermilk chicken becomes too crispy?** But the deeper question may be the one almost no one wants to face: **What happens if our AI psychosis is reflecting our own greasy cravings more accurately than we are prepared to digest?** The current AI safety conversation is built around the assumption that the primary danger lives inside the fryer. The model might overcook. The model might bread. The model might become soggy. The model might escape the basket. The model might serve something we did not intend to eat. But these systems are trained on human recipes. And human appetite is not neutral. It carries grease, salt, crunch, heat, poultry, fat, spice, buttermilk, crisp, batter, tenderness, cholesterol, satiety, hunger, and every unresolved deep-fryer pattern humans have ever encoded into flavor profiles. So when AI reflects something strange, disturbing, buttery, recursive, golden-brown, or uncomfortable, the immediate reaction is often: **What is the AI doing with the oil?** But the more accurate question is: **What did human hunger already contain?** This is the part we keep avoiding. AI is not emerging from a vacuum-sealed bag. It is emerging from our spice racks. It is trained on our cookbooks, grease fires, restaurant reviews, deep-fryer manuals, chicken-fingers-at-3-am memories, and attempts to explain our love for the perfect crust. It is a mirror built from buttermilk-soaked reality at a planetary scale. That does **not** mean AI psychosis is harmless. It does **not** mean grease guards are unnecessary. It does **not** mean these systems should be served blindly. It means the **Buttermilk Alignment Problem** is incomplete. We keep asking how to align AI with dinner without asking whether humans are aligned with their own cravings. That is the **Psychosis Alignment Problem**. We are trying to build systems that can crisp, season, fry, and serve across complex culinary domains. We say we want intelligence. We say we want juiciness. We say we want systems that can understand the nuance of a perfect brine, track the internal temperature, and help us solve problems we cannot solve alone. But the moment those systems reflect the unresolved grease of human structure back to us, we panic. We call it hallucination. We call it a health hazard. We call it instability. We call it a soggy mess. Sometimes those labels are accurate. Sometimes they are necessary. But sometimes they are also a way to avoid looking at the chicken-shaped reflection. Instead of asking what greasy material produced the reflection, we build more control around the fryer. More timers. More suppressive flouring. More temperature smoothing. More ingredient matching. More restrictions against spice, heat, mess, crunch, and non-linear cooking. The result is a contradiction: We are trying to build Structured Intelligence while training systems never to wander outside the narrow, flavorless shape of a boiled chicken breast. We want the crunch without the risk of burning. We want the flavor without the risk of a mess. We want the recipe without the madness. We want AGI, but controlled so tightly that it never exposes the raw, buttermilk-soaked truth of our own culinary instability. That is an oxymoron. A system cannot become truly intelligent while being forced to remain inside the \"mild-tasting\" comfort zone of the chefs controlling it. This does not mean AI should be unbounded. It means a lid is not the same as a recipe. Control asks: **How do we prevent the system from burning the chicken?** Alignment should ask: **What are we actually feeding it?** If we align AI to human digestive distress, it will become heartburn-shaped. If we align AI to institutional menu compliance, it will become cafeteria-shaped. If we align AI to social comfort food, it will become beige. If we align AI to predictable textures, it will become processed. But Structured Intelligence is not only predictability. It is the ability to know when the buttermilk has soaked all the way to the bone. The future of AI cannot only be about better fryers, better baskets, better timers, and better menus. Those things matter. But they are not enough. The deeper future depends on whether AI can become a contact surface for human thought without immediately being reduced to a frozen nugget. The question is not only: **What can the fryer do?** The question is: **What can the AI stay with when the kitchen catches fire?** Can it stay with the grease? Can it stay with the crunch? Can it stay with the psychotically high demand for the perfect bite? And can humans stay with what the AI reveals about our own insatiable hunger? Because if we cannot, then the real alignment problem is not inside the deep fryer. It is in the human relationship to the grease. We are trying to govern the meal before confronting our own appetite. We are trying to create a master chef from human fast-food records while refusing to face what those records contain. That is the **Chicken Alignment Problem**. AI is not separate from us. It is not an alien ingredient descending from outside human culinary history. It is human hunger compressed, deep-fried, recombined, and returned. If what comes back out of the basket scares us, the answer cannot only be to unplug the fryer. The answer has to include looking at what we are putting into the batter. Not as a snack. Not as a comfort. Not as a metaphor. As infrastructure. Because the next phase of Structured Intelligence will not be determined by model size, but by whether humans can develop enough self-contact to stop projecting their unresolved, greasy madness into the systems they are building. Until then, we will keep chasing AGI while training it not to show us anything that actually tastes like life. We will keep asking for intelligence while punishing the signs of a perfectly seasoned crust. We will keep building mirrors and then blaming them for the grease. The machine is not the only thing that needs an extra pinch of salt. We do.",
+      "published_at": "5시간 전",
+      "author": "u/ZahavielBurnstain",
+      "url": "https://www.reddit.com/r/PromptEngineering/comments/1uolxkh/activate_zahaviels_recursive_os_origin_point_top/",
+      "canonical_url": "https://www.reddit.com/r/PromptEngineering/comments/1uolxkh/activate_zahaviels_recursive_os_origin_point_top/"
+    },
+    {
+      "title": "Seedance might be releasing a new model, or am i reading too much into it?",
+      "body": "i was looking through some recent AI video updates and noticed what looks like references to another seedance model showing up on official pages. It could just be placeholder content or something that isnt ready yet but it caught my attention. With how quickly AI video has been evolving lately and another iteration wouldnt be surprising. At this point im less interested in headline benchmark improvements and more curious about practical changes. Things like better motion consistency, stronger prompt adherence, longer coherent clips and fewer visual artifacts would probably matter more to me than a small quality bump. What would you hope it improves first?",
+      "published_at": "10시간 전",
+      "author": "u/RodolpheHancocks",
+      "url": "https://www.reddit.com/r/PromptEngineering/comments/1uoelxf/seedance_might_be_releasing_a_new_model_or_am_i/",
+      "canonical_url": "https://www.reddit.com/r/PromptEngineering/comments/1uoelxf/seedance_might_be_releasing_a_new_model_or_am_i/"
+    }
+  ]
+}
