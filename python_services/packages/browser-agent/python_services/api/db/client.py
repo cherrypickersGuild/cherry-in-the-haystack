@@ -105,6 +105,38 @@ async def get_source(source_id: UUID) -> Optional[dict]:
     return {"id": row["id"], "url_handle": row["url_handle"]}
 
 
+async def get_curation_reference() -> dict:
+    """
+    Load the reference lists an LLM needs to classify an article into cherry's model:
+      - tracked_entities: the 48 trackable entities (id + name)
+      - entity_categories: category codes per entity_page
+      - side_categories: cross-cutting article types (Case Study, Applied Research, ...)
+    """
+    pool = _get_pool()
+    async with pool.acquire() as conn:
+        entities = await conn.fetch(
+            "SELECT id, name FROM content.tracked_entity "
+            "WHERE is_active AND revoked_at IS NULL ORDER BY name"
+        )
+        ecats = await conn.fetch(
+            "SELECT entity_page::text AS entity_page, code, name FROM content.entity_category "
+            "WHERE is_active ORDER BY entity_page, sort_order"
+        )
+        scats = await conn.fetch(
+            "SELECT id, code, name FROM content.side_category "
+            "WHERE is_active ORDER BY sort_order"
+        )
+    return {
+        "tracked_entities": [{"id": str(r["id"]), "name": r["name"]} for r in entities],
+        "entity_categories": [
+            {"page": r["entity_page"], "code": r["code"], "name": r["name"]} for r in ecats
+        ],
+        "side_categories": [
+            {"id": str(r["id"]), "code": r["code"], "name": r["name"]} for r in scats
+        ],
+    }
+
+
 async def get_crawler_analysis(source_id: UUID) -> Optional[dict]:
     """Return existing analysis row for source_id, or None if absent."""
     pool = _get_pool()

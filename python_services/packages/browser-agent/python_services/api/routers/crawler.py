@@ -116,11 +116,8 @@ async def _run_browser_use_analysis(url: str) -> AnalysisJson:
     """
     async def _inner() -> str | None:
         from browser_use import Agent  # deferred import — not available at module load in tests
-        from browser_use.llm.anthropic.chat import ChatAnthropic
-        llm = ChatAnthropic(
-            model=_llm_model_name(),
-            api_key=os.environ["ANTHROPIC_API_KEY"],
-        )
+        from ..llm import make_browser_use_llm
+        llm = make_browser_use_llm("ANALYZE")
         agent = Agent(
             task=CRAWLER_ANALYSIS_PROMPT.format(url=url),
             llm=llm,
@@ -428,11 +425,8 @@ async def _do_fallback(source_id: UUID, url: str, browser_config) -> list[dict]:
     """Invoke browser-use Agent to visually read the page and extract article content."""
     async def _inner() -> str | None:
         from browser_use import Agent  # deferred import — not available at module load in tests
-        from browser_use.llm.anthropic.chat import ChatAnthropic
-        llm = ChatAnthropic(
-            model=_llm_model_name(),
-            api_key=os.environ["ANTHROPIC_API_KEY"],
-        )
+        from ..llm import make_browser_use_llm
+        llm = make_browser_use_llm("FALLBACK")
         agent = Agent(
             task=CRAWLER_FALLBACK_PROMPT.format(url=url),
             llm=llm,
