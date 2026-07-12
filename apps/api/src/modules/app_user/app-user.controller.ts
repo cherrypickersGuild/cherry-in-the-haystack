@@ -18,6 +18,7 @@ import { AppUserService } from './app-user.service';
 import { SignupDto } from './input-dto/signup.dto';
 import { SigninDto } from './input-dto/signin.dto';
 import { LoginDto } from './input-dto/login.dto';
+import { GoogleLoginDto } from './input-dto/google-login.dto';
 import { RefreshTokenDto } from './input-dto/refresh-token.dto';
 import type { SignupResponseDto } from './output-dto/signup-response.dto';
 import type { SigninResponseDto } from './output-dto/signin-response.dto';
@@ -66,6 +67,17 @@ export class AppUserController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResponseDto> {
     return this.appUserService.login(dto, req, res);
+  }
+
+  @Post('google-login')
+  @ApiOperation({ summary: 'Login with a Google ID token (Google Identity Services)' })
+  @ApiBody({ type: GoogleLoginDto })
+  async googleLogin(
+    @Body(new ZodValidationPipe(GoogleLoginDto.schema)) dto: GoogleLoginDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LoginResponseDto> {
+    return this.appUserService.googleLogin(dto, req, res);
   }
 
   @Post('refresh')

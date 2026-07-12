@@ -5,6 +5,7 @@ import { AppUserAuthService } from './app-user-auth.service';
 import type { SignupDto } from './input-dto/signup.dto';
 import type { SigninDto } from './input-dto/signin.dto';
 import type { LoginDto } from './input-dto/login.dto';
+import type { GoogleLoginDto } from './input-dto/google-login.dto';
 import type { RefreshTokenDto } from './input-dto/refresh-token.dto';
 import type { SignupResponseDto } from './output-dto/signup-response.dto';
 import type { SigninResponseDto } from './output-dto/signin-response.dto';
@@ -29,6 +30,14 @@ export class AppUserService {
     res: Response,
   ): Promise<LoginResponseDto> {
     return this.appUserAuthService.login(dto, req, res);
+  }
+
+  async googleLogin(
+    dto: GoogleLoginDto,
+    req: Request,
+    res: Response,
+  ): Promise<LoginResponseDto> {
+    return this.appUserAuthService.googleLogin(dto, req, res);
   }
 
   async refresh(

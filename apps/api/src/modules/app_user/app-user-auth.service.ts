@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { OAuth2Client, type TokenPayload } from 'google-auth-library';
 import { Knex } from 'knex';
 import type { Request, Response } from 'express';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
@@ -19,6 +20,7 @@ import type { AppUserEntity, AppUserRole } from './entity/app-user.entity';
 import type { SignupDto } from './input-dto/signup.dto';
 import type { SigninDto } from './input-dto/signin.dto';
 import type { LoginDto } from './input-dto/login.dto';
+import type { GoogleLoginDto } from './input-dto/google-login.dto';
 import type { RefreshTokenDto } from './input-dto/refresh-token.dto';
 import type { SignupResponseDto } from './output-dto/signup-response.dto';
 import type { SigninResponseDto } from './output-dto/signin-response.dto';
@@ -44,6 +46,7 @@ const REFRESH_COOKIE_PATH = '/api/app-user';
 @Injectable()
 export class AppUserAuthService {
   private readonly logger = new Logger(AppUserAuthService.name);
+  private googleClient?: OAuth2Client;
 
   constructor(
     @Inject('KNEX_CONNECTION')
@@ -173,6 +176,58 @@ export class AppUserAuthService {
       magic_token_consumed_at: now,
       magic_token_last_ip: this.extractClientIp(req),
       magic_token_last_user_agent: this.extractUserAgent(req),
+      updated_at: now,
+    });
+
+    const tokens = await this.issueTokens(user);
+    this.setRefreshCookie(res, tokens.refreshToken);
+
+    return {
+      accessToken: tokens.accessToken,
+      user: this.toLoginUserDto(user),
+    };
+  }
+
+  /**
+   * Google 로그인 — 프론트에서 받은 Google ID 토큰을 검증하고,
+   * 유저를 find-or-create 한 뒤 기존 JWT 발급 로직을 그대로 재사용한다.
+   * 매직링크(signin/login)와 독립적으로 동작.
+   */
+  async googleLogin(
+    dto: GoogleLoginDto,
+    req: Request,
+    res: Response,
+  ): Promise<LoginResponseDto> {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      throw new UnauthorizedException('Google login is not configured.');
+    }
+
+    let payload: TokenPayload | undefined;
+    try {
+      const ticket = await this.getGoogleClient(clientId).verifyIdToken({
+        idToken: dto.idToken,
+        audience: clientId,
+      });
+      payload = ticket.getPayload();
+    } catch {
+      throw new UnauthorizedException('Invalid Google token.');
+    }
+
+    if (!payload?.sub || !payload.email || payload.email_verified === false) {
+      throw new UnauthorizedException('Google account email is not verified.');
+    }
+
+    const user = await this.findOrCreateGoogleUser({
+      googleSub: payload.sub,
+      email: payload.email,
+      name: payload.name ?? null,
+      avatar: payload.picture ?? null,
+    });
+
+    const now = new Date();
+    await this.knex('core.app_user').where({ id: user.id }).update({
+      last_login_at: now,
       updated_at: now,
     });
 
@@ -424,5 +479,82 @@ export class AppUserAuthService {
       .first<AppUserEntity>();
 
     return row ?? null;
+  }
+
+  private getGoogleClient(clientId: string): OAuth2Client {
+    if (!this.googleClient) {
+      this.googleClient = new OAuth2Client(clientId);
+    }
+    return this.googleClient;
+  }
+
+  private async getActiveUserByGoogleSub(
+    googleSub: string,
+  ): Promise<AppUserEntity | null> {
+    const row = await this.knex('core.app_user')
+      .where({ google_sub: googleSub })
+      .where('is_active', true)
+      .whereNull('revoked_at')
+      .first<AppUserEntity>();
+
+    return row ?? null;
+  }
+
+  /**
+   * google_sub → email 순으로 유저를 찾고, 없으면 생성한다.
+   *  - google_sub로 매칭되면 그 유저
+   *  - 아니면 email로 매칭되는 기존(매직링크) 유저에 google_sub/avatar 백필
+   *  - 둘 다 없으면 신규 INSERT
+   */
+  private async findOrCreateGoogleUser(input: {
+    googleSub: string;
+    email: string;
+    name: string | null;
+    avatar: string | null;
+  }): Promise<AppUserEntity> {
+    const email = this.normalizeEmail(input.email);
+
+    const bySub = await this.getActiveUserByGoogleSub(input.googleSub);
+    if (bySub) {
+      return bySub;
+    }
+
+    const byEmail = await this.getActiveUserByEmail(email);
+    if (byEmail) {
+      await this.knex('core.app_user').where({ id: byEmail.id }).update({
+        google_sub: input.googleSub,
+        avatar_url: byEmail.avatar_url ?? input.avatar,
+        name: byEmail.name ?? input.name?.trim() ?? null,
+        updated_at: new Date(),
+      });
+      const refreshed = await this.getActiveUserById(byEmail.id);
+      if (!refreshed) {
+        throw new UnauthorizedException('Failed to link Google account.');
+      }
+      return refreshed;
+    }
+
+    const id = uuidv7();
+    const now = new Date();
+    await this.knex('core.app_user').insert({
+      id,
+      email,
+      name: input.name?.trim() || null,
+      google_sub: input.googleSub,
+      avatar_url: input.avatar || null,
+      subscription_tier: 'FREE',
+      role: 'GENERAL',
+      timezone: 'Asia/Seoul',
+      is_active: true,
+      created_at: now,
+      updated_at: now,
+      revoked_at: null,
+    });
+
+    const created = await this.getActiveUserById(id);
+    if (!created) {
+      throw new UnauthorizedException('Failed to create user.');
+    }
+    return created;
   }
 }

@@ -1,20 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense } from "react"
 import { API_URL, setAccessToken } from "@/lib/auth"
+import { GoogleLoginButton } from "@/components/auth/google-login-button"
 
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const [email, setEmail] = useState("")
-  const [step, setStep] = useState<"input" | "sent" | "verifying" | "error">("input")
+  const [step, setStep] = useState<"input" | "verifying" | "error">("input")
   const [errorMsg, setErrorMsg] = useState("")
 
-  // 로그인 성공 후 돌아갈 경로 — /login?next=/start 로 들어오면 기억해둠
-  // 매직링크 이메일 왕복 시 URL 파라미터가 유실되므로 localStorage 에 저장
+  // 로그인 성공 후 돌아갈 경로 — /login?next=/start 저장
   useEffect(() => {
     const nextFromUrl = searchParams.get("next")
     if (nextFromUrl && nextFromUrl.startsWith("/")) {
@@ -22,65 +20,46 @@ function LoginContent() {
     }
   }, [searchParams])
 
-  // 매직링크 클릭 시 자동 로그인 처리
+  const goAfterLogin = useCallback(() => {
+    let dest = "/"
+    try {
+      const saved = localStorage.getItem("cherry_login_next")
+      if (saved && saved.startsWith("/")) {
+        dest = saved
+        localStorage.removeItem("cherry_login_next")
+      }
+    } catch { /* noop */ }
+    router.push(dest)
+  }, [router])
+
+  // 매직링크(?token=&email=) 자동 로그인 — 백엔드 매직링크는 유지되므로 그대로 처리
   useEffect(() => {
     const tokenFromUrl = searchParams.get("token")
     const emailFromUrl = searchParams.get("email")
+    if (!tokenFromUrl || !emailFromUrl) return
 
-    if (tokenFromUrl && emailFromUrl) {
-      setStep("verifying")
-      fetch(`${API_URL}/api/app-user/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email: emailFromUrl, signInToken: tokenFromUrl }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.accessToken) {
-            setAccessToken(data.accessToken)
-            let dest = "/"
-            try {
-              const saved = localStorage.getItem("cherry_login_next")
-              if (saved && saved.startsWith("/")) {
-                dest = saved
-                localStorage.removeItem("cherry_login_next")
-              }
-            } catch { /* noop */ }
-            router.push(dest)
-          } else {
-            setErrorMsg(data.message ?? "로그인에 실패했습니다.")
-            setStep("error")
-          }
-        })
-        .catch(() => {
-          setErrorMsg("서버 연결에 실패했습니다.")
+    setStep("verifying")
+    fetch(`${API_URL}/api/app-user/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email: emailFromUrl, signInToken: tokenFromUrl }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.accessToken) {
+          setAccessToken(data.accessToken)
+          goAfterLogin()
+        } else {
+          setErrorMsg(data.message ?? "로그인에 실패했습니다.")
           setStep("error")
-        })
-    }
-  }, [searchParams, router])
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setErrorMsg("")
-
-    try {
-      const res = await fetch(`${API_URL}/api/app-user/signin`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, from: "main" }),
+        }
       })
-
-      if (res.ok) {
-        setStep("sent")
-      } else {
-        const data = await res.json()
-        setErrorMsg(data.message ?? "요청에 실패했습니다.")
-      }
-    } catch {
-      setErrorMsg("서버 연결에 실패했습니다.")
-    }
-  }
+      .catch(() => {
+        setErrorMsg("서버 연결에 실패했습니다.")
+        setStep("error")
+      })
+  }, [searchParams, goAfterLogin])
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#FBFAF8" }}>
@@ -101,53 +80,24 @@ function LoginContent() {
         {/* 카드 */}
         <div className="bg-white rounded-2xl shadow-sm border border-[#E4E1EE] p-8">
 
-          {/* 이메일 입력 */}
           {step === "input" && (
             <>
               <h2 className="text-[18px] font-bold text-[#1A1626] mb-1">로그인 / 가입</h2>
               <p className="text-[13px] text-[#7B7599] mb-6">
-                이메일을 입력하면 로그인 링크를 보내드립니다.<br />
+                Google 계정으로 로그인하세요.<br />
                 처음 이용하시면 자동으로 가입됩니다.
               </p>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                  type="email"
-                  placeholder="이메일 주소"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-[#E4E1EE] text-[14px] text-[#1A1626] placeholder-[#B0ADCA] outline-none focus:border-[#C94B6E] transition-colors"
+              <div className="flex flex-col items-center gap-3">
+                <GoogleLoginButton
+                  onStart={() => setStep("verifying")}
+                  onSuccess={goAfterLogin}
+                  onError={(m) => { setErrorMsg(m); setStep("error") }}
                 />
                 {errorMsg && (
                   <p className="text-[12px] text-[#C94B6E]">{errorMsg}</p>
                 )}
-                <button
-                  type="submit"
-                  className="w-full py-3 rounded-xl text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: "#C94B6E" }}
-                >
-                  로그인 / 가입 링크 받기
-                </button>
-              </form>
+              </div>
             </>
-          )}
-
-          {/* 이메일 발송 완료 */}
-          {step === "sent" && (
-            <div className="text-center py-4">
-              <div className="text-4xl mb-4">📬</div>
-              <h2 className="text-[18px] font-bold text-[#1A1626] mb-2">이메일을 확인해주세요</h2>
-              <p className="text-[13px] text-[#7B7599]">
-                <span className="font-semibold text-[#1A1626]">{email}</span>으로<br />
-                로그인 링크를 보냈습니다. (15분 유효)
-              </p>
-              <button
-                onClick={() => setStep("input")}
-                className="mt-6 text-[13px] text-[#C94B6E] hover:underline"
-              >
-                다시 보내기
-              </button>
-            </div>
           )}
 
           {/* 매직링크 처리 중 */}
@@ -165,7 +115,7 @@ function LoginContent() {
               <h2 className="text-[18px] font-bold text-[#1A1626] mb-2">로그인 실패</h2>
               <p className="text-[13px] text-[#7B7599] mb-6">{errorMsg}</p>
               <button
-                onClick={() => setStep("input")}
+                onClick={() => { setErrorMsg(""); setStep("input") }}
                 className="text-[13px] text-[#C94B6E] hover:underline"
               >
                 다시 시도하기

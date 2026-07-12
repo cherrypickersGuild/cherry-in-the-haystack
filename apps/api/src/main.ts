@@ -86,7 +86,7 @@ async function bootstrap() {
 
   // Swagger 설정
   const config = new DocumentBuilder()
-      .setTitle('egoidsm')
+      .setTitle('cherry')
       .setDescription('API 설명')
       .setVersion('1.0')
       .addBearerAuth(

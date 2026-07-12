@@ -19,6 +19,8 @@ export interface AppUserEntity {
   magic_token_consumed_at: Date | null;
   magic_token_last_ip: string | null;
   magic_token_last_user_agent: string | null;
+  google_sub: string | null;
+  avatar_url: string | null;
   created_at: Date;
   updated_at: Date;
   revoked_at: Date | null;
