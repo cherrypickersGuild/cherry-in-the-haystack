@@ -10,6 +10,7 @@ import { PromptTemplateModule } from './modules/prompt_template/prompt-template.
 import { AgentCommModule } from './modules/agent_comm/agent-comm.module';
 import { KaasModule } from './modules/kaas/kaas.module';
 import { WriterAgentModule } from './modules/writer_agent/writer-agent.module';
+import { BenchModule } from './modules/bench/bench.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { WriterAgentModule } from './modules/writer_agent/writer-agent.module';
     AgentCommModule,
     KaasModule,
     WriterAgentModule,
+    BenchModule,
   ],
   controllers: [],
   providers: [],
