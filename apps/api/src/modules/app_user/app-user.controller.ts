@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Post,
+  Put,
   Req,
   Res,
   UnauthorizedException,
@@ -19,6 +21,7 @@ import { SignupDto } from './input-dto/signup.dto';
 import { SigninDto } from './input-dto/signin.dto';
 import { LoginDto } from './input-dto/login.dto';
 import { GoogleLoginDto } from './input-dto/google-login.dto';
+import { BenchKeyDto } from './input-dto/bench-key.dto';
 import { RefreshTokenDto } from './input-dto/refresh-token.dto';
 import type { SignupResponseDto } from './output-dto/signup-response.dto';
 import type { SigninResponseDto } from './output-dto/signin-response.dto';
@@ -112,5 +115,44 @@ export class AppUserController {
       throw new UnauthorizedException('Invalid authentication context.');
     }
     return this.appUserService.me(userId);
+  }
+
+  // ── 벤치마크용 회원 Claude API 키 ──
+
+  private requireUserId(req: Request): string {
+    const userId = String((req as RequestWithJwtUser).user?.id ?? '').trim();
+    if (!userId) {
+      throw new UnauthorizedException('Invalid authentication context.');
+    }
+    return userId;
+  }
+
+  @Get('bench-key')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Bench Claude API key status (masked)' })
+  async getBenchKey(@Req() req: Request) {
+    return this.appUserService.getBenchKeyStatus(this.requireUserId(req));
+  }
+
+  @Put('bench-key')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Register/replace member Claude API key (encrypted)' })
+  @ApiBody({ type: BenchKeyDto })
+  async putBenchKey(
+    @Body(new ZodValidationPipe(BenchKeyDto.schema)) dto: BenchKeyDto,
+    @Req() req: Request,
+  ) {
+    return this.appUserService.setBenchKey(this.requireUserId(req), dto.apiKey);
+  }
+
+  @Delete('bench-key')
+  @HttpCode(200)
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Remove member Claude API key' })
+  async deleteBenchKey(@Req() req: Request): Promise<void> {
+    return this.appUserService.deleteBenchKey(this.requireUserId(req));
   }
 }

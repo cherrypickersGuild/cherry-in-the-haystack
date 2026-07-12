@@ -9,6 +9,7 @@ import { KaasWorkshopPanel } from "@/components/cherry/kaas-workshop-panel"
 import { StartFlowNav } from "@/components/cherry/start-flow-nav"
 import {
   fetchBenchSets,
+  fetchBenchKeyStatus,
   runBenchWithBuild,
   computeMetricDeltas,
   type BenchSetSummary,
@@ -131,6 +132,24 @@ function BeforeAfterPreview({ agentName }: { agentName?: string }) {
   const [running, setRunning] = useState(false)
   const [result, setResult] = useState<BenchRunResponse | null>(null)
   const [runError, setRunError] = useState<string | null>(null)
+  const [hasKey, setHasKey] = useState<boolean | null>(null)
+
+  // 회원 Claude 키 등록 여부 — 미등록이면 벤치 비활성.
+  // Settings 모달에서 저장/삭제 시 'bench-key:change' 이벤트로 즉시 반영(새로고침 불필요).
+  useEffect(() => {
+    let cancelled = false
+    const refresh = () => {
+      fetchBenchKeyStatus()
+        .then((s) => { if (!cancelled) setHasKey(s.hasKey) })
+        .catch(() => { if (!cancelled) setHasKey(false) })
+    }
+    refresh()
+    window.addEventListener("bench-key:change", refresh)
+    return () => {
+      cancelled = true
+      window.removeEventListener("bench-key:change", refresh)
+    }
+  }, [])
 
   // Load sets once.
   useEffect(() => {
@@ -217,6 +236,14 @@ function BeforeAfterPreview({ agentName }: { agentName?: string }) {
         Benchmark
       </h2>
 
+      {/* ── 회원 키 미등록 안내 (벤치 비활성) ── */}
+      {hasKey === false && (
+        <div className="mb-4 rounded-xl px-4 py-3 text-[13px]" style={{ backgroundColor: "#FBF6ED", border: "1px solid #E9D1A6", color: "#6B4F2A" }}>
+          벤치마크를 실행하려면 <b>상단 Settings</b>에서 본인 <b>Claude API 키</b>를 등록하세요.
+          <br />키는 본인 Anthropic 계정으로 실행·과금됩니다.
+        </div>
+      )}
+
       {/* ── Sets error state ── */}
       {setsError && (
         <div className="mb-4 rounded-xl px-4 py-3 text-[12px]" style={{ backgroundColor: "#FBE8E3", border: "1px solid #F2C7BE", color: "#C8301E" }}>
@@ -263,7 +290,8 @@ function BeforeAfterPreview({ agentName }: { agentName?: string }) {
           </p>
           <button
             onClick={runBenchmark}
-            disabled={running || !activeId}
+            disabled={running || !activeId || hasKey === false}
+            title={hasKey === false ? "Settings에서 Claude API 키를 먼저 등록하세요" : undefined}
             className="px-4 py-2 rounded-full bg-[#B12A17] text-white text-[12px] font-bold hover:bg-[#8F1D12] disabled:opacity-60 transition-colors flex-shrink-0"
           >
             {running ? "Running…" : ran ? "Run again" : "Run benchmark"}
@@ -305,7 +333,7 @@ function BeforeAfterPreview({ agentName }: { agentName?: string }) {
             <div className="flex items-center gap-2 justify-end">
               <span className="w-1.5 h-1.5 rounded-full bg-[#9A7C55]" />
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B4F2A]">
-                Before · Default Flock
+                Before · Default Claude
               </span>
             </div>
             <div className="text-center text-[9px] font-bold uppercase tracking-[0.25em] text-[#9A7C55]">
@@ -352,7 +380,7 @@ function BeforeAfterPreview({ agentName }: { agentName?: string }) {
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#9A7C55]" />
               <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6B4F2A]">
-                Before · Default Flock
+                Before · Default Claude
               </span>
             </div>
             <span className="text-[10px] text-[#9A7C55]">
@@ -364,7 +392,7 @@ function BeforeAfterPreview({ agentName }: { agentName?: string }) {
               <EmptyState
                 text={
                   running
-                    ? "Calling Flock without tools…"
+                    ? "Calling Claude without tools…"
                     : "Run the benchmark to see baseline response."
                 }
               />
@@ -404,7 +432,7 @@ function BeforeAfterPreview({ agentName }: { agentName?: string }) {
               <EmptyState
                 text={
                   running
-                    ? "Calling Flock with build + tools…"
+                    ? "Calling Claude with build + tools…"
                     : "Run the benchmark to see enhanced response."
                 }
               />
@@ -447,7 +475,7 @@ function BeforeAfterPreview({ agentName }: { agentName?: string }) {
       {result && (
         <details className="mt-3 text-[11px]">
           <summary className="cursor-pointer text-[#9A7C55] hover:text-[#6B4F2A] font-semibold">
-            See system prompt sent to Flock for "After"
+            See system prompt sent to Claude for "After"
           </summary>
           <pre className="mt-2 p-3 rounded-lg bg-[#FBF6ED] text-[11px] font-mono text-[#3A2A1C] whitespace-pre-wrap" style={{ border: "1px solid #E9D1A6" }}>
 {result.systemPrompt}
@@ -550,7 +578,7 @@ function AppliedSlotsBanner({
       }}
     >
       <span className="font-bold uppercase tracking-[0.18em] text-[#6B4F2A]">
-        Applied to Flock
+        Applied to Claude
       </span>
       <AppliedDot label="prompt" on={applied.prompt} />
       <AppliedDot label="mcp" on={applied.mcp} />

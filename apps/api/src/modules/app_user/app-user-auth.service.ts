@@ -15,6 +15,7 @@ import { v7 as uuidv7 } from 'uuid';
 import { jwtConstants } from 'src/common/constants/constants';
 import { TOKEN_EXPIRY_USER } from 'src/common/constants/auth.constants';
 import { RedisService } from 'src/common/basic-service/redis.service';
+import { encryptSecret, decryptSecret, maskKey } from 'src/utils/crypto';
 import sendEmail, { EMAIL_TEMPLATE } from 'src/utils/resend';
 import type { AppUserEntity, AppUserRole } from './entity/app-user.entity';
 import type { SignupDto } from './input-dto/signup.dto';
@@ -479,6 +480,55 @@ export class AppUserAuthService {
       .first<AppUserEntity>();
 
     return row ?? null;
+  }
+
+  // ── 벤치마크용 회원 Claude API 키 (암호화 저장) ──
+
+  async setBenchKey(
+    userId: string,
+    apiKey: string,
+  ): Promise<{ hasKey: boolean; masked: string }> {
+    const user = await this.getActiveUserById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found or inactive.');
+    }
+    await this.knex('core.app_user').where({ id: userId }).update({
+      bench_api_key_enc: encryptSecret(apiKey),
+      updated_at: new Date(),
+    });
+    return { hasKey: true, masked: maskKey(apiKey) };
+  }
+
+  async getBenchKeyStatus(
+    userId: string,
+  ): Promise<{ hasKey: boolean; masked: string | null }> {
+    const user = await this.getActiveUserById(userId);
+    const enc = user?.bench_api_key_enc ?? null;
+    if (!enc) return { hasKey: false, masked: null };
+    try {
+      return { hasKey: true, masked: maskKey(decryptSecret(enc)) };
+    } catch {
+      return { hasKey: true, masked: null };
+    }
+  }
+
+  async deleteBenchKey(userId: string): Promise<void> {
+    await this.knex('core.app_user').where({ id: userId }).update({
+      bench_api_key_enc: null,
+      updated_at: new Date(),
+    });
+  }
+
+  /** bench 실행이 쓸 평문 키. 미등록/복호화실패 시 null. 절대 외부 응답에 노출 금지. */
+  async getDecryptedBenchKey(userId: string): Promise<string | null> {
+    const user = await this.getActiveUserById(userId);
+    const enc = user?.bench_api_key_enc ?? null;
+    if (!enc) return null;
+    try {
+      return decryptSecret(enc);
+    } catch {
+      return null;
+    }
   }
 
   private getGoogleClient(clientId: string): OAuth2Client {

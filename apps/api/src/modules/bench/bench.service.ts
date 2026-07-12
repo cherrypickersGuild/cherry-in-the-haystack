@@ -84,7 +84,7 @@ export class BenchService {
   }
 
   /** POST /v1/kaas/bench/compare { setId } — real baseline + enhanced run. */
-  async compare(setId: string): Promise<BenchCompareResponse> {
+  async compare(setId: string, apiKey?: string): Promise<BenchCompareResponse> {
     const set = getSetById(setId)
     if (!set) {
       throw new Error(`Unknown benchmark set: ${setId}`)
@@ -99,8 +99,8 @@ export class BenchService {
 
     // Baseline and enhanced can run in parallel — they don't share state.
     const [baseline, enhanced] = await Promise.all([
-      this.runBaseline(set),
-      this.runEnhanced(set),
+      this.runBaseline(set, apiKey),
+      this.runEnhanced(set, apiKey),
     ])
 
     const evaluator = getEvaluator(set.evaluatorId)
@@ -141,7 +141,11 @@ export class BenchService {
    *  equipped Workshop build against a chosen task. The ONLY thing shared
    *  with /compare is the task + evaluator; system prompt / tools / memory
    *  come from the build via composeRuntime(). Empty slots = baseline-like. */
-  async run(taskId: string, build: AgentBuildInput): Promise<BenchRunResponse> {
+  async run(
+    taskId: string,
+    build: AgentBuildInput,
+    apiKey?: string,
+  ): Promise<BenchRunResponse> {
     const set = getSetById(taskId)
     if (!set) {
       throw new Error(`Unknown benchmark task: ${taskId}`)
@@ -164,6 +168,7 @@ export class BenchService {
     const baselinePromise = callClaude({
       messages: [{ role: 'user', content: set.task }],
       maxTokens: 500,
+      ...this.memberFields(apiKey),
     })
 
     // Enhanced runs with composed runtime. If slots are empty, runtime fields
@@ -176,6 +181,7 @@ export class BenchService {
       maxTokens: 800,
       maxToolIterations: runtime.maxIterations,
       orchestration: runtime.orchestrationId,
+      ...this.memberFields(apiKey),
     })
 
     const [baseline, enhanced] = await Promise.all([
@@ -240,17 +246,29 @@ export class BenchService {
     }
   }
 
+  /** 회원 키가 있으면 callClaude에 {apiKey, model} 주입 (Anthropic 강제 + Claude 모델). */
+  private memberFields(
+    apiKey?: string,
+  ): { apiKey: string; model: string } | Record<string, never> {
+    return apiKey
+      ? { apiKey, model: process.env.BENCH_MEMBER_MODEL ?? 'claude-haiku-4-5' }
+      : {}
+  }
+
   private async runBaseline(
     set: BenchSetDefinition,
+    apiKey?: string,
   ): Promise<ClaudeCallResult> {
     return callClaude({
       messages: [{ role: 'user', content: set.task }],
       maxTokens: 500,
+      ...this.memberFields(apiKey),
     })
   }
 
   private async runEnhanced(
     set: BenchSetDefinition,
+    apiKey?: string,
   ): Promise<ClaudeCallResult> {
     const tools = set.tools.map((t) => {
       const impl = TOOL_IMPL[t.name]
@@ -264,6 +282,7 @@ export class BenchService {
       toolDispatcher: dispatcher,
       messages: [{ role: 'user', content: set.task }],
       maxTokens: 800,
+      ...this.memberFields(apiKey),
     })
   }
 

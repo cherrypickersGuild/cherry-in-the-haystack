@@ -68,6 +68,11 @@ export interface ClaudeCallInput {
   maxToolIterations?: number
   /** Phase 2: orchestration strategy. Defaults to 'standard' when undefined. */
   orchestration?: OrchestrationId
+  /**
+   * 회원별 벤치 실행용 Anthropic API 키. 있으면 전역 BENCH_PROVIDER(flock 등)를
+   * 무시하고 이 키로 per-call Anthropic 호출을 강제한다 (회원 계정 과금).
+   */
+  apiKey?: string
 }
 
 export interface ClaudeCallResult {
@@ -112,19 +117,24 @@ export async function callClaudeStandard(
   input: ClaudeCallInput,
 ): Promise<ClaudeCallResult> {
   const model = input.model ?? DEFAULT_MODEL
+  const memberKey = input.apiKey
+  // 회원 키가 있으면 전역 provider(flock/openai)를 무시하고 Anthropic 강제.
   // Provider routing — explicit env var wins over heuristics. The same
   // ClaudeCallInput shape works for all providers because openai/flock
   // clients translate to OpenAI-compatible chat-completions and translate
   // the response back to ClaudeCallResult.
-  if (BENCH_PROVIDER === 'flock') {
-    const { callFlockStandard } = await import('./flock.client.js')
-    return callFlockStandard({ ...input, model })
+  if (!memberKey) {
+    if (BENCH_PROVIDER === 'flock') {
+      const { callFlockStandard } = await import('./flock.client.js')
+      return callFlockStandard({ ...input, model })
+    }
+    if (BENCH_PROVIDER === 'openai' || model.startsWith('gpt-')) {
+      const { callOpenAIStandard } = await import('./openai.client.js')
+      return callOpenAIStandard({ ...input, model })
+    }
   }
-  if (BENCH_PROVIDER === 'openai' || model.startsWith('gpt-')) {
-    const { callOpenAIStandard } = await import('./openai.client.js')
-    return callOpenAIStandard({ ...input, model })
-  }
-  const client = getClient()
+  // 회원 키 → per-call 클라이언트(싱글턴 우회), 없으면 기존 공용 싱글턴
+  const client = memberKey ? new Anthropic({ apiKey: memberKey }) : getClient()
   const maxTokens = input.maxTokens ?? 1024
   const temperature = input.temperature ?? 0
   const maxIter = input.maxToolIterations ?? DEFAULT_MAX_TOOL_ITERATIONS

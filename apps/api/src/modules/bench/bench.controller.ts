@@ -6,8 +6,13 @@ import {
   HttpStatus,
   Logger,
   Post,
+  Req,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { AuthGuard } from '@nestjs/passport'
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
+import type { Request } from 'express'
 
 import {
   BenchService,
@@ -16,16 +21,73 @@ import {
 } from './bench.service'
 import type { BenchSetSummary } from './sets/set-definitions'
 import type { AgentBuildInput } from './cards/compose-runtime'
+import { AppUserService } from '../app_user/app-user.service'
 import { searchMarketplace } from './tools/marketplace.tool'
 import { fetchCryptoPrice } from './tools/coingecko.tool'
 import { searchCatalog } from './tools/catalog.tool'
+
+type RequestWithJwtUser = Request & { user?: { id?: string } }
 
 @Controller('v1/kaas/bench')
 @ApiTags('KaaS — Bench (Workshop Before/After demo)')
 export class BenchController {
   private readonly logger = new Logger(BenchController.name)
 
-  constructor(private readonly bench: BenchService) {}
+  constructor(
+    private readonly bench: BenchService,
+    private readonly appUser: AppUserService,
+  ) {}
+
+  /** JWT에서 유저 → 복호화된 회원 키. 미등록이면 NO_BENCH_KEY. */
+  private async requireBenchKey(req: Request): Promise<string> {
+    const userId = String(
+      (req as RequestWithJwtUser).user?.id ?? '',
+    ).trim()
+    if (!userId) {
+      throw new UnauthorizedException('Invalid authentication context.')
+    }
+    const apiKey = await this.appUser.getDecryptedBenchKey(userId)
+    if (!apiKey) {
+      throw new HttpException(
+        {
+          statusCode: 400,
+          code: 'NO_BENCH_KEY',
+          message: 'Settings에서 Claude API 키를 등록하세요.',
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    return apiKey
+  }
+
+  /** Anthropic 실행 에러를 프론트가 분기할 수 있게 code로 매핑. */
+  private mapBenchError(err: unknown, fallbackCode: string): never {
+    if (err instanceof HttpException) throw err
+    const status = (err as { status?: number })?.status
+    const msg = err instanceof Error ? err.message : String(err)
+    if (status === 401) {
+      throw new HttpException(
+        { statusCode: 400, code: 'INVALID_API_KEY', message: 'API 키가 유효하지 않습니다. Settings에서 확인하세요.' },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    if (status === 429) {
+      throw new HttpException(
+        { statusCode: 429, code: 'RATE_LIMITED', message: '요청이 많습니다. 잠시 후 재시도하세요.' },
+        HttpStatus.TOO_MANY_REQUESTS,
+      )
+    }
+    if (status === 402 || status === 400) {
+      throw new HttpException(
+        { statusCode: 400, code: 'INSUFFICIENT_CREDITS', message: 'Anthropic 크레딧 부족 또는 요청이 거부됐습니다.' },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    throw new HttpException(
+      { statusCode: 500, code: fallbackCode, message: msg },
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    )
+  }
 
   @Get('sets')
   @ApiOperation({
@@ -36,9 +98,11 @@ export class BenchController {
   }
 
   @Post('compare')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary:
-      'Run baseline + enhanced Claude calls for the given set, evaluate both, return metrics.',
+      'Run baseline + enhanced Claude calls for the given set, evaluate both, return metrics. (회원 Claude 키 필요)',
   })
   @ApiBody({
     schema: {
@@ -54,6 +118,7 @@ export class BenchController {
   })
   async compare(
     @Body() body: { setId?: string },
+    @Req() req: Request,
   ): Promise<BenchCompareResponse> {
     const setId = body?.setId
     if (!setId || typeof setId !== 'string') {
@@ -62,26 +127,22 @@ export class BenchController {
         HttpStatus.BAD_REQUEST,
       )
     }
+    const apiKey = await this.requireBenchKey(req)
     try {
-      return await this.bench.compare(setId)
+      return await this.bench.compare(setId, apiKey)
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       this.logger.error(`[bench] compare failed · setId=${setId} · ${msg}`)
-      throw new HttpException(
-        {
-          statusCode: 500,
-          code: 'BENCH_COMPARE_FAILED',
-          message: msg,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      )
+      this.mapBenchError(err, 'BENCH_COMPARE_FAILED')
     }
   }
 
   @Post('run')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary:
-      "Run a task against the user's equipped Workshop build. Baseline is empty-build; enhanced composes the runtime from card ids (prompt/mcp/memory). Empty build ⇒ enhanced ≈ baseline.",
+      "Run a task against the user's equipped Workshop build. (회원 Claude 키 필요) Baseline is empty-build; enhanced composes the runtime from card ids.",
   })
   @ApiBody({
     schema: {
@@ -110,6 +171,7 @@ export class BenchController {
   async run(
     @Body()
     body: { taskId?: string; build?: Partial<AgentBuildInput> },
+    @Req() req: Request,
   ): Promise<BenchRunResponse> {
     const taskId = body?.taskId
     if (!taskId || typeof taskId !== 'string') {
@@ -127,19 +189,13 @@ export class BenchController {
       orchestration: body?.build?.orchestration ?? null,
       memory: body?.build?.memory ?? null,
     }
+    const apiKey = await this.requireBenchKey(req)
     try {
-      return await this.bench.run(taskId, build)
+      return await this.bench.run(taskId, build, apiKey)
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       this.logger.error(`[bench] run failed · taskId=${taskId} · ${msg}`)
-      throw new HttpException(
-        {
-          statusCode: 500,
-          code: 'BENCH_RUN_FAILED',
-          message: msg,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      )
+      this.mapBenchError(err, 'BENCH_RUN_FAILED')
     }
   }
 

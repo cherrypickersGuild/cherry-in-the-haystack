@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { CherryBao } from "./cherry-bao"
+import { SettingsModal } from "./settings-modal"
 import { useAuthTick, getAccessToken, clearAccessToken } from "@/lib/auth"
 
 const TABS: { href: string; label: string }[] = [
@@ -21,6 +22,7 @@ export function ConsumerNav() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
   const token = mounted ? getAccessToken() : null
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   function handleAuth() {
     if (getAccessToken()) {
@@ -72,6 +74,16 @@ export function ConsumerNav() {
           })}
         </nav>
 
+        {/* Settings (로그인 시에만) — Logout 왼쪽 */}
+        {token && (
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className="px-3 py-1.5 text-[12px] font-semibold rounded-full border border-[#E9D1A6] text-[#6B4F2A] hover:bg-[#F5E4C2]/40 cursor-pointer flex-shrink-0 transition-colors"
+          >
+            Settings
+          </button>
+        )}
+
         {/* Auth */}
         <button
           onClick={handleAuth}
@@ -80,6 +92,8 @@ export function ConsumerNav() {
           {token ? "Logout" : "Login"}
         </button>
       </div>
+
+      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </header>
   )
 }

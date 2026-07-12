@@ -1,4 +1,38 @@
-import { API_URL } from "./auth"
+import { API_URL, authHeaders } from "./auth"
+
+/* ── 회원 벤치 키 (Settings) ─────────────────────────────── */
+export interface BenchKeyStatus { hasKey: boolean; masked: string | null }
+
+export async function fetchBenchKeyStatus(): Promise<BenchKeyStatus> {
+  const res = await fetch(`${API_URL}/api/app-user/bench-key`, {
+    headers: { ...authHeaders() },
+    cache: "no-store",
+  })
+  if (!res.ok) throw new Error(`fetchBenchKeyStatus ${res.status}`)
+  return res.json()
+}
+
+export async function putBenchKey(apiKey: string): Promise<BenchKeyStatus> {
+  const res = await fetch(`${API_URL}/api/app-user/bench-key`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
+    body: JSON.stringify({ apiKey }),
+  })
+  if (!res.ok) {
+    let msg = `putBenchKey ${res.status}`
+    try { const b = await res.json(); msg = b?.message ?? b?.code ?? msg } catch { /* ignore */ }
+    throw new Error(msg)
+  }
+  return res.json()
+}
+
+export async function deleteBenchKey(): Promise<void> {
+  const res = await fetch(`${API_URL}/api/app-user/bench-key`, {
+    method: "DELETE",
+    headers: { ...authHeaders() },
+  })
+  if (!res.ok) throw new Error(`deleteBenchKey ${res.status}`)
+}
 
 /* ══════════════════════════════════════════════════════════════════
    Types — mirror `apps/api/src/modules/bench/` response shapes.
@@ -89,7 +123,7 @@ export async function runBenchCompare(
 ): Promise<BenchCompareResponse> {
   const res = await fetch(`${API_URL}/api/v1/kaas/bench/compare`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ setId }),
   })
   if (!res.ok) {
@@ -230,7 +264,7 @@ export async function runBenchWithBuild(
 ): Promise<BenchRunResponse> {
   const res = await fetch(`${API_URL}/api/v1/kaas/bench/run`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ taskId, build }),
   })
   if (!res.ok) {

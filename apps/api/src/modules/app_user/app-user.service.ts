@@ -40,6 +40,23 @@ export class AppUserService {
     return this.appUserAuthService.googleLogin(dto, req, res);
   }
 
+  async setBenchKey(userId: string, apiKey: string) {
+    return this.appUserAuthService.setBenchKey(userId, apiKey);
+  }
+
+  async getBenchKeyStatus(userId: string) {
+    return this.appUserAuthService.getBenchKeyStatus(userId);
+  }
+
+  async deleteBenchKey(userId: string): Promise<void> {
+    return this.appUserAuthService.deleteBenchKey(userId);
+  }
+
+  /** bench 모듈이 사용 — 복호화된 회원 키 (없으면 null) */
+  async getDecryptedBenchKey(userId: string): Promise<string | null> {
+    return this.appUserAuthService.getDecryptedBenchKey(userId);
+  }
+
   async refresh(
     dto: RefreshTokenDto,
     req: Request,
