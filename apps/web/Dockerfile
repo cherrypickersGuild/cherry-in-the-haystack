@@ -20,6 +20,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
+# Google 로그인용 Client ID — NEXT_PUBLIC_* 는 빌드 시점에 번들에 박히므로 여기서 ARG로 받아야 함
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
 # Skew Protection: 배포마다 고유 deploymentId.
 # 핵심: 빌드 시점과 런타임 시점이 같은 값을 가져야 함 (다르면 client/server mismatch → 무한 reload 루프).
 # 빌드 시 한 번 결정해서 파일로 저장 → 런타임 컨테이너에 복사 → 서버 시작 시 env로 주입.
