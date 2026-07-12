@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
+import { API_URL, authHeaders } from "@/lib/auth"
 import {
   fetchBenchKeyStatus,
   putBenchKey,
@@ -21,6 +22,7 @@ export function SettingsModal({
   onClose: () => void
 }) {
   const [status, setStatus] = useState<BenchKeyStatus | null>(null)
+  const [email, setEmail] = useState<string | null>(null)
   const [apiKey, setApiKey] = useState("")
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState("")
@@ -28,10 +30,14 @@ export function SettingsModal({
 
   useEffect(() => {
     if (!open) return
-    setApiKey(""); setMsg(""); setErr(""); setStatus(null)
+    setApiKey(""); setMsg(""); setErr(""); setStatus(null); setEmail(null)
     fetchBenchKeyStatus()
       .then(setStatus)
       .catch(() => setErr("키 상태를 불러오지 못했습니다. 로그인 상태를 확인하세요."))
+    fetch(`${API_URL}/api/app-user/me`, { headers: { ...authHeaders() }, cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((u) => setEmail(u?.email ?? null))
+      .catch(() => { /* noop */ })
   }, [open])
 
   if (!open) return null
@@ -76,6 +82,11 @@ export function SettingsModal({
           <h2 className="text-[18px] font-extrabold text-[#3A2A1C]">Settings</h2>
           <button onClick={onClose} className="text-[#6B4F2A] hover:text-[#3A2A1C] text-[18px]">✕</button>
         </div>
+        <div className="flex items-center gap-2 text-[12px] text-[#6B4F2A] mb-3">
+          <span>로그인 계정</span>
+          <span className="font-bold text-[#3A2A1C]">{email ?? "…"}</span>
+        </div>
+
         <p className="text-[13px] text-[#6B4F2A] leading-relaxed mb-4">
           벤치마크는 <b>본인 Claude(Anthropic) API 키</b>로 실행됩니다. 키는 암호화되어 저장되고
           화면엔 마스킹만 표시됩니다.
