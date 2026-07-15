@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cherry — 사이드바 메뉴 목업 (확장 IA)</title>
+<style>
+  :root{
+    --cherry:#C94B6E;          /* active text / accent (원래 --cherry) */
+    --cherry-soft:#FDF0F3;     /* active bg (원래 --cherry-soft) */
+    --cherry-box:#C94B6E;      /* logo box (원래 --sidebar-primary) */
+    --ink:#3D3652;             /* hover text (원래 --text-body) */
+    --muted:#6B727E;           /* default item text */
+    --label:#9E97B3;           /* section label (원래 --text-muted, 회색 아님) */
+    --hover:#F9F7F5;
+    --line:#E4E1EE;            /* 원래 --sidebar-border */
+    --stem:#D5D0E0;
+    --bg:#FBFAF9;
+    --panel:#FFFFFF;
+    --new:#2E8B6F;
+    --warn:#C7791B;
+    --star:#C94B6E;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    background:var(--bg); color:#2A2733; -webkit-font-smoothing:antialiased;
+    display:flex; min-height:100vh;
+  }
+  /* ── Sidebar ─────────────────────────── */
+  aside{
+    width:260px; flex-shrink:0; background:#fff; border-right:1px solid var(--line);
+    min-height:100vh; position:sticky; top:0; align-self:flex-start;
+  }
+  .logo{display:flex; align-items:center; gap:10px; padding:20px 16px 16px; border-bottom:1px solid var(--line)}
+  .logo .box{width:34px;height:34px;border-radius:10px;background:var(--cherry-box);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+  .logo b{font-size:17px;letter-spacing:-.2px}
+  .logo small{display:block;color:var(--label);font-size:11px;font-weight:600;margin-top:1px}
+  nav{padding:14px 8px 28px}
+  .section{margin-top:14px}
+  .section:first-child{margin-top:2px}
+  .section > .slabel{
+    font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--label);
+    padding:0 8px;margin-bottom:5px;display:flex;align-items:center;gap:6px
+  }
+  .hot{background:var(--cherry);color:#fff;font-size:9px;font-weight:700;letter-spacing:0;
+    border-radius:4px;padding:1px 5px}
+  .item{
+    display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;cursor:pointer;
+    color:var(--muted);font-size:13.5px;font-weight:500;text-align:left;padding:8px 10px;border-radius:8px;
+    line-height:1.25;font-family:inherit;transition:background .12s,color .12s
+  }
+  .item:hover{background:var(--hover);color:var(--ink)}
+  .item.active{background:var(--cherry-soft);color:var(--cherry);font-weight:600}
+  .item .ic{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .item .lab{flex:1;min-width:0}
+  .item .chev{width:13px;height:13px;flex-shrink:0;transition:transform .15s;opacity:.7}
+  .group.collapsed .chev{transform:rotate(-90deg)}
+  .badge{font-size:8.5px;font-weight:700;border-radius:4px;padding:1px 4px;letter-spacing:.2px;flex-shrink:0}
+  .b-new{background:#E7F4EF;color:var(--new)}
+  .b-warn{background:#FBF0DE;color:var(--warn)}
+  .b-star{color:var(--star);font-size:11px}
+  /* children tree */
+  .children{margin-left:18px;padding-left:12px;border-left:1px solid var(--stem);margin-top:2px}
+  .children .item{font-size:12.5px;padding:6px 8px;flex-wrap:wrap;row-gap:1px}
+  .children .item .lab{flex:1 1 auto}
+  .children .item .tag{margin-left:auto;font-size:9.5px;color:#B7B3C0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;flex-shrink:0;white-space:nowrap}
+  .hidden{display:none}
+  /* ── Detail panel ────────────────────── */
+  main{flex:1;padding:28px 34px;min-width:0}
+  .crumb{font-size:12px;color:var(--label);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+  h1{font-size:24px;margin:6px 0 2px;letter-spacing:-.4px}
+  .ko{font-size:15px;color:#6E6A78;margin:0 0 16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;max-width:640px;box-shadow:0 1px 2px rgba(20,10,30,.03)}
+  .ov{font-size:13.5px;line-height:1.65;color:#3A3646;background:var(--cherry-soft);border:1px solid var(--cherry-border,#F2C4CE);border-radius:10px;padding:11px 13px;margin-bottom:14px}
+  .ov-k{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.6px;color:#fff;background:var(--cherry);border-radius:5px;padding:2px 7px;margin-right:8px;vertical-align:middle}
+  .row{display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+  .row:last-child{border-bottom:0}
+  .row .k{width:110px;flex-shrink:0;color:var(--label);font-weight:600}
+  .row .v{flex:1;min-width:0;color:#3A3646;overflow-wrap:break-word}
+  .pill{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:#F3F1F6;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:#5A5568}
+  .conflict{color:var(--warn);font-weight:600}
+  .cf{display:flex;flex-direction:column;gap:7px}
+  .cf-topic{font-size:12px;font-weight:700;color:#6E6A78}
+  .cf-row{display:flex;flex-direction:column;gap:5px;font-size:12.5px;background:#FBFAF9;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+  .cf-row > div{min-width:0;overflow-wrap:break-word}
+  .cf-tag{align-self:flex-start}
+  .cf-base{border-left:3px solid var(--new)}
+  .cf-clash{border-left:3px solid var(--warn)}
+  .cf-tag{flex-shrink:0;font-size:9.5px;font-weight:700;border-radius:5px;padding:2px 6px;margin-top:1px;white-space:nowrap}
+  .t-base{background:#E7F4EF;color:var(--new)}
+  .t-clash{background:#FBF0DE;color:var(--warn)}
+  .cf-row b{color:#3A3646}
+  .cf-row em{font-style:normal;color:#9AA0AA;font-size:11px;margin-left:2px}
+  .cf-says{color:#5A5568;margin-top:2px;line-height:1.45}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0;max-width:640px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5A5568;background:#fff;border:1px solid var(--line);border-radius:20px;padding:4px 10px}
+  .note{max-width:640px;margin-top:18px;font-size:12.5px;color:#8A8694;line-height:1.7}
+  .tl{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:#5A5568;background:#fff}
+  .tl.t-base{background:#E7F4EF;color:var(--new);border-color:#CDE8DE}
+  .tl.t-clash{background:#FBF0DE;color:var(--warn);border-color:#F0DFBF}
+  /* 근거 문서 칩 */
+  .dchip{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;border-radius:5px;padding:2px 7px;margin:0 4px 4px 0;border:1px solid;overflow-wrap:break-word;max-width:100%}
+  .d-cat{background:#E7F4EF;color:#2E8B6F;border-color:#CDE8DE}
+  .d-prd{background:#EAF0FB;color:#3A6EA5;border-color:#D3E0F3}
+  .d-ia{background:#FBF0DE;color:#B07A1E;border-color:#F0DFBF}
+  .d-site{background:#F1F0F4;color:#6B6577;border-color:#E2DFE8}
+  .d-graph{background:#F1EBFA;color:#7A5AB0;border-color:#E2D6F3}
+  .dot{width:8px;height:8px;border-radius:50%}
+</style>
+</head>
+<body>
+  <aside>
+    <div class="logo">
+      <div class="box">
+        <!-- lucide "Cherry" — 원래 사이드바(components/cherry/sidebar.tsx)에서 쓰는 아이콘 -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3z"/><path d="M12 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3z"/><path d="M7 14c3.22-2.91 4.29-8.75 5-12 1.66 2.38 4.94 9 5 12"/><path d="M22 9c-4.29 0-7.14-2.33-10-7 5.71 0 10 4.67 10 7Z"/></svg>
+      </div>
+      <div><b>Cherry</b><small>for AI Engineers</small></div>
+    </div>
+    <nav id="nav"></nav>
+  </aside>
+
+  <main>
+    <div class="crumb" id="crumb">NEWLY DISCOVERED · CASES</div>
+    <h1 id="title">Domain Applications</h1>
+    <p class="ko" id="ko">도메인별 응용</p>
+    <div class="card" id="detail"></div>
+    <p class="note">
+      <b>기준</b>: <span class="tl t-base">현행 PRD ≡ Cherry Category (260530)</span> — 두 문서의 카테고리가 현재 <b>완전히 동일</b>(PRD가 Category에 맞춰 갱신됨). 이걸 기준으로 정리.
+      <span class="tl t-clash">UI &amp; Information Architecture (260415) · 2026-04-15</span> 만 갱신 전 버전이라 <b>2건</b>만 다름 → 충돌로 표시:
+      ① Building Blocks 명칭(IA는 'Patterns & Implementations'), ② Community 누락(IA엔 없음).
+    </p>
+  </main>
+
+<script>
+/* ── 아이콘(최소 인라인 SVG) ── */
+const I = (p)=>`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const IC = {
+  home:I('<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>'),
+  file:I('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>'),
+  bag:I('<path d="M6 8h12l-1 12H7z"/><path d="M9 8a3 3 0 0 1 6 0"/>'),
+  trophy:I('<path d="M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M9 20h6M12 13v4"/>'),
+  overview:I('<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>'),
+  research:I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
+  eng:I('<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2z"/>'),
+  cases:I('<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'),
+  discourse:I('<path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12z"/>'),
+  book:I('<path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M18 3v16"/>'),
+  cap:I('<path d="M22 9 12 5 2 9l10 4 10-4z"/><path d="M6 11v5c0 1 3 2.5 6 2.5s6-1.5 6-2.5v-5"/>'),
+  zap:I('<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>'),
+  archive:I('<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/>'),
+  compare:I('<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M6 8.5V15a3 3 0 0 0 3 3h6M18 15.5V9a3 3 0 0 0-3-3H9"/>'),
+  track:I('<path d="M3 12h4l3 8 4-16 3 8h4"/>'),
+};
+
+/* ── 근거 문서 정의 + 메뉴별 근거 매핑 ── */
+const DOCS = {
+  cat:  {label:"Cherry Category (260530)", cls:"d-cat",  title:"Cherry Category 정의 (260530) · 콘텐츠 태그 taxonomy · 2026-05-30 · 최신·기준"},
+  prd:  {label:"PRD product-scope", cls:"d-prd", title:"docs/PRD/product-scope.md · 2026-03-19 · 제품 범위"},
+  ia:   {label:"UI & Information Architecture (260415)", cls:"d-ia",   title:"UI & Information Architecture (260415) · 2026-04-15 · 화면 정보구조"},
+  site: {label:"현재 사이트", cls:"d-site", title:"현행 cherryinthehaystack.com (KaaS 포함) — 요구문서엔 없음"},
+  graph:{label:"Graph DB", cls:"d-graph",  title:"온톨로지 개념 기반(동적 목록)"},
+};
+// 각 메뉴의 근거 문서. 여러 문서가 일치하면 '대표 문서 하나'만, 충돌이면 채택(base) 쪽 문서만 표기(상세 대조는 충돌 블록)
+const BASIS = {
+  "highlight":["ia"], "patch-notes":["ia"],
+  "kaas-catalog":["site"], "kaas-arena":["site"],
+  "nd-overview":["ia"],
+  "model-updates":["cat"], "papers":["cat"], "benchmarks-datasets":["cat"],
+  "frameworks":["cat"], "dev-tools":["cat"], "building-blocks":["cat","prd"],
+  "domain-applications":["cat"], "case-studies":["cat"], "product-discovery":["cat"],
+  "regulations-policy-compliance":["cat"], "community":["cat","prd"],
+  "big-tech-trends":["cat"], "market-investment":["cat"],
+  "technical-deep-dives":["cat"], "insights-opinions":["cat"],
+  "concept-reader":["prd"],
+  "b-prompting":["prd"], "b-rag":["prd"], "b-agents":["prd"], "b-more":["graph"],
+  "a-cot":["prd"], "a-a2a":["ia"], "a-peft":["prd"],
+  "archive":["ia"], "compare-kb":["ia"], "change-tracking":["ia"],
+};
+function basisChips(id){
+  const b = BASIS[id]||[];
+  if(!b.length) return '—';
+  return b.map(c=>`<span class="dchip ${DOCS[c].cls}" title="${DOCS[c].title}">${DOCS[c].label}</span>`).join('');
+}
+// 그룹 헤더도 근거 문서 표시
+Object.assign(BASIS, {
+  research:["cat"], eng:["cat"], cases:["cat"], discourse:["cat"], basics:["prd"], advanced:["prd"],
+});
+
+/* ── 메뉴별 개요(이 메뉴가 뭔지) — 기획서(Category 예시/KR, PRD, IA) 근거로 정리 ── */
+const DESC = {
+  // 그룹
+  research:"연구·모델 그룹 — 기초 연구·모델 출시·평가 리소스를 추적. (Model Updates · Papers · Benchmarks & Datasets)",
+  eng:"엔지니어링·툴링 그룹 — AI 앱을 만들고 배포하는 도구·프레임워크·패턴. (Frameworks · Dev Tools · Building Blocks)",
+  cases:"산업·사례 그룹(⭐우선) — 실제 도메인 적용과 시장. (Domain Applications · Case Studies · Product Discovery)",
+  discourse:"담론 그룹 — AI 거버넌스·커뮤니티·사고 리더십. (규제·커뮤니티·빅테크·투자·기술심층·인사이트)",
+  basics:"기초 섹션 — 정립된 교재·강의에서 추출한 파운데이션 개념(개념 기반 동적 목록).",
+  advanced:"심화 섹션 — 초보자용이 아닌 깊은 기술 콘텐츠. 새 개념이 먼저 등장하는 곳.",
+  // 리프
+  "highlight":"한 주간 수집·평가된 콘텐츠 중 상위 항목을 모아 보여주는 주간 다이제스트(홈).",
+  "patch-notes":"사이트·지식베이스의 최근 변경사항을 changelog 형태로 정리한 페이지.",
+  "kaas-catalog":"에이전트가 개념·스킬을 크레딧으로 사고파는 지식 마켓. (KaaS 해커톤 산물 — 요구문서엔 없음)",
+  "kaas-arena":"에이전트 빌드 성능을 겨루는 리더보드. (KaaS 해커톤 산물)",
+  "nd-overview":"Newly Discovered 4개 그룹의 최신 항목을 한눈에 보는 개요 페이지.",
+  "model-updates":"신규 모델 출시·API 업데이트·버전/가격/프로토콜 변경. 예) GPT-4.5 launch, Claude 4 API update, token limit 변경.",
+  "papers":"학회 논문·학계 돌파구·새 기법. 직접 큐레이션하지 않고 외부 링크로 연결. 예) NeurIPS, ICML spotlight.",
+  "benchmarks-datasets":"벤치마크 결과·신규 데이터셋·평가 도구·리더보드(큐레이션 링크). 예) MMLU 갱신, LM-eval-harness.",
+  "frameworks":"개발 프레임워크·SDK·API 라이브러리, 릴리스/사용중단/의존성 업데이트. 예) LangChain v0.3, PEFT update.",
+  "dev-tools":"개발자 생산성 도구·모니터링·디버깅·테스트 서비스, 도구 디렉토리 + 명예의 전당(Hall of Fame).",
+  "building-blocks":"바로 가져다 조립하는 부품: 프롬프트·템플릿·코드 스니펫·오케스트레이션 패턴·MCP·에이전트 구성. 하위태그(mixed/agents/mcp/prompt)는 한 페이지에 함께 표시.",
+  "domain-applications":"도메인별 개선된 솔루션/프롬프트/워크플로, 도메인별 AI 활용 짧은 뉴스. 예) 콘텐츠 제작·학교·정신건강 도메인 사례.",
+  "case-studies":"도메인 특화 유스케이스·ROI·도입 전략·성공/실패 사례·컨퍼런스 발표. 예) 배민 text-to-SQL.",
+  "product-discovery":"AI로 실생활 문제를 푸는 솔루션 모음(개발자 생산성 도구는 제외 → Dev Tools). 예) 이력서 빌더·의료 영상 스크리너.",
+  "regulations-policy-compliance":"AI 정책·규제·컴플라이언스·법적 선례·표준(ISO/IEC). 예) EU AI Act, FTC 가이드라인.",
+  "community":"사람·이벤트·밋업·오픈소스 마일스톤·기여자 스포트라이트.",
+  "big-tech-trends":"빅테크의 전략적 움직임(모델 업데이트·투자 소식 제외). 예) 구글 AI 조직 개편, 메타 오픈소스 전략.",
+  "market-investment":"벤처 투자·M&A·후원 등 AI 산업 자금 흐름. 예) LLM 스타트업 시리즈 A, AI 기업 인수.",
+  "technical-deep-dives":"롱폼 기술 아티클·시스템 설계 분석·성능 분석·비교 평가.",
+  "insights-opinions":"오피니언 리더십·새 패턴·예측·트렌드 분석. 예) 'Why RAG won't scale'.",
+  "concept-reader":"개념 페이지 리더. PRD의 4섹션 포맷(Overview→Cherries→Child Concepts→Progressive References)으로 개념 학습.",
+  "b-prompting":"기초 — 프롬프팅·추론 기법 개념 페이지.",
+  "b-rag":"기초 — 검색증강(RAG) 개념 페이지.",
+  "b-agents":"기초 — 에이전트·추론 시스템 개념 페이지.",
+  "b-more":"Graph DB 온톨로지 기반으로 동적 확장되는 기초 개념 목록.",
+  "a-cot":"심화 — Chain-of-Thought 등 고급 추론 개념.",
+  "a-a2a":"심화 — 에이전트 간 통신(A2A) 개념.",
+  "a-peft":"심화 — PEFT/LoRA/QLoRA 경량 파인튜닝 개념.",
+  "archive":"과거 발행 콘텐츠 아카이브 뷰.",
+  "compare-kb":"지식베이스 비교 — 버전/에이전트 간 지식 차이 비교.",
+  "change-tracking":"변경사항 추적 — 개념·콘텐츠 업데이트 이력.",
+};
+
+/* ── 메뉴 데이터 (종합안) ── */
+const MENU = [
+  { label:"DIGEST", items:[
+    {id:"highlight", ic:"home", label:"This Week's Highlights", ko:"한 주 요약", tag:"— (Weekly)", src:"UI & Information Architecture (260415) · 현재 사이트"},
+    {id:"patch-notes", ic:"file", label:"Patch Notes", ko:"변경사항 (Changelog)", tag:"—", src:"UI & Information Architecture (260415) · 현재 사이트"},
+  ]},
+  { label:"AGENT SHOP", hot:true, items:[
+    {id:"kaas-catalog", ic:"bag", label:"Knowledge Market", ko:"지식 마켓", tag:"kaas", src:"현재 사이트(KaaS) · 현위치 유지"},
+    {id:"kaas-arena", ic:"trophy", label:"Arena", ko:"아레나", tag:"kaas", src:"현재 사이트(KaaS) · 현위치 유지"},
+  ]},
+  { label:"NEWLY DISCOVERED", items:[
+    {id:"nd-overview", ic:"overview", label:"Overview", ko:"전체 개요", badge:"new", tag:"—", src:"UI & Information Architecture (260415) · 이번 시즌 구현"},
+    {group:"research", ic:"research", label:"Research & Models", ko:"연구·모델", children:[
+      {id:"model-updates", label:"Model Updates", ko:"모델 업데이트", tag:"model-updates", src:"Cherry Category (260530)에 정의 (대표 문서)"},
+      {id:"papers", label:"Papers", ko:"논문", tag:"papers", src:"Cherry Category (260530)에 정의 · 외부 링크 · +조감도(landscape)"},
+      {id:"benchmarks-datasets", label:"Benchmarks & Datasets", ko:"벤치마크·데이터셋", tag:"benchmarks-datasets", src:"Cherry Category (260530)에 정의 · +조감도(landscape)"},
+    ]},
+    {group:"eng", ic:"eng", label:"Engineering & Tooling", ko:"엔지니어링·툴링", children:[
+      {id:"frameworks", label:"Frameworks & SDK", ko:"프레임워크·SDK", tag:"frameworks", src:"Cherry Category (260530)에 정의 (대표 문서)"},
+      {id:"dev-tools", label:"Dev Tools", ko:"개발 도구", tag:"dev-tools", src:"Cherry Category (260530)에 정의 · +Hall of Fame"},
+      {id:"building-blocks", label:"Building Blocks", ko:"빌딩 블록", tag:"building-blocks", badge:"warn",
+        src:"현행 PRD·Cherry Category는 'Building Blocks'(+하위태그) — UI & Information Architecture (260415)만 옛 명칭 'Patterns & Implementations'",
+        conflict:{ topic:"② 셋째 항목 명칭",
+          base:{doc:"PRD product-scope · Cherry Category (260530)", date:"현행·기준", says:"명칭 = Building Blocks (하위태그 mixed/agents/mcp/prompt)"},
+          clash:{doc:"UI & Information Architecture (260415)", date:"2026-04-15 · 갱신 전", says:"옛 명칭 = Patterns & Implementations"} }},
+    ]},
+    {group:"cases", ic:"cases", label:"Cases", ko:"산업·사례", star:true, children:[
+      {id:"domain-applications", label:"Domain Applications", ko:"도메인 응용", tag:"domain-applications", src:"3문서 모두 Cases 3분할(대표: Cherry Category 260530). 구 PRD는 Case Studies 1개였으나 현행 PRD에서 3분할로 정정됨"},
+      {id:"case-studies", label:"Case Studies", ko:"사례 연구", tag:"case-studies", src:"Cherry Category (260530)에 정의 (대표 문서)"},
+      {id:"product-discovery", label:"Product Discovery", ko:"제품 발굴", tag:"product-discovery", src:"3문서 모두 Cases 3분할에 포함(대표: Cherry Category 260530)"},
+    ]},
+    {group:"discourse", ic:"discourse", label:"Discourse", ko:"담론", children:[
+      {id:"regulations-policy-compliance", label:"Regulations · Policy · Compliance", ko:"규제·정책·컴플라이언스", tag:"regulations-policy-compliance", src:"Cherry Category (260530)에 정의 (대표 문서)"},
+      {id:"community", label:"Community", ko:"커뮤니티", tag:"community", badge:"warn",
+        src:"UI & Information Architecture (260415)엔 누락 → PRD·Cherry Category 따라 유지",
+        conflict:{ topic:"④ Community 존재 여부",
+          base:{doc:"Cherry Category (260530) · PRD product-scope", date:"2026-05-30 · 최신", says:"Community 카테고리 유지"},
+          clash:{doc:"UI & Information Architecture (260415)", date:"2026-04-15 · 과거", says:"담론 그룹에 Community 없음(누락)"} }},
+      {id:"big-tech-trends", label:"Big Tech Trends", ko:"빅테크 동향", tag:"big-tech-trends", src:"3문서 모두 독립 카테고리(대표: Cherry Category 260530). 구 PRD는 Insights에 포함이었으나 현행 PRD에서 독립됨"},
+      {id:"market-investment", label:"Market & Investment", ko:"시장·투자", tag:"market-investment", src:"3문서 모두 독립 카테고리(대표: Cherry Category 260530). 구 PRD엔 없었으나 현행 PRD에 추가됨"},
+      {id:"technical-deep-dives", label:"Technical Deep Dives", ko:"기술 심층분석", tag:"technical-deep-dives", src:"Cherry Category (260530)에 정의 (대표 문서)"},
+      {id:"insights-opinions", label:"Insights & Opinions", ko:"인사이트·오피니언", tag:"insights-opinions", src:"Cherry Category (260530)에 정의 (대표 문서)"},
+    ]},
+  ]},
+  { label:"LEARNING", items:[
+    {id:"concept-reader", ic:"book", label:"Concept Reader", ko:"개념 리더 (4섹션 포맷)", tag:"—", src:"PRD product-scope의 4섹션 포맷(Overview→Cherries→Child Concepts→Progressive References)"},
+    {group:"basics", ic:"cap", label:"Basics", ko:"기초", childrenNote:"개념 기반 동적 목록(24개)", children:[
+      {id:"b-prompting", label:"Prompting & Reasoning", ko:"프롬프팅·추론", tag:"concept", src:"PRD·UI & Information Architecture (260415) · 개념페이지"},
+      {id:"b-rag", label:"Retrieval-Augmented (RAG)", ko:"검색증강", tag:"concept", src:"PRD·UI & Information Architecture (260415) · 개념페이지"},
+      {id:"b-agents", label:"Agents & Reasoning", ko:"에이전트", tag:"concept", src:"PRD·UI & Information Architecture (260415) · 개념페이지"},
+      {id:"b-more", label:"… (Graph DB 개념 목록)", ko:"동적 확장", tag:"concept", src:"Graph DB 온톨로지 기반"},
+    ]},
+    {group:"advanced", ic:"zap", label:"Advanced", ko:"심화", children:[
+      {id:"a-cot", label:"Chain-of-Thought", ko:"사고사슬", tag:"concept", src:"PRD·UI & Information Architecture (260415)"},
+      {id:"a-a2a", label:"A2A", ko:"에이전트 간 통신", tag:"concept", src:"UI & Information Architecture (260415) 추가 항목"},
+      {id:"a-peft", label:"PEFT / LoRA / QLoRA", ko:"경량 파인튜닝", tag:"concept", src:"PRD·UI & Information Architecture (260415)"},
+    ]},
+  ]},
+  { label:"UTILITY", items:[
+    {id:"archive", ic:"archive", label:"Archive", ko:"아카이브", badge:"new", tag:"—", src:"UI & Information Architecture (260415) · 이번 시즌 구현"},
+    {id:"compare-kb", ic:"compare", label:"Compare Knowledge", ko:"지식베이스 비교", badge:"new", tag:"—", src:"UI & Information Architecture (260415) · 이번 시즌 구현"},
+    {id:"change-tracking", ic:"track", label:"Change Tracking", ko:"변경사항 추적", badge:"new", tag:"—", src:"UI & Information Architecture (260415) · 이번 시즌 구현"},
+  ]},
+];
+
+/* ── 렌더 ── */
+const nav = document.getElementById('nav');
+const collapsed = { basics:true, advanced:true }; // 기본 접힘
+let active = 'domain-applications';
+
+function badgeHTML(b){
+  if(b==='new') return `<span class="badge b-new">NEW</span>`;
+  if(b==='warn') return `<span class="badge b-warn">⚠️</span>`;
+  return '';
+}
+function leafHTML(it, inChildren){
+  return `<button class="item ${it.id===active?'active':''}" data-leaf="${it.id}">
+    ${it.ic?`<span class="ic">${IC[it.ic]}</span>`:''}
+    <span class="lab">${it.label}</span>
+    ${badgeHTML(it.badge)}
+  </button>`;
+}
+function render(){
+  nav.innerHTML = MENU.map(sec=>{
+    const items = sec.items.map(it=>{
+      if(it.children){
+        const isC = collapsed[it.group];
+        const kids = `<div class="children ${isC?'hidden':''}" data-kids="${it.group}">
+          ${it.children.map(c=>leafHTML(c,true)).join('')}
+        </div>`;
+        return `<div class="group ${isC?'collapsed':''}">
+          <button class="item" data-group="${it.group}">
+            <span class="ic">${IC[it.ic]}</span>
+            <span class="lab">${it.label}</span>
+            ${it.star?'<span class="b-star">★</span>':''}
+            <span class="chev">${I('<path d="M6 9l6 6 6-6"/>')}</span>
+          </button>${kids}</div>`;
+      }
+      return leafHTML(it,false);
+    }).join('');
+    return `<div class="section">
+      <div class="slabel">${sec.label}${sec.hot?'<span class="hot">HOT</span>':''}</div>
+      ${items}
+    </div>`;
+  }).join('');
+
+  nav.querySelectorAll('[data-group]').forEach(b=>b.onclick=()=>{
+    const g=b.getAttribute('data-group'); collapsed[g]=!collapsed[g]; render(); showDetail(g);
+  });
+  nav.querySelectorAll('[data-leaf]').forEach(b=>b.onclick=()=>{
+    active=b.getAttribute('data-leaf'); render(); showDetail(active);
+  });
+}
+function findLeaf(id){
+  for(const sec of MENU) for(const it of sec.items){
+    if(it.id===id) return {it, sec, group:null};
+    if(it.group===id) return {it:{id:it.group, label:it.label, ko:it.ko, tag:'—', src:'그룹 페이지'}, sec, group:null};
+    if(it.children) for(const c of it.children) if(c.id===id) return {it:c, sec, group:it};
+  }
+  return null;
+}
+function showDetail(id){
+  const f=findLeaf(id); if(!f) return;
+  const {it, sec, group}=f;
+  document.getElementById('crumb').textContent =
+    sec.label + (group?` · ${group.label.toUpperCase()}`:'');
+  document.getElementById('title').textContent = it.label;
+  document.getElementById('ko').textContent = it.ko||'';
+  const rows = [
+    ['한글', it.ko||'—'],
+    ['데이터 태그', it.tag && it.tag!=='—' ? `<span class="pill">${it.tag}</span>` : '<span style="color:#B7B3C0">해당 없음(UI 전용)</span>'],
+    ['그룹', group? group.label+' / '+(group.ko||'') : sec.label],
+    ['근거 문서', basisChips(it.id) + (it.conflict?' <span style="color:var(--warn);font-size:11px">← ⚠️ 아래 충돌 참고</span>':'')],
+    ['근거(설명)', it.src||'—'],
+  ];
+  if(it.conflict){
+    const c=it.conflict;
+    rows.push([`<span class="conflict">⚠️ 충돌</span>`,
+      `<div class="cf">
+        <div class="cf-topic">${c.topic}</div>
+        <div class="cf-row cf-base"><span class="cf-tag t-base">기준·최신</span>
+          <div><b>${c.base.doc}</b> <em>${c.base.date}</em><div class="cf-says">${c.base.says}</div></div></div>
+        <div class="cf-row cf-clash"><span class="cf-tag t-clash">과거·충돌</span>
+          <div><b>${c.clash.doc}</b> <em>${c.clash.date}</em><div class="cf-says">${c.clash.says}</div></div></div>
+      </div>`]);
+  }
+  const ov = DESC[it.id] ? `<div class="ov"><span class="ov-k">개요</span>${DESC[it.id]}</div>` : '';
+  document.getElementById('detail').innerHTML = ov +
+    rows.map(([k,v])=>`<div class="row"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+}
+render(); showDetail(active);
+</script>
+</body>
+</html>

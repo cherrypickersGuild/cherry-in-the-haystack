@@ -2,250 +2,194 @@
 
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
+import { Cherry as CherryLucide } from "lucide-react"
 import {
-  Home,
-  FileText,
-  Sparkles,
-  Link2,
-  Lightbulb,
-  BookOpen,
-  ChevronRight,
-  ChevronDown,
-  GraduationCap,
-  Zap,
-  ShoppingBag,
-  Trophy,
-  LayoutDashboard,
-  Cherry as CherryLucide,
-} from "lucide-react"
+  ND_GROUPS,
+  ND_UTILITY_IDS,
+  getNDItem,
+  getNDGroup,
+} from "@/lib/nd-taxonomy"
+
+/* ─────────────────────────────────────────────
+   목업(apps/docs/mockups/sidebar-mockup.html) 디자인 그대로.
+   색상·간격·폰트·아이콘 모두 목업 CSS 값을 사용한다.
+───────────────────────────────────────────── */
+const C = {
+  cherry: "#C94B6E",
+  cherrySoft: "#FDF0F3",
+  ink: "#3D3652",      // hover text
+  muted: "#6B727E",    // default item text
+  label: "#9E97B3",    // section label
+  hover: "#F9F7F5",
+  line: "#E4E1EE",
+  stem: "#D5D0E0",     // children 좌측 선
+} as const
+
+/* ── 아이콘 — 목업의 인라인 SVG 그대로 (16px, stroke 1.9) ── */
+function Ic({ d }: { d: React.ReactNode }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.9}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {d}
+    </svg>
+  )
+}
+
+const IC: Record<string, React.ReactNode> = {
+  home: <Ic d={<><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /></>} />,
+  file: <Ic d={<><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /></>} />,
+  bag: <Ic d={<><path d="M6 8h12l-1 12H7z" /><path d="M9 8a3 3 0 0 1 6 0" /></>} />,
+  trophy: <Ic d={<><path d="M7 4h10v4a5 5 0 0 1-10 0z" /><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M9 20h6M12 13v4" /></>} />,
+  overview: <Ic d={<><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></>} />,
+  research: <Ic d={<><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>} />,
+  eng: <Ic d={<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2z" />} />,
+  cases: <Ic d={<><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></>} />,
+  discourse: <Ic d={<path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12z" />} />,
+  book: <Ic d={<><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z" /><path d="M18 3v16" /></>} />,
+  cap: <Ic d={<><path d="M22 9 12 5 2 9l10 4 10-4z" /><path d="M6 11v5c0 1 3 2.5 6 2.5s6-1.5 6-2.5v-5" /></>} />,
+  zap: <Ic d={<path d="M13 2 4 14h7l-1 8 9-12h-7z" />} />,
+  archive: <Ic d={<><rect x="3" y="4" width="18" height="4" rx="1" /><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4" /></>} />,
+  compare: <Ic d={<><circle cx="6" cy="6" r="2.5" /><circle cx="18" cy="18" r="2.5" /><path d="M6 8.5V15a3 3 0 0 0 3 3h6M18 15.5V9a3 3 0 0 0-3-3H9" /></>} />,
+  track: <Ic d={<path d="M3 12h4l3 8 4-16 3 8h4" />} />,
+}
+
+const Chevron = () => (
+  <svg
+    width="13"
+    height="13"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.9}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M6 9l6 6 6-6" />
+  </svg>
+)
 
 /* ─────────────────────────────────────────────
    Types
 ───────────────────────────────────────────── */
-type ChildItem = {
-  id: string
-  label: string
-}
+type ChildItem = { id: string; label: string; badge?: "new" | "warn" }
+
+type Badge = "new" | "warn"
 
 type NavItem = {
   id: string
-  icon: React.ReactNode | null
+  ic?: string
   label: string
-  hasArrow?: boolean
+  star?: boolean
+  badge?: Badge
   children?: ChildItem[]
+}
+
+/* 목업 .badge / .b-new / .b-warn */
+function BadgeChip({ kind }: { kind: Badge }) {
+  const isNew = kind === "new"
+  return (
+    <span
+      className="flex-shrink-0"
+      style={{
+        fontSize: 8.5,
+        fontWeight: 700,
+        borderRadius: 4,
+        padding: "1px 4px",
+        letterSpacing: "0.2px",
+        background: isNew ? "#E7F4EF" : "#FBF0DE",
+        color: isNew ? "#2E8B6F" : "#C7791B",
+      }}
+    >
+      {isNew ? "NEW" : "⚠️"}
+    </span>
+  )
+}
+
+/** taxonomy 항목 → 사이드바 배지.
+ *  충돌(⚠️)은 메뉴에 표시하지 않는다 — 기획페이지 안에서만 대조해서 보여준다. */
+function badgeOf(id: string): Badge | undefined {
+  const item = getNDItem(id)
+  if (!item) return undefined
+  if (item.isNew) return "new"
+  return undefined
 }
 
 type SectionDef = {
   id: string
   label: string
-  highlight?: boolean
+  hot?: boolean
   items: NavItem[]
-}
-
-/* ─────────────────────────────────────────────
-   TreeStemList — 1px vertical stem + curve at last item only
-───────────────────────────────────────────── */
-const ITEM_H       = 32   // height per row — default (1 line)
-const ITEM_H_LONG  = 48   // height per row — 2 lines (long labels)
-const LONG_LABEL   = 25   // chars threshold for 2-line wrapping
-const CURVE_R   = 8    // arc radius
-const HORIZ_TAIL= 4    // short horizontal tail after arc
-const VERT_X    = 1    // x of vertical line
-const SVG_WIDTH = VERT_X + CURVE_R + HORIZ_TAIL + 1
-// arc starts this many px ABOVE row midpoint so it curves into the midpoint
-const ARC_ABOVE = CURVE_R  // curveStartY = midY - CURVE_R, arcEndY = midY
-
-function TreeStemList({
-  items,
-  active,
-  onSelect,
-  onCollapse,
-}: {
-  items: NavItem[]
-  active: string
-  onSelect: (id: string) => void
-  onCollapse?: () => void
-}) {
-  const count  = items.length
-  const [stemHovered, setStemHovered] = useState(false)
-
-  // 각 행 높이 — 라벨이 길면 2줄 슬롯
-  const rowH = (idx: number) => (items[idx].label.length > LONG_LABEL ? ITEM_H_LONG : ITEM_H)
-  // 슬롯 top (누적 합)
-  const slotTop = (idx: number) => {
-    let y = 0
-    for (let i = 0; i < idx; i++) y += rowH(i)
-    return y
-  }
-  const totalH = slotTop(count)
-  // midpoint Y of each row (슬롯 내 중앙)
-  const midY = (idx: number) => slotTop(idx) + rowH(idx) / 2
-  // arc starts ARC_ABOVE pixels before midpoint
-  const arcStartY = (idx: number) => midY(idx) - ARC_ABOVE
-  // last item arc start = vertical line end
-  const stemEndY = arcStartY(count - 1)
-
-  const stemColor = stemHovered ? "#8F879E" : "#D5D0E0"
-
-  return (
-    <div className="relative ml-5" style={{ height: totalH }}>
-      <svg
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        width={SVG_WIDTH}
-        height={totalH}
-        style={{ overflow: "visible" }}
-      >
-        {/* Single continuous vertical line from top to last arc start */}
-        <line
-          x1={VERT_X} y1={0}
-          x2={VERT_X} y2={stemEndY}
-          stroke={stemColor}
-          strokeWidth={stemHovered ? 1.5 : 1}
-          style={{ transition: "stroke 120ms, stroke-width 120ms" }}
-        />
-
-        {/* Only last item gets the curved branch */}
-        {(() => {
-          const lastIdx = count - 1
-          const cy = arcStartY(lastIdx)
-          return (
-            <path
-              d={[
-                `M ${VERT_X} ${cy}`,
-                `A ${CURVE_R} ${CURVE_R} 0 0 0 ${VERT_X + CURVE_R} ${cy + CURVE_R}`,
-                `L ${VERT_X + CURVE_R + HORIZ_TAIL} ${cy + CURVE_R}`,
-              ].join(" ")}
-              fill="none"
-              stroke={stemColor}
-              strokeWidth={stemHovered ? 1.5 : 1}
-              style={{ transition: "stroke 120ms, stroke-width 120ms" }}
-            />
-          )
-        })()}
-      </svg>
-
-      {/* Transparent hitbox for the vertical stem — wider than the visible line so it's easy to click (YouTube-style). */}
-      {onCollapse && (
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onCollapse() }}
-          onMouseEnter={() => setStemHovered(true)}
-          onMouseLeave={() => setStemHovered(false)}
-          aria-label="Collapse section"
-          title="Collapse"
-          className="absolute top-0 cursor-pointer"
-          style={{
-            left: VERT_X - 5,
-            width: 11,
-            height: stemEndY,
-            background: "transparent",
-            border: "none",
-            padding: 0,
-          }}
-        />
-      )}
-
-      {/* Buttons — fill the row (padding 3px top/bottom) so active bg contains wrapped text */}
-      {items.map((item, idx) => {
-        const rh     = rowH(idx)
-        const btnH   = rh - 6
-        const btnTop = slotTop(idx) + 3
-        return (
-          <TreeStemButton
-            key={item.id}
-            item={item}
-            isActive={active === item.id}
-            btnTop={btnTop}
-            btnH={btnH}
-            onSelect={onSelect}
-          />
-        )
-      })}
-    </div>
-  )
-}
-
-function TreeStemButton(props: {
-  item: NavItem
-  isActive: boolean
-  btnTop: number
-  btnH: number
-  onSelect: (id: string) => void
-}) {
-  const { item, isActive, btnTop, btnH, onSelect } = props
-  const [hovered, setHovered] = useState(false)
-  const textColor = isActive ? "var(--cherry)" : hovered ? "#3D3652" : "#6B727E"
-  const bg        = isActive ? "var(--cherry-soft)" : hovered ? "#F9F7F5" : "transparent"
-  const leftPx    = SVG_WIDTH + 3
-
-  return (
-    <button
-      onClick={() => onSelect(item.id)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="absolute right-0 flex items-center transition-all duration-150 cursor-pointer"
-      style={{
-        left: leftPx,
-        top: btnTop,
-        height: btnH,
-        minHeight: btnH,
-        color: textColor,
-        backgroundColor: bg,
-        fontWeight: isActive ? 600 : 500,
-        lineHeight: 1.25,
-        textAlign: "left",
-        paddingLeft: 8,
-        paddingRight: 8,
-        borderRadius: 6,
-        fontSize: 13,
-      }}
-      aria-current={isActive ? "page" : undefined}
-    >
-      <span style={{ fontSize: item.label.length > 20 ? "11.5px" : undefined }}>
-        {item.label}
-      </span>
-    </button>
-  )
 }
 
 /* ─────────────────────────────────────────────
    Navigation data
+   NEWLY DISCOVERED + UTILITY 는 lib/nd-taxonomy.ts 단일 소스에서 생성.
+   DIGEST / AGENT SHOP / LEARNING 은 기존 그대로.
 ───────────────────────────────────────────── */
+const ND_GROUP_IC: Record<string, string> = {
+  research: "research",
+  eng: "eng",
+  cases: "cases",
+  discourse: "discourse",
+}
+const ND_UTILITY_IC: Record<string, string> = {
+  archive: "archive",
+  "compare-kb": "compare",
+  "change-tracking": "track",
+}
+
 const SECTIONS: SectionDef[] = [
   {
     id: "digest",
     label: "DIGEST",
     items: [
-      { id: "highlight", icon: <Home size={16} />, label: "This Week's Highlight", hasArrow: true },
-      { id: "patch-notes", icon: <FileText size={16} />, label: "Patch Notes" },
+      { id: "highlight", ic: "home", label: "This Week's Highlights" },
+      { id: "patch-notes", ic: "file", label: "Patch Notes" },
     ],
   },
   {
     id: "agent-shopping",
     label: "AGENT SHOP",
-    highlight: true,
+    hot: true,
     items: [
-      { id: "kaas-catalog", icon: <ShoppingBag size={16} />, label: "Knowledge Market" },
-      { id: "kaas-arena", icon: <Trophy size={16} />, label: "Arena" },
+      { id: "kaas-catalog", ic: "bag", label: "Knowledge Market" },
+      { id: "kaas-arena", ic: "trophy", label: "Arena" },
     ],
   },
   {
     id: "newly-discovered",
     label: "NEWLY DISCOVERED",
     items: [
-      { id: "model-updates", icon: <Sparkles size={16} />, label: "Model Updates" },
-      { id: "frameworks", icon: <Link2 size={16} />, label: "Frameworks" },
-      { id: "case-studies", icon: <Lightbulb size={16} />, label: "Case Studies" },
+      { id: "nd-overview", ic: "overview", label: "Overview", badge: badgeOf("nd-overview") },
+      ...ND_GROUPS.map((g) => ({
+        id: g.key,
+        ic: ND_GROUP_IC[g.key],
+        label: g.label,
+        star: g.star,
+        children: g.children.map((cid) => {
+          const item = getNDItem(cid)!
+          return { id: item.id, label: item.label, badge: badgeOf(item.id) }
+        }),
+      })),
     ],
   },
   {
     id: "learning",
     label: "LEARNING",
     items: [
-      { id: "concept-reader", icon: <BookOpen size={16} />, label: "Concept Reader" },
+      { id: "concept-reader", ic: "book", label: "Concept Reader" },
       {
-        id: "basics", icon: <GraduationCap size={16} />, label: "Basics",
+        id: "basics",
+        ic: "cap",
+        label: "Basics",
         children: [
           { id: "foundations",              label: "Foundations of LLM Systems" },
           { id: "prompting-reasoning",      label: "Prompting & Reasoning" },
@@ -274,128 +218,117 @@ const SECTIONS: SectionDef[] = [
         ],
       },
       {
-        id: "advanced", icon: <Zap size={16} />, label: "Advanced",
+        id: "advanced",
+        ic: "zap",
+        label: "Advanced",
         children: [
-          { id: "chain-of-thought",   label: "Chain-of-Thought" },
-          { id: "multi-hop-rag",      label: "Multi-hop RAG" },
-          { id: "peft-lora",          label: "PEFT / LoRA / QLoRA" },
-          { id: "custom-embeddings",  label: "Custom Embeddings" },
-          { id: "adversarial-eval",   label: "Adversarial Evaluation" },
-          { id: "agent-topologies",   label: "Agent Topologies" },
+          { id: "chain-of-thought",  label: "Chain-of-Thought" },
+          { id: "multi-hop-rag",     label: "Multi-hop RAG" },
+          { id: "peft-lora",         label: "PEFT / LoRA / QLoRA" },
+          { id: "custom-embeddings", label: "Custom Embeddings" },
+          { id: "adversarial-eval",  label: "Adversarial Evaluation" },
+          { id: "agent-topologies",  label: "Agent Topologies" },
         ],
       },
     ],
   },
+  {
+    id: "utility",
+    label: "UTILITY",
+    items: ND_UTILITY_IDS.map((uid) => {
+      const item = getNDItem(uid)!
+      return { id: item.id, ic: ND_UTILITY_IC[item.id], label: item.label, badge: badgeOf(item.id) }
+    }),
+  },
 ]
 
 /* ─────────────────────────────────────────────
-   Cherry SVG Icon
+   Cherry Icon (로고) — 기존 export 유지
 ───────────────────────────────────────────── */
 export function CherryIcon({ className }: { className?: string }) {
   return (
     <div
-      className={cn("w-8 h-8 rounded-[10px] bg-[#C94B6E] flex items-center justify-center", className)}
+      className={cn("flex items-center justify-center", className)}
+      style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: C.cherry, color: "#fff", flexShrink: 0 }}
       aria-label="cherry"
       role="img"
     >
-      <CherryLucide size={18} className="text-white" />
+      <CherryLucide size={18} />
     </div>
   )
 }
 
-/* ──────────��──────────────────────────────────
-   Nav Button
+/* ─────────────────────────────────────────────
+   Item button — 목업 .item
 ───────────────────────────────────────────── */
-function NavButton({
+function ItemButton({
   item,
   isActive,
-  onSelect,
+  isChild,
+  isCollapsed,
+  onClick,
 }: {
   item: NavItem
   isActive: boolean
-  onSelect: (id: string) => void
+  isChild?: boolean
+  isCollapsed?: boolean
+  onClick: () => void
 }) {
   const [hovered, setHovered] = useState(false)
-  const color = isActive ? "var(--cherry)" : hovered ? "#3D3652" : "#6B727E"
-  const bg    = isActive ? "var(--cherry-soft)" : hovered ? "#F9F7F5" : "transparent"
+  const hasChildren = !!item.children?.length
 
-  return (
-    <button
-      onClick={() => onSelect(item.id)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="w-full flex items-center transition-all duration-150 cursor-pointer"
-      style={{
-        color,
-        backgroundColor: bg,
-        gap: 10,
-        paddingLeft: 20,
-        paddingRight: 12,
-        paddingTop: 8,
-        paddingBottom: 8,
-        borderRadius: 8,
-        fontSize: 13.5,
-        fontWeight: isActive ? 600 : 500,
-        textAlign: "left",
-      }}
-      aria-current={isActive ? "page" : undefined}
-    >
-      <span className="flex-shrink-0" style={{ color }}>{item.icon}</span>
-      <span className="flex-1 truncate">{item.label}</span>
-      {item.hasArrow && isActive && (
-        <ChevronRight size={14} style={{ color: "var(--cherry)" }} className="flex-shrink-0" />
-      )}
-    </button>
-  )
-}
-
-/* ─────────────────────────────────────────────
-   Group Header Button — clickable header for sections with children (Basics, Advanced)
-───────────────────────────────────────────── */
-function GroupHeaderButton({
-  item,
-  isCollapsed,
-  onToggle,
-}: {
-  item: NavItem
-  isCollapsed: boolean
-  onToggle: () => void
-}) {
-  const [hovered, setHovered] = useState(false)
-  const color = hovered ? "#3D3652" : "#6B727E"
-  const bg    = hovered ? "#F9F7F5" : "transparent"
+  const color = isActive ? C.cherry : hovered ? C.ink : C.muted
+  const bg = isActive ? C.cherrySoft : hovered ? C.hover : "transparent"
 
   return (
     <button
       type="button"
-      onClick={onToggle}
+      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="w-full flex items-center transition-all duration-150 cursor-pointer"
+      className="w-full flex items-center cursor-pointer"
       style={{
+        gap: 10,
         color,
         backgroundColor: bg,
-        height: ITEM_H,
-        gap: 10,
-        paddingLeft: 20,
-        paddingRight: 12,
-        borderRadius: 8,
-        fontSize: 13.5,
-        fontWeight: 500,
+        fontSize: isChild ? 12.5 : 13.5,
+        fontWeight: isActive ? 600 : 500,
         textAlign: "left",
+        padding: isChild ? "6px 8px" : "8px 10px",
+        borderRadius: 8,
+        lineHeight: 1.25,
+        border: 0,
+        transition: "background .12s, color .12s",
       }}
-      aria-expanded={!isCollapsed}
+      aria-current={isActive ? "page" : undefined}
+      aria-expanded={hasChildren ? !isCollapsed : undefined}
     >
-      <span className="flex-shrink-0" style={{ color }}>{item.icon}</span>
-      <span className="flex-1 truncate">{item.label}</span>
-      <ChevronDown
-        size={13}
-        className="flex-shrink-0 transition-transform duration-150"
-        style={{
-          color,
-          transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
-        }}
-      />
+      {item.ic && (
+        <span
+          className="flex items-center justify-center flex-shrink-0"
+          style={{ width: 16, height: 16, color }}
+        >
+          {IC[item.ic]}
+        </span>
+      )}
+      <span style={{ flex: 1, minWidth: 0 }}>{item.label}</span>
+      {item.badge && <BadgeChip kind={item.badge} />}
+      {item.star && <span style={{ color: C.cherry, fontSize: 11, flexShrink: 0 }}>★</span>}
+      {hasChildren && (
+        <span
+          className="flex-shrink-0"
+          style={{
+            width: 13,
+            height: 13,
+            opacity: 0.7,
+            color,
+            transition: "transform .15s",
+            transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+          }}
+        >
+          <Chevron />
+        </span>
+      )}
     </button>
   )
 }
@@ -414,107 +347,158 @@ export function Sidebar({
   className?: string
   hideLogo?: boolean
 }) {
-  // YouTube 스타일 접기: 헤더 클릭 또는 stem 클릭 → 토글. localStorage에 저장.
-  // 기본값은 Basics / Advanced 모두 접힌 상태 — 메뉴가 간결하게 시작.
-  // SSR 하이드레이션 일치를 위해:
-  //   · 첫 렌더는 서버·클라이언트 둘 다 DEFAULT_COLLAPSED로 동일하게 그림
-  //   · mount 후 useEffect에서 localStorage 값을 읽어 상태 갱신 (이 시점엔 paint 완료, mismatch 없음)
   const COLLAPSE_KEY = "cherry_sidebar_collapsed"
-  const DEFAULT_COLLAPSED: Record<string, boolean> = { basics: true, advanced: true }
+  // ND 4그룹은 펼친 채로 시작(신규 구조를 바로 보이게), Basics/Advanced는 기존대로 접힘.
+  // 이후엔 그룹별로 각각 저장·복원된다.
+  const DEFAULT_COLLAPSED: Record<string, boolean> = {
+    basics: true,
+    advanced: true,
+    research: false,
+    eng: false,
+    cases: false,
+    discourse: false,
+  }
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>(DEFAULT_COLLAPSED)
   const [hydrated, setHydrated] = useState(false)
 
-  // mount 시 1회만 localStorage에서 복원
+  // mount 시 1회만 복원.
+  // ⚠️ 저장값을 통째로 교체하면 안 된다 — 기존 사용자의 저장값엔 신규 그룹 키가 없어
+  //    undefined(=펼침)가 되어 기본값이 안 먹는다. 반드시 기본값과 '병합'한다.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(COLLAPSE_KEY)
       if (raw) {
         const parsed = JSON.parse(raw)
-        if (parsed && typeof parsed === "object") setCollapsed(parsed)
+        if (parsed && typeof parsed === "object") {
+          setCollapsed({ ...DEFAULT_COLLAPSED, ...parsed })
+        }
       }
     } catch { /* noop */ }
     setHydrated(true)
   }, [])
 
-  // hydrated 이후부터 localStorage 저장 (초기 DEFAULT 값으로 덮어쓰는 것 방지)
   useEffect(() => {
     if (!hydrated) return
     try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(collapsed)) } catch {}
   }, [collapsed, hydrated])
+
   const toggle = (id: string) => setCollapsed((c) => ({ ...c, [id]: !c[id] }))
 
   return (
     <aside
-      className={cn("flex flex-col bg-sidebar border-r border-sidebar-border flex-shrink-0", className)}
-      style={{ width: 240, minHeight: "100vh" }}
+      className={cn("flex flex-col flex-shrink-0", className)}
+      style={{
+        width: 260,
+        minHeight: "100vh",
+        background: "#fff",
+        borderRight: `1px solid ${C.line}`,
+      }}
       aria-label="Main navigation"
     >
-      {/* Logo — hidden in mobile sheet */}
+      {/* Logo — 목업 .logo */}
       {!hideLogo && (
         <div
-          className="flex-shrink-0 border-b border-sidebar-border"
-          style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 20, paddingBottom: 16 }}
+          className="flex items-center flex-shrink-0"
+          style={{ gap: 10, padding: "20px 16px 16px", borderBottom: `1px solid ${C.line}` }}
         >
-          <div className="flex items-center" style={{ gap: 10 }}>
-            <CherryIcon className="flex-shrink-0" />
-            <div className="leading-tight">
-              <span className="text-[17px] font-bold text-text-primary tracking-tight">Cherry</span>
-              <p className="text-[11px] text-text-muted font-medium">for AI Engineers</p>
-            </div>
+          <CherryIcon />
+          <div className="leading-tight">
+            <b style={{ fontSize: 17, letterSpacing: "-0.2px" }}>Cherry</b>
+            <small style={{ display: "block", color: C.label, fontSize: 11, fontWeight: 600, marginTop: 1 }}>
+              for AI Engineers
+            </small>
           </div>
         </div>
       )}
 
-      {/* Nav sections */}
-      <nav
-        className="flex-1 overflow-y-auto flex flex-col"
-        style={{ paddingLeft: 8, paddingRight: 8, paddingTop: 16, paddingBottom: 24, gap: 2 }}
-      >
+      {/* Nav — 목업 nav */}
+      <nav className="flex-1 overflow-y-auto" style={{ padding: "14px 8px 28px" }}>
         {SECTIONS.map((section, si) => (
-          <div key={section.id} style={si > 0 ? { marginTop: 12 } : undefined}>
-            <p
-              className="text-[10px] font-bold uppercase tracking-[0.8px] text-text-muted"
-              style={{ paddingLeft: 8, paddingRight: 8, marginBottom: 4 }}
+          <div key={section.id} style={{ marginTop: si === 0 ? 2 : 14 }}>
+            {/* 목업 .slabel */}
+            <div
+              className="flex items-center"
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: "0.9px",
+                textTransform: "uppercase",
+                color: C.label,
+                padding: "0 8px",
+                marginBottom: 5,
+                gap: 6,
+              }}
             >
               {section.label}
-              {section.highlight && (
+              {section.hot && (
                 <span
-                  className="text-[9px] font-semibold tracking-normal bg-[var(--cherry)] text-white align-middle"
-                  style={{ marginLeft: 6, borderRadius: 4, paddingLeft: 4, paddingRight: 4, paddingTop: 1, paddingBottom: 1 }}
+                  style={{
+                    background: C.cherry,
+                    color: "#fff",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    letterSpacing: 0,
+                    borderRadius: 4,
+                    padding: "1px 5px",
+                  }}
                 >
                   HOT
                 </span>
               )}
-            </p>
+            </div>
 
-            <div className="flex flex-col" style={{ gap: 2 }}>
-              {section.items.map((item) => (
+            {section.items.map((item) => {
+              const hasChildren = !!item.children?.length
+              if (!hasChildren) {
+                return (
+                  <ItemButton
+                    key={item.id}
+                    item={item}
+                    isActive={active === item.id}
+                    onClick={() => onSelect(item.id)}
+                  />
+                )
+              }
+
+              const isC = !!collapsed[item.id]
+              return (
                 <div key={item.id}>
-                  {item.children && item.children.length > 0 ? (
-                    /* Collapsible group — header is a toggle button, stem also clickable to collapse */
-                    <>
-                      <GroupHeaderButton
-                        item={item}
-                        isCollapsed={!!collapsed[item.id]}
-                        onToggle={() => toggle(item.id)}
-                      />
-                      {!collapsed[item.id] && (
-                        <div className="ml-4">
-                          <TreeStemList
-                            items={item.children.map(c => ({ id: c.id, icon: null, label: c.label }))}
-                            active={active}
-                            onSelect={onSelect}
-                            onCollapse={() => toggle(item.id)}
-                          />
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <NavButton item={item} isActive={active === item.id} onSelect={onSelect} />
+                  <ItemButton
+                    item={item}
+                    isActive={false}
+                    isCollapsed={isC}
+                    onClick={() => {
+                      toggle(item.id)
+                      // ND 그룹 헤더는 페이지가 없다 → 열고닫기 + 첫 서브메뉴 활성화.
+                      // Basics/Advanced는 기존대로 토글만.
+                      const g = getNDGroup(item.id)
+                      if (g) onSelect(g.children[0])
+                    }}
+                  />
+                  {/* 목업 .children — 단순 좌측 선 */}
+                  {!isC && (
+                    <div
+                      style={{
+                        marginLeft: 18,
+                        paddingLeft: 12,
+                        borderLeft: `1px solid ${C.stem}`,
+                        marginTop: 2,
+                      }}
+                    >
+                      {item.children!.map((c) => (
+                        <ItemButton
+                          key={c.id}
+                          item={{ id: c.id, label: c.label, badge: c.badge }}
+                          isActive={active === c.id}
+                          isChild
+                          onClick={() => onSelect(c.id)}
+                        />
+                      ))}
+                    </div>
                   )}
                 </div>
-              ))}
-            </div>
+              )
+            })}
           </div>
         ))}
       </nav>

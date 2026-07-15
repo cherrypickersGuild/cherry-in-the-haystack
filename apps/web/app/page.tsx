@@ -14,6 +14,8 @@ import { NDModelUpdatesPage } from "@/components/cherry/nd-model-updates-page"
 import { NDCaseStudiesPage } from "@/components/cherry/nd-case-studies-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
 import { HandbookPlaceholder } from "@/components/cherry/handbook-placeholder"
+import { NDSpecPage } from "@/components/cherry/nd-spec-page"
+import { isNDSpecPage } from "@/lib/nd-taxonomy"
 import { KaasCatalogPage } from "@/components/cherry/kaas-catalog-page"
 import { KaasArenaPage } from "@/components/cherry/kaas-arena-page"
 import { KaasDashboardPage } from "@/components/cherry/kaas-dashboard-page"
@@ -66,6 +68,13 @@ export default function CherryApp() {
      Route content based on active nav
   ───────────────────────────────────────────── */
   function renderContent() {
+    /* 신규 메뉴(Newly Discovered 신규 카테고리 · Overview · Utility) → 기획페이지.
+       ⚠️ switch의 `default:`가 홈으로 폴백하므로, 여기서 먼저 처리하지 않으면
+          신규 메뉴를 눌러도 조용히 홈이 뜨는 무증상 버그가 된다.
+       ※ 기존 진짜 페이지(model-updates/frameworks/case-studies)는 taxonomy에서
+          existing:true 라서 여기 걸리지 않고 아래 switch의 기존 분기로 간다. */
+    if (isNDSpecPage(activeNav)) return <NDSpecPage id={activeNav} />
+
     switch (activeNav) {
       case "patch-notes":
         return <PatchNotesPage />
