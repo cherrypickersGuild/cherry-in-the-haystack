@@ -348,15 +348,15 @@ export function Sidebar({
   hideLogo?: boolean
 }) {
   const COLLAPSE_KEY = "cherry_sidebar_collapsed"
-  // ND 4그룹은 펼친 채로 시작(신규 구조를 바로 보이게), Basics/Advanced는 기존대로 접힘.
-  // 이후엔 그룹별로 각각 저장·복원된다.
+  // 전 그룹 기본 접힘 — 메뉴가 간결하게 시작.
+  // 사용자가 펼친 상태는 그룹별로 localStorage에 각각 저장·복원된다.
   const DEFAULT_COLLAPSED: Record<string, boolean> = {
     basics: true,
     advanced: true,
-    research: false,
-    eng: false,
-    cases: false,
-    discourse: false,
+    research: true,
+    eng: true,
+    cases: true,
+    discourse: true,
   }
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>(DEFAULT_COLLAPSED)
   const [hydrated, setHydrated] = useState(false)
