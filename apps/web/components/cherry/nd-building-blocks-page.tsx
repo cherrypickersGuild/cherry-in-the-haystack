@@ -172,13 +172,14 @@ function CategorySection({ g }: { g: Group }) {
         <span className="rounded-[9px] bg-[#F3F1F6] px-2 py-[2px] text-[10.5px] font-bold text-[#9E97B3]">
           {items.length}
         </span>
-        {hasMore && (
+        {/* 펼치기는 그리드 마지막 칸의 카드가 담당한다. 여기는 접기 전용. */}
+        {hasMore && expanded && (
           <button
             type="button"
-            onClick={() => setExpanded((v) => !v)}
+            onClick={() => setExpanded(false)}
             className="ml-auto cursor-pointer border-0 bg-transparent text-[11.5px] font-semibold text-[#7B5EA7] hover:underline"
           >
-            {expanded ? "Show less ↑" : `View all (${items.length}) →`}
+            Show less ↑
           </button>
         )}
       </div>
@@ -187,6 +188,30 @@ function CategorySection({ g }: { g: Group }) {
         {shown.map((e) => (
           <EntityCard key={e.i + e.n} e={e} m={m} />
         ))}
+
+        {/* 그리드 마지막 칸 — 숨겨진 항목이 있다는 걸 목록 안에서 보이게 */}
+        {hasMore && !expanded && (
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-[12px] border border-dashed bg-transparent p-3 transition-all"
+            style={{ borderColor: "#C7B8E8", color: "#7B5EA7", minHeight: 112 }}
+            onMouseEnter={(ev) => {
+              ev.currentTarget.style.background = "#F3EFFA"
+              ev.currentTarget.style.borderColor = "#7B5EA7"
+            }}
+            onMouseLeave={(ev) => {
+              ev.currentTarget.style.background = "transparent"
+              ev.currentTarget.style.borderColor = "#C7B8E8"
+            }}
+          >
+            <span className="text-[20px] font-extrabold leading-none">
+              +{items.length - PREVIEW_COUNT}
+            </span>
+            <span className="text-[12px] font-semibold">more {m.label.toLowerCase()}</span>
+            <span className="text-[11px] text-[#9E97B3]">Click to show all</span>
+          </button>
+        )}
       </div>
     </div>
   )
@@ -235,10 +260,7 @@ export function NDBuildingBlocksPage() {
     <IconSetContext.Provider value={iconSet}>
       <div>
       {/* 헤더 */}
-      <div className="text-[12px] font-semibold uppercase tracking-[0.3px] text-[#9E97B3]">
-        Newly Discovered · Engineering &amp; Tooling
-      </div>
-      <h1 className="mb-[2px] mt-[6px] text-[26px] font-extrabold tracking-[-0.4px] text-[#1A1626]">
+      <h1 className="mb-[2px] text-[26px] font-extrabold tracking-[-0.4px] text-[#1A1626]">
         Building Blocks
       </h1>
       <p className="mb-[18px] max-w-[780px] text-[14px] leading-[1.7] text-[#6E6A78]">
