@@ -91,15 +91,9 @@ export function SettingsModal({
           <span className="font-bold text-[#3A2A1C]">{email ?? "…"}</span>
         </div>
 
-        <p className="text-[13px] text-[#6B4F2A] leading-relaxed mb-2">
+        <p className="text-[13px] text-[#6B4F2A] leading-relaxed mb-4">
           벤치마크는 <b>본인 Claude(Anthropic) API 키</b>로 실행됩니다. 키는 암호화되어 저장되고
           화면엔 마스킹만 표시됩니다.
-        </p>
-
-        {/* 만료 정책 안내 — 등록 전에 반드시 알린다 */}
-        <p className="text-[12.5px] text-[#8A6A3A] leading-relaxed mb-4">
-          🔒 보안을 위해 <b>등록 후 72시간(3일)이 지나면 자동으로 삭제</b>됩니다.
-          이후 다시 사용하려면 재등록이 필요합니다.
         </p>
 
         <div className="rounded-xl bg-[#FBF6ED] px-4 py-3 mb-4" style={{ border: "1px solid #E9D1A6" }}>
@@ -130,6 +124,14 @@ export function SettingsModal({
           className="w-full mt-1 px-4 py-3 rounded-xl bg-white text-[14px] text-[#3A2A1C] placeholder:text-[#C9B88A] outline-none focus:ring-2 focus:ring-[#C8301E]/30 transition"
           style={{ border: "1px solid #E9D1A6" }}
         />
+        {/* 만료 정책 안내 — 키 입력란 바로 아래 */}
+        <div
+          className="mt-2 rounded-lg bg-[#FBF6ED] px-3 py-2 text-[12px] text-[#8A6A3A] leading-relaxed"
+          style={{ border: "1px solid #EDDCBB" }}
+        >
+          등록 후 <b>72시간(3일)</b>이 지나면 자동으로 삭제됩니다. 이후 다시 사용하려면 재등록이 필요합니다.
+        </div>
+
         {msg && <p className="text-[12px] text-[#2E7D32] mt-2">{msg}</p>}
         {err && <p className="text-[12px] text-[#C8301E] mt-2">{err}</p>}
 
