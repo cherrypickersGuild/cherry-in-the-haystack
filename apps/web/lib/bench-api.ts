@@ -1,7 +1,32 @@
 import { API_URL, authHeaders } from "./auth"
 
 /* ── 회원 벤치 키 (Settings) ─────────────────────────────── */
-export interface BenchKeyStatus { hasKey: boolean; masked: string | null }
+export interface BenchKeyStatus {
+  hasKey: boolean
+  masked: string | null
+  /** 만료 시각(ISO 8601). 등록 시점 + 72시간. 미등록이면 null */
+  expiresAt: string | null
+}
+
+/** 만료까지 남은 시간을 "2일 5시간" 형태로. 이미 지났으면 null */
+export function formatTimeLeft(expiresAt: string | null): string | null {
+  if (!expiresAt) return null
+  const ms = new Date(expiresAt).getTime() - Date.now()
+  if (!Number.isFinite(ms) || ms <= 0) return null
+  const totalHours = Math.floor(ms / 3_600_000)
+  const days = Math.floor(totalHours / 24)
+  const hours = totalHours % 24
+  if (days > 0) return `${days}일 ${hours}시간`
+  if (totalHours > 0) return `${totalHours}시간`
+  return `${Math.max(1, Math.floor(ms / 60_000))}분`
+}
+
+/** 만료 임박(24시간 미만) 여부 — 주의 색 강조에 사용 */
+export function isExpiringSoon(expiresAt: string | null): boolean {
+  if (!expiresAt) return false
+  const ms = new Date(expiresAt).getTime() - Date.now()
+  return ms > 0 && ms < 24 * 3_600_000
+}
 
 export async function fetchBenchKeyStatus(): Promise<BenchKeyStatus> {
   const res = await fetch(`${API_URL}/api/app-user/bench-key`, {

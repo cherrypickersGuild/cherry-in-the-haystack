@@ -7,6 +7,8 @@ import {
   fetchBenchKeyStatus,
   putBenchKey,
   deleteBenchKey,
+  formatTimeLeft,
+  isExpiringSoon,
   type BenchKeyStatus,
 } from "@/lib/bench-api"
 
@@ -42,11 +44,13 @@ export function SettingsModal({
 
   if (!open) return null
 
+  const timeLeft = formatTimeLeft(status?.expiresAt ?? null)
+
   const save = async () => {
     setBusy(true); setMsg(""); setErr("")
     try {
       const s = await putBenchKey(apiKey.trim())
-      setStatus(s); setApiKey(""); setMsg("저장되었습니다.")
+      setStatus(s); setApiKey(""); setMsg("저장되었습니다. 72시간 후 자동 삭제됩니다.")
       window.dispatchEvent(new Event("bench-key:change"))
     } catch (e) {
       setErr(e instanceof Error ? e.message : "저장 실패")
@@ -59,7 +63,7 @@ export function SettingsModal({
     setBusy(true); setMsg(""); setErr("")
     try {
       await deleteBenchKey()
-      setStatus({ hasKey: false, masked: null }); setMsg("삭제되었습니다.")
+      setStatus({ hasKey: false, masked: null, expiresAt: null }); setMsg("삭제되었습니다.")
       window.dispatchEvent(new Event("bench-key:change"))
     } catch (e) {
       setErr(e instanceof Error ? e.message : "삭제 실패")
@@ -87,9 +91,15 @@ export function SettingsModal({
           <span className="font-bold text-[#3A2A1C]">{email ?? "…"}</span>
         </div>
 
-        <p className="text-[13px] text-[#6B4F2A] leading-relaxed mb-4">
+        <p className="text-[13px] text-[#6B4F2A] leading-relaxed mb-2">
           벤치마크는 <b>본인 Claude(Anthropic) API 키</b>로 실행됩니다. 키는 암호화되어 저장되고
           화면엔 마스킹만 표시됩니다.
+        </p>
+
+        {/* 만료 정책 안내 — 등록 전에 반드시 알린다 */}
+        <p className="text-[12.5px] text-[#8A6A3A] leading-relaxed mb-4">
+          🔒 보안을 위해 <b>등록 후 72시간(3일)이 지나면 자동으로 삭제</b>됩니다.
+          이후 다시 사용하려면 재등록이 필요합니다.
         </p>
 
         <div className="rounded-xl bg-[#FBF6ED] px-4 py-3 mb-4" style={{ border: "1px solid #E9D1A6" }}>
@@ -101,6 +111,14 @@ export function SettingsModal({
               ? `등록됨 · ${status.masked ?? "sk-ant-…"}`
               : "미등록"}
           </div>
+          {status?.hasKey && timeLeft && (
+            <div
+              className="text-[12px] mt-1 font-semibold"
+              style={{ color: isExpiringSoon(status.expiresAt) ? "#C8301E" : "#8A6A3A" }}
+            >
+              {timeLeft} 후 만료
+            </div>
+          )}
         </div>
 
         <label className="text-[12px] font-semibold text-[#6B4F2A]">Anthropic API Key</label>

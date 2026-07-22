@@ -41,6 +41,8 @@ type RequestWithAuthData = Request & {
 };
 
 const MAGIC_TOKEN_TTL_MS = 15 * 60 * 1000;
+/** 벤치 키 유효기간: 등록 시점부터 72시간(3일) */
+const BENCH_KEY_TTL_MS = 72 * 60 * 60 * 1000;
 const REFRESH_COOKIE_NAME = 'cherryRefreshToken';
 const REFRESH_COOKIE_PATH = '/api/app-user';
 
@@ -487,36 +489,77 @@ export class AppUserAuthService {
   async setBenchKey(
     userId: string,
     apiKey: string,
-  ): Promise<{ hasKey: boolean; masked: string }> {
+  ): Promise<{ hasKey: boolean; masked: string; expiresAt: string }> {
     const user = await this.getActiveUserById(userId);
     if (!user) {
       throw new UnauthorizedException('User not found or inactive.');
     }
+    const expiresAt = new Date(Date.now() + BENCH_KEY_TTL_MS);
     await this.knex('core.app_user').where({ id: userId }).update({
       bench_api_key_enc: encryptSecret(apiKey),
+      bench_api_key_expires_at: expiresAt,
       updated_at: new Date(),
     });
-    return { hasKey: true, masked: maskKey(apiKey) };
+    return {
+      hasKey: true,
+      masked: maskKey(apiKey),
+      expiresAt: expiresAt.toISOString(),
+    };
   }
 
   async getBenchKeyStatus(
     userId: string,
-  ): Promise<{ hasKey: boolean; masked: string | null }> {
+  ): Promise<{ hasKey: boolean; masked: string | null; expiresAt: string | null }> {
     const user = await this.getActiveUserById(userId);
     const enc = user?.bench_api_key_enc ?? null;
-    if (!enc) return { hasKey: false, masked: null };
+    if (!enc) return { hasKey: false, masked: null, expiresAt: null };
+
+    // 만료됐으면 즉시 비우고 미등록으로 응답 (lazy delete)
+    const expiresAt = this.toDate(user?.bench_api_key_expires_at ?? null);
+    if (this.isBenchKeyExpired(expiresAt)) {
+      await this.purgeBenchKey(userId);
+      return { hasKey: false, masked: null, expiresAt: null };
+    }
+
     try {
-      return { hasKey: true, masked: maskKey(decryptSecret(enc)) };
+      return {
+        hasKey: true,
+        masked: maskKey(decryptSecret(enc)),
+        expiresAt: expiresAt!.toISOString(),
+      };
     } catch {
-      return { hasKey: true, masked: null };
+      return { hasKey: true, masked: null, expiresAt: expiresAt!.toISOString() };
     }
   }
 
   async deleteBenchKey(userId: string): Promise<void> {
     await this.knex('core.app_user').where({ id: userId }).update({
       bench_api_key_enc: null,
+      bench_api_key_expires_at: null,
       updated_at: new Date(),
     });
+  }
+
+  /**
+   * 만료 판정. 매직토큰(`magic_token_expires_at`)과 동일한 방식으로 앱에서 비교한다.
+   * ⚠️ expiresAt 이 없으면 **만료로 간주**한다 — 만료 시각을 알 수 없는 자격증명은 신뢰할 수 없다(fail-safe).
+   */
+  private isBenchKeyExpired(expiresAt: Date | null): boolean {
+    if (!expiresAt) return true;
+    return expiresAt.getTime() < Date.now();
+  }
+
+  /** 키 컬럼만 비운다. 실패해도 호출부는 '키 없음'으로 처리해야 한다. */
+  private async purgeBenchKey(userId: string): Promise<void> {
+    try {
+      await this.knex('core.app_user').where({ id: userId }).update({
+        bench_api_key_enc: null,
+        bench_api_key_expires_at: null,
+        updated_at: new Date(),
+      });
+    } catch {
+      /* 삭제 실패가 '키 사용 허용'으로 이어지면 안 되므로 무시하고 진행 */
+    }
   }
 
   /** bench 실행이 쓸 평문 키. 미등록/복호화실패 시 null. 절대 외부 응답에 노출 금지. */
@@ -524,6 +567,14 @@ export class AppUserAuthService {
     const user = await this.getActiveUserById(userId);
     const enc = user?.bench_api_key_enc ?? null;
     if (!enc) return null;
+
+    /* 만료 검사 — 이 경로가 키를 꺼내는 유일한 통로다.
+       여기서 막으면 크론이 죽어 있어도 만료된 키는 절대 사용되지 않는다. */
+    if (this.isBenchKeyExpired(this.toDate(user?.bench_api_key_expires_at ?? null))) {
+      await this.purgeBenchKey(userId);
+      return null;
+    }
+
     try {
       return decryptSecret(enc);
     } catch {

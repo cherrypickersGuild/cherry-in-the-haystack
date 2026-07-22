@@ -22,6 +22,8 @@ export interface AppUserEntity {
   google_sub: string | null;
   avatar_url: string | null;
   bench_api_key_enc: string | null;
+  /** 벤치 키 만료 시각(등록 + 72h). NULL이면 만료로 간주한다(fail-safe). */
+  bench_api_key_expires_at: Date | null;
   created_at: Date;
   updated_at: Date;
   revoked_at: Date | null;
