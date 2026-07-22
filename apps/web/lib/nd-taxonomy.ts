@@ -143,6 +143,7 @@ export const ND_ITEMS: NDItem[] = [
     basis: ["ia"],
     note: "UI & Information Architecture (260415) · 이번 시즌 구현",
     isNew: true,
+    existing: true,
   },
 
   /* ── Research & Models ── */

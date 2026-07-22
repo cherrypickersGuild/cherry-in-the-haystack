@@ -15,6 +15,7 @@ import { NDCaseStudiesPage } from "@/components/cherry/nd-case-studies-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
 import { HandbookPlaceholder } from "@/components/cherry/handbook-placeholder"
 import { NDSpecPage } from "@/components/cherry/nd-spec-page"
+import { NDOverviewPage } from "@/components/cherry/nd-overview-page"
 import { NDBuildingBlocksPage } from "@/components/cherry/nd-building-blocks-page"
 import { isNDSpecPage } from "@/lib/nd-taxonomy"
 import { KaasCatalogPage } from "@/components/cherry/kaas-catalog-page"
@@ -77,6 +78,9 @@ export default function CherryApp() {
     if (isNDSpecPage(activeNav)) return <NDSpecPage id={activeNav} />
 
     switch (activeNav) {
+      case "nd-overview":
+        return <NDOverviewPage />
+
       case "patch-notes":
         return <PatchNotesPage />
 
