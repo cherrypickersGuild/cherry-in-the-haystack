@@ -15,6 +15,7 @@ import { NDCaseStudiesPage } from "@/components/cherry/nd-case-studies-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
 import { HandbookPlaceholder } from "@/components/cherry/handbook-placeholder"
 import { NDSpecPage } from "@/components/cherry/nd-spec-page"
+import { NDBuildingBlocksPage } from "@/components/cherry/nd-building-blocks-page"
 import { isNDSpecPage } from "@/lib/nd-taxonomy"
 import { KaasCatalogPage } from "@/components/cherry/kaas-catalog-page"
 import { KaasArenaPage } from "@/components/cherry/kaas-arena-page"
@@ -87,6 +88,9 @@ export default function CherryApp() {
 
       case "case-studies":
         return <NDCaseStudiesPage />
+
+      case "building-blocks":
+        return <NDBuildingBlocksPage />
 
       case "kaas-catalog":
         return <KaasCatalogPage

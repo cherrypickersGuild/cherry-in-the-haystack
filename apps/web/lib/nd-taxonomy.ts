@@ -222,6 +222,8 @@ export const ND_ITEMS: NDItem[] = [
         says: "옛 명칭 = Patterns & Implementations",
       },
     },
+    // 실제 페이지 구현됨(NDBuildingBlocksPage) → 기획페이지 아님
+    existing: true,
   },
 
   /* ── Cases (우선순위) ── */
