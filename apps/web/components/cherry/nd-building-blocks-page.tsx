@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 
 /**
  * Building Blocks 페이지
@@ -26,8 +26,11 @@ type Group = { t: string; c: number; items: Entity[] }
 type Topic = { k: string; l: string; total: number; groups: Group[] }
 type Payload = { total: number; topics: Topic[] }
 
-/* ── 카테고리(entity_type) 표시 정보 ── */
-const TYPE_META: Record<string, { ic: string; c: string; bg: string; label: string }> = {
+/* ── 카테고리(entity_type) 표시 정보 ──
+   ic는 카테고리 헤더 아이콘이자, 로고 수집이 안 된 항목의 '기본 아이콘'으로도 쓰인다. */
+type TypeMeta = { ic: string; c: string; bg: string; label: string }
+
+const TYPE_META: Record<string, TypeMeta> = {
   server:      { ic: "🖥", c: "#4B78F0", bg: "#EEF2FD", label: "Server" },
   skill:       { ic: "⚡", c: "#C94B6E", bg: "#FDF0F3", label: "Skill" },
   product:     { ic: "📦", c: "#7B5EA7", bg: "#F3EFFA", label: "Product" },
@@ -50,9 +53,34 @@ const fmtStars = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 
 
 const PREVIEW_COUNT = 8
 
+/* ── 데이터 판단은 전부 여기(로직)에서 한다. JSON은 원본 그대로 두고 손대지 않는다. ── */
+
+/** 링크가 실제로 쓸 수 있는 주소인가. 원본에 target_url이 "unknown" 등으로 오는 경우가 있다. */
+function isUsableUrl(u: string): boolean {
+  return /^https?:\/\//i.test(u)
+}
+
+/** 표시 대상인가 — 링크가 없는 항목은 클릭해도 갈 곳이 없으므로 목록에서 제외 */
+function isDisplayable(e: Entity): boolean {
+  return isUsableUrl(e.u)
+}
+
+/**
+ * 수집된 아이콘 slug 목록(icons.json).
+ * 이게 있으면 파일 없는 아이콘은 요청조차 하지 않아 404가 안 난다.
+ * 로드 실패해도 동작한다 — 그 경우 요청해보고 onError로 폴백(404는 나지만 화면은 정상).
+ */
+const IconSetContext = createContext<Set<string> | null>(null)
+const useHasIcon = () => {
+  const set = useContext(IconSetContext)
+  return (slug: string) => (set ? set.has(slug) : true)
+}
+
 /* ── 엔티티 카드 (아이콘이 카드 폭의 약 1/3) ── */
-function EntityCard({ e, color, bg }: { e: Entity; color: string; bg: string }) {
-  const [failed, setFailed] = useState(false)
+function EntityCard({ e, m }: { e: Entity; m: TypeMeta }) {
+  const hasIcon = useHasIcon()
+  // 수집된 아이콘 파일이 없으면 요청을 아예 보내지 않고 바로 기본 아이콘으로(404 방지)
+  const [failed, setFailed] = useState(!hasIcon(e.i))
   return (
     <a
       href={e.u}
@@ -69,20 +97,20 @@ function EntityCard({ e, color, bg }: { e: Entity; color: string; bg: string }) 
         ev.currentTarget.style.boxShadow = "none"
       }}
     >
-      {/* 아이콘: 카드 폭의 33% */}
+      {/* 아이콘: 카드 폭의 33%. 수집된 로고가 없으면 카테고리 기본 아이콘으로 폴백 */}
       <span
         className="flex flex-shrink-0 items-center justify-center overflow-hidden rounded-[10px] border"
         style={{
           width: "33%",
           maxWidth: 88,
           aspectRatio: "1 / 1",
-          background: failed ? color : bg,
+          background: m.bg,
           borderColor: "#E4E1EE",
         }}
       >
         {failed ? (
-          <span className="text-[26px] font-extrabold text-white">
-            {e.n.trim().charAt(0).toUpperCase()}
+          <span className="text-[30px] leading-none" style={{ color: m.c }} title={m.label}>
+            {m.ic}
           </span>
         ) : (
           <img
@@ -124,8 +152,12 @@ function EntityCard({ e, color, bg }: { e: Entity; color: string; bg: string }) 
 function CategorySection({ g }: { g: Group }) {
   const [expanded, setExpanded] = useState(false)
   const m = meta(g.t)
-  const shown = expanded ? g.items : g.items.slice(0, PREVIEW_COUNT)
-  const hasMore = g.items.length > PREVIEW_COUNT
+  // 링크 없는 항목은 로직에서 걸러낸다 (JSON은 원본 그대로)
+  const items = g.items.filter(isDisplayable)
+  const shown = expanded ? items : items.slice(0, PREVIEW_COUNT)
+  const hasMore = items.length > PREVIEW_COUNT
+
+  if (items.length === 0) return null
 
   return (
     <div className="mb-7">
@@ -138,7 +170,7 @@ function CategorySection({ g }: { g: Group }) {
         </span>
         <span className="text-[15px] font-extrabold tracking-[-0.2px] text-[#1A1626]">{m.label}</span>
         <span className="rounded-[9px] bg-[#F3F1F6] px-2 py-[2px] text-[10.5px] font-bold text-[#9E97B3]">
-          {g.c}
+          {items.length}
         </span>
         {hasMore && (
           <button
@@ -146,14 +178,14 @@ function CategorySection({ g }: { g: Group }) {
             onClick={() => setExpanded((v) => !v)}
             className="ml-auto cursor-pointer border-0 bg-transparent text-[11.5px] font-semibold text-[#7B5EA7] hover:underline"
           >
-            {expanded ? "Show less ↑" : `View all (${g.c}) →`}
+            {expanded ? "Show less ↑" : `View all (${items.length}) →`}
           </button>
         )}
       </div>
 
       <div className="grid gap-[10px]" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(276px, 1fr))" }}>
         {shown.map((e) => (
-          <EntityCard key={e.i + e.n} e={e} color={m.c} bg={m.bg} />
+          <EntityCard key={e.i + e.n} e={e} m={m} />
         ))}
       </div>
     </div>
@@ -163,6 +195,7 @@ function CategorySection({ g }: { g: Group }) {
 /* ── 페이지 ── */
 export function NDBuildingBlocksPage() {
   const [data, setData] = useState<Payload | null>(null)
+  const [iconSet, setIconSet] = useState<Set<string> | null>(null)
   const [active, setActive] = useState<string>("agent")
   const [error, setError] = useState(false)
 
@@ -174,6 +207,12 @@ export function NDBuildingBlocksPage() {
         if (j.topics[0]) setActive(j.topics[0].k)
       })
       .catch(() => setError(true))
+
+    // 아이콘 매니페스트 — 실패해도 페이지는 정상 동작(요청 후 onError 폴백)
+    fetch("/building-blocks/icons.json")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("no manifest"))))
+      .then((slugs: string[]) => setIconSet(new Set(slugs)))
+      .catch(() => setIconSet(null))
   }, [])
 
   if (error) {
@@ -187,8 +226,14 @@ export function NDBuildingBlocksPage() {
 
   const topic = data?.topics.find((t) => t.k === active)
 
+  // 카운트도 표시 기준(링크 유효한 것)으로 로직에서 계산한다
+  const countOf = (t: Topic) =>
+    t.groups.reduce((n, g) => n + g.items.filter(isDisplayable).length, 0)
+  const grandTotal = data ? data.topics.reduce((n, t) => n + countOf(t), 0) : 0
+
   return (
-    <div>
+    <IconSetContext.Provider value={iconSet}>
+      <div>
       {/* 헤더 */}
       <div className="text-[12px] font-semibold uppercase tracking-[0.3px] text-[#9E97B3]">
         Newly Discovered · Engineering &amp; Tooling
@@ -205,13 +250,13 @@ export function NDBuildingBlocksPage() {
       <div className="mb-[22px] flex flex-wrap gap-[10px]">
         <div className="min-w-[104px] rounded-[10px] border bg-white px-[14px] py-[10px]" style={{ borderColor: "#E4E1EE" }}>
           <b className="block text-[19px] font-extrabold leading-[1.2] text-[#1A1626]">
-            {data ? data.total.toLocaleString() : "—"}
+            {data ? grandTotal.toLocaleString() : "—"}
           </b>
           <span className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#9E97B3]">Total</span>
         </div>
         {data?.topics.map((t) => (
           <div key={t.k} className="min-w-[104px] rounded-[10px] border bg-white px-[14px] py-[10px]" style={{ borderColor: "#E4E1EE" }}>
-            <b className="block text-[19px] font-extrabold leading-[1.2] text-[#1A1626]">{t.total}</b>
+            <b className="block text-[19px] font-extrabold leading-[1.2] text-[#1A1626]">{countOf(t)}</b>
             <span className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#9E97B3]">{t.l}</span>
           </div>
         ))}
@@ -238,7 +283,7 @@ export function NDBuildingBlocksPage() {
                 className="rounded-[9px] px-[7px] py-[1px] text-[10.5px] font-bold"
                 style={{ background: on ? "#FDF0F3" : "#F3F1F6", color: on ? "#C94B6E" : "#6B6577" }}
               >
-                {t.total}
+                {countOf(t)}
               </span>
             </button>
           )
@@ -250,6 +295,7 @@ export function NDBuildingBlocksPage() {
       {topic?.groups.map((g) => (
         <CategorySection key={g.t} g={g} />
       ))}
-    </div>
+      </div>
+    </IconSetContext.Provider>
   )
 }
