@@ -238,7 +238,7 @@ function HeroCarousel({ items }: { items: Item[] }) {
 /* ── 섹션 헤더 ── */
 function SectionHead({ title, desc }: { title: string; desc?: string }) {
   return (
-    <div className="mb-[14px] mt-[72px] flex items-baseline gap-[10px]">
+    <div className="mb-[14px] mt-[52px] flex items-baseline gap-[10px]">
       <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">{title}</h2>
       {desc && <span className="text-[12.5px] text-[#9E97B3]">{desc}</span>}
     </div>
