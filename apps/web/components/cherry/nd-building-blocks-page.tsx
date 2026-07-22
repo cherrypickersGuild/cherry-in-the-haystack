@@ -100,7 +100,7 @@ function EntityCard({ e, color, bg }: { e: Entity; color: string; bg: string }) 
         <span className="truncate text-[13.5px] font-bold text-[#1A1626]">
           {e.n}
           {e.vf === 1 && (
-            <span className="ml-[3px] text-[10px] text-[#2E8B6F]" title="출처 확인됨">
+            <span className="ml-[3px] text-[10px] text-[#2E8B6F]" title="Verified source">
               ✔
             </span>
           )}
@@ -146,7 +146,7 @@ function CategorySection({ g }: { g: Group }) {
             onClick={() => setExpanded((v) => !v)}
             className="ml-auto cursor-pointer border-0 bg-transparent text-[11.5px] font-semibold text-[#7B5EA7] hover:underline"
           >
-            {expanded ? "접기 ↑" : `전체 보기 (${g.c}) →`}
+            {expanded ? "Show less ↑" : `View all (${g.c}) →`}
           </button>
         )}
       </div>
@@ -180,7 +180,7 @@ export function NDBuildingBlocksPage() {
     return (
       <div style={{ maxWidth: 720 }}>
         <h1 className="mb-2 text-[26px] font-extrabold text-[#1A1626]">Building Blocks</h1>
-        <p className="text-[13.5px] text-[#6E6A78]">데이터를 불러오지 못했습니다.</p>
+        <p className="text-[13.5px] text-[#6E6A78]">Failed to load data.</p>
       </div>
     )
   }
@@ -196,10 +196,9 @@ export function NDBuildingBlocksPage() {
       <h1 className="mb-[2px] mt-[6px] text-[26px] font-extrabold tracking-[-0.4px] text-[#1A1626]">
         Building Blocks
       </h1>
-      <p className="mb-[6px] text-[14px] text-[#6E6A78]">빌딩 블록</p>
-      <p className="mb-[18px] max-w-[780px] text-[13.5px] leading-[1.7] text-[#3D3652]">
-        바로 가져다 조립하는 부품 — 프롬프트·템플릿·코드 스니펫·오케스트레이션 패턴·MCP·에이전트 구성.
-        <b> 서브카테고리</b>로 나누고, 그 안을 다시 <b>카테고리</b>로 묶었습니다.
+      <p className="mb-[18px] max-w-[780px] text-[14px] leading-[1.7] text-[#6E6A78]">
+        Prompts, templates, code snippets, orchestration patterns, MCP servers, and agent
+        configurations — ready to pick up and assemble.
       </p>
 
       {/* 요약 */}
@@ -208,7 +207,7 @@ export function NDBuildingBlocksPage() {
           <b className="block text-[19px] font-extrabold leading-[1.2] text-[#1A1626]">
             {data ? data.total.toLocaleString() : "—"}
           </b>
-          <span className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#9E97B3]">전체 엔티티</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.6px] text-[#9E97B3]">Total</span>
         </div>
         {data?.topics.map((t) => (
           <div key={t.k} className="min-w-[104px] rounded-[10px] border bg-white px-[14px] py-[10px]" style={{ borderColor: "#E4E1EE" }}>
@@ -247,7 +246,7 @@ export function NDBuildingBlocksPage() {
       </div>
 
       {/* 카테고리별 목록 */}
-      {!data && <p className="text-[13px] text-[#9E97B3]">불러오는 중…</p>}
+      {!data && <p className="text-[13px] text-[#9E97B3]">Loading…</p>}
       {topic?.groups.map((g) => (
         <CategorySection key={g.t} g={g} />
       ))}
