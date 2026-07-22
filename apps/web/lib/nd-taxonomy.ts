@@ -87,20 +87,20 @@ export type NDItem = {
 ───────────────────────────────────────────── */
 export const ND_GROUPS: NDGroup[] = [
   {
+    key: "eng",
+    label: "Engineering & Tooling",
+    ko: "엔지니어링·툴링",
+    desc: "AI 앱을 만들고 배포하는 도구·프레임워크·패턴 그룹.",
+    basis: ["cat"],
+    children: ["building-blocks", "frameworks", "dev-tools"],
+  },
+  {
     key: "research",
     label: "Research & Models",
     ko: "연구·모델",
     desc: "기초 연구·모델 출시·평가 리소스를 추적하는 그룹.",
     basis: ["cat"],
     children: ["model-updates", "papers", "benchmarks-datasets"],
-  },
-  {
-    key: "eng",
-    label: "Engineering & Tooling",
-    ko: "엔지니어링·툴링",
-    desc: "AI 앱을 만들고 배포하는 도구·프레임워크·패턴 그룹.",
-    basis: ["cat"],
-    children: ["frameworks", "dev-tools", "building-blocks"],
   },
   {
     key: "cases",

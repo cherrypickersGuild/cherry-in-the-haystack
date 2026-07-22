@@ -156,15 +156,6 @@ const SECTIONS: SectionDef[] = [
     ],
   },
   {
-    id: "agent-shopping",
-    label: "AGENT SHOP",
-    hot: true,
-    items: [
-      { id: "kaas-catalog", ic: "bag", label: "Knowledge Market" },
-      { id: "kaas-arena", ic: "trophy", label: "Arena" },
-    ],
-  },
-  {
     id: "newly-discovered",
     label: "NEWLY DISCOVERED",
     items: [
@@ -239,6 +230,15 @@ const SECTIONS: SectionDef[] = [
       const item = getNDItem(uid)!
       return { id: item.id, ic: ND_UTILITY_IC[item.id], label: item.label, badge: badgeOf(item.id) }
     }),
+  },
+  {
+    id: "agent-shopping",
+    label: "AGENT SHOP",
+    hot: true,
+    items: [
+      { id: "kaas-catalog", ic: "bag", label: "Knowledge Market" },
+      { id: "kaas-arena", ic: "trophy", label: "Arena" },
+    ],
   },
 ]
 
