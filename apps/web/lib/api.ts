@@ -79,6 +79,7 @@ export interface FrameworkEntityItem {
   name: string
   url: string | null
   isSpotlight: boolean
+  description: string | null
 }
 
 export interface FrameworkCategoryItem {

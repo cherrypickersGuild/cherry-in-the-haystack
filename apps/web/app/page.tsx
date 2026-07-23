@@ -339,7 +339,8 @@ export default function CherryApp() {
           style={{ backgroundColor: "#FBFAF8" }}
           id="main-content"
         >
-          <div className="w-full max-w-[1000px]">
+          {/* 가로 표준은 1000px. Frameworks만 Landscape 4단을 위해 1160px 허용. */}
+          <div className={`w-full ${activeNav === "frameworks" ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
             {renderContent()}
           </div>
         </main>

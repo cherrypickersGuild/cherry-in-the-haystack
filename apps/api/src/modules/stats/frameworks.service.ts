@@ -8,6 +8,7 @@ export interface FrameworkEntityItem {
   name: string;
   url: string | null;
   isSpotlight: boolean;
+  description: string | null;
 }
 
 export interface FrameworkCategoryItem {
@@ -62,6 +63,7 @@ export class FrameworksService {
         te.id           AS entity_id,
         te.name         AS entity_name,
         te.url          AS entity_url,
+        te.description  AS entity_description,
         te.is_spotlight AS is_spotlight
       FROM content.tracked_entity_placement tep
       JOIN content.entity_category ec
@@ -93,6 +95,7 @@ export class FrameworksService {
         name: r.entity_name,
         url: r.entity_url ?? null,
         isSpotlight: !!r.is_spotlight,
+        description: r.entity_description ?? null,
       });
     }
 

@@ -90,11 +90,13 @@ function EntityCard({ e, m }: { e: Entity; m: TypeMeta }) {
       style={{ borderColor: "#E4E1EE", textDecoration: "none" }}
       onMouseEnter={(ev) => {
         ev.currentTarget.style.borderColor = "#C7B8E8"
-        ev.currentTarget.style.boxShadow = "0 3px 10px rgba(91,61,135,.08)"
+        ev.currentTarget.style.boxShadow = "0 8px 24px rgba(91,61,135,.14)"
+        ev.currentTarget.style.transform = "translateY(-2px)"
       }}
       onMouseLeave={(ev) => {
         ev.currentTarget.style.borderColor = "#E4E1EE"
         ev.currentTarget.style.boxShadow = "none"
+        ev.currentTarget.style.transform = "none"
       }}
     >
       {/* 아이콘: 카드 폭의 33%. 수집된 로고가 없으면 카테고리 기본 아이콘으로 폴백 */}

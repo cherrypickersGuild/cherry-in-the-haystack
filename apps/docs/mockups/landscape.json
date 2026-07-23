@@ -1,0 +1,368 @@
+{
+  "generatedNote": "GitHub stars are a snapshot collected at build time; not live.",
+  "categories": [
+    {
+      "code": "agent",
+      "name": "Agent",
+      "entities": [
+        {
+          "name": "LangGraph",
+          "desc": "Stateful, graph-based orchestration for multi-actor agents",
+          "url": "https://github.com/langchain-ai/langgraph",
+          "stars": 37951,
+          "spotlight": true,
+          "emoji": "🕸",
+          "detail": "A low-level orchestration framework from the LangChain team for building stateful, multi-actor agents as graphs. Supports durable execution, human-in-the-loop, streaming, and persistent memory across steps."
+        },
+        {
+          "name": "CrewAI",
+          "desc": "Role-playing autonomous agents that collaborate on tasks",
+          "url": "https://github.com/crewAIInc/crewAI",
+          "stars": 56034,
+          "spotlight": false,
+          "emoji": "👥",
+          "detail": "A standalone framework for orchestrating role-playing autonomous agents. Define agents with roles, goals, and tools, then compose them into crews that collaborate on complex tasks."
+        },
+        {
+          "name": "AutoGen",
+          "desc": "Multi-agent conversation framework for LLM apps",
+          "url": "https://github.com/microsoft/autogen",
+          "stars": 59920,
+          "spotlight": false,
+          "emoji": "🧠",
+          "detail": "Microsoft's framework for building multi-agent LLM applications through conversation. Agents message one another — and optionally humans — to solve tasks, with support for code execution and tool use."
+        },
+        {
+          "name": "Swarm",
+          "desc": "Lightweight, ergonomic multi-agent orchestration",
+          "url": "https://github.com/openai/swarm",
+          "stars": 21858,
+          "spotlight": false,
+          "emoji": "🐝",
+          "detail": "OpenAI's lightweight, educational framework exploring ergonomic multi-agent orchestration through simple primitives — agents and handoffs — rather than a heavy runtime."
+        },
+        {
+          "name": "AutoGPT",
+          "desc": "Autonomous GPT agent platform",
+          "url": "https://github.com/Significant-Gravitas/AutoGPT",
+          "stars": 185657,
+          "spotlight": false,
+          "emoji": "🤖",
+          "detail": "One of the first autonomous GPT agent platforms. It chains LLM calls to pursue a goal with minimal human input, and has grown into a broader platform for building and deploying agents."
+        }
+      ]
+    },
+    {
+      "code": "fine-tuning",
+      "name": "Fine-Tuning",
+      "entities": [
+        {
+          "name": "Unsloth",
+          "desc": "2× faster, memory-efficient LLM fine-tuning",
+          "url": "https://github.com/unslothai/unsloth",
+          "stars": 68797,
+          "spotlight": true,
+          "emoji": "🦥",
+          "detail": "Makes LLM fine-tuning up to 2× faster and far more memory-efficient through custom kernels. Supports LoRA/QLoRA on consumer GPUs for popular open models."
+        },
+        {
+          "name": "PEFT",
+          "desc": "Parameter-efficient fine-tuning methods",
+          "url": "https://github.com/huggingface/peft",
+          "stars": 21441,
+          "spotlight": false,
+          "emoji": "🤗",
+          "detail": "Hugging Face's library for parameter-efficient fine-tuning. Implements LoRA, prefix tuning, prompt tuning, and more so you adapt large models by training only a small set of parameters."
+        },
+        {
+          "name": "Axolotl",
+          "desc": "Config-driven fine-tuning for open models",
+          "url": "https://github.com/axolotl-ai-cloud/axolotl",
+          "stars": 12239,
+          "spotlight": false,
+          "emoji": "🪄",
+          "detail": "A config-driven tool that wraps the open-model fine-tuning stack. Define dataset, model, and method in YAML and it handles LoRA/QLoRA, multi-GPU, and sequence packing."
+        },
+        {
+          "name": "LoRA",
+          "desc": "Low-rank adaptation for efficient fine-tuning",
+          "url": "https://github.com/microsoft/LoRA",
+          "stars": 13680,
+          "spotlight": false,
+          "emoji": "🧬",
+          "detail": "Low-Rank Adaptation — the foundational method that freezes the base model and trains small low-rank matrices, drastically cutting the cost of fine-tuning large models. Microsoft's reference implementation."
+        },
+        {
+          "name": "LLaMA-Factory",
+          "desc": "Unified fine-tuning for 100+ LLMs",
+          "url": "https://github.com/hiyouga/LlamaFactory",
+          "stars": 73471,
+          "spotlight": false,
+          "emoji": "🏭",
+          "detail": "A unified toolkit for fine-tuning 100+ LLMs and VLMs through a single interface. Supports full/LoRA/QLoRA tuning, many training methods, and a web UI."
+        }
+      ]
+    },
+    {
+      "code": "rag",
+      "name": "RAG",
+      "entities": [
+        {
+          "name": "LlamaIndex",
+          "desc": "Data framework for LLM applications",
+          "url": "https://github.com/run-llama/llama_index",
+          "stars": 51039,
+          "spotlight": true,
+          "emoji": "📚",
+          "detail": "A data framework for connecting custom and private data to LLMs. Provides loaders, indexes, retrievers, and query engines for building RAG and agentic apps over your own sources."
+        },
+        {
+          "name": "LangChain",
+          "desc": "Composable framework for LLM apps",
+          "url": "https://github.com/langchain-ai/langchain",
+          "stars": 142439,
+          "spotlight": false,
+          "emoji": "🔗",
+          "detail": "The widely-used framework for composing LLM applications from modular building blocks — models, prompts, retrievers, tools, and chains — with a large ecosystem of integrations."
+        },
+        {
+          "name": "Haystack",
+          "desc": "End-to-end search & RAG framework",
+          "url": "https://github.com/deepset-ai/haystack",
+          "stars": 25991,
+          "spotlight": false,
+          "emoji": "🌾",
+          "detail": "deepset's end-to-end framework for building production search and RAG pipelines. Composable components connect retrievers, readers, and generators into deployable pipelines."
+        },
+        {
+          "name": "RAGAS",
+          "desc": "Evaluation toolkit for RAG pipelines",
+          "url": "https://github.com/vibrantlabsai/ragas",
+          "stars": 14970,
+          "spotlight": false,
+          "emoji": "📏",
+          "detail": "An evaluation toolkit for RAG pipelines. Provides reference-free metrics — faithfulness, answer relevancy, context precision and recall — to measure and improve retrieval-augmented systems."
+        },
+        {
+          "name": "RAGFlow",
+          "desc": "Deep-document-understanding RAG engine",
+          "url": "https://github.com/infiniflow/ragflow",
+          "stars": 85794,
+          "spotlight": false,
+          "emoji": "🌊",
+          "detail": "An open-source RAG engine built around deep document understanding. It parses complex documents — tables, layouts — for high-quality, citation-grounded retrieval."
+        }
+      ]
+    },
+    {
+      "code": "prompt-eng",
+      "name": "Prompt Engineering",
+      "entities": [
+        {
+          "name": "DSPy",
+          "desc": "Programming — not prompting — language models",
+          "url": "https://github.com/stanfordnlp/dspy",
+          "stars": 36328,
+          "spotlight": true,
+          "emoji": "⚙️",
+          "detail": "Stanford's framework for programming — rather than prompting — language models. You write declarative modules and DSPy compiles and optimizes the prompts (and weights) automatically."
+        },
+        {
+          "name": "Guidance",
+          "desc": "Constrained generation & prompt control",
+          "url": "https://github.com/guidance-ai/guidance",
+          "stars": 21691,
+          "spotlight": false,
+          "emoji": "🧭",
+          "detail": "A library for constrained generation that interleaves control flow with LLM output. Enforce structure, regex, and grammars so models produce exactly the format you need."
+        },
+        {
+          "name": "Priompt",
+          "desc": "Priority-based prompt design library",
+          "url": "https://github.com/anysphere/priompt",
+          "stars": 2842,
+          "spotlight": false,
+          "emoji": "📐",
+          "detail": "Anysphere's (Cursor) priority-based prompt design library. Treats prompt construction like rendering, keeping the most important content when the context budget is tight."
+        }
+      ]
+    },
+    {
+      "code": "serving",
+      "name": "Serving",
+      "entities": [
+        {
+          "name": "vLLM",
+          "desc": "High-throughput LLM inference & serving",
+          "url": "https://github.com/vllm-project/vllm",
+          "stars": 86988,
+          "spotlight": true,
+          "emoji": "⚡",
+          "detail": "A high-throughput, memory-efficient inference and serving engine for LLMs. Its PagedAttention and continuous batching deliver state-of-the-art throughput for production serving."
+        },
+        {
+          "name": "Ollama",
+          "desc": "Run large language models locally",
+          "url": "https://github.com/ollama/ollama",
+          "stars": 176728,
+          "spotlight": false,
+          "emoji": "🦙",
+          "detail": "The simplest way to run open LLMs locally. A single command pulls and runs quantized models and exposes an API — popular for local development and private inference."
+        },
+        {
+          "name": "TGI",
+          "desc": "Text Generation Inference serving toolkit",
+          "url": "https://github.com/huggingface/text-generation-inference",
+          "stars": 10882,
+          "spotlight": false,
+          "emoji": "🔥",
+          "detail": "Hugging Face's Text Generation Inference — a production-grade toolkit for serving LLMs with tensor parallelism, continuous batching, and optimized kernels."
+        },
+        {
+          "name": "SGLang",
+          "desc": "Fast serving for complex LLM programs",
+          "url": "https://github.com/sgl-project/sglang",
+          "stars": 30673,
+          "spotlight": false,
+          "emoji": "🚀",
+          "detail": "A fast serving framework for complex LLM programs. Its RadixAttention and structured-generation runtime speed up multi-call, agentic, and structured workloads."
+        },
+        {
+          "name": "TensorRT-LLM",
+          "desc": "NVIDIA-optimized LLM inference",
+          "url": "https://github.com/NVIDIA/TensorRT-LLM",
+          "stars": 14184,
+          "spotlight": false,
+          "emoji": "🏎️",
+          "detail": "NVIDIA's library for optimizing and serving LLM inference on its GPUs. Compiles models into highly optimized TensorRT engines for maximum throughput and low latency."
+        }
+      ]
+    },
+    {
+      "code": "data-storage",
+      "name": "Data & Storage",
+      "entities": [
+        {
+          "name": "Qdrant",
+          "desc": "High-performance vector database",
+          "url": "https://github.com/qdrant/qdrant",
+          "stars": 33534,
+          "spotlight": true,
+          "emoji": "🟥",
+          "detail": "A high-performance, open-source vector database written in Rust. Offers fast filtered similarity search, rich payloads, and horizontal scaling for production vector workloads."
+        },
+        {
+          "name": "Weaviate",
+          "desc": "Open-source vector search engine",
+          "url": "https://github.com/weaviate/weaviate",
+          "stars": 16638,
+          "spotlight": false,
+          "emoji": "🌿",
+          "detail": "An open-source vector database with built-in vectorization modules and hybrid search. Combines semantic and keyword retrieval behind a simple API."
+        },
+        {
+          "name": "ChromaDB",
+          "desc": "Embeddings database for AI apps",
+          "url": "https://github.com/chroma-core/chroma",
+          "stars": 28858,
+          "spotlight": false,
+          "emoji": "🎨",
+          "detail": "A developer-friendly, open-source embeddings database. Popular for prototyping RAG apps — store, embed, and query documents with a minimal Python API."
+        },
+        {
+          "name": "pgvector",
+          "desc": "Vector similarity search for Postgres",
+          "url": "https://github.com/pgvector/pgvector",
+          "stars": 22323,
+          "spotlight": false,
+          "emoji": "🐘",
+          "detail": "A PostgreSQL extension that adds vector similarity search to your existing database. Store embeddings alongside relational data and query them with familiar SQL."
+        }
+      ]
+    },
+    {
+      "code": "llmops",
+      "name": "LLMOps",
+      "entities": [
+        {
+          "name": "MLflow",
+          "desc": "ML lifecycle & experiment tracking",
+          "url": "https://github.com/mlflow/mlflow",
+          "stars": 27184,
+          "spotlight": true,
+          "emoji": "📊",
+          "detail": "An open-source platform for the ML lifecycle — experiment tracking, model registry, packaging, and deployment — with growing first-class support for LLMs and prompts."
+        },
+        {
+          "name": "W&B",
+          "desc": "Experiment tracking & model evaluation",
+          "url": "https://github.com/wandb/wandb",
+          "stars": 11200,
+          "spotlight": false,
+          "emoji": "🟡",
+          "detail": "Weights & Biases — experiment tracking, evaluation, and observability for ML and LLM development. Logs runs, visualizes metrics, and includes tools for prompt and model evaluation."
+        },
+        {
+          "name": "ZenML",
+          "desc": "Portable MLOps pipeline framework",
+          "url": "https://github.com/zenml-io/zenml",
+          "stars": 5513,
+          "spotlight": false,
+          "emoji": "🧘",
+          "detail": "An extensible, open-source MLOps framework for building portable, production-ready pipelines. Abstracts infrastructure so the same pipeline runs locally or in the cloud."
+        }
+      ]
+    },
+    {
+      "code": "observability",
+      "name": "Observability",
+      "entities": [
+        {
+          "name": "Langfuse",
+          "desc": "Open-source LLM engineering & tracing",
+          "url": "https://github.com/langfuse/langfuse",
+          "stars": 31740,
+          "spotlight": true,
+          "emoji": "🔭",
+          "detail": "An open-source LLM engineering platform for tracing, evaluation, prompt management, and metrics. Instrument your app to debug and monitor LLM calls end to end."
+        },
+        {
+          "name": "LangSmith",
+          "desc": "Debug, test & monitor LLM apps",
+          "url": "https://smith.langchain.com",
+          "stars": null,
+          "spotlight": false,
+          "emoji": "🧪",
+          "detail": "LangChain's platform for debugging, testing, evaluating, and monitoring LLM applications. Captures detailed traces and supports datasets and evals — with or without LangChain."
+        },
+        {
+          "name": "Phoenix",
+          "desc": "Open-source LLM tracing & evaluation",
+          "url": "https://github.com/Arize-ai/phoenix",
+          "stars": 10702,
+          "spotlight": false,
+          "emoji": "🐦",
+          "detail": "Arize's open-source tool for LLM tracing and evaluation. Built on OpenTelemetry, it visualizes traces and runs evals to find and fix issues in LLM apps."
+        },
+        {
+          "name": "Helicone",
+          "desc": "LLM observability & gateway",
+          "url": "https://github.com/Helicone/helicone",
+          "stars": 5987,
+          "spotlight": false,
+          "emoji": "🍯",
+          "detail": "An open-source LLM observability platform that works as a proxy or via SDKs. Logs requests, tracks cost and latency, and adds caching and rate limiting with a one-line change."
+        },
+        {
+          "name": "TruLens",
+          "desc": "Evaluation & tracking for LLM apps",
+          "url": "https://github.com/truera/trulens",
+          "stars": 3456,
+          "spotlight": false,
+          "emoji": "🔍",
+          "detail": "An open-source library for evaluating and tracking LLM app quality. Its feedback functions score relevance, groundedness, and more to systematically improve apps."
+        }
+      ]
+    }
+  ]
+}

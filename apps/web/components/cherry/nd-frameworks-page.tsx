@@ -1,323 +1,443 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import {
-  fetchFrameworks,
-  FrameworkCategoryItem,
-  FrameworksRisingstar,
-  FrameworksArticleItem,
-} from "@/lib/api"
+import { createPortal } from "react-dom"
+import { fetchFrameworks, FrameworksArticleItem } from "@/lib/api"
 
-/* ─────────────────────────────────────────────
-   Category color map
-───────────────────────────────────────────── */
-const CATEGORY_COLORS: Record<string, string> = {
-  "agent":        "#E94057",
-  "fine-tuning":  "#8B5CF6",
-  "rag":          "#7C3AED",
-  "prompt-eng":   "#DC2626",
-  "serving":      "#10B981",
-  "data-storage": "#F97316",
-  "llmops":       "#0194E2",
-  "observability":"#7B5EA7",
+/**
+ * Frameworks & SDK 페이지
+ *
+ * 구성(목업: apps/docs/mockups/frameworks-mockup.html)
+ *  ① Landscape       — 정적 JSON(/frameworks/landscape.json)로 구성. Building Blocks 방식.
+ *                       카테고리 → 엔티티(이름·설명·링크·GitHub 스타 스냅샷·spotlight·이모지). 전부 링크 있음.
+ *  ② Rising Star     — 정적 샘플(‘sample’ 표기). 추세 그래프 없음. 기획회의 전 임시 자리.
+ *  ③ Recent Updates  — 실제 DB 기사(fetchFrameworks.articles). ai_score → ★ 별점.
+ */
+
+/* ── Landscape JSON 타입 (public/frameworks/landscape.json) ── */
+type LandscapeEntity = {
+  name: string
+  desc: string
+  /** 모달용 긴 설명 */
+  detail?: string
+  url: string | null
+  stars: number | null
+  spotlight: boolean
+  emoji: string
+}
+type LandscapeCategory = { code: string; name: string; entities: LandscapeEntity[] }
+type LandscapeData = { categories: LandscapeCategory[] }
+
+/* ── 카테고리(code) → 색상 ── */
+type CatColor = { c: string; bg: string }
+const CAT_COLOR: Record<string, CatColor> = {
+  "agent":         { c: "#E94057", bg: "#FDECEF" },
+  "fine-tuning":   { c: "#8B5CF6", bg: "#F3EFFA" },
+  "rag":           { c: "#7C3AED", bg: "#F3EFFA" },
+  "prompt-eng":    { c: "#DC2626", bg: "#FDECEC" },
+  "serving":       { c: "#10B981", bg: "#E7F4EF" },
+  "data-storage":  { c: "#F97316", bg: "#FEF3E2" },
+  "llmops":        { c: "#0194E2", bg: "#E6F4FD" },
+  "observability": { c: "#7B5EA7", bg: "#F3EFFA" },
+}
+const catColor = (code: string): CatColor => CAT_COLOR[code] ?? { c: "#9E97B3", bg: "#F3F1F6" }
+
+/* 기사 카테고리(표시명) → 점 색상 */
+const ARTICLE_CAT_COLOR: Record<string, string> = {
+  "Agent": "#E94057",
+  "Fine-Tuning": "#8B5CF6",
+  "RAG": "#7C3AED",
+  "Prompt Engineering": "#DC2626",
+  "Serving": "#10B981",
+  "Data & Storage": "#F97316",
+  "LLMOps": "#0194E2",
+  "Observability": "#7B5EA7",
+}
+const articleDot = (name: string) => ARTICLE_CAT_COLOR[name] ?? "#9E97B3"
+
+/* 스타 수 축약 표기 — 8900 → "8.9k", 22000 → "22k" */
+const fmtStars = (n: number) =>
+  n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : `${n}`
+
+/* 카테고리(code) → 이모지. JSON에 이모지가 비었을 때의 폴백. */
+const CAT_EMOJI: Record<string, string> = {
+  "agent": "🤖", "fine-tuning": "🎯", "rag": "🔍", "prompt-eng": "✏️",
+  "serving": "📬", "data-storage": "🗄️", "llmops": "⚙️", "observability": "📈",
 }
 
-const CATEGORY_ICONS: Record<string, string> = {
-  "agent":        "🤖",
-  "fine-tuning":  "🎯",
-  "rag":          "🔍",
-  "prompt-eng":   "✏️",
-  "serving":      "📬",
-  "data-storage": "🗄️",
-  "llmops":       "⚙️",
-  "observability":"📊",
-}
-
-const ARTICLE_COLORS: Record<string, { color: string; bg: string; border: string }> = {
-  "Agent":              { color: "#E94057", bg: "#FFF8F9", border: "#FECDD3" },
-  "Fine-Tuning":        { color: "#8B5CF6", bg: "#FAF8FF", border: "#DDD6FE" },
-  "RAG":                { color: "#7C3AED", bg: "#F9F7FD", border: "#C4B5FD" },
-  "Prompt Engineering": { color: "#DC2626", bg: "#FFF8F8", border: "#FECACA" },
-  "Serving":            { color: "#10B981", bg: "#F5FAFA", border: "#A7F3D0" },
-  "Data & Storage":     { color: "#F97316", bg: "#FFFAF5", border: "#FED7AA" },
-  "LLMOps":             { color: "#0194E2", bg: "#F5FAFF", border: "#BAE6FD" },
-  "Observability":      { color: "#7B5EA7", bg: "#F3EFFA", border: "#C7B8E8" },
-}
-const DEFAULT_ARTICLE_STYLE = { color: "#9E97B3", bg: "#FFFFFF", border: "#E4E1EE" }
-const getArticleStyle = (name: string) => ARTICLE_COLORS[name] ?? DEFAULT_ARTICLE_STYLE
-const getCategoryColor = (code: string) => CATEGORY_COLORS[code] ?? "#9E97B3"
-
-/* ─────────────────────────────────────────────
-   Skeleton placeholder data
-───────────────────────────────────────────── */
-const SKELETON_CATEGORIES: FrameworkCategoryItem[] = [
-  { id: "sk1", code: "agent",        name: "Agent",            sortOrder: 1, entities: [{ id: "e1", name: "LangGraph", url: null, isSpotlight: true }, { id: "e2", name: "CrewAI", url: null, isSpotlight: false }] },
-  { id: "sk2", code: "fine-tuning",  name: "Fine-Tuning",      sortOrder: 2, entities: [{ id: "e3", name: "LoRA", url: null, isSpotlight: false }] },
-  { id: "sk3", code: "rag",          name: "RAG",              sortOrder: 3, entities: [{ id: "e4", name: "LlamaIndex", url: null, isSpotlight: true }] },
-  { id: "sk4", code: "prompt-eng",   name: "Prompt Engineering",sortOrder: 4, entities: [{ id: "e5", name: "DSPy", url: null, isSpotlight: false }] },
-  { id: "sk5", code: "serving",      name: "Serving",          sortOrder: 5, entities: [{ id: "e6", name: "vLLM", url: null, isSpotlight: false }] },
-  { id: "sk6", code: "data-storage", name: "Data & Storage",   sortOrder: 6, entities: [{ id: "e7", name: "Weaviate", url: null, isSpotlight: false }] },
-  { id: "sk7", code: "llmops",       name: "LLMOps",           sortOrder: 7, entities: [{ id: "e8", name: "Weights & Biases", url: null, isSpotlight: false }] },
-  { id: "sk8", code: "observability","name": "Observability",  sortOrder: 8, entities: [{ id: "e9", name: "LangSmith", url: null, isSpotlight: false }] },
-]
-
-const SKELETON_RISINGSTAR: FrameworksRisingstar = {
-  categoryName: "Agent", isNew: false, changePct: null, articleCount: 0, topEntities: [],
-}
-
-const SKELETON_ARTICLES: FrameworksArticleItem[] = Array.from({ length: 5 }, (_, i) => ({
-  id: `sk-${i}`, articleStateId: `sk-${i}`, title: "Placeholder framework article title",
-  oneLiner: "One liner placeholder text", entityName: "LangGraph", categoryName: "Agent",
-  score: 4, date: "2026-04-07",
-}))
-
-/* ─────────────────────────────────────────────
-   Stars
-───────────────────────────────────────────── */
-function Stars({ count, color = "#7B5EA7" }: { count: number; color?: string }) {
+/* ── 엔티티 행 (카드 안 미리보기 — 표시 전용, 카드 전체가 클릭 대상) ── */
+function EntityRow({ e, code }: { e: LandscapeEntity; code: string }) {
+  const col = catColor(code)
   return (
-    <span className="flex items-center gap-[1px] text-[12px]" style={{ color }}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} style={{ opacity: i < count ? 1 : 0.2 }}>★</span>
-      ))}
+    <span className="flex items-center gap-3 border-t border-[#F1EFF5] py-[11px] first:border-t-0">
+      <span
+        className="flex flex-shrink-0 items-center justify-center rounded-[9px] border text-[18px] leading-none"
+        style={{ width: 36, height: 36, background: col.bg, borderColor: "#E4E1EE" }}
+      >
+        {e.emoji || CAT_EMOJI[code] || "•"}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-baseline justify-between gap-[10px]">
+          <span
+            className="min-w-0 truncate text-[14px] font-bold"
+            style={{ color: e.spotlight ? "#C94B6E" : "#1A1626" }}
+          >
+            {e.name}
+          </span>
+          {e.stars != null && (
+            <span className="flex-shrink-0 text-[11.5px] font-extrabold text-[#C7791B]">
+              ★ {fmtStars(e.stars)}
+            </span>
+          )}
+        </span>
+        {e.desc && (
+          <span className="mt-[2px] block truncate text-[11.5px] leading-[1.4] text-[#6E6A78]">
+            {e.desc}
+          </span>
+        )}
+      </span>
     </span>
   )
 }
 
-/* ─────────────────────────────────────────────
-   Entity Pill
-───────────────────────────────────────────── */
-function EntityPill({ name, isSpotlight, color, loading }: { name: string; isSpotlight: boolean; color: string; loading?: boolean }) {
-  const abbr = name.slice(0, 2).toUpperCase()
-  return (
+/* ── 카테고리 상세 모달 — 카드 안 3~5개를 전부 상세히 + 각각 링크 ── */
+function CategoryModal({ cat, onClose }: { cat: LandscapeCategory; onClose: () => void }) {
+  const col = catColor(cat.code)
+
+  useEffect(() => {
+    const onKey = (ev: KeyboardEvent) => ev.key === "Escape" && onClose()
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [onClose])
+
+  const modal = (
     <div
-      className="flex items-center gap-1.5 px-2 py-1.5 rounded-[6px] border transition-colors"
-      style={{ backgroundColor: isSpotlight ? "#FDF0F3" : "#F2F0F7", borderColor: isSpotlight ? "#F2C4CE" : "#E4E1EE" }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4"
+      onClick={onClose}
     >
       <div
-        className="w-5 h-5 rounded-[4px] flex items-center justify-center flex-shrink-0 text-white"
-        style={{ backgroundColor: color, fontSize: "7px", fontWeight: 700 }}
+        className="flex max-h-[86vh] w-full max-w-[600px] flex-col rounded-[20px] bg-white"
+        style={{ border: "1px solid #E4E1EE", boxShadow: "0 20px 48px rgba(26,22,38,.22)" }}
+        onClick={(ev) => ev.stopPropagation()}
       >
-        <span className={loading ? "opacity-0" : ""}>{abbr}</span>
+        {/* 헤더 */}
+        <div className="flex items-center gap-[10px] border-b border-[#EEECF4] px-6 py-[18px]">
+          <span
+            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[9px] text-[15px]"
+            style={{ background: col.bg, color: col.c }}
+          >
+            {CAT_EMOJI[cat.code] ?? "•"}
+          </span>
+          <h3 className="flex-1 text-[18px] font-extrabold tracking-[-0.3px] text-[#1A1626]">
+            {cat.name}
+          </h3>
+          <span className="text-[12px] font-extrabold text-[#9E97B3]">
+            {cat.entities.length}
+          </span>
+          <button
+            onClick={onClose}
+            className="ml-2 flex-shrink-0 rounded-md px-1.5 text-[18px] text-[#9E97B3] hover:text-[#1A1626]"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* 엔티티 목록 — 각 항목이 사이트로 가는 링크 */}
+        <div className="overflow-y-auto px-6 py-2">
+          {cat.entities.map((e) => {
+            const inner = (
+              <>
+                <span
+                  className="flex flex-shrink-0 items-center justify-center rounded-[12px] border text-[26px] leading-none"
+                  style={{ width: 52, height: 52, background: col.bg, borderColor: "#E4E1EE" }}
+                >
+                  {e.emoji || CAT_EMOJI[cat.code] || "•"}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="text-[15px] font-extrabold tracking-[-0.2px]"
+                      style={{ color: e.spotlight ? "#C94B6E" : "#1A1626" }}
+                    >
+                      {e.name}
+                    </span>
+                    {e.spotlight && (
+                      <span
+                        className="rounded-[5px] px-[6px] py-[1px] text-[9.5px] font-extrabold"
+                        style={{ background: "#FDF0F3", color: "#C94B6E" }}
+                      >
+                        SPOTLIGHT
+                      </span>
+                    )}
+                    {e.stars != null && (
+                      <span className="text-[11.5px] font-extrabold text-[#C7791B]">
+                        ★ {fmtStars(e.stars)}
+                      </span>
+                    )}
+                    {e.url && (
+                      <span className="ml-auto flex-shrink-0 text-[12px] font-bold text-[#7B5EA7] opacity-0 transition-opacity group-hover:opacity-100">
+                        Visit ↗
+                      </span>
+                    )}
+                  </span>
+                  <span className="mt-[4px] block text-[12.5px] leading-[1.6] text-[#3D3652]">
+                    {e.detail || e.desc}
+                  </span>
+                </span>
+              </>
+            )
+            const cls =
+              "group flex items-start gap-[14px] border-b border-[#F1EFF5] py-[15px] no-underline last:border-b-0"
+            return e.url ? (
+              <a
+                key={e.name}
+                href={e.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cls + " -mx-3 rounded-[12px] px-3 transition-colors hover:bg-[#F8F5FE]"}
+              >
+                {inner}
+              </a>
+            ) : (
+              <span key={e.name} className={cls}>
+                {inner}
+              </span>
+            )
+          })}
+        </div>
       </div>
-      <span
-        className={`text-[10px] font-medium transition-opacity duration-300 ${loading ? "opacity-0" : "opacity-100"}`}
-        style={{ color: isSpotlight ? "#C94B6E" : "#1A1626" }}
-      >
-        {name}
-      </span>
     </div>
+  )
+
+  return typeof document !== "undefined" ? createPortal(modal, document.body) : null
+}
+
+/* ── 카테고리 카드 (카드 전체 클릭 → 상세 모달) ── */
+function CategoryCard({
+  cat,
+  onOpen,
+}: {
+  cat: LandscapeCategory
+  onOpen: (cat: LandscapeCategory) => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(cat)}
+      className="flex w-full cursor-pointer flex-col rounded-[14px] border bg-white px-[18px] pb-[10px] pt-4 text-left"
+      style={{ borderColor: "#E4E1EE", transition: "border-color .15s, box-shadow .15s, transform .15s" }}
+      onMouseEnter={(ev) => {
+        ev.currentTarget.style.borderColor = "#C7B8E8"
+        ev.currentTarget.style.boxShadow = "0 8px 24px rgba(91,61,135,.14)"
+        ev.currentTarget.style.transform = "translateY(-2px)"
+      }}
+      onMouseLeave={(ev) => {
+        ev.currentTarget.style.borderColor = "#E4E1EE"
+        ev.currentTarget.style.boxShadow = "none"
+        ev.currentTarget.style.transform = "none"
+      }}
+    >
+      <div className="mb-2 flex items-center gap-[10px]">
+        <span className="flex-1 text-[15px] font-extrabold tracking-[-0.2px] text-[#1A1626]">
+          {cat.name}
+        </span>
+        <span className="text-[11px] font-extrabold text-[#9E97B3]">{cat.entities.length}</span>
+      </div>
+      <div className="flex flex-col">
+        {cat.entities.map((e) => (
+          <EntityRow key={e.name} e={e} code={cat.code} />
+        ))}
+      </div>
+    </button>
   )
 }
 
-/* ─────────────────────────────────────────────
-   Category Card
-───────────────────────────────────────────── */
-function CategoryCard({ cat, loading }: { cat: FrameworkCategoryItem; loading?: boolean }) {
-  const color = getCategoryColor(cat.code)
-  const icon = CATEGORY_ICONS[cat.code] ?? "📦"
-  const txt = loading ? "opacity-0" : "opacity-100 transition-opacity duration-300"
-
+/* ── ② Rising Star — 정적 샘플 ── */
+function RisingStarSample() {
   return (
     <div
-      className="bg-white border border-[#E4E1EE] rounded-[10px] p-3.5 hover:border-[#7B5EA7] transition-colors cursor-pointer"
-      style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
+      className="relative rounded-[14px] border bg-white px-6 py-[22px]"
+      style={{ borderColor: "#E4E1EE" }}
     >
-      <div className="text-[18px] mb-1">{icon}</div>
-      <p className={`text-[11px] font-bold uppercase tracking-[0.6px] text-[#1A1626] mb-2 ${txt}`}>{cat.name}</p>
-      <div className="flex flex-col gap-1.5">
-        {cat.entities.map((e) => (
-          <EntityPill key={e.id} name={e.name} isSpotlight={e.isSpotlight} color={color} loading={loading} />
+      <span
+        className="absolute left-0 top-0 rounded-br-[4px] rounded-tl-[5px] px-[10px] py-[5px] text-[10px] font-extrabold tracking-[0.3px] text-white"
+        style={{ background: "#7B5EA7" }}
+      >
+        HOT
+      </span>
+      <span
+        className="absolute right-[14px] top-[12px] rounded-[6px] border px-[7px] py-[2px] text-[9.5px] font-extrabold uppercase tracking-[0.5px] text-[#9E97B3]"
+        style={{ background: "#F3F1F6", borderColor: "#E4E1EE" }}
+      >
+        sample
+      </span>
+      <span className="mb-[6px] mt-[6px] block text-[11px] font-bold text-[#7B5EA7]">
+        Framework to Watch
+      </span>
+      <h3 className="mb-[6px] text-[22px] font-extrabold tracking-[-0.4px] text-[#1A1626]">Agent</h3>
+      <p className="mb-4 max-w-[560px] text-[13px] leading-[1.6] text-[#5A5568]">
+        Agent frameworks are drawing the most activity this cycle, concentrated around multi-agent
+        orchestration. This card is a placeholder — the ranking model is still being defined.
+      </p>
+      <div className="flex gap-7">
+        <div>
+          <b className="block text-[18px] font-extrabold leading-[1.2] text-[#1A1626]">24</b>
+          <span className="text-[11px] text-[#9E97B3]">recent updates</span>
+        </div>
+        <div>
+          <b className="block text-[18px] font-extrabold leading-[1.2] text-[#2E8B6F]">+38%</b>
+          <span className="text-[11px] text-[#9E97B3]">vs prior period</span>
+        </div>
+        <div>
+          <b className="block text-[18px] font-extrabold leading-[1.2] text-[#1A1626]">4</b>
+          <span className="text-[11px] text-[#9E97B3]">frameworks tracked</span>
+        </div>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-[7px]">
+        {[
+          ["LangGraph", "9"],
+          ["CrewAI", "6"],
+          ["AutoGen", "5"],
+          ["Swarm", "4"],
+        ].map(([n, c]) => (
+          <span
+            key={n}
+            className="inline-flex items-center gap-[6px] rounded-[8px] border px-[10px] py-[5px] text-[11.5px] font-semibold text-[#7B5EA7]"
+            style={{ background: "#F3EFFA", borderColor: "#C7B8E8" }}
+          >
+            {n} <span className="font-bold text-[#9E97B3]">{c}</span>
+          </span>
         ))}
       </div>
     </div>
   )
 }
 
-/* ─────────────────────────────────────────────
-   Sparkline
-───────────────────────────────────────────── */
-function Sparkline() {
-  const pts = [55, 50, 48, 45, 42, 38, 32, 28, 22, 18, 12, 8]
-  const w = 180, h = 50
-  const step = w / (pts.length - 1)
-  const d = pts.map((y, i) => `${i === 0 ? "M" : "L"}${(i * step).toFixed(1)},${y}`).join(" ")
+/* ── ③ Recent Updates 행 (실제 기사) ── */
+function ArticleRow({ item }: { item: FrameworksArticleItem }) {
+  const dot = articleDot(item.categoryName)
+  const score = Math.max(0, Math.min(5, item.score))
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-[50px]" preserveAspectRatio="none">
-      <defs>
-        <linearGradient id="fw-spark-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#7B5EA7" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="#7B5EA7" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={`${d} L${w},${h} L0,${h} Z`} fill="url(#fw-spark-fill)" />
-      <path d={d} fill="none" stroke="#7B5EA7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-/* ─────────────────────────────────────────────
-   Rising Star Card
-───────────────────────────────────────────── */
-function RisingStarCard({ rs, loading }: { rs: FrameworksRisingstar; loading?: boolean }) {
-  const pct = rs.changePct !== null ? Number(rs.changePct) : null
-  const topEntity = rs.topEntities?.[0]
-  const summary = topEntity
-    ? `${topEntity.article_count} articles this week featuring ${topEntity.name}.${rs.isNew ? " First time in rankings." : pct && pct > 0 ? ` Up ${pct}% from last week.` : ""}`
-    : `${rs.articleCount} articles this week in ${rs.categoryName}.`
-  const txt = loading ? "opacity-0" : "opacity-100 transition-opacity duration-300"
-
-  return (
-    <div
-      className="relative flex flex-col lg:flex-row items-center gap-5 rounded-[10px] border p-5"
-      style={{ backgroundColor: "#FFFFFF", borderColor: "#E4E1EE", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
-    >
-      <div className="flex-1 min-w-0 lg:pl-12">
-        <span className={`inline-block text-[11px] font-semibold mb-2 ${txt}`}
-          style={{ color: "#7B5EA7" }}
-        >
-          Rising Star — Framework to Watch
-        </span>
-        <div className="flex items-center gap-2 mb-1">
-          <h3 className={`text-[20px] font-bold text-[#1A1626] ${txt}`}>{rs.categoryName}</h3>
-        </div>
-        {!loading && (
-          <span className="absolute top-0 left-0 px-2.5 py-1 text-[10px] font-bold text-white rounded-tl-[5px] rounded-br-[4px]"
-            style={{ backgroundColor: rs.isNew ? "#E94057" : "#7B5EA7" }}
+    <div className="flex items-start gap-[14px] border-b py-[15px] last:border-b-0" style={{ borderColor: "#E4E1EE" }}>
+      <span className="mt-[6px] block h-[9px] w-[9px] flex-shrink-0 rounded-full" style={{ background: dot }} />
+      <div className="min-w-0 flex-1">
+        <p className="mb-[3px] text-[15px] font-bold leading-[1.35] text-[#1A1626]">{item.title}</p>
+        {item.oneLiner && (
+          <p
+            className="mb-[7px] text-[12.5px] leading-[1.5] text-[#6E6A78]"
+            style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
           >
-            {rs.isNew ? "NEW" : "HOT"}
-          </span>
+            {item.oneLiner}
+          </p>
         )}
-        <p className={`text-[13px] leading-relaxed mb-4 ${txt}`} style={{ color: "#3D3652" }}>{summary}</p>
-        <div className={`flex items-center gap-5 ${txt}`}>
-          <div>
-            <p className="text-[14px] font-bold text-[#1A1626]">{rs.articleCount}</p>
-            <p className="text-[11px] text-[#9E97B3]">articles this week</p>
-          </div>
-          {pct !== null && (
-            <div>
-              <p className="text-[14px] font-bold" style={{ color: pct >= 0 ? "#10B981" : "#E94057" }}>
-                {pct >= 0 ? "+" : ""}{pct}%
-              </p>
-              <p className="text-[11px] text-[#9E97B3]">vs last week</p>
-            </div>
+        <div className="flex items-center gap-[9px] text-[11px] text-[#9E97B3]">
+          {item.categoryName && (
+            <span className="font-bold" style={{ color: dot }}>
+              {item.categoryName}
+            </span>
           )}
-        </div>
-      </div>
-      <div className="w-full lg:w-[180px] lg:flex-shrink-0 lg:mr-12">
-        <div className="rounded-[10px] border p-3" style={{ backgroundColor: "#FFFFFF", borderColor: "#E4E1EE" }}>
-          <p className="text-[9px] font-bold uppercase tracking-[0.6px] text-[#9E97B3] mb-2">Trend</p>
-          <Sparkline />
+          <span className="text-[11px] tracking-[1px] text-[#C7791B]">
+            {"★".repeat(score)}
+            <span className="text-[#D8D3E2]">{"★".repeat(5 - score)}</span>
+          </span>
+          <span>
+            {item.entityName ? `${item.entityName} · ` : ""}
+            {item.date}
+          </span>
         </div>
       </div>
     </div>
   )
 }
 
-/* ─────────────────────────────────────────────
-   Article Item
-───────────────────────────────────────────── */
-function ArticleItem({ item, loading }: { item: FrameworksArticleItem; loading?: boolean }) {
-  const style = getArticleStyle(item.categoryName)
-  const initials = item.categoryName
-    ? item.categoryName.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
-    : item.entityName.slice(0, 2).toUpperCase()
-  const txt = loading ? "opacity-0" : "opacity-100 transition-opacity duration-300"
-
+/* ── 섹션 헤더 ── */
+function SectionHead({ title, desc, first }: { title: string; desc: string; first?: boolean }) {
   return (
     <div
-      className="bg-white rounded-[10px] border border-[#E4E1EE] p-4 pl-6 flex gap-3.5 cursor-pointer hover:shadow-md transition-shadow"
-      style={{ borderLeft: `3px solid ${style.color}`, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
+      className="mb-4 flex items-baseline gap-[10px]"
+      style={{ marginTop: first ? 36 : 52 }}
     >
-      <div className="flex-1 min-w-0">
-        <p className={`text-[15px] font-bold text-[#1A1626] mb-1 leading-snug ${txt}`}>{item.title}</p>
-        <p className={`text-[13px] text-[#9E97B3] leading-relaxed mb-2 line-clamp-2 ${txt}`}>{item.oneLiner}</p>
-        <div className={`flex items-center gap-2 ${txt}`}>
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold border"
-            style={{ backgroundColor: style.bg, color: style.color, borderColor: style.border }}
-          >
-            {item.categoryName || item.entityName}
-          </span>
-          <Stars count={item.score} color={style.color} />
-          <span className="text-[11px] text-[#9E97B3]">{item.entityName} · {item.date}</span>
-        </div>
-      </div>
+      <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">{title}</h2>
+      <span className="text-[12.5px] text-[#9E97B3]">{desc}</span>
     </div>
   )
 }
 
-/* ─────────────────────────────────────────────
-   Main Page
-───────────────────────────────────────────── */
+/* ── 페이지 ── */
 export function NDFrameworksPage() {
-  const [categories, setCategories] = useState<FrameworkCategoryItem[]>([])
-  const [risingstar, setRisingstar] = useState<FrameworksRisingstar | null>(null)
+  const [categories, setCategories] = useState<LandscapeCategory[]>([])
   const [articles, setArticles] = useState<FrameworksArticleItem[]>([])
   const [loading, setLoading] = useState(true)
+  // 상세 모달 — 선택된 카테고리(그 안 3~5개를 전부 상세히 표시)
+  const [selected, setSelected] = useState<LandscapeCategory | null>(null)
 
   useEffect(() => {
+    // ① Landscape — 정적 JSON (Building Blocks 방식)
+    fetch("/frameworks/landscape.json")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("load failed"))))
+      .then((d: LandscapeData) => setCategories(d.categories))
+      .catch(console.error)
+
+    // ③ Recent Updates — 실제 DB 기사 (categories/risingstar는 사용 안 함)
     fetchFrameworks()
-      .then((fw) => {
-        setCategories(fw.categories)
-        setRisingstar(fw.risingstar)
-        setArticles(fw.articles)
-      })
+      .then((fw) => setArticles(fw.articles))
       .catch(console.error)
       .finally(() => setLoading(false))
   }, [])
 
-  const displayCategories = loading ? SKELETON_CATEGORIES : categories
-  const displayRisingstar  = loading ? SKELETON_RISINGSTAR  : (risingstar ?? SKELETON_RISINGSTAR)
-  const displayArticles    = loading ? SKELETON_ARTICLES    : articles
-
   return (
-    <div className="max-w-[900px]">
-      <h1
-        className="font-extrabold text-[#1A1626] mb-2 leading-tight text-[22px] lg:text-[30px]"
-        style={{ letterSpacing: "-0.5px" }}
-      >
-        Frameworks
-      </h1>
-      <p className="text-[13px] text-[#9E97B3] mb-7">
-        Browse the AI framework landscape by category and discover the rising star of the week.
-      </p>
-
-      {/* ── Section 1: Framework Landscape ── */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-3">
-          <h2 className="text-[15px] font-bold text-[#1A1626] whitespace-nowrap">Framework Landscape</h2>
-          <div className="flex-1 border-t border-[#E4E1EE]" />
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-[10px]">
-          {displayCategories.map((cat) => (
-            <CategoryCard key={cat.id} cat={cat} loading={loading} />
-          ))}
-        </div>
+    // Landscape는 최대 1160px까지 넓혀 화면 폭에 따라 1~4단. 나머지는 940px 읽기 폭.
+    <div className="max-w-[1160px]">
+      <div className="max-w-[940px]">
+        <h1 className="m-0 mb-[4px] text-[30px] font-extrabold leading-[1.1] tracking-[-0.6px] text-[#1A1626]">
+          Frameworks &amp; SDK
+        </h1>
+        <p className="mb-[30px] text-[13.5px] text-[#9E97B3]">
+          The AI framework and SDK landscape by category — plus what&apos;s gaining momentum this cycle.
+        </p>
       </div>
 
-      {/* ── Section 2: Rising Star ── */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-3">
-          <h2 className="text-[15px] font-bold text-[#1A1626] whitespace-nowrap">Rising Star</h2>
-          <div className="flex-1 border-t border-[#E4E1EE]" />
-        </div>
-        <RisingStarCard rs={displayRisingstar} loading={loading} />
-      </div>
-
-      {/* ── Section 3: All Framework Updates ── */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-3">
-          <h2 className="text-[15px] font-bold text-[#1A1626] whitespace-nowrap">All Framework Updates</h2>
-          <div className="flex-1 border-t border-[#E4E1EE]" />
-        </div>
-        <div className="flex flex-col gap-3">
-          {displayArticles.map((item, i) => (
-            <ArticleItem key={loading ? `sk-${i}` : item.id} item={item} loading={loading} />
+      {/* ① Landscape — 카드 크기 유지, 개수는 화면 폭에 맞춰 auto-fill(최대 4단) */}
+      <SectionHead first title="Landscape" desc="Frameworks and SDKs across the ecosystem" />
+      {categories.length === 0 ? (
+        <p className="text-[13px] text-[#9E97B3]">Loading…</p>
+      ) : (
+        <div
+          className="grid gap-[12px]"
+          style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}
+        >
+          {categories.map((cat) => (
+            <CategoryCard key={cat.code} cat={cat} onOpen={setSelected} />
           ))}
         </div>
+      )}
+
+      <div className="max-w-[940px]">
+        {/* ② Rising Star (sample) */}
+        <SectionHead title="Rising Star" desc="The category drawing the most attention" />
+        <RisingStarSample />
+
+        {/* ③ Recent Updates (real) */}
+        <SectionHead title="Recent Updates" desc="Latest releases and articles" />
+        {articles.length === 0 ? (
+          <p className="text-[13px] text-[#9E97B3]">
+            {loading ? "Loading…" : "No updates yet."}
+          </p>
+        ) : (
+          <div className="flex flex-col">
+            {articles.map((item) => (
+              <ArticleRow key={item.id} item={item} />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="h-8" aria-hidden />
+
+      {selected && (
+        <CategoryModal cat={selected} onClose={() => setSelected(null)} />
+      )}
     </div>
   )
 }
