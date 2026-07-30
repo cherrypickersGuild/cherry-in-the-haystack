@@ -56,7 +56,9 @@ export type NDGroup = {
   desc: string
   basis: NDDocCode[]
   star?: boolean
-  children: string[]  // item id 순서 (첫 번째가 헤더 클릭 시 활성화될 항목)
+  children: string[]  // 사이드바에 렌더되는 하위 항목 id (순서대로)
+  /** 헤더 클릭 시 활성화할 페이지. 없으면 children[0]. 메뉴엔 안 보이지만 그룹의 랜딩 페이지로 쓰는 항목용. */
+  landingId?: string
 }
 
 export type NDItem = {
@@ -88,19 +90,14 @@ export type NDItem = {
 export const ND_GROUPS: NDGroup[] = [
   {
     key: "eng",
-    label: "Engineering & Tooling",
+    label: "Engineering Blocks",
     ko: "엔지니어링·툴링",
     desc: "AI 앱을 만들고 배포하는 도구·프레임워크·패턴 그룹.",
     basis: ["cat"],
-    children: ["building-blocks", "frameworks", "dev-tools"],
-  },
-  {
-    key: "research",
-    label: "Research & Models",
-    ko: "연구·모델",
-    desc: "기초 연구·모델 출시·평가 리소스를 추적하는 그룹.",
-    basis: ["cat"],
-    children: ["model-updates", "papers", "benchmarks-datasets"],
+    // Building Blocks는 메뉴에 노출하지 않고, 그룹 헤더 클릭 시 뜨는 랜딩 페이지로만 사용(위계 정리).
+    // Dev Tools는 메뉴에서 숨김(페이지 정의는 남겨둠 — 나중에 사용할 수 있음).
+    children: ["frameworks", "prompting"],
+    landingId: "building-blocks",
   },
   {
     key: "cases",
@@ -110,6 +107,14 @@ export const ND_GROUPS: NDGroup[] = [
     basis: ["cat"],
     star: true,
     children: ["domain-applications", "case-studies", "product-discovery"],
+  },
+  {
+    key: "research",
+    label: "Research & Models",
+    ko: "연구·모델",
+    desc: "기초 연구·모델 출시·평가 리소스를 추적하는 그룹.",
+    basis: ["cat"],
+    children: ["model-updates", "papers", "benchmarks-datasets"],
   },
   {
     key: "discourse",
@@ -179,16 +184,27 @@ export const ND_ITEMS: NDItem[] = [
     note: "Cherry Category (260530)에 정의 · +조감도(landscape)",
   },
 
-  /* ── Engineering & Tooling ── */
+  /* ── Engineering Blocks ── */
   {
     id: "frameworks",
-    label: "Frameworks & SDK",
+    label: "Frameworks Best",
     ko: "프레임워크·SDK",
     tag: "frameworks",
     group: "eng",
     desc: "개발 프레임워크·SDK·API 라이브러리, 릴리스/사용중단/의존성 업데이트. 예) LangChain v0.3, PEFT update.",
     basis: ["cat"],
     note: "Cherry Category (260530)에 정의 (대표 문서)",
+    existing: true,
+  },
+  {
+    id: "prompting",
+    label: "Prompting Best",
+    ko: "프롬프트·스킬",
+    tag: "prompting",
+    group: "eng",
+    desc: "빌딩블락스의 프롬프트·스킬 계열을 테마별로: 기법·가이드·프롬프트 도구/라이브러리·데이터셋·스킬·마켓·스펙. 각 테마 top5.",
+    basis: ["cat"],
+    note: "Building Blocks 파생(자동 생성 + 관리자 큐레이션)",
     existing: true,
   },
   {

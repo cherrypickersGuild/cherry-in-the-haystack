@@ -1,0 +1,381 @@
+{
+  "page": "overview",
+  "generatedAt": "2026-07-30T03:20:30.650Z",
+  "source": "building-blocks/entities.json",
+  "title": {
+    "source": "auto",
+    "updatedAt": "2026-07-30T03:20:30.650Z",
+    "updatedBy": null,
+    "heading": "Newly Discovered",
+    "subheading": "Editor's Choice"
+  },
+  "hero": {
+    "source": "auto",
+    "updatedAt": "2026-07-30T03:20:30.650Z",
+    "updatedBy": null,
+    "items": [
+      {
+        "entityKey": "skill|Superpowers",
+        "name": "Superpowers",
+        "desc": "A complete software-development methodology for coding agents built on a set of composable Claude C",
+        "url": "https://github.com/obra/superpowers",
+        "stars": 254842,
+        "icon": "002fa984156e",
+        "topic": "Skill",
+        "type": "skill"
+      },
+      {
+        "entityKey": "server|MarkItDown",
+        "name": "MarkItDown",
+        "desc": "Python tool for converting files and office documents to Markdown; ships an MCP server (markitdown-mcp) for LLM consumption.",
+        "url": "https://github.com/microsoft/markitdown",
+        "stars": 165197,
+        "icon": "80e8ccffad76",
+        "topic": "MCP",
+        "type": "server"
+      },
+      {
+        "entityKey": "framework|Mem0",
+        "name": "Mem0",
+        "desc": "A semantic graph memory framework (mem0.ai) that extracts and maintains user-specific preferences and h",
+        "url": "https://github.com/mem0ai/mem0",
+        "stars": 60792,
+        "icon": "d99da34c35ca",
+        "topic": "Agent",
+        "type": "framework"
+      },
+      {
+        "entityKey": "skill|andrej-karpathy-skills",
+        "name": "andrej-karpathy-skills",
+        "desc": "A drop-in Claude Code skill (a single CLAUDE.md) distilling Andrej Karpathy's observations on LLM c",
+        "url": "https://github.com/multica-ai/andrej-karpathy-skills",
+        "stars": 192340,
+        "icon": "386a5f98e4fb",
+        "topic": "Skill",
+        "type": "skill"
+      },
+      {
+        "entityKey": "dataset|prompts.chat",
+        "name": "prompts.chat",
+        "desc": "Prompts.chat (formerly 'Awesome ChatGPT Prompts') is a curated collection/database of prompt examples for",
+        "url": "https://github.com/f/prompts.chat",
+        "stars": 165659,
+        "icon": "37e64e1b36bb",
+        "topic": "Prompt",
+        "type": "dataset"
+      }
+    ]
+  },
+  "spotlight": {
+    "source": "auto",
+    "updatedAt": "2026-07-30T03:20:30.650Z",
+    "updatedBy": null,
+    "label": "Worth a Look",
+    "sub": "Standouts this week",
+    "items": [
+      {
+        "entityKey": "skill|mattpocock/skills",
+        "name": "mattpocock/skills",
+        "desc": "Matt Pocock's curated collection of agent skills for AI-assisted software development, targeting co",
+        "url": "https://github.com/mattpocock/skills",
+        "stars": 170756,
+        "icon": "dcb9031e498b",
+        "topic": "Skill",
+        "type": "skill"
+      },
+      {
+        "entityKey": "skill|UI UX Pro Max",
+        "name": "UI UX Pro Max",
+        "desc": "An AI skill providing design intelligence for building professional UI/UX across platforms - 84 UI",
+        "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+        "stars": 105676,
+        "icon": "38704f011eb3",
+        "topic": "Skill",
+        "type": "skill"
+      }
+    ]
+  },
+  "justAdded": {
+    "source": "auto",
+    "updatedAt": "2026-07-30T03:20:30.650Z",
+    "updatedBy": null,
+    "label": "Just Added",
+    "sub": "Most recent updates",
+    "items": [
+      {
+        "entityKey": "skill|Claude Scientific Skills",
+        "name": "Claude Scientific Skills",
+        "desc": "A collection of 148 pre-built scientific skills enabling AI agents to execute research workflows ac",
+        "url": "https://github.com/K-Dense-AI/scientific-agent-skills",
+        "stars": 30919,
+        "icon": "c4d0bb4ab603",
+        "topic": "Skill",
+        "type": "skill"
+      },
+      {
+        "entityKey": "skill|Humanizer",
+        "name": "Humanizer",
+        "desc": "An agent skill that detects and removes 33 patterns of AI-generated writing to make text sound more",
+        "url": "https://github.com/blader/humanizer",
+        "stars": 29231,
+        "icon": "44e41613f9d6",
+        "topic": "Skill",
+        "type": "skill"
+      },
+      {
+        "entityKey": "skill|Anthropic Cybersecurity Skills",
+        "name": "Anthropic Cybersecurity Skills",
+        "desc": "An open-source AI-native knowledge base of 817 structured cybersecurity skills for agents (Claude C",
+        "url": "https://github.com/mukul975/Anthropic-Cybersecurity-Skills",
+        "stars": 25580,
+        "icon": "138ce7d722a3",
+        "topic": "Skill",
+        "type": "skill"
+      },
+      {
+        "entityKey": "other|SkillSpector",
+        "name": "SkillSpector",
+        "desc": "An NVIDIA security scanner that audits AI agent skills before installation, running fast static pat",
+        "url": "https://github.com/NVIDIA/SkillSpector",
+        "stars": 13182,
+        "icon": "4fd0dc70a409",
+        "topic": "Skill",
+        "type": "other"
+      },
+      {
+        "entityKey": "skill|Dev Browser",
+        "name": "Dev Browser",
+        "desc": "'A Claude Skill to give your agent the ability to use a web browser' — sandbox-protected JavaScript execut",
+        "url": "https://github.com/SawyerHood/dev-browser",
+        "stars": 6435,
+        "icon": "193c21001015",
+        "topic": "Skill",
+        "type": "skill"
+      },
+      {
+        "entityKey": "skill|n8n Skills",
+        "name": "n8n Skills",
+        "desc": "A collection of 14 Claude Code skills that help AI assistants build production-ready n8n automation",
+        "url": "https://github.com/czlonkowski/n8n-skills",
+        "stars": 5792,
+        "icon": "d3c1970b500b",
+        "topic": "Skill",
+        "type": "skill"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "key": "mcp",
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "title": "Pick an MCP Server",
+      "banner": [
+        {
+          "entityKey": "server|Netdata MCP Server",
+          "name": "Netdata MCP Server",
+          "desc": "Netdata's MCP server for discovery, exploration, reporting and root-cause analysis across metrics, logs, systems and containers.",
+          "url": "https://github.com/netdata/netdata",
+          "stars": 79626,
+          "icon": "35290d7d070e",
+          "topic": "MCP",
+          "type": "server"
+        },
+        {
+          "entityKey": "server|serena",
+          "name": "serena",
+          "desc": "A powerful MCP toolkit for coding, providing semantic retrieval and editing capabilities - the IDE for your agent.",
+          "url": "https://github.com/oraios/serena",
+          "stars": 26379,
+          "icon": "b34aac060269",
+          "topic": "MCP",
+          "type": "server"
+        }
+      ],
+      "rows": [
+        {
+          "entityKey": "server|Screenpipe",
+          "name": "Screenpipe",
+          "desc": "AI that knows what you've seen, said, or heard: records screen and audio 24/7 locally and privately, with timestamped indexing and",
+          "url": "https://github.com/mediar-ai/screenpipe",
+          "stars": 19802,
+          "icon": "d3c2340a7c02",
+          "topic": "MCP",
+          "type": "server"
+        },
+        {
+          "entityKey": "server|DesktopCommanderMCP",
+          "name": "DesktopCommanderMCP",
+          "desc": "MCP server for Claude that gives it terminal control, file system search, and diff-based file editing capabilities.",
+          "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
+          "stars": 8059,
+          "icon": "40604f262812",
+          "topic": "MCP",
+          "type": "server"
+        },
+        {
+          "entityKey": "registry|awesome-mcp-clients",
+          "name": "awesome-mcp-clients",
+          "desc": "A collection of MCP clients — a curated companion list cataloging MCP client applications.",
+          "url": "https://github.com/punkpeye/awesome-mcp-clients",
+          "stars": 6514,
+          "icon": "2f8ec87e5bf7",
+          "topic": "MCP",
+          "type": "registry"
+        },
+        {
+          "entityKey": "server|godot-mcp",
+          "name": "godot-mcp",
+          "desc": "MCP server for interfacing with the Godot game engine - launch the editor, run projects, and capture debug output.",
+          "url": "https://github.com/Coding-Solo/godot-mcp",
+          "stars": 4676,
+          "icon": "243051d77b60",
+          "topic": "MCP",
+          "type": "server"
+        }
+      ]
+    },
+    {
+      "key": "agent",
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "title": "Build Your Agent",
+      "banner": [
+        {
+          "entityKey": "platform|AgentGPT",
+          "name": "AgentGPT",
+          "desc": "Browser-based autonomous-agent platform (beta) by Reworkd AI that lets users configure and deploy agents toward a goal, with pre-b",
+          "url": "https://agentgpt.reworkd.ai/",
+          "stars": 36274,
+          "icon": "6fcd1165a59a",
+          "topic": "Agent",
+          "type": "platform"
+        },
+        {
+          "entityKey": "framework|Deep Agents",
+          "name": "Deep Agents",
+          "desc": "Open-source LangChain agent framework providing an opinionated agent that runs out of the box with filesystem access, sub-agents,",
+          "url": "https://github.com/langchain-ai/deepagents",
+          "stars": 26205,
+          "icon": "2ba7d53b3693",
+          "topic": "Agent",
+          "type": "framework"
+        }
+      ],
+      "rows": [
+        {
+          "entityKey": "product|LocalGPT",
+          "name": "LocalGPT",
+          "desc": "Chat with your documents on your local device using GPT models, with no data leaving the device and 100% private.",
+          "url": "https://github.com/PromtEngineer/localGPT",
+          "stars": 22202,
+          "icon": "08f6788189a1",
+          "topic": "Agent",
+          "type": "product"
+        },
+        {
+          "entityKey": "framework|Smol Developer",
+          "name": "Smol Developer",
+          "desc": "The first library to let you embed a junior AI developer agent in your own app, scaffolding codebases from a prompt.",
+          "url": "https://github.com/smol-ai/developer",
+          "stars": 12192,
+          "icon": "eee546c2d2ff",
+          "topic": "Agent",
+          "type": "framework"
+        },
+        {
+          "entityKey": "framework|Self-Operating Computer",
+          "name": "Self-Operating Computer",
+          "desc": "A framework to enable a multimodal model to operate a c",
+          "url": "https://github.com/OthersideAI/self-operating-computer",
+          "stars": 10245,
+          "icon": "f624cc8796e0",
+          "topic": "Agent",
+          "type": "framework"
+        },
+        {
+          "entityKey": "framework|UFO",
+          "name": "UFO",
+          "desc": "Microsoft's UI-Focused multi-agent framework (UFO³) that decomposes user requests into task workflows (DAGs) and coordinates agent",
+          "url": "https://github.com/microsoft/UFO",
+          "stars": 9283,
+          "icon": "78f231fdaf9f",
+          "topic": "Agent",
+          "type": "framework"
+        }
+      ]
+    },
+    {
+      "key": "prompt",
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "title": "Working with Prompts",
+      "banner": [],
+      "rows": [
+        {
+          "entityKey": "guide|Prompt Engineering Guide",
+          "name": "Prompt Engineering Guide",
+          "desc": "The Prompt Engineering Guide is an open-source collection of guides, papers, lessons, notebooks and resour",
+          "url": "https://github.com/dair-ai/Prompt-Engineering-Guide",
+          "stars": 76442,
+          "icon": "394209b8faac",
+          "topic": "Prompt",
+          "type": "guide"
+        },
+        {
+          "entityKey": "technique|GEPA",
+          "name": "GEPA",
+          "desc": "GEPA (Genetic-Pareto), a prompt optimization technique using reflective natural-language evolutio",
+          "url": "https://arxiv.org/abs/2507.19457",
+          "stars": 5633,
+          "icon": "78ac02bbd640",
+          "topic": "Prompt",
+          "type": "technique"
+        },
+        {
+          "entityKey": "tool|Purple Llama",
+          "name": "Purple Llama",
+          "desc": "Meta's umbrella project of open tools and evals (e.g. CyberSecEval, input/output safeguards) for building",
+          "url": "https://github.com/meta-llama/PurpleLlama",
+          "stars": 4278,
+          "icon": "3867da8af2f6",
+          "topic": "Prompt",
+          "type": "tool"
+        },
+        {
+          "entityKey": "tool|Pezzo",
+          "name": "Pezzo",
+          "desc": "An open-source, developer-first LLMOps/prompt-ops toolkit for prompt d",
+          "url": "https://github.com/pezzolabs/pezzo",
+          "stars": 3253,
+          "icon": "8abac5185f89",
+          "topic": "Prompt",
+          "type": "tool"
+        },
+        {
+          "entityKey": "library|NanoBanana Trending Prompts",
+          "name": "NanoBanana Trending Prompts",
+          "desc": "A community-curated, engagement-ranked collection of 1,400+ trending AI image-generation prompts sourced from X, compatible with m",
+          "url": "https://github.com/jau123/nanobanana-trending-prompts",
+          "stars": 676,
+          "icon": "ba27f8cb6b40",
+          "topic": "Prompt",
+          "type": "library"
+        },
+        {
+          "entityKey": "tool|AgentSeal",
+          "name": "AgentSeal",
+          "desc": "A security toolkit that scans AI-agent and system-prompt configurations against 225+ adversarial attack pr",
+          "url": "https://github.com/getagentseal/agentseal",
+          "stars": 326,
+          "icon": "fe9e594fe62b",
+          "topic": "Prompt",
+          "type": "tool"
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { API_URL } from "@/lib/auth"
 
 /**
  * Newly Discovered — Overview
@@ -316,14 +317,35 @@ function BannerFeatures({ items, gradientOffset = 0 }: { items: Item[]; gradient
 }
 
 /* ── 페이지 ── */
+/* ── Overview 구성 API 타입 (백엔드 overview-config.service.ts와 일치) ── */
+type CfgItem = {
+  entityKey: string; name: string; desc: string; url: string
+  stars: number | null; icon: string | null; topic: string; type: string
+}
+type OverviewConfig = {
+  title: { heading: string; subheading: string }
+  hero: { items: CfgItem[] }
+  spotlight: { label: string; sub: string; items: CfgItem[] }
+  justAdded: { label: string; sub: string; items: CfgItem[] }
+  blocks: Array<{ key: string; title: string; banner: CfgItem[]; rows: CfgItem[] }>
+}
+/** config 항목 → 화면 Item 형태로 매핑 */
+const toItem = (c: CfgItem): Item => ({
+  n: c.name, s: c.stars, v: "", u: c.url, i: c.icon ?? "", d: c.desc, vf: 0,
+  topic: c.topic, type: c.type,
+})
+
 export function NDOverviewPage() {
-  const [data, setData] = useState<Payload | null>(null)
+  const [cfg, setCfg] = useState<OverviewConfig | null>(null)
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    fetch("/building-blocks/entities.json")
+    fetch(`${API_URL}/api/overview/config`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("load failed"))))
-      .then(setData)
+      .then((d: OverviewConfig) => {
+        if (!d?.hero?.items?.length) setError(true)
+        else setCfg(d)
+      })
       .catch(() => setError(true))
   }, [])
 
@@ -335,47 +357,23 @@ export function NDOverviewPage() {
       </div>
     )
   }
-  if (!data) return <p className="text-[13px] text-[#9E97B3]">Loading…</p>
+  if (!cfg) return <p className="text-[13px] text-[#9E97B3]">Loading…</p>
 
-  /* 토픽별로 평탄화 + 스타 순 정렬 */
-  const byTopic = new Map<string, Item[]>()
-  for (const t of data.topics) {
-    const flat: Item[] = t.groups
-      .flatMap((g) => g.items.map((e) => ({ ...e, topic: t.l, type: g.t })))
-      .filter((x) => isUsableUrl(x.u))
-      .sort((a, b) => (b.s ?? 0) - (a.s ?? 0))
-    byTopic.set(t.k, flat)
-  }
-  const pick = (k: string, from: number, to: number) => (byTopic.get(k) ?? []).slice(from, to)
-
-  const skill = byTopic.get("skill") ?? []
-  // 히어로 5개 — 분야를 섞어 한쪽으로 쏠리지 않게
-  const heroes: Item[] = [
-    skill[0],
-    (byTopic.get("mcp") ?? [])[0],
-    (byTopic.get("agent") ?? [])[0],
-    skill[1],
-    (byTopic.get("prompt") ?? [])[0],
-  ].filter(Boolean) as Item[]
-  if (heroes.length === 0) return <p className="text-[13px] text-[#9E97B3]">No data.</p>
-
-  const blocks = [
-    { key: "mcp", title: "Pick an MCP Server", grad: 0 },
-    { key: "agent", title: "Build Your Agent", grad: 2 },
-  ]
+  const heroes = cfg.hero.items.map(toItem)
+  const spotlight = cfg.spotlight.items.map(toItem)
 
   return (
     <div>
-      <h1 className="m-0 mb-[3px] text-[30px] font-extrabold tracking-[-0.6px] text-[#1A1626]">Newly Discovered</h1>
-      <p className="mb-6 mt-0 text-[14px] text-[#6E6A78]">Editor's Choice</p>
+      <h1 className="m-0 mb-[3px] text-[30px] font-extrabold tracking-[-0.6px] text-[#1A1626]">{cfg.title.heading}</h1>
+      <p className="mb-6 mt-0 text-[14px] text-[#6E6A78]">{cfg.title.subheading}</p>
 
       {/* HERO — 5개 가로 스크롤 */}
       <HeroCarousel items={heroes} />
 
       {/* 스포트라이트 */}
-      <SectionHead title="Worth a Look" desc="Standouts this week" />
+      <SectionHead title={cfg.spotlight.label} desc={cfg.spotlight.sub} />
       <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
-        {skill.slice(2, 4).map((x) => (
+        {spotlight.map((x) => (
           <a
             key={x.i + x.n}
             href={x.u}
@@ -405,21 +403,22 @@ export function NDOverviewPage() {
       </div>
 
       {/* 새로 추가됨 */}
-      <SectionHead title="Just Added" desc="Most recent updates" />
-      <ItemRows items={skill.slice(4, 10)} />
+      <SectionHead title={cfg.justAdded.label} desc={cfg.justAdded.sub} />
+      <ItemRows items={cfg.justAdded.items.map(toItem)} />
 
-      {/* 아래로 반복되는 블록 */}
-      {blocks.map((b) => (
+      {/* 아래로 반복되는 블록 (배너 있는 블록만 배너 렌더) */}
+      {cfg.blocks.map((b, i) => (
         <div key={b.key}>
           <SectionHead title={b.title} />
-          <BannerFeatures items={pick(b.key, 1, 3)} gradientOffset={b.grad} />
-          <div className="h-[26px]" />
-          <ItemRows items={pick(b.key, 3, 7)} />
+          {b.banner.length > 0 && (
+            <>
+              <BannerFeatures items={b.banner.map(toItem)} gradientOffset={i * 2} />
+              <div className="h-[26px]" />
+            </>
+          )}
+          <ItemRows items={b.rows.map(toItem)} />
         </div>
       ))}
-
-      <SectionHead title="Working with Prompts" />
-      <ItemRows items={pick("prompt", 1, 7)} />
 
       <div className="h-10" />
     </div>

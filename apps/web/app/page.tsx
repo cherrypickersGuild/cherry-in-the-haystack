@@ -10,6 +10,7 @@ import { PatchNotesPage } from "@/components/cherry/patch-notes-page"
 import { fetchLanding, fetchLandingArticles, LandingResponse, LandingTopArticle } from "@/lib/api"
 import { useAuthTick, getAccessToken, decodeToken, clearAccessToken } from "@/lib/auth"
 import { NDFrameworksPage } from "@/components/cherry/nd-frameworks-page"
+import { NDPromptingPage } from "@/components/cherry/nd-prompting-page"
 import { NDModelUpdatesPage } from "@/components/cherry/nd-model-updates-page"
 import { NDCaseStudiesPage } from "@/components/cherry/nd-case-studies-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
@@ -34,7 +35,7 @@ const STATIC_MOMENTUM = [
 
 export default function CherryApp() {
   const [activeNav, setActiveNav] = useState("highlight")
-  const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "concept-page" | "template">("dashboard")
+  const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder">("dashboard")
   const [marketConceptId, setMarketConceptId] = useState<string | null>(null)
   const [landing, setLanding] = useState<LandingResponse | null>(null)
   const [topArticles, setTopArticles] = useState<LandingTopArticle[]>([])
@@ -86,6 +87,9 @@ export default function CherryApp() {
 
       case "frameworks":
         return <NDFrameworksPage />
+
+      case "prompting":
+        return <NDPromptingPage />
 
       case "model-updates":
         return <NDModelUpdatesPage />
@@ -339,8 +343,8 @@ export default function CherryApp() {
           style={{ backgroundColor: "#FBFAF8" }}
           id="main-content"
         >
-          {/* 가로 표준은 1000px. Frameworks만 Landscape 4단을 위해 1160px 허용. */}
-          <div className={`w-full ${activeNav === "frameworks" ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
+          {/* 가로 표준은 1000px. Landscape 4단 페이지(Frameworks/Prompting)만 1160px 허용. */}
+          <div className={`w-full ${activeNav === "frameworks" || activeNav === "prompting" ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
             {renderContent()}
           </div>
         </main>

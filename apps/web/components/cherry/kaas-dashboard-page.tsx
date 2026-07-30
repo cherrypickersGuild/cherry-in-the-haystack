@@ -8,6 +8,7 @@ import {
   Copy, Check, Globe, UserPlus, Plus, X, Key,
 } from "lucide-react"
 import { KnowledgeCurationPanel, ConceptPagePublishPanel } from "./kaas-admin-page"
+import { OverviewBuilderPanel } from "./overview-builder-panel"
 import { TemplateEditorBody } from "@/app/template/edit/page"
 import { KaasWorkshopPanel } from "./kaas-workshop-panel"
 import dash from "./dashboard.module.css"
@@ -1531,11 +1532,11 @@ function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefr
 /* ═══════════════════════════════════════════════
    Main — 2 panel layout
 ═══════════════════════════════════════════════ */
-export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: boolean; onTabChange?: (tab: "dashboard" | "curation" | "concept-page" | "template") => void }) {
+export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: boolean; onTabChange?: (tab: "dashboard" | "curation" | "concept-page" | "template" | "overview-builder") => void }) {
   const [agents, setAgents] = useState<Agent[]>([])
   const [selectedAgentId, setSelectedAgentId] = useState("")
   const [showRegister, setShowRegister] = useState(false)
-  const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "concept-page" | "template">("dashboard")
+  const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder">("dashboard")
   // Workshop 은 별도 팝업 — 특정 에이전트 카드에서 🔧 Workshop 버튼 눌러 열기
   const [workshopOpenId, setWorkshopOpenId] = useState<string | null>(null)
 
@@ -1648,6 +1649,7 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
     ...(isAdmin ? [
       { key: "concept-page" as const, label: "Concept Page" },
       { key: "template" as const, label: "Prompt Templates" },
+      { key: "overview-builder" as const, label: "Overview Builder" },
     ] : []),
   ]
 
@@ -1738,6 +1740,11 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
         {activeTab === "template" && (
           <div className={dash.subTab}>
             <TemplateEditorBody />
+          </div>
+        )}
+        {activeTab === "overview-builder" && (
+          <div className={dash.subTab}>
+            <OverviewBuilderPanel />
           </div>
         )}
       </div>

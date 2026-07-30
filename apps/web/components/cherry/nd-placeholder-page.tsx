@@ -31,7 +31,7 @@ const CATEGORY_META: Record<string, {
   },
   "developer-tools": {
     title: "Developer Tools & Services",
-    parentCategory: "Engineering & Tooling",
+    parentCategory: "Engineering Blocks",
     description: "Newly emerged developer tools, productivity enhancements, monitoring, debugging, and testing services for AI engineering.",
     accent: "#4B78F0",
     accentBg: "#F8F9FF",
@@ -39,7 +39,7 @@ const CATEGORY_META: Record<string, {
   },
   "patterns": {
     title: "Patterns & Implementations",
-    parentCategory: "Engineering & Tooling",
+    parentCategory: "Engineering Blocks",
     description: "Shared prompts, templates, agent architectures, MCP implementations, reference code, and orchestration patterns.",
     accent: "#4B78F0",
     accentBg: "#F8F9FF",

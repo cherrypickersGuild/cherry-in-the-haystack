@@ -11,6 +11,7 @@ import { AgentCommModule } from './modules/agent_comm/agent-comm.module';
 import { KaasModule } from './modules/kaas/kaas.module';
 import { WriterAgentModule } from './modules/writer_agent/writer-agent.module';
 import { BenchModule } from './modules/bench/bench.module';
+import { FrameworksLandscapeModule } from './modules/frameworks_landscape/frameworks-landscape.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { BenchModule } from './modules/bench/bench.module';
     KaasModule,
     WriterAgentModule,
     BenchModule,
+    FrameworksLandscapeModule,
   ],
   controllers: [],
   providers: [],

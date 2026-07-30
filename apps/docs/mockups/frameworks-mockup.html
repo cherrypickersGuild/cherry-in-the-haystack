@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Frameworks & SDK — 재설계 목업</title>
+<style>
+  :root{
+    --ink:#1A1626; --body:#3D3652; --muted:#6E6A78; --label:#9E97B3;
+    --line:#E4E1EE; --hoverline:#C7B8E8;
+    --cherry:#C94B6E; --cherrySoft:#FDF0F3; --cherryLine:#F2C4CE;
+    --purple:#7B5EA7; --purpleSoft:#F3EFFA; --purpleLine:#C7B8E8;
+    --star:#C7791B; --ok:#2E8B6F; --bg:#FBFAF8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1216px; margin:0 auto; padding:40px 28px 96px}
+  .narrow{max-width:940px}
+  .mocknote{max-width:940px; margin:0 auto 8px; padding:10px 16px; font-size:12px; color:#8A6A3A; background:#FBF6ED; border:1px solid #EDDCBB; border-radius:10px}
+
+  h1{margin:0 0 4px; font-size:30px; font-weight:800; letter-spacing:-0.6px; line-height:1.1}
+  .sub{margin:0 0 30px; font-size:13.5px; color:var(--label)}
+  .sec{margin-top:56px}
+  .sec:first-of-type{margin-top:36px}
+  .sechead{display:flex; align-items:baseline; gap:10px; margin-bottom:16px}
+  .sechead h2{margin:0; font-size:19px; font-weight:800; letter-spacing:-0.3px}
+  .sechead .desc{font-size:12.5px; color:var(--label)}
+
+  /* Landscape — 카드 전체가 클릭 대상 */
+  .map{display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+  .mapcard{background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px 10px; cursor:pointer;
+    text-align:left; font:inherit; color:inherit; width:100%;
+    display:flex; flex-direction:column; justify-content:flex-start;   /* 상단 정렬 (버튼 기본 중앙정렬 방지) */
+    transition:border-color .15s, box-shadow .15s, transform .15s}
+  .mapcard:hover{border-color:var(--hoverline); box-shadow:0 8px 24px rgba(91,61,135,.14); transform:translateY(-2px)}  /* 강한 호버 */
+  .mc-head{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+  .mc-name{font-size:15px;font-weight:800;letter-spacing:-0.2px;flex:1;min-width:0}
+  .mc-count{font-size:11px;font-weight:800;color:var(--label)}
+  .mc-list{display:flex;flex-direction:column}
+  .ent{display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid #F1EFF5}
+  .ent:first-child{border-top:0}
+  .ent-logo{width:36px;height:36px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;border:1px solid var(--line)}
+  .ent-main{flex:1;min-width:0}
+  .ent-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .ent-name{font-size:14px;font-weight:700;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ent.spot .ent-name{color:var(--cherry)}
+  .ent-star{font-size:11.5px;font-weight:800;color:var(--star);flex-shrink:0}
+  .ent-desc{font-size:11.5px;line-height:1.4;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* 카테고리 상세 모달 */
+  .overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.4);padding:16px}
+  .overlay.on{display:flex}
+  .modal{width:100%;max-width:600px;max-height:86vh;display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 48px rgba(26,22,38,.22)}
+  .m-top{display:flex;align-items:center;gap:10px;padding:18px 24px;border-bottom:1px solid #EEECF4}
+  .m-catic{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .m-catname{flex:1;font-size:18px;font-weight:800;letter-spacing:-0.3px}
+  .m-count{font-size:12px;font-weight:800;color:var(--label)}
+  .m-close{border:0;background:none;cursor:pointer;font-size:18px;color:var(--label);padding:2px 6px}
+  .m-close:hover{color:var(--ink)}
+  .m-list{overflow-y:auto;padding:2px 24px}
+  .m-ent{display:flex;align-items:flex-start;gap:14px;padding:15px 12px;margin:0 -12px;border-bottom:1px solid #F1EFF5;border-radius:12px;text-decoration:none;color:inherit;transition:background .12s}
+  .m-ent:last-child{border-bottom:0}
+  .m-ent:hover{background:#F8F5FE}
+  .m-logo{width:52px;height:52px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;border:1px solid var(--line)}
+  .m-body{flex:1;min-width:0}
+  .m-nl{display:flex;align-items:center;gap:8px}
+  .m-name{font-size:15px;font-weight:800;letter-spacing:-0.2px}
+  .m-name.spot{color:var(--cherry)}
+  .m-spot{border-radius:5px;padding:1px 6px;font-size:9.5px;font-weight:800;background:var(--cherrySoft);color:var(--cherry)}
+  .m-star{font-size:11.5px;font-weight:800;color:var(--star)}
+  .m-visit{margin-left:auto;font-size:12px;font-weight:700;color:var(--purple);opacity:0;transition:opacity .12s;flex-shrink:0}
+  .m-ent:hover .m-visit{opacity:1}
+  .m-detail{margin:4px 0 0;font-size:12.5px;line-height:1.6;color:var(--body)}
+
+  /* Rising Star */
+  .rising{position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+  .rising .flag{position:absolute;top:0;left:0;background:var(--purple);color:#fff;font-size:10px;font-weight:800;padding:5px 10px;border-radius:5px 0 4px 0}
+  .sample-badge{position:absolute;top:12px;right:14px;font-size:9.5px;font-weight:800;letter-spacing:.5px;color:var(--label);background:#F3F1F6;border:1px solid var(--line);border-radius:6px;padding:2px 7px;text-transform:uppercase}
+  .rising .eyebrow{display:block;margin:6px 0 6px;font-size:11px;font-weight:700;color:var(--purple)}
+  .rising h3{margin:0 0 6px;font-size:22px;font-weight:800;letter-spacing:-0.4px}
+  .rising p{margin:0 0 16px;font-size:13px;line-height:1.6;color:var(--body);max-width:560px}
+  .stats{display:flex;gap:28px}
+  .stat b{display:block;font-size:18px;font-weight:800;line-height:1.2}
+  .stat span{font-size:11px;color:var(--label)}
+  .stat b.up{color:var(--ok)}
+  .toplist{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--purpleSoft);border:1px solid var(--purpleLine);border-radius:8px;padding:5px 10px;font-size:11.5px;font-weight:600;color:var(--purple)}
+  .chip .n{color:var(--label);font-weight:700}
+
+  /* Recent Updates */
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;align-items:flex-start;gap:14px;padding:15px 4px;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .row-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:6px}
+  .row-title{font-size:15px;font-weight:700;line-height:1.35;margin:0 0 3px}
+  .row-desc{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 7px}
+  .row-meta{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--label)}
+  .row-stars{color:var(--star);letter-spacing:1px;font-size:11px}
+</style>
+</head>
+<body>
+<div class="mocknote">목업 — landscape.json 실제 데이터. <b>카테고리 카드를 클릭</b>하면 그 안 항목을 전부 자세히 담은 큰 모달이 뜨고, 모달에서 각 항목이 사이트로 링크됩니다.</div>
+<div class="wrap">
+
+  <div class="narrow">
+    <h1>Frameworks &amp; SDK</h1>
+    <p class="sub">The AI framework and SDK landscape by category — plus what's gaining momentum this cycle.</p>
+  </div>
+
+  <section class="sec">
+    <div class="sechead"><h2>Landscape</h2><span class="desc">Frameworks and SDKs across the ecosystem — click a category for details</span></div>
+    <div class="map" id="map"></div>
+  </section>
+
+  <section class="sec narrow">
+    <div class="sechead"><h2>Rising Star</h2><span class="desc">The category drawing the most attention</span></div>
+    <div class="rising">
+      <span class="flag">HOT</span>
+      <span class="eyebrow">Framework to Watch</span>
+      <h3>Agent</h3>
+      <p>Agent frameworks are drawing the most activity this cycle, concentrated around multi-agent orchestration. This card is a placeholder — the ranking model is still being defined.</p>
+      <div class="stats">
+        <div class="stat"><b>24</b><span>recent updates</span></div>
+        <div class="stat"><b class="up">+38%</b><span>vs prior period</span></div>
+        <div class="stat"><b>4</b><span>frameworks tracked</span></div>
+      </div>
+      <div class="toplist">
+        <span class="chip">LangGraph <span class="n">9</span></span><span class="chip">CrewAI <span class="n">6</span></span>
+        <span class="chip">AutoGen <span class="n">5</span></span><span class="chip">Swarm <span class="n">4</span></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec narrow">
+    <div class="sechead"><h2>Recent Updates</h2><span class="desc">Latest releases and articles</span></div>
+    <div class="rows">
+      <div class="row"><span class="row-dot" style="background:#E94057"></span><div><p class="row-title">LangGraph 0.3 ships durable execution and native human-in-the-loop</p><p class="row-desc">Checkpointing survives process restarts, and interrupts can pause a run mid-graph for human approval before resuming.</p><span class="row-meta"><span style="color:#E94057;font-weight:700">Agent</span><span class="row-stars">★★★★★</span><span>LangGraph · Apr 7</span></span></div></div>
+      <div class="row"><span class="row-dot" style="background:#10B981"></span><div><p class="row-title">vLLM adds speculative decoding for 2× faster long-context inference</p><p class="row-desc">Draft-model speculative decoding lands in the serving loop, cutting median latency on 32k-token prompts roughly in half.</p><span class="row-meta"><span style="color:#10B981;font-weight:700">Serving</span><span class="row-stars">★★★★☆</span><span>vLLM · Apr 5</span></span></div></div>
+      <div class="row"><span class="row-dot" style="background:#7C3AED"></span><div><p class="row-title">LlamaIndex introduces workflow-based agents replacing the query engine</p><p class="row-desc">Event-driven workflows become the recommended way to compose retrieval and reasoning steps into agentic pipelines.</p><span class="row-meta"><span style="color:#7C3AED;font-weight:700">RAG</span><span class="row-stars">★★★★☆</span><span>LlamaIndex · Apr 3</span></span></div></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+
+<script>
+const CAT_COLOR = {
+  'agent':{c:'#E94057',bg:'#FDECEF'},'fine-tuning':{c:'#8B5CF6',bg:'#F3EFFA'},'rag':{c:'#7C3AED',bg:'#F3EFFA'},
+  'prompt-eng':{c:'#DC2626',bg:'#FDECEC'},'serving':{c:'#10B981',bg:'#E7F4EF'},'data-storage':{c:'#F97316',bg:'#FEF3E2'},
+  'llmops':{c:'#0194E2',bg:'#E6F4FD'},'observability':{c:'#7B5EA7',bg:'#F3EFFA'}
+};
+const CAT_EMOJI = {'agent':'🤖','fine-tuning':'🎯','rag':'🔍','prompt-eng':'✏️','serving':'📬','data-storage':'🗄️','llmops':'⚙️','observability':'📈'};
+const fmtStars = (n)=> n==null ? '' : (n>=1000 ? (n/1000).toFixed(n>=10000?0:1)+'k' : ''+n);
+const esc = (s)=> (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let DATA = null;
+fetch('landscape.json').then(r=>r.json()).then(d=>{ DATA = d; renderMap(d); });
+
+function renderMap(d){
+  const map = document.getElementById('map');
+  map.innerHTML = d.categories.map(cat=>{
+    const col = CAT_COLOR[cat.code] || {c:'#9E97B3',bg:'#F3F1F6'};
+    const rows = cat.entities.map(e=>`
+      <span class="ent${e.spotlight?' spot':''}">
+        <span class="ent-logo" style="background:${col.bg}">${e.emoji||'•'}</span>
+        <span class="ent-main">
+          <span class="ent-top"><span class="ent-name">${esc(e.name)}</span>${e.stars!=null?`<span class="ent-star">★ ${fmtStars(e.stars)}</span>`:''}</span>
+          <span class="ent-desc">${esc(e.desc)}</span>
+        </span>
+      </span>`).join('');
+    return `<button class="mapcard" data-cat="${cat.code}"><div class="mc-head"><span class="mc-name">${esc(cat.name)}</span><span class="mc-count">${cat.entities.length}</span></div><div class="mc-list">${rows}</div></button>`;
+  }).join('');
+  map.querySelectorAll('.mapcard').forEach(btn=> btn.addEventListener('click', ()=> openModal(btn.dataset.cat)));
+}
+
+function openModal(code){
+  const cat = DATA.categories.find(c=>c.code===code);
+  const col = CAT_COLOR[code] || {c:'#9E97B3',bg:'#F3F1F6'};
+  const items = cat.entities.map(e=>`
+    ${e.url?`<a class="m-ent" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">`:`<span class="m-ent">`}
+      <span class="m-logo" style="background:${col.bg}">${e.emoji||'•'}</span>
+      <span class="m-body">
+        <span class="m-nl">
+          <span class="m-name${e.spotlight?' spot':''}">${esc(e.name)}</span>
+          ${e.spotlight?'<span class="m-spot">SPOTLIGHT</span>':''}
+          ${e.stars!=null?`<span class="m-star">★ ${fmtStars(e.stars)}</span>`:''}
+          ${e.url?'<span class="m-visit">Visit ↗</span>':''}
+        </span>
+        <p class="m-detail">${esc(e.detail||e.desc)}</p>
+      </span>
+    ${e.url?'</a>':'</span>'}`).join('');
+  document.getElementById('modal').innerHTML = `
+    <div class="m-top">
+      <span class="m-catic" style="background:${col.bg};color:${col.c}">${CAT_EMOJI[code]||'•'}</span>
+      <span class="m-catname">${esc(cat.name)}</span>
+      <span class="m-count">${cat.entities.length}</span>
+      <button class="m-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="m-list">${items}</div>`;
+  document.getElementById('overlay').classList.add('on');
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('on'); }
+document.getElementById('overlay').addEventListener('click', ev=>{ if(ev.target.id==='overlay') closeModal(); });
+window.addEventListener('keydown', ev=>{ if(ev.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>

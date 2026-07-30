@@ -1,0 +1,611 @@
+{
+  "page": "prompting",
+  "generatedAt": "2026-07-30T03:20:30.650Z",
+  "source": "building-blocks/entities.json",
+  "categories": [
+    {
+      "key": "techniques",
+      "label": "Techniques",
+      "sel": [
+        {
+          "topic": "prompt",
+          "type": "technique"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "technique|GEPA",
+          "name": "GEPA",
+          "desc": "GEPA (Genetic-Pareto), a prompt optimization technique using reflective natural-language…",
+          "detail": "GEPA (Genetic-Pareto), a prompt optimization technique using reflective natural-language evolutio",
+          "url": "https://arxiv.org/abs/2507.19457",
+          "stars": 5633,
+          "emoji": "🎯",
+          "icon": "78ac02bbd640",
+          "verified": true,
+          "vendor": "Lakshya A Agrawal et al.; UC Berkeley, Stanford (code released by gepa-ai)"
+        },
+        {
+          "entityKey": "technique|OPRO",
+          "name": "OPRO",
+          "desc": "Implements 'Large Language Models as Optimizers' (arXiv:2309.03409) — a technique that…",
+          "detail": "Implements 'Large Language Models as Optimizers' (arXiv:2309.03409) — a technique that uses an LLM as an i",
+          "url": "https://github.com/google-deepmind/opro",
+          "stars": null,
+          "emoji": "💡",
+          "icon": "915dfd39da46",
+          "verified": true,
+          "vendor": "Google DeepMind"
+        },
+        {
+          "entityKey": "technique|Code execution with MCP (Code Mode)",
+          "name": "Code execution with MCP (Code Mode)",
+          "desc": "An Anthropic engineering pattern (referencing Cloudflare's 'Code Mode' term) that has…",
+          "detail": "An Anthropic engineering pattern (referencing Cloudflare's 'Code Mode' term) that has agents write code ag",
+          "url": "https://www.anthropic.com/engineering/code-execution-with-mcp",
+          "stars": null,
+          "emoji": "🧠",
+          "icon": "7876982bd40a",
+          "verified": true,
+          "vendor": "Anthropic (technique attributed in part to Cloudflare's 'Code Mode')"
+        },
+        {
+          "entityKey": "technique|Constitutional AI",
+          "name": "Constitutional AI",
+          "desc": "Constitutional AI trains a harmless AI assistant using a list of principles…",
+          "detail": "Constitutional AI trains a harmless AI assistant using a list of principles ('constitution') rat",
+          "url": "https://arxiv.org/abs/2212.08073",
+          "stars": null,
+          "emoji": "🧠",
+          "icon": "8f8ca58adba9",
+          "verified": true,
+          "vendor": "Anthropic (Bai et al.)"
+        },
+        {
+          "entityKey": "technique|Many-Shot Jailbreaking",
+          "name": "Many-Shot Jailbreaking",
+          "desc": "Research describing many-shot jailbreaking, where many fake dialogue examples in a…",
+          "detail": "Research describing many-shot jailbreaking, where many fake dialogue examples in a long-context promp",
+          "url": "https://www.anthropic.com/research/many-shot-jailbreaking",
+          "stars": null,
+          "emoji": "🎯",
+          "icon": "354920194f12",
+          "verified": true,
+          "vendor": "Anthropic"
+        }
+      ]
+    },
+    {
+      "key": "guides",
+      "label": "Guides",
+      "sel": [
+        {
+          "topic": "prompt",
+          "type": "guide"
+        },
+        {
+          "topic": "skill",
+          "type": "guide"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "guide|Prompt Engineering Guide",
+          "name": "Prompt Engineering Guide",
+          "desc": "The Prompt Engineering Guide is an open-source collection of guides, papers, lessons…",
+          "detail": "The Prompt Engineering Guide is an open-source collection of guides, papers, lessons, notebooks and resour",
+          "url": "https://github.com/dair-ai/Prompt-Engineering-Guide",
+          "stars": 76442,
+          "emoji": "🗺",
+          "icon": "394209b8faac",
+          "verified": true,
+          "vendor": "DAIR.AI"
+        },
+        {
+          "entityKey": "guide|RAG Learning Academy",
+          "name": "RAG Learning Academy",
+          "desc": "'A structured, multi-agent learning environment for mastering Retrieval-Augmented…",
+          "detail": "'A structured, multi-agent learning environment for mastering Retrieval-Augmented Generation (RAG) — power",
+          "url": "https://github.com/TakaGoto/rag-learning-academy",
+          "stars": 8,
+          "emoji": "📘",
+          "icon": "3b54a9e6a0ab",
+          "verified": true,
+          "vendor": "TakaGoto"
+        },
+        {
+          "entityKey": "guide|OpenAI GPT-4.1 Prompting Guide",
+          "name": "OpenAI GPT-4.1 Prompting Guide",
+          "desc": "A prompting guide by OpenAI (Noah MacCallum, Julian Lee) covering agentic workflows…",
+          "detail": "A prompting guide by OpenAI (Noah MacCallum, Julian Lee) covering agentic workflows, long-conte",
+          "url": "https://developers.openai.com/cookbook/examples/gpt4-1_prompting_guide",
+          "stars": null,
+          "emoji": "📘",
+          "icon": "bfd9f7a37e68",
+          "verified": true,
+          "vendor": "OpenAI"
+        },
+        {
+          "entityKey": "guide|Anthropic Claude 4 Prompt Engineering Best Practices",
+          "name": "Anthropic Claude 4 Prompt Engineering Best Practices",
+          "desc": "Official prompt-engineering best-practices guide for Claude's latest models, covering…",
+          "detail": "Official prompt-engineering best-practices guide for Claude's latest models, covering clarity, examp",
+          "url": "https://platform.claude.com/docs/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices",
+          "stars": null,
+          "emoji": "🗺",
+          "icon": "c96c91113822",
+          "verified": true,
+          "vendor": "Anthropic"
+        },
+        {
+          "entityKey": "guide|Anthropic Claude 4 Prompt Best Practices",
+          "name": "Anthropic Claude 4 Prompt Best Practices",
+          "desc": "Prompt-engineering best practices for Claude's latest models (Claude 4 family and newer)",
+          "detail": "Prompt-engineering best practices for Claude's latest models (Claude 4 family and newer)",
+          "url": "https://platform.claude.com/docs/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices",
+          "stars": null,
+          "emoji": "🧭",
+          "icon": "2b0185c40350",
+          "verified": true,
+          "vendor": "Anthropic"
+        }
+      ]
+    },
+    {
+      "key": "prompt_tools",
+      "label": "Prompt Tools",
+      "sel": [
+        {
+          "topic": "prompt",
+          "type": "tool"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "tool|Purple Llama",
+          "name": "Purple Llama",
+          "desc": "Meta's umbrella project of open tools and evals (e.g.",
+          "detail": "Meta's umbrella project of open tools and evals (e.g. CyberSecEval, input/output safeguards) for building",
+          "url": "https://github.com/meta-llama/PurpleLlama",
+          "stars": 4278,
+          "emoji": "🔨",
+          "icon": "3867da8af2f6",
+          "verified": true,
+          "vendor": "Meta"
+        },
+        {
+          "entityKey": "tool|Pezzo",
+          "name": "Pezzo",
+          "desc": "An open-source, developer-first LLMOps/prompt-ops toolkit for prompt d",
+          "detail": "An open-source, developer-first LLMOps/prompt-ops toolkit for prompt d",
+          "url": "https://github.com/pezzolabs/pezzo",
+          "stars": 3253,
+          "emoji": "🧰",
+          "icon": "8abac5185f89",
+          "verified": true,
+          "vendor": "pezzolabs"
+        },
+        {
+          "entityKey": "tool|AgentSeal",
+          "name": "AgentSeal",
+          "desc": "A security toolkit that scans AI-agent and system-prompt configurations against 225+…",
+          "detail": "A security toolkit that scans AI-agent and system-prompt configurations against 225+ adversarial attack pr",
+          "url": "https://github.com/getagentseal/agentseal",
+          "stars": 326,
+          "emoji": "🔧",
+          "icon": "fe9e594fe62b",
+          "verified": true,
+          "vendor": "getagentseal"
+        },
+        {
+          "entityKey": "tool|LangSmith",
+          "name": "LangSmith",
+          "desc": "LangChain's agent & LLM observability platform for tracing, debugging, evaluating, and m",
+          "detail": "LangChain's agent & LLM observability platform for tracing, debugging, evaluating, and m",
+          "url": "https://www.langchain.com/langsmith",
+          "stars": null,
+          "emoji": "🧪",
+          "icon": "6bb73b001e64",
+          "verified": true,
+          "vendor": "LangChain"
+        },
+        {
+          "entityKey": "tool|Helicone",
+          "name": "Helicone",
+          "desc": "An AI gateway and LLM observability platform providing request monitoring, prompt…",
+          "detail": "An AI gateway and LLM observability platform providing request monitoring, prompt management, datasets, rate limiting, and alerts",
+          "url": "https://www.helicone.ai/",
+          "stars": null,
+          "emoji": "🍯",
+          "icon": "27d751ef04e5",
+          "verified": true,
+          "vendor": "Helicone, Inc. (YC-backed)"
+        }
+      ]
+    },
+    {
+      "key": "prompt_libraries",
+      "label": "Prompt Libraries",
+      "sel": [
+        {
+          "topic": "prompt",
+          "type": "library"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "library|NanoBanana Trending Prompts",
+          "name": "NanoBanana Trending Prompts",
+          "desc": "A community-curated, engagement-ranked collection of 1,400+ trending AI image-generation…",
+          "detail": "A community-curated, engagement-ranked collection of 1,400+ trending AI image-generation prompts sourced from X, compatible with m",
+          "url": "https://github.com/jau123/nanobanana-trending-prompts",
+          "stars": 676,
+          "emoji": "🧮",
+          "icon": "ba27f8cb6b40",
+          "verified": true,
+          "vendor": "jau123"
+        },
+        {
+          "entityKey": "library|Guidance",
+          "name": "Guidance",
+          "desc": "A programming framework for controlling LLM output via constrained generation —…",
+          "detail": "A programming framework for controlling LLM output via constrained generation — regex/context-free-grammar syn",
+          "url": "https://github.com/microsoft/guidance",
+          "stars": null,
+          "emoji": "🧭",
+          "icon": "95ae1c1d6f41",
+          "verified": true,
+          "vendor": "guidance-ai / Microsoft (guidanceai@microsoft.com)"
+        },
+        {
+          "entityKey": "library|Phoenix",
+          "name": "Phoenix",
+          "desc": "Open-source AI observability and evaluation platform providing OpenTelemetry-based…",
+          "detail": "Open-source AI observability and evaluation platform providing OpenTelemetry-based tracing, LLM evaluation tools, dataset manageme",
+          "url": "https://github.com/Arize-ai/phoenix",
+          "stars": null,
+          "emoji": "🐦",
+          "icon": "773b7b988c25",
+          "verified": true,
+          "vendor": "Arize AI, Inc."
+        },
+        {
+          "entityKey": "library|PromptBench",
+          "name": "PromptBench",
+          "desc": "A PyTorch-based Python package for evaluating LLM robustness — adversarial prompt…",
+          "detail": "A PyTorch-based Python package for evaluating LLM robustness — adversarial prompt attacks, prompt-engineering",
+          "url": "https://github.com/microsoft/promptbench",
+          "stars": null,
+          "emoji": "🧰",
+          "icon": "6c70d2291e3b",
+          "verified": true,
+          "vendor": "Microsoft Research"
+        },
+        {
+          "entityKey": "library|prompt-engine",
+          "name": "prompt-engine",
+          "desc": "An NPM library (PromptEngine, CodeEngine, ChatEngine) for composing LLM prompts from a…",
+          "detail": "An NPM library (PromptEngine, CodeEngine, ChatEngine) for composing LLM prompts from a description plus in",
+          "url": "https://github.com/microsoft/prompt-engine",
+          "stars": null,
+          "emoji": "🔤",
+          "icon": "616932c5b3b7",
+          "verified": true,
+          "vendor": "Microsoft"
+        }
+      ]
+    },
+    {
+      "key": "datasets",
+      "label": "Datasets",
+      "sel": [
+        {
+          "topic": "prompt",
+          "type": "dataset"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "dataset|prompts.chat",
+          "name": "prompts.chat",
+          "desc": "Prompts.chat (formerly 'Awesome ChatGPT Prompts') is a curated collection/database of…",
+          "detail": "Prompts.chat (formerly 'Awesome ChatGPT Prompts') is a curated collection/database of prompt examples for",
+          "url": "https://github.com/f/prompts.chat",
+          "stars": 165659,
+          "emoji": "📁",
+          "icon": "37e64e1b36bb",
+          "verified": true,
+          "vendor": "Fatih Kadir Akın (f)"
+        },
+        {
+          "entityKey": "dataset|DecodingTrust",
+          "name": "DecodingTrust",
+          "desc": "A comprehensive trustworthiness benchmark for GPT/LLM models (243,877 prompts) evaluating…",
+          "detail": "A comprehensive trustworthiness benchmark for GPT/LLM models (243,877 prompts) evaluating eight dime",
+          "url": "https://github.com/AI-secure/DecodingTrust",
+          "stars": 314,
+          "emoji": "📊",
+          "icon": "3444f5feaeb5",
+          "verified": true,
+          "vendor": "AI-secure research group"
+        },
+        {
+          "entityKey": "dataset|AgentHarm",
+          "name": "AgentHarm",
+          "desc": "A benchmark of 110 explicitly malicious agent tasks (440 with augmentations) across 11…",
+          "detail": "A benchmark of 110 explicitly malicious agent tasks (440 with augmentations) across 11 harm categor",
+          "url": "https://arxiv.org/abs/2410.09024",
+          "stars": null,
+          "emoji": "🔢",
+          "icon": "02208938425b",
+          "verified": true,
+          "vendor": "AgentHarm authors (M. Andriushchenko, A. Souly, et al.)"
+        },
+        {
+          "entityKey": "dataset|Agentic System Prompts",
+          "name": "Agentic System Prompts",
+          "desc": "A curated catalog of real system prompts and tool definitions from production coding…",
+          "detail": "A curated catalog of real system prompts and tool definitions from production coding agents (Claude Code,",
+          "url": "https://github.com/tallesborges/agentic-system-prompts",
+          "stars": null,
+          "emoji": "🗂",
+          "icon": "1da96c30b918",
+          "verified": true,
+          "vendor": "tallesborges"
+        },
+        {
+          "entityKey": "dataset|CodeAlpaca-20k",
+          "name": "CodeAlpaca-20k",
+          "desc": "~20,000 code-instruction prompt/response pairs (≈8.06 MB JSON) for instruction-tuning",
+          "detail": "~20,000 code-instruction prompt/response pairs (≈8.06 MB JSON) for instruction-tuning",
+          "url": "https://huggingface.co/datasets/sahil2801/CodeAlpaca-20k",
+          "stars": null,
+          "emoji": "🗂",
+          "icon": "badbe54cfe7c",
+          "verified": true,
+          "vendor": "sahil2801"
+        }
+      ]
+    },
+    {
+      "key": "skills",
+      "label": "Skills",
+      "sel": [
+        {
+          "topic": "skill",
+          "type": "skill"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "skill|Superpowers",
+          "name": "Superpowers",
+          "desc": "A complete software-development methodology for coding agents built on a set of…",
+          "detail": "A complete software-development methodology for coding agents built on a set of composable Claude C",
+          "url": "https://github.com/obra/superpowers",
+          "stars": 254842,
+          "emoji": "🎓",
+          "icon": "002fa984156e",
+          "verified": true,
+          "vendor": "Jesse Vincent (obra)"
+        },
+        {
+          "entityKey": "skill|andrej-karpathy-skills",
+          "name": "andrej-karpathy-skills",
+          "desc": "A drop-in Claude Code skill (a single CLAUDE.md) distilling Andrej Karpathy's…",
+          "detail": "A drop-in Claude Code skill (a single CLAUDE.md) distilling Andrej Karpathy's observations on LLM c",
+          "url": "https://github.com/multica-ai/andrej-karpathy-skills",
+          "stars": 192340,
+          "emoji": "✨",
+          "icon": "386a5f98e4fb",
+          "verified": true,
+          "vendor": "multica-ai"
+        },
+        {
+          "entityKey": "skill|mattpocock/skills",
+          "name": "mattpocock/skills",
+          "desc": "Matt Pocock's curated collection of agent skills for AI-assisted software development…",
+          "detail": "Matt Pocock's curated collection of agent skills for AI-assisted software development, targeting co",
+          "url": "https://github.com/mattpocock/skills",
+          "stars": 170756,
+          "emoji": "⚡",
+          "icon": "dcb9031e498b",
+          "verified": true,
+          "vendor": "Matt Pocock"
+        },
+        {
+          "entityKey": "skill|UI UX Pro Max",
+          "name": "UI UX Pro Max",
+          "desc": "An AI skill providing design intelligence for building professional UI/UX across…",
+          "detail": "An AI skill providing design intelligence for building professional UI/UX across platforms - 84 UI",
+          "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+          "stars": 105676,
+          "emoji": "🧠",
+          "icon": "38704f011eb3",
+          "verified": true,
+          "vendor": "nextlevelbuilder"
+        },
+        {
+          "entityKey": "skill|Claude Scientific Skills",
+          "name": "Claude Scientific Skills",
+          "desc": "A collection of 148 pre-built scientific skills enabling AI agents to execute research…",
+          "detail": "A collection of 148 pre-built scientific skills enabling AI agents to execute research workflows ac",
+          "url": "https://github.com/K-Dense-AI/scientific-agent-skills",
+          "stars": 30919,
+          "emoji": "🎓",
+          "icon": "c4d0bb4ab603",
+          "verified": true,
+          "vendor": "K-Dense Inc."
+        }
+      ]
+    },
+    {
+      "key": "skill_marketplaces",
+      "label": "Skill Marketplaces",
+      "sel": [
+        {
+          "topic": "skill",
+          "type": "marketplace"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "marketplace|motion-skills",
+          "name": "motion-skills",
+          "desc": "An open-source collection of 51 skills in 15 installable packs teaching AI coding agents…",
+          "detail": "An open-source collection of 51 skills in 15 installable packs teaching AI coding agents to create",
+          "url": "https://github.com/iart-ai/motion-skills",
+          "stars": 279,
+          "emoji": "🧩",
+          "icon": "fac4d87ab456",
+          "verified": true,
+          "vendor": "iart.ai"
+        },
+        {
+          "entityKey": "marketplace|Agent Collab Skills",
+          "name": "Agent Collab Skills",
+          "desc": "A set of 6 Claude Code skills for context-safe multi-agent collaboration - task splitter…",
+          "detail": "A set of 6 Claude Code skills for context-safe multi-agent collaboration - task splitter, context b",
+          "url": "https://github.com/WenyuChiou/agent-collab-skills",
+          "stars": 13,
+          "emoji": "🏪",
+          "icon": "50e1d96389c7",
+          "verified": true,
+          "vendor": "WenyuChiou"
+        },
+        {
+          "entityKey": "marketplace|Cloudflare Skills",
+          "name": "Cloudflare Skills",
+          "desc": "Cloudflare's official collection of Agent Skills for building on Cloudflare Workers…",
+          "detail": "Cloudflare's official collection of Agent Skills for building on Cloudflare Workers, Pages, the Agents SDK",
+          "url": "https://github.com/cloudflare/skills",
+          "stars": null,
+          "emoji": "🏪",
+          "icon": "473807ecffe6",
+          "verified": true,
+          "vendor": "Cloudflare"
+        },
+        {
+          "entityKey": "marketplace|Microsoft Skills",
+          "name": "Microsoft Skills",
+          "desc": "Microsoft's open-source collection of 175 domain-specific skills organized by language…",
+          "detail": "Microsoft's open-source collection of 175 domain-specific skills organized by language (Python, .NET, Type",
+          "url": "https://github.com/microsoft/skills",
+          "stars": null,
+          "emoji": "🛒",
+          "icon": "792de18a6a8c",
+          "verified": true,
+          "vendor": "Microsoft"
+        },
+        {
+          "entityKey": "marketplace|NVIDIA/skills",
+          "name": "NVIDIA/skills",
+          "desc": "NVIDIA's official catalog of 100+ verified agent skills across 40+ NVIDIA products…",
+          "detail": "NVIDIA's official catalog of 100+ verified agent skills across 40+ NVIDIA products (CUDA-X librarie",
+          "url": "https://github.com/nvidia/skills",
+          "stars": null,
+          "emoji": "🔖",
+          "icon": "33fa0a30e5de",
+          "verified": true,
+          "vendor": "NVIDIA"
+        }
+      ]
+    },
+    {
+      "key": "skill_specs",
+      "label": "Skill Specs",
+      "sel": [
+        {
+          "topic": "skill",
+          "type": "spec"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "spec|Agent Skills",
+          "name": "Agent Skills",
+          "desc": "Agent Skills are organized directories containing a SKILL.md file with instructions…",
+          "detail": "Agent Skills are organized directories containing a SKILL.md file with instructions, scripts, and resources that let AI agents lik",
+          "url": "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",
+          "stars": null,
+          "emoji": "📐",
+          "icon": "e5123e6797f9",
+          "verified": true,
+          "vendor": "Anthropic"
+        },
+        {
+          "entityKey": "spec|Claude Skills",
+          "name": "Claude Skills",
+          "desc": "Anthropic'",
+          "detail": "Anthropic'",
+          "url": "https://optif.ai/media/articles/anthropic-claude-skills/",
+          "stars": null,
+          "emoji": "📜",
+          "icon": "c3d615a63972",
+          "verified": true,
+          "vendor": "Anthropic"
+        },
+        {
+          "entityKey": "spec|Agent Skills (Microsoft Agent Framework)",
+          "name": "Agent Skills (Microsoft Agent Framework)",
+          "desc": "Microsoft Learn documentation defining Agent Skills as 'portable packages of…",
+          "detail": "Microsoft Learn documentation defining Agent Skills as 'portable packages of instructions, scripts, and re",
+          "url": "https://learn.microsoft.com/en-us/agent-framework/agents/skills",
+          "stars": null,
+          "emoji": "📐",
+          "icon": "3a0aabf6a016",
+          "verified": true,
+          "vendor": "Microsoft"
+        },
+        {
+          "entityKey": "spec|Agent Skills (open standard)",
+          "name": "Agent Skills (open standard)",
+          "desc": "The open, cross-agent Agent Skills specification: a lightweight format (a folder with a…",
+          "detail": "The open, cross-agent Agent Skills specification: a lightweight format (a folder with a required SKILL.md containing name/descript",
+          "url": "https://agentskills.io/home",
+          "stars": null,
+          "emoji": "📜",
+          "icon": "2e4f94c6b4aa",
+          "verified": true,
+          "vendor": "Open community standard, originated by Anthropic (GitHub org agentskills)"
+        },
+        {
+          "entityKey": "spec|Claude Code Skills",
+          "name": "Claude Code Skills",
+          "desc": "Official Claude Code documentation describing Skills as SKILL.md-based packages that…",
+          "detail": "Official Claude Code documentation describing Skills as SKILL.md-based packages that extend what Claude ca",
+          "url": "https://code.claude.com/docs/en/skills",
+          "stars": null,
+          "emoji": "📜",
+          "icon": "54a4cd8f2776",
+          "verified": true,
+          "vendor": "Anthropic (Claude Code)"
+        }
+      ]
+    }
+  ]
+}

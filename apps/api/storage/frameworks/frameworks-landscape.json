@@ -1,0 +1,602 @@
+{
+  "page": "frameworks",
+  "generatedAt": "2026-07-30T03:20:30.650Z",
+  "source": "building-blocks/entities.json",
+  "categories": [
+    {
+      "key": "framework",
+      "label": "Framework",
+      "sel": [
+        {
+          "type": "framework"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "framework|Mem0",
+          "name": "Mem0",
+          "desc": "A semantic graph memory framework (mem0.ai) that extracts and maintains user-specific…",
+          "detail": "A semantic graph memory framework (mem0.ai) that extracts and maintains user-specific preferences and h",
+          "url": "https://github.com/mem0ai/mem0",
+          "stars": 60792,
+          "emoji": "🧠",
+          "icon": "d99da34c35ca",
+          "verified": true,
+          "vendor": "Mem0 (mem0.ai)"
+        },
+        {
+          "entityKey": "framework|Deep Agents",
+          "name": "Deep Agents",
+          "desc": "Open-source LangChain agent framework providing an opinionated agent that runs out of the…",
+          "detail": "Open-source LangChain agent framework providing an opinionated agent that runs out of the box with filesystem access, sub-agents,",
+          "url": "https://github.com/langchain-ai/deepagents",
+          "stars": 26205,
+          "emoji": "🐝",
+          "icon": "2ba7d53b3693",
+          "verified": true,
+          "vendor": "LangChain AI"
+        },
+        {
+          "entityKey": "framework|Smol Developer",
+          "name": "Smol Developer",
+          "desc": "The first library to let you embed a junior AI developer agent in your own app…",
+          "detail": "The first library to let you embed a junior AI developer agent in your own app, scaffolding codebases from a prompt.",
+          "url": "https://github.com/smol-ai/developer",
+          "stars": 12192,
+          "emoji": "📦",
+          "icon": "eee546c2d2ff",
+          "verified": true,
+          "vendor": "smol-ai"
+        },
+        {
+          "entityKey": "framework|Self-Operating Computer",
+          "name": "Self-Operating Computer",
+          "desc": "A framework to enable a multimodal model to operate a c",
+          "detail": "A framework to enable a multimodal model to operate a c",
+          "url": "https://github.com/OthersideAI/self-operating-computer",
+          "stars": 10245,
+          "emoji": "⚙️",
+          "icon": "f624cc8796e0",
+          "verified": true,
+          "vendor": "OthersideAI (HyperWrite)"
+        },
+        {
+          "entityKey": "framework|UFO",
+          "name": "UFO",
+          "desc": "Microsoft's UI-Focused multi-agent framework (UFO³) that decomposes user requests into…",
+          "detail": "Microsoft's UI-Focused multi-agent framework (UFO³) that decomposes user requests into task workflows (DAGs) and coordinates agent",
+          "url": "https://github.com/microsoft/UFO",
+          "stars": 9283,
+          "emoji": "🧠",
+          "icon": "78f231fdaf9f",
+          "verified": true,
+          "vendor": "Microsoft Research"
+        }
+      ]
+    },
+    {
+      "key": "library",
+      "label": "Library",
+      "sel": [
+        {
+          "type": "library"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "library|NanoBanana Trending Prompts",
+          "name": "NanoBanana Trending Prompts",
+          "desc": "A community-curated, engagement-ranked collection of 1,400+ trending AI image-generation…",
+          "detail": "A community-curated, engagement-ranked collection of 1,400+ trending AI image-generation prompts sourced from X, compatible with m",
+          "url": "https://github.com/jau123/nanobanana-trending-prompts",
+          "stars": 676,
+          "emoji": "🧮",
+          "icon": "ba27f8cb6b40",
+          "verified": true,
+          "vendor": "jau123"
+        },
+        {
+          "entityKey": "library|Guidance",
+          "name": "Guidance",
+          "desc": "A programming framework for controlling LLM output via constrained generation —…",
+          "detail": "A programming framework for controlling LLM output via constrained generation — regex/context-free-grammar syn",
+          "url": "https://github.com/microsoft/guidance",
+          "stars": null,
+          "emoji": "🧭",
+          "icon": "95ae1c1d6f41",
+          "verified": true,
+          "vendor": "guidance-ai / Microsoft (guidanceai@microsoft.com)"
+        },
+        {
+          "entityKey": "library|Phoenix",
+          "name": "Phoenix",
+          "desc": "Open-source AI observability and evaluation platform providing OpenTelemetry-based…",
+          "detail": "Open-source AI observability and evaluation platform providing OpenTelemetry-based tracing, LLM evaluation tools, dataset manageme",
+          "url": "https://github.com/Arize-ai/phoenix",
+          "stars": null,
+          "emoji": "🐦",
+          "icon": "773b7b988c25",
+          "verified": true,
+          "vendor": "Arize AI, Inc."
+        },
+        {
+          "entityKey": "library|PromptBench",
+          "name": "PromptBench",
+          "desc": "A PyTorch-based Python package for evaluating LLM robustness — adversarial prompt…",
+          "detail": "A PyTorch-based Python package for evaluating LLM robustness — adversarial prompt attacks, prompt-engineering",
+          "url": "https://github.com/microsoft/promptbench",
+          "stars": null,
+          "emoji": "🧰",
+          "icon": "6c70d2291e3b",
+          "verified": true,
+          "vendor": "Microsoft Research"
+        },
+        {
+          "entityKey": "library|prompt-engine",
+          "name": "prompt-engine",
+          "desc": "An NPM library (PromptEngine, CodeEngine, ChatEngine) for composing LLM prompts from a…",
+          "detail": "An NPM library (PromptEngine, CodeEngine, ChatEngine) for composing LLM prompts from a description plus in",
+          "url": "https://github.com/microsoft/prompt-engine",
+          "stars": null,
+          "emoji": "🔤",
+          "icon": "616932c5b3b7",
+          "verified": true,
+          "vendor": "Microsoft"
+        }
+      ]
+    },
+    {
+      "key": "client_sdk",
+      "label": "Client SDK",
+      "sel": [
+        {
+          "type": "client_sdk"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "client_sdk|Cline",
+          "name": "Cline",
+          "desc": "A VS Code extension AI assistant that can use the CLI and editor to perform autonomous…",
+          "detail": "A VS Code extension AI assistant that can use the CLI and editor to perform autonomous codi",
+          "url": "https://marketplace.visualstudio.com/items?itemName=saoudrizwan.claude-dev",
+          "stars": null,
+          "emoji": "🧩",
+          "icon": "505c04dd67e5",
+          "verified": true,
+          "vendor": "Cline Bot Inc."
+        },
+        {
+          "entityKey": "client_sdk|5ire",
+          "name": "5ire",
+          "desc": "'a sleek desktop AI assistant and MCP client' providing local RAG capabilities, tool…",
+          "detail": "'a sleek desktop AI assistant and MCP client' providing local RAG capabilities, tool integration, and conversation management acro",
+          "url": "https://5ire.app/",
+          "stars": null,
+          "emoji": "🖱",
+          "icon": "5d8d5855d137",
+          "verified": true,
+          "vendor": "Individual developer (GitHub persona 'Ironben')"
+        },
+        {
+          "entityKey": "client_sdk|AgentOne",
+          "name": "AgentOne",
+          "desc": "A feature-rich desktop app / AI agent platform that automates multi-step tasks…",
+          "detail": "A feature-rich desktop app / AI agent platform that automates multi-step tasks autonomously across 11,000+ connected apps and serv",
+          "url": "https://www.agent-one.dev",
+          "stars": null,
+          "emoji": "💻",
+          "icon": "f05e71aeb588",
+          "verified": true,
+          "vendor": "AgentOne"
+        },
+        {
+          "entityKey": "client_sdk|ChatMCP",
+          "name": "ChatMCP",
+          "desc": "A cross-platform (macOS/Windows/Linux/iOS/Android/web) AI chat client implementing MCP…",
+          "detail": "A cross-platform (macOS/Windows/Linux/iOS/Android/web) AI chat client implementing MCP, with an MCP server",
+          "url": "https://github.com/daodao97/chatmcp",
+          "stars": null,
+          "emoji": "⌨️",
+          "icon": "d5439855a66b",
+          "verified": true,
+          "vendor": "daodao97"
+        },
+        {
+          "entityKey": "client_sdk|Copilot-MCP",
+          "name": "Copilot-MCP",
+          "desc": "A VS Code extension for discovering, installing, and managing MCP servers and Agent…",
+          "detail": "A VS Code extension for discovering, installing, and managing MCP servers and Agent Skills (from skills.sh",
+          "url": "https://github.com/VikashLoomba/copilot-mcp",
+          "stars": null,
+          "emoji": "🔌",
+          "icon": "3aa9d0ec9fff",
+          "verified": true,
+          "vendor": "Vikash Loomba"
+        }
+      ]
+    },
+    {
+      "key": "server",
+      "label": "Server",
+      "sel": [
+        {
+          "type": "server"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "server|MarkItDown",
+          "name": "MarkItDown",
+          "desc": "Python tool for converting files and office documents to Markdown; ships an MCP server…",
+          "detail": "Python tool for converting files and office documents to Markdown; ships an MCP server (markitdown-mcp) for LLM consumption.",
+          "url": "https://github.com/microsoft/markitdown",
+          "stars": 165197,
+          "emoji": "📄",
+          "icon": "80e8ccffad76",
+          "verified": true,
+          "vendor": "Microsoft"
+        },
+        {
+          "entityKey": "server|Netdata MCP Server",
+          "name": "Netdata MCP Server",
+          "desc": "Netdata's MCP server for discovery, exploration, reporting and root-cause analysis across…",
+          "detail": "Netdata's MCP server for discovery, exploration, reporting and root-cause analysis across metrics, logs, systems and containers.",
+          "url": "https://github.com/netdata/netdata",
+          "stars": 79626,
+          "emoji": "⚡",
+          "icon": "35290d7d070e",
+          "verified": false,
+          "vendor": "Netdata"
+        },
+        {
+          "entityKey": "server|serena",
+          "name": "serena",
+          "desc": "A powerful MCP toolkit for coding, providing semantic retrieval and editing capabilities…",
+          "detail": "A powerful MCP toolkit for coding, providing semantic retrieval and editing capabilities - the IDE for your agent.",
+          "url": "https://github.com/oraios/serena",
+          "stars": 26379,
+          "emoji": "📡",
+          "icon": "b34aac060269",
+          "verified": true,
+          "vendor": "oraios"
+        },
+        {
+          "entityKey": "server|Screenpipe",
+          "name": "Screenpipe",
+          "desc": "AI that knows what you've seen, said, or heard: records screen and audio 24/7 locally and…",
+          "detail": "AI that knows what you've seen, said, or heard: records screen and audio 24/7 locally and privately, with timestamped indexing and",
+          "url": "https://github.com/mediar-ai/screenpipe",
+          "stars": 19802,
+          "emoji": "📡",
+          "icon": "d3c2340a7c02",
+          "verified": true,
+          "vendor": "Mediar AI"
+        },
+        {
+          "entityKey": "server|DesktopCommanderMCP",
+          "name": "DesktopCommanderMCP",
+          "desc": "MCP server for Claude that gives it terminal control, file system search, and diff-based…",
+          "detail": "MCP server for Claude that gives it terminal control, file system search, and diff-based file editing capabilities.",
+          "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
+          "stars": 8059,
+          "emoji": "📡",
+          "icon": "40604f262812",
+          "verified": true,
+          "vendor": "wonderwhy-er"
+        }
+      ]
+    },
+    {
+      "key": "platform",
+      "label": "Platform",
+      "sel": [
+        {
+          "type": "platform"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "platform|AgentGPT",
+          "name": "AgentGPT",
+          "desc": "Browser-based autonomous-agent platform (beta) by Reworkd AI that lets users configure…",
+          "detail": "Browser-based autonomous-agent platform (beta) by Reworkd AI that lets users configure and deploy agents toward a goal, with pre-b",
+          "url": "https://agentgpt.reworkd.ai/",
+          "stars": 36274,
+          "emoji": "🚀",
+          "icon": "6fcd1165a59a",
+          "verified": true,
+          "vendor": "Reworkd AI"
+        },
+        {
+          "entityKey": "platform|OpenAgents",
+          "name": "OpenAgents",
+          "desc": "OpenAgents (COLM 2024) is an open platform hosting data, plugins, and web-browsing…",
+          "detail": "OpenAgents (COLM 2024) is an open platform hosting data, plugins, and web-browsing language agents for real-world use.",
+          "url": "https://github.com/xlang-ai/OpenAgents",
+          "stars": 4844,
+          "emoji": "🧭",
+          "icon": "576481c18c4b",
+          "verified": true,
+          "vendor": "xlang-ai"
+        },
+        {
+          "entityKey": "platform|OpenAGI",
+          "name": "OpenAGI",
+          "desc": "OpenAGI ('When LLM Meets Domain Experts') is an R&D agent platform that combines LLMs…",
+          "detail": "OpenAGI ('When LLM Meets Domain Experts') is an R&D agent platform that combines LLMs with domain-expert models for complex tasks.",
+          "url": "https://github.com/agiresearch/OpenAGI",
+          "stars": 2275,
+          "emoji": "🏙",
+          "icon": "e2c5e40646d7",
+          "verified": true,
+          "vendor": "agiresearch"
+        },
+        {
+          "entityKey": "platform|Hivemind",
+          "name": "Hivemind",
+          "desc": "'Hivemind turns your traces into reusable skills across agents' — a cloud-backed…",
+          "detail": "'Hivemind turns your traces into reusable skills across agents' — a cloud-backed, auto-learning shared-mem",
+          "url": "https://github.com/activeloopai/hivemind",
+          "stars": 1477,
+          "emoji": "🚀",
+          "icon": "239ca8af1b68",
+          "verified": true,
+          "vendor": "Activeloop"
+        },
+        {
+          "entityKey": "platform|IX",
+          "name": "IX",
+          "desc": "An autonomous GPT-4 agent platform for building, debugging, and deploying agents.",
+          "detail": "An autonomous GPT-4 agent platform for building, debugging, and deploying agents.",
+          "url": "https://github.com/kreneskyp/ix",
+          "stars": 1045,
+          "emoji": "🛰",
+          "icon": "1fee6bd494ba",
+          "verified": true,
+          "vendor": "kreneskyp"
+        }
+      ]
+    },
+    {
+      "key": "tool",
+      "label": "Tool",
+      "sel": [
+        {
+          "type": "tool"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "tool|Purple Llama",
+          "name": "Purple Llama",
+          "desc": "Meta's umbrella project of open tools and evals (e.g.",
+          "detail": "Meta's umbrella project of open tools and evals (e.g. CyberSecEval, input/output safeguards) for building",
+          "url": "https://github.com/meta-llama/PurpleLlama",
+          "stars": 4278,
+          "emoji": "🔨",
+          "icon": "3867da8af2f6",
+          "verified": true,
+          "vendor": "Meta"
+        },
+        {
+          "entityKey": "tool|Pezzo",
+          "name": "Pezzo",
+          "desc": "An open-source, developer-first LLMOps/prompt-ops toolkit for prompt d",
+          "detail": "An open-source, developer-first LLMOps/prompt-ops toolkit for prompt d",
+          "url": "https://github.com/pezzolabs/pezzo",
+          "stars": 3253,
+          "emoji": "🧰",
+          "icon": "8abac5185f89",
+          "verified": true,
+          "vendor": "pezzolabs"
+        },
+        {
+          "entityKey": "tool|AgentSeal",
+          "name": "AgentSeal",
+          "desc": "A security toolkit that scans AI-agent and system-prompt configurations against 225+…",
+          "detail": "A security toolkit that scans AI-agent and system-prompt configurations against 225+ adversarial attack pr",
+          "url": "https://github.com/getagentseal/agentseal",
+          "stars": 326,
+          "emoji": "🔧",
+          "icon": "fe9e594fe62b",
+          "verified": true,
+          "vendor": "getagentseal"
+        },
+        {
+          "entityKey": "tool|LangSmith",
+          "name": "LangSmith",
+          "desc": "LangChain's agent & LLM observability platform for tracing, debugging, evaluating, and m",
+          "detail": "LangChain's agent & LLM observability platform for tracing, debugging, evaluating, and m",
+          "url": "https://www.langchain.com/langsmith",
+          "stars": null,
+          "emoji": "🧪",
+          "icon": "6bb73b001e64",
+          "verified": true,
+          "vendor": "LangChain"
+        },
+        {
+          "entityKey": "tool|Helicone",
+          "name": "Helicone",
+          "desc": "An AI gateway and LLM observability platform providing request monitoring, prompt…",
+          "detail": "An AI gateway and LLM observability platform providing request monitoring, prompt management, datasets, rate limiting, and alerts",
+          "url": "https://www.helicone.ai/",
+          "stars": null,
+          "emoji": "🍯",
+          "icon": "27d751ef04e5",
+          "verified": true,
+          "vendor": "Helicone, Inc. (YC-backed)"
+        }
+      ]
+    },
+    {
+      "key": "product",
+      "label": "Product",
+      "sel": [
+        {
+          "type": "product"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "product|LocalGPT",
+          "name": "LocalGPT",
+          "desc": "Chat with your documents on your local device using GPT models, with no data leaving the…",
+          "detail": "Chat with your documents on your local device using GPT models, with no data leaving the device and 100% private.",
+          "url": "https://github.com/PromtEngineer/localGPT",
+          "stars": 22202,
+          "emoji": "📦",
+          "icon": "08f6788189a1",
+          "verified": true,
+          "vendor": "PromtEngineer"
+        },
+        {
+          "entityKey": "product|Devon",
+          "name": "Devon",
+          "desc": "Devon is an open-source pair programmer, positioned as an autonomous software-engineer…",
+          "detail": "Devon is an open-source pair programmer, positioned as an autonomous software-engineer agent and Devin alternative.",
+          "url": "https://github.com/entropy-research/Devon",
+          "stars": 3449,
+          "emoji": "🚀",
+          "icon": "565478e19561",
+          "verified": true,
+          "vendor": "entropy-research"
+        },
+        {
+          "entityKey": "product|Mentat",
+          "name": "Mentat",
+          "desc": "An AI coding assistant that helps with coding tasks directly from the command line; the…",
+          "detail": "An AI coding assistant that helps with coding tasks directly from the command line; the repository is now archived and no longer m",
+          "url": "https://github.com/biobootloader/mentat",
+          "stars": 2549,
+          "emoji": "🧴",
+          "icon": "8fc2d2fe3a1e",
+          "verified": true,
+          "vendor": "biobootloader"
+        },
+        {
+          "entityKey": "product|Taxy AI",
+          "name": "Taxy AI",
+          "desc": "Open-source browser extension that uses GPT-4 to control the browser and perform…",
+          "detail": "Open-source browser extension that uses GPT-4 to control the browser and perform repetitive actions on the user's behalf (research",
+          "url": "https://github.com/TaxyAI/browser-extension",
+          "stars": 1274,
+          "emoji": "🚀",
+          "icon": "0b83f23386cc",
+          "verified": true,
+          "vendor": "TaxyAI"
+        },
+        {
+          "entityKey": "product|Mutahunter",
+          "name": "Mutahunter",
+          "desc": "Open-source, language-agnostic LLM-driven mutation testing to accelerate developer…",
+          "detail": "Open-source, language-agnostic LLM-driven mutation testing to accelerate developer productivity and code security.",
+          "url": "https://github.com/codeintegrity-ai/mutahunter",
+          "stars": 298,
+          "emoji": "🎁",
+          "icon": "b98ce5a04526",
+          "verified": true,
+          "vendor": "codeintegrity-ai"
+        }
+      ]
+    },
+    {
+      "key": "spec_registry",
+      "label": "Spec & Registry",
+      "sel": [
+        {
+          "type": "spec"
+        },
+        {
+          "type": "registry"
+        }
+      ],
+      "source": "auto",
+      "updatedAt": "2026-07-30T03:20:30.650Z",
+      "updatedBy": null,
+      "items": [
+        {
+          "entityKey": "registry|awesome-mcp-clients",
+          "name": "awesome-mcp-clients",
+          "desc": "A collection of MCP clients — a curated companion list cataloging MCP client applications.",
+          "detail": "A collection of MCP clients — a curated companion list cataloging MCP client applications.",
+          "url": "https://github.com/punkpeye/awesome-mcp-clients",
+          "stars": 6514,
+          "emoji": "📒",
+          "icon": "2f8ec87e5bf7",
+          "verified": true,
+          "vendor": "punkpeye"
+        },
+        {
+          "entityKey": "spec|Agent Skills",
+          "name": "Agent Skills",
+          "desc": "Agent Skills are organized directories containing a SKILL.md file with instructions…",
+          "detail": "Agent Skills are organized directories containing a SKILL.md file with instructions, scripts, and resources that let AI agents lik",
+          "url": "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",
+          "stars": null,
+          "emoji": "📐",
+          "icon": "e5123e6797f9",
+          "verified": true,
+          "vendor": "Anthropic"
+        },
+        {
+          "entityKey": "spec|Claude Skills",
+          "name": "Claude Skills",
+          "desc": "Anthropic'",
+          "detail": "Anthropic'",
+          "url": "https://optif.ai/media/articles/anthropic-claude-skills/",
+          "stars": null,
+          "emoji": "📜",
+          "icon": "c3d615a63972",
+          "verified": true,
+          "vendor": "Anthropic"
+        },
+        {
+          "entityKey": "spec|Agent Skills (Microsoft Agent Framework)",
+          "name": "Agent Skills (Microsoft Agent Framework)",
+          "desc": "Microsoft Learn documentation defining Agent Skills as 'portable packages of…",
+          "detail": "Microsoft Learn documentation defining Agent Skills as 'portable packages of instructions, scripts, and re",
+          "url": "https://learn.microsoft.com/en-us/agent-framework/agents/skills",
+          "stars": null,
+          "emoji": "📐",
+          "icon": "3a0aabf6a016",
+          "verified": true,
+          "vendor": "Microsoft"
+        },
+        {
+          "entityKey": "spec|Agent Skills (open standard)",
+          "name": "Agent Skills (open standard)",
+          "desc": "The open, cross-agent Agent Skills specification: a lightweight format (a folder with a…",
+          "detail": "The open, cross-agent Agent Skills specification: a lightweight format (a folder with a required SKILL.md containing name/descript",
+          "url": "https://agentskills.io/home",
+          "stars": null,
+          "emoji": "📜",
+          "icon": "2e4f94c6b4aa",
+          "verified": true,
+          "vendor": "Open community standard, originated by Anthropic (GitHub org agentskills)"
+        }
+      ]
+    }
+  ]
+}

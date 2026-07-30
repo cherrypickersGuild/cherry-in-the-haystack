@@ -245,7 +245,7 @@ export function NDBuildingBlocksPage() {
   if (error) {
     return (
       <div style={{ maxWidth: 720 }}>
-        <h1 className="mb-2 text-[26px] font-extrabold text-[#1A1626]">Building Blocks</h1>
+        <h1 className="mb-2 text-[26px] font-extrabold text-[#1A1626]">Engineering - Building Blocks</h1>
         <p className="text-[13.5px] text-[#6E6A78]">Failed to load data.</p>
       </div>
     )
@@ -263,7 +263,7 @@ export function NDBuildingBlocksPage() {
       <div>
       {/* 헤더 */}
       <h1 className="mb-[2px] text-[26px] font-extrabold tracking-[-0.4px] text-[#1A1626]">
-        Building Blocks
+        Engineering - Building Blocks
       </h1>
       <p className="mb-[18px] max-w-[780px] text-[14px] leading-[1.7] text-[#6E6A78]">
         Prompts, templates, code snippets, orchestration patterns, MCP servers, and agent

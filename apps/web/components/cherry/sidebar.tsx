@@ -267,12 +267,15 @@ function ItemButton({
   isChild,
   isCollapsed,
   onClick,
+  onToggle,
 }: {
   item: NavItem
   isActive: boolean
   isChild?: boolean
   isCollapsed?: boolean
   onClick: () => void
+  /** 있으면 화살표(전용 영역)를 눌러야 접기/펴기. 본문 클릭은 onClick(이동)만. */
+  onToggle?: () => void
 }) {
   const [hovered, setHovered] = useState(false)
   const hasChildren = !!item.children?.length
@@ -316,17 +319,34 @@ function ItemButton({
       {item.star && <span style={{ color: C.cherry, fontSize: 11, flexShrink: 0 }}>★</span>}
       {hasChildren && (
         <span
-          className="flex-shrink-0"
-          style={{
-            width: 13,
-            height: 13,
-            opacity: 0.7,
-            color,
-            transition: "transform .15s",
-            transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
-          }}
+          onClick={
+            onToggle
+              ? (e) => {
+                  e.stopPropagation()
+                  onToggle()
+                }
+              : undefined
+          }
+          role={onToggle ? "button" : undefined}
+          aria-label={onToggle ? (isCollapsed ? "펼치기" : "접기") : undefined}
+          className={
+            "flex flex-shrink-0 items-center justify-center rounded-md" +
+            (onToggle ? " cursor-pointer hover:bg-black/5" : "")
+          }
+          style={{ width: 22, height: 22, marginRight: -4, color }}
         >
-          <Chevron />
+          <span
+            className="flex"
+            style={{
+              width: 13,
+              height: 13,
+              opacity: 0.7,
+              transition: "transform .15s",
+              transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+            }}
+          >
+            <Chevron />
+          </span>
         </span>
       )}
     </button>
@@ -467,13 +487,13 @@ export function Sidebar({
                     item={item}
                     isActive={false}
                     isCollapsed={isC}
+                    // 본문 클릭 = 이동만. 접기/펴기는 화살표(onToggle) 전용.
                     onClick={() => {
-                      toggle(item.id)
-                      // ND 그룹 헤더는 페이지가 없다 → 열고닫기 + 첫 서브메뉴 활성화.
-                      // Basics/Advanced는 기존대로 토글만.
                       const g = getNDGroup(item.id)
-                      if (g) onSelect(g.children[0])
+                      if (g) onSelect(g.landingId ?? g.children[0])
+                      else if (item.children?.length) onSelect(item.children[0].id)
                     }}
+                    onToggle={() => toggle(item.id)}
                   />
                   {/* 목업 .children — 단순 좌측 선 */}
                   {!isC && (
