@@ -35,6 +35,11 @@ RUN pnpm install --frozen-lockfile --filter=api... --prod
 # Copy built output
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 
+# Copy seed config data (Frameworks/Prompting Landscape + Overview config JSON).
+# DATA_DIR 환경변수를 /app/apps/api/storage 로 지정해 이 경로를 읽게 한다.
+# (영속 편집이 필요하면 이 경로에 퍼시스턴트 볼륨을 마운트)
+COPY apps/api/storage ./apps/api/storage
+
 EXPOSE 4000
 
 CMD ["node", "apps/api/dist/main"]
