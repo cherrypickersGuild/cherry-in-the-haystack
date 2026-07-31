@@ -1,0 +1,446 @@
+{
+  "page": "domain-applications",
+  "generatedAt": "2026-07-31T17:46:09.031Z",
+  "source": "cases/entities.json",
+  "categories": [
+    {
+      "key": "education-research",
+      "label": "Education & Research",
+      "color": {
+        "c": "#4B78F0",
+        "bg": "#EEF2FD"
+      },
+      "icon": "🧮",
+      "items": [
+        {
+          "name": "Elicit",
+          "desc": "Use AI to search, summarize, extract data from, and chat with over 125 million papers.…",
+          "detail": "Use AI to search, summarize, extract data from, and chat with over 125 million papers. Used by over 2 million researchers in academia and industry.",
+          "url": "https://elicit.org/",
+          "stars": null,
+          "emoji": "📖",
+          "meta": ""
+        },
+        {
+          "name": "genei",
+          "desc": "genei is a intelligent research tool enabling you to improve productivity by using a…",
+          "detail": "genei is a intelligent research tool enabling you to improve productivity by using a custom AI algorithm to summarise articles, analyse research and find key information, instantly.",
+          "url": "https://www.genei.io/",
+          "stars": null,
+          "emoji": "📖",
+          "meta": ""
+        },
+        {
+          "name": "Explainpaper",
+          "desc": "Read research papers 10x faster",
+          "detail": "Read research papers 10x faster",
+          "url": "https://www.explainpaper.com/",
+          "stars": null,
+          "emoji": "🧮",
+          "meta": ""
+        },
+        {
+          "name": "Consensus",
+          "desc": "Consensus is an AI academic search engine for peer-reviewed literature—your research OS…",
+          "detail": "Consensus is an AI academic search engine for peer-reviewed literature—your research OS for finding, organizing, and analyzing science 10x faster.",
+          "url": "https://consensus.app/search/",
+          "stars": null,
+          "emoji": "📝",
+          "meta": ""
+        },
+        {
+          "name": "scite",
+          "desc": "A platform for discovering and evaluating scientific articles.",
+          "detail": "A platform for discovering and evaluating scientific articles.",
+          "url": "https://scite.ai/",
+          "stars": null,
+          "emoji": "✏️",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "software-it",
+      "label": "Software & IT",
+      "color": {
+        "c": "#2E8B6F",
+        "bg": "#E7F4EF"
+      },
+      "icon": "🖥",
+      "items": [
+        {
+          "name": "Citadel",
+          "desc": "The operating layer for Claude Code + OpenAI Codex: persistent project memory, intent…",
+          "detail": "The operating layer for Claude Code + OpenAI Codex: persistent project memory, intent routing, safety hooks, cost telemetry, and parallel agent fleets. - SethGammon/Citadel",
+          "url": "https://github.com/SethGammon/Citadel",
+          "stars": null,
+          "emoji": "🖥",
+          "meta": ""
+        },
+        {
+          "name": "Landing Page Generator",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/crews/landing_page_generator",
+          "stars": null,
+          "emoji": "⌨️",
+          "meta": ""
+        },
+        {
+          "name": "Game Builder Crew",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/crews/game-builder-crew",
+          "stars": null,
+          "emoji": "🖥",
+          "meta": ""
+        },
+        {
+          "name": "Starter Template",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/crews/starter_template",
+          "stars": null,
+          "emoji": "🔌",
+          "meta": ""
+        },
+        {
+          "name": "SQL: Natural Language to SQL Query",
+          "desc": "A programming framework for agentic AI. Contribute to microsoft/autogen development by…",
+          "detail": "A programming framework for agentic AI. Contribute to microsoft/autogen development by creating an account on GitHub.",
+          "url": "https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_sql_spider.ipynb",
+          "stars": null,
+          "emoji": "🧑‍💻",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "media-content",
+      "label": "Media & Content",
+      "color": {
+        "c": "#7C3AED",
+        "bg": "#F3EFFA"
+      },
+      "icon": "📺",
+      "items": [
+        {
+          "name": "Content Personalization Agent",
+          "desc": "🪞 Personalized LLM Agents 🪞. Contribute to crosleythomas/MirrorGPT development by…",
+          "detail": "🪞 Personalized LLM Agents 🪞. Contribute to crosleythomas/MirrorGPT development by creating an account on GitHub.",
+          "url": "https://github.com/crosleythomas/MirrorGPT",
+          "stars": null,
+          "emoji": "🎞",
+          "meta": ""
+        },
+        {
+          "name": "Write a Book with Flows",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/flows/write_a_book_with_flows",
+          "stars": null,
+          "emoji": "🎬",
+          "meta": ""
+        },
+        {
+          "name": "Screenplay Writer",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/crews/screenplay_writer",
+          "stars": null,
+          "emoji": "📺",
+          "meta": ""
+        },
+        {
+          "name": "Multimodal Agent with DALLE and GPT-4V",
+          "desc": "A programming framework for agentic AI. Contribute to microsoft/autogen development by…",
+          "detail": "A programming framework for agentic AI. Contribute to microsoft/autogen development by creating an account on GitHub.",
+          "url": "https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_dalle_and_gpt4v.ipynb",
+          "stars": null,
+          "emoji": "📸",
+          "meta": ""
+        },
+        {
+          "name": "Multimodal Agent with GPT-4V",
+          "desc": "A programming framework for agentic AI. Contribute to microsoft/autogen development by…",
+          "detail": "A programming framework for agentic AI. Contribute to microsoft/autogen development by creating an account on GitHub.",
+          "url": "https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_lmm_gpt-4v.ipynb",
+          "stars": null,
+          "emoji": "🎞",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "workflow-automation",
+      "label": "Workflow & Automation",
+      "color": {
+        "c": "#0194E2",
+        "bg": "#E6F4FD"
+      },
+      "icon": "🧩",
+      "items": [
+        {
+          "name": "NVIDIA Models Integration",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/integrations/nvidia_models",
+          "stars": null,
+          "emoji": "🔄",
+          "meta": ""
+        },
+        {
+          "name": "CrewAI + LangGraph Integration",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/integrations/CrewAI-LangGraph",
+          "stars": null,
+          "emoji": "🔄",
+          "meta": ""
+        },
+        {
+          "name": "‍💻 Task Solving with Coding & Planning Agents",
+          "desc": "A programming framework for agentic AI. Contribute to microsoft/autogen development by…",
+          "detail": "A programming framework for agentic AI. Contribute to microsoft/autogen development by creating an account on GitHub.",
+          "url": "https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_planning.ipynb",
+          "stars": null,
+          "emoji": "🛠",
+          "meta": ""
+        },
+        {
+          "name": "Multi-Agent Workflow (Supervisor)",
+          "desc": "Build resilient agents. Contribute to langchain-ai/langgraph development by creating an…",
+          "detail": "Build resilient agents. Contribute to langchain-ai/langgraph development by creating an account on GitHub.",
+          "url": "https://github.com/langchain-ai/langgraph/blob/main/docs/docs/tutorials/multi_agent/agent_supervisor.ipynb",
+          "stars": null,
+          "emoji": "🧩",
+          "meta": ""
+        },
+        {
+          "name": "Hierarchical Agent Teams",
+          "desc": "Build resilient agents. Contribute to langchain-ai/langgraph development by creating an…",
+          "detail": "Build resilient agents. Contribute to langchain-ai/langgraph development by creating an account on GitHub.",
+          "url": "https://github.com/langchain-ai/langgraph/blob/main/docs/docs/tutorials/multi_agent/hierarchical_agent_teams.ipynb",
+          "stars": null,
+          "emoji": "🔄",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "information-knowledge",
+      "label": "Information & Knowledge",
+      "color": {
+        "c": "#D4854A",
+        "bg": "#FEF3E2"
+      },
+      "icon": "🔍",
+      "items": [
+        {
+          "name": "Markdown Validator",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/crews/markdown_validator",
+          "stars": null,
+          "emoji": "📚",
+          "meta": ""
+        },
+        {
+          "name": "Meta Quest Knowledge",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/crews/meta_quest_knowledge",
+          "stars": null,
+          "emoji": "🗂",
+          "meta": ""
+        },
+        {
+          "name": "Web Search: Solve Tasks Requiring Web Info",
+          "desc": "A programming framework for agentic AI. Contribute to microsoft/autogen development by…",
+          "detail": "A programming framework for agentic AI. Contribute to microsoft/autogen development by creating an account on GitHub.",
+          "url": "https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_web_info.ipynb",
+          "stars": null,
+          "emoji": "🔍",
+          "meta": ""
+        },
+        {
+          "name": "Adaptive RAG",
+          "desc": "Build resilient agents. Contribute to langchain-ai/langgraph development by creating an…",
+          "detail": "Build resilient agents. Contribute to langchain-ai/langgraph development by creating an account on GitHub.",
+          "url": "https://github.com/langchain-ai/langgraph/blob/main/docs/docs/tutorials/rag/langgraph_adaptive_rag.ipynb",
+          "stars": null,
+          "emoji": "🔍",
+          "meta": ""
+        },
+        {
+          "name": "Corrective RAG (CRAG)",
+          "desc": "Build resilient agents. Contribute to langchain-ai/langgraph development by creating an…",
+          "detail": "Build resilient agents. Contribute to langchain-ai/langgraph development by creating an account on GitHub.",
+          "url": "https://github.com/langchain-ai/langgraph/blob/main/docs/docs/tutorials/rag/langgraph_crag.ipynb",
+          "stars": null,
+          "emoji": "🧠",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "finance-insurance",
+      "label": "Finance & Insurance",
+      "color": {
+        "c": "#5B3D87",
+        "bg": "#F3EFFA"
+      },
+      "icon": "📈",
+      "items": [
+        {
+          "name": "Automated Trading Bot",
+          "desc": "[TIST] Large Language Model-based Stock Trading in Simulated Real-world Environments -…",
+          "detail": "[TIST] Large Language Model-based Stock Trading in Simulated Real-world Environments - MingyuJ666/Stockagent",
+          "url": "https://github.com/MingyuJ666/Stockagent",
+          "stars": null,
+          "emoji": "💰",
+          "meta": ""
+        },
+        {
+          "name": "Agent Wallet SDK",
+          "desc": "Non-custodial crypto wallets for AI agents with on-chain spending limits. ERC-6551, x402…",
+          "detail": "Non-custodial crypto wallets for AI agents with on-chain spending limits. ERC-6551, x402 compatible, Base Mainnet. - up2itnow0822/agent-wallet-sdk",
+          "url": "https://github.com/up2itnow0822/agent-wallet-sdk",
+          "stars": null,
+          "emoji": "📊",
+          "meta": ""
+        },
+        {
+          "name": "MediSuite-AI-Agent",
+          "desc": "A medical ai agent that helps automating the process of hospitals / insurance claiming…",
+          "detail": "A medical ai agent that helps automating the process of hospitals / insurance claiming workflow - ahmedmansour5/MediSuite-Ai-Agent",
+          "url": "https://github.com/ahmedmansour5/MediSuite-Ai-Agent",
+          "stars": null,
+          "emoji": "📈",
+          "meta": ""
+        },
+        {
+          "name": "Stock Analysis Tool",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/crews/stock_analysis",
+          "stars": null,
+          "emoji": "📈",
+          "meta": ""
+        },
+        {
+          "name": "Finance Agent (Thinking)",
+          "desc": "Build, run, and manage agent platforms. Contribute to agno-agi/agno development by…",
+          "detail": "Build, run, and manage agent platforms. Contribute to agno-agi/agno development by creating an account on GitHub.",
+          "url": "https://github.com/agno-agi/agno/blob/main/cookbook/examples/agents/thinking_finance_agent.py",
+          "stars": null,
+          "emoji": "📈",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "hr-recruitment",
+      "label": "HR & Recruitment",
+      "color": {
+        "c": "#C94B6E",
+        "bg": "#FDF0F3"
+      },
+      "icon": "📄",
+      "items": [
+        {
+          "name": "Recruitment Recommendation Agent",
+          "desc": "browser controlling AI agent that applies to relavant jobs on internet autonomously. join…",
+          "detail": "browser controlling AI agent that applies to relavant jobs on internet autonomously. join chat @ https://discord.gg/umgnyQU2K8 - sentient-engineering/jobber",
+          "url": "https://github.com/sentient-engineering/jobber",
+          "stars": null,
+          "emoji": "👥",
+          "meta": ""
+        },
+        {
+          "name": "NextRole (AI Career Assistant)",
+          "desc": "🚀 Level up your career with GenAI. 📄 Tailor your CV to any JD, 🔍 automate company…",
+          "detail": "🚀 Level up your career with GenAI. 📄 Tailor your CV to any JD, 🔍 automate company research, and 🗓️ generate custom interview prep plans for your next role or internal promotion. - tam159/next-role",
+          "url": "https://github.com/tam159/next-role",
+          "stars": null,
+          "emoji": "🧑‍💼",
+          "meta": ""
+        },
+        {
+          "name": "Self Evaluation Loop Flow",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/flows/self_evaluation_loop_flow",
+          "stars": null,
+          "emoji": "👥",
+          "meta": ""
+        },
+        {
+          "name": "Job Posting Generator",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/crews/job-posting",
+          "stars": null,
+          "emoji": "🧑‍💼",
+          "meta": ""
+        },
+        {
+          "name": "Recruitment Workflow",
+          "desc": "A collection of examples that show how to use CrewAI framework to automate workflows. -…",
+          "detail": "A collection of examples that show how to use CrewAI framework to automate workflows. - crewAIInc/crewAI-examples",
+          "url": "https://github.com/crewAIInc/crewAI-examples/tree/main/crews/recruitment",
+          "stars": null,
+          "emoji": "🤝",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "security-compliance",
+      "label": "Security & Compliance",
+      "color": {
+        "c": "#DC2626",
+        "bg": "#FDECEC"
+      },
+      "icon": "🔏",
+      "items": [
+        {
+          "name": "Real-Time Threat Detection Agent",
+          "desc": "A collection of agents that use Large Language Models (LLMs) to perform tasks common on…",
+          "detail": "A collection of agents that use Large Language Models (LLMs) to perform tasks common on our day to day jobs in cyber security. - NVISOsecurity/cyber-security-llm-agents",
+          "url": "https://github.com/NVISOsecurity/cyber-security-llm-agents",
+          "stars": null,
+          "emoji": "🗂",
+          "meta": ""
+        },
+        {
+          "name": "Vibe Hacking Agent",
+          "desc": "Autonomous Hacking Agent for Red Team. Contribute to PurpleAILAB/Decepticon development by…",
+          "detail": "Autonomous Hacking Agent for Red Team. Contribute to PurpleAILAB/Decepticon development by creating an account on GitHub.",
+          "url": "https://github.com/PurpleAILAB/Decepticon",
+          "stars": null,
+          "emoji": "👨‍⚖️",
+          "meta": ""
+        },
+        {
+          "name": "Agent Memory Guard",
+          "desc": "OWASP Foundation web repository. Contribute to OWASP/www-project-agent-memory-guard…",
+          "detail": "OWASP Foundation web repository. Contribute to OWASP/www-project-agent-memory-guard development by creating an account on GitHub.",
+          "url": "https://github.com/OWASP/www-project-agent-memory-guard",
+          "stars": null,
+          "emoji": "🔏",
+          "meta": ""
+        },
+        {
+          "name": "PII Sanitization Agent",
+          "desc": "Control the information flow between autonomous agents. PII redaction, on-chain payment…",
+          "detail": "Control the information flow between autonomous agents. PII redaction, on-chain payment verification, and audit trails. Open source. - teodorofodocrispin-cmyk/TrustBoost-PII-Sanitizer",
+          "url": "https://github.com/teodorofodocrispin-cmyk/TrustBoost-PII-Sanitizer",
+          "stars": null,
+          "emoji": "🏛",
+          "meta": ""
+        }
+      ]
+    }
+  ]
+}

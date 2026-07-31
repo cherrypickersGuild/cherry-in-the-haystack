@@ -1,0 +1,455 @@
+{
+  "page": "case-studies",
+  "generatedAt": "2026-07-31T17:37:42.799Z",
+  "source": "cases/entities.json",
+  "categories": [
+    {
+      "key": "tech",
+      "label": "Tech",
+      "color": {
+        "c": "#4B78F0",
+        "bg": "#EEF2FD"
+      },
+      "icon": "⌨️",
+      "items": [
+        {
+          "name": "Context Engineering for AI Agents: Lessons from Building Manus",
+          "desc": "This post shares the local optima Manus arrived at through our own \"SGD\". If you're…",
+          "detail": "This post shares the local optima Manus arrived at through our own \"SGD\". If you're building your own AI agent, we hope these principles help you converge faster.",
+          "url": "https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus",
+          "stars": null,
+          "emoji": "💻",
+          "meta": "Manus · 2025"
+        },
+        {
+          "name": "Building Dash: How RAG and AI agents help us meet the needs of businesses",
+          "desc": "To meet the challenges of modern work in data-intensive environments, we ultimately turned…",
+          "detail": "To meet the challenges of modern work in data-intensive environments, we ultimately turned to retrieval-augmented generation and AI agents.",
+          "url": "https://dropbox.tech/machine-learning/building-dash-rag-multi-step-ai-agents-business-users",
+          "stars": null,
+          "emoji": "🖥",
+          "meta": "Dropbox · 2025"
+        },
+        {
+          "name": "How we brought multimedia search to Dropbox Dash",
+          "desc": "Our multimedia retrieval features allow users to find images, video, and audio just as…",
+          "detail": "Our multimedia retrieval features allow users to find images, video, and audio just as easily as they find documents.",
+          "url": "https://dropbox.tech/infrastructure/multimedia-search-dropbox-dash-evolution",
+          "stars": null,
+          "emoji": "🛠",
+          "meta": "Dropbox · 2025"
+        },
+        {
+          "name": "How we built enterprise search to be secure and private",
+          "desc": "Many don’t know that “Slack” is in fact a backronym—it stands for “Searchable Log of all…",
+          "detail": "Many don’t know that “Slack” is in fact a backronym—it stands for “Searchable Log of all Communication and Knowledge”. And these days, it’s not just a searchable log: with Slack AI, Slack is now an intelligent log, leveraging the latest in generative AI to securely surface powerful, time-saving…",
+          "url": "https://slack.engineering/how-we-built-enterprise-search-to-be-secure-and-private/",
+          "stars": null,
+          "emoji": "🛠",
+          "meta": "Slack · 2025"
+        },
+        {
+          "name": "[VIDEO] Building Effective Voice Agents",
+          "desc": "How to build production voice applications and learnings from working with customers along…",
+          "detail": "How to build production voice applications and learnings from working with customers along the way!https://x.com/tokisherbakovhttps://www.linkedin.com/in/ako...",
+          "url": "https://www.youtube.com/watch?v=-OXiljTJxQU",
+          "stars": null,
+          "emoji": "⌨️",
+          "meta": "OpenAI · 2025"
+        }
+      ]
+    },
+    {
+      "key": "e-commerce-and-retail",
+      "label": "E-commerce and retail",
+      "color": {
+        "c": "#2E8B6F",
+        "bg": "#E7F4EF"
+      },
+      "icon": "🏷",
+      "items": [
+        {
+          "name": "Compatibility Challenges in Recommendation System",
+          "desc": "How to address compatibility in DIY Product Recommendations.",
+          "detail": "How to address compatibility in DIY Product Recommendations.",
+          "url": "https://medium.com/manomano-tech/compatibility-challenges-in-recommendation-system-4d233c676d35",
+          "stars": null,
+          "emoji": "🧾",
+          "meta": "ManoMano · 2025"
+        },
+        {
+          "name": "Leveraging Knowledge Graphs in Real Estate Search",
+          "desc": "Improve search with Knowledge Graphs",
+          "detail": "Improve search with Knowledge Graphs",
+          "url": "https://www.zillow.com/tech/leveraging-knowledge-graphs-in-real-estate-search/",
+          "stars": null,
+          "emoji": "📦",
+          "meta": "Zillow · 2025"
+        },
+        {
+          "name": "Evolving Feed Ranking at Whatnot",
+          "desc": "This is part of our ML blog series and pairs well with 6x Faster ML Inference: Why…",
+          "detail": "This is part of our ML blog series and pairs well with 6x Faster ML Inference: Why Online≫Batch, which goes deeper into how we built the…",
+          "url": "https://medium.com/whatnot-engineering/evolving-feed-ranking-at-whatnot-25adb116aeb6",
+          "stars": null,
+          "emoji": "🛒",
+          "meta": "Whatnot · 2025"
+        },
+        {
+          "name": "Evolution of Product Classification at Shopify: From Categories to Comprehensive Product Understanding",
+          "desc": "Shopify’s product classification system has evolved from basic categorization to an…",
+          "detail": "Shopify’s product classification system has evolved from basic categorization to an AI-driven framework using Vision Language Models and the Shopify Product Taxonomy. It accurately classifies products, extracts attributes, and processes over 30 million predictions daily, improving search,…",
+          "url": "https://shopify.engineering/evolution-product-classification",
+          "stars": null,
+          "emoji": "📦",
+          "meta": "Shopify · 2025"
+        },
+        {
+          "name": "Efficient Visual Representation Learning And Evaluation",
+          "desc": "Visual search and visually similar recommendations",
+          "detail": "Visual search and visually similar recommendations",
+          "url": "https://www.etsy.com/codeascraft/efficient-visual-representation-learning-and-evaluation",
+          "stars": null,
+          "emoji": "💳",
+          "meta": "Etsy · 2024"
+        }
+      ]
+    },
+    {
+      "key": "delivery-and-mobility",
+      "label": "Delivery and mobility",
+      "color": {
+        "c": "#7C3AED",
+        "bg": "#F3EFFA"
+      },
+      "icon": "📍",
+      "items": [
+        {
+          "name": "Real-Time Spatial Temporal Forecasting @ Lyft",
+          "desc": "Reliability and Simplicity: A Look at Classical Time-Series Models for Real-Time…",
+          "detail": "Reliability and Simplicity: A Look at Classical Time-Series Models for Real-Time Forecasting",
+          "url": "https://eng.lyft.com/real-time-spatial-temporal-forecasting-lyft-fa90b3f3ec24",
+          "stars": null,
+          "emoji": "📦",
+          "meta": "Lyft · 2025"
+        },
+        {
+          "name": "Adding Eyes to Picnic’s Automated Warehouses",
+          "desc": "Read the latest news and insights from the Picnic team. Building the Best Milkman on Earth",
+          "detail": "Read the latest news and insights from the Picnic team. Building the Best Milkman on Earth",
+          "url": "https://blog.picnic.nl/adding-eyes-to-picnics-automated-warehouses-8b6c70613e2f",
+          "stars": null,
+          "emoji": "🚚",
+          "meta": "Picnic · 2025"
+        },
+        {
+          "name": "Enhancing Brand Visibility and Trust with On device ML models: A Journey at Swiggy",
+          "desc": "Detect branded gear on delivery executives",
+          "detail": "Detect branded gear on delivery executives",
+          "url": "https://bytes.swiggy.com/enhancing-brand-visibility-and-trust-with-on-device-ml-models-a-journey-at-swiggy-e3e626f96c52",
+          "stars": null,
+          "emoji": "🧭",
+          "meta": "Swiggy · 2025"
+        },
+        {
+          "name": "Solving the weekly menu puzzle pt.2: recommendations at Picnic",
+          "desc": "Read the latest news and insights from the Picnic team. Building the Best Milkman on Earth",
+          "detail": "Read the latest news and insights from the Picnic team. Building the Best Milkman on Earth",
+          "url": "https://blog.picnic.nl/solving-the-weekly-menu-puzzle-pt-2-recommendations-at-picnic-b48a4c434159",
+          "stars": null,
+          "emoji": "🚚",
+          "meta": "Picnic · 2025"
+        },
+        {
+          "name": "Reinforcement Learning for Modeling Marketplace Balance",
+          "desc": "Forecast demand for taxi rides",
+          "detail": "Forecast demand for taxi rides",
+          "url": "https://www.uber.com/en-IN/blog/reinforcement-learning-for-modeling-marketplace-balance/",
+          "stars": null,
+          "emoji": "🚚",
+          "meta": "Uber · 2025"
+        }
+      ]
+    },
+    {
+      "key": "social-platforms",
+      "label": "Social platforms",
+      "color": {
+        "c": "#0194E2",
+        "bg": "#E6F4FD"
+      },
+      "icon": "👥",
+      "items": [
+        {
+          "name": "Advancements in Embedding-Based Retrieval at Pinterest Homefeed",
+          "desc": "Zhibo Fan | Machine Learning Engineer, Homefeed Candidate Generation; Bowen Deng | Machine…",
+          "detail": "Zhibo Fan | Machine Learning Engineer, Homefeed Candidate Generation; Bowen Deng | Machine Learning Engineer, Homefeed Candidate…",
+          "url": "https://medium.com/pinterest-engineering/advancements-in-embedding-based-retrieval-at-pinterest-homefeed-d7d7971a409e",
+          "stars": null,
+          "emoji": "💬",
+          "meta": "Pinterest · 2025"
+        },
+        {
+          "name": "Module Relevance on Home Feed",
+          "desc": "Usha Amrutha Nookala, Jason Madeano, Siddarth Malreddy, Lucy Song, Alekhya P",
+          "detail": "Usha Amrutha Nookala, Jason Madeano, Siddarth Malreddy, Lucy Song, Alekhya P",
+          "url": "https://medium.com/pinterest-engineering/module-relevance-on-homefeed-ae76f8b545b2",
+          "stars": null,
+          "emoji": "💬",
+          "meta": "Pinterest · 2025"
+        },
+        {
+          "name": "Inside Glassdoor’s Multi-Stage Recommendation System",
+          "desc": "Inside Glassdoor’s Multi-Stage Recommendation System Introduction: Recommendation systems…",
+          "detail": "Inside Glassdoor’s Multi-Stage Recommendation System Introduction: Recommendation systems are central to modern digital platforms, delivering personalized content by intelligently analyzing user …",
+          "url": "https://medium.com/glassdoor-engineering/inside-glassdoors-multi-stage-recommendation-system-cee58b52a75a",
+          "stars": null,
+          "emoji": "🔔",
+          "meta": "Glassdoor · 2025"
+        },
+        {
+          "name": "Unlocking Efficient Ad Retrieval: Offline Approximate Nearest Neighbors in Pinterest Ads",
+          "desc": "Authors (non-ordered): Qishan(Shanna) Zhu, Chen Hu Acknowledgements: Longyu Zhao, Jacob…",
+          "detail": "Authors (non-ordered): Qishan(Shanna) Zhu, Chen Hu Acknowledgements: Longyu Zhao, Jacob Gao, Quannan Li, Dinesh Govindaraj",
+          "url": "https://medium.com/pinterest-engineering/unlocking-efficient-ad-retrieval-offline-approximate-nearest-neighbors-in-pinterest-ads-6fccc131ac14",
+          "stars": null,
+          "emoji": "📢",
+          "meta": "Pinterest · 2025"
+        },
+        {
+          "name": "Building Holiday Finds: How Pinterest Engineers Reimagined Gift Discovery",
+          "desc": "Recommend holiday gifts",
+          "detail": "Recommend holiday gifts",
+          "url": "https://medium.com/pinterest-engineering/building-holiday-finds-how-pinterest-engineers-reimagined-gift-discovery-0a48a0c8bfd8",
+          "stars": null,
+          "emoji": "💬",
+          "meta": "Pinterest · 2025"
+        }
+      ]
+    },
+    {
+      "key": "fintech-and-banking",
+      "label": "Fintech and banking",
+      "color": {
+        "c": "#D4854A",
+        "bg": "#FEF3E2"
+      },
+      "icon": "📊",
+      "items": [
+        {
+          "name": "From RAG to Richness: How Ramp Revamped Industry Classification",
+          "desc": "Better classify customers",
+          "detail": "Better classify customers",
+          "url": "https://engineering.ramp.com/industry_classification",
+          "stars": null,
+          "emoji": "📊",
+          "meta": "Ramp · 2025"
+        },
+        {
+          "name": "Wise Tech Stack (2025 update)",
+          "desc": "An overview of the tech stack we use at Wise as of early 2025",
+          "detail": "An overview of the tech stack we use at Wise as of early 2025",
+          "url": "https://medium.com/wise-engineering/wise-tech-stack-2025-update-d0e63fe718c7",
+          "stars": null,
+          "emoji": "🏦",
+          "meta": "Wise · 2025"
+        },
+        {
+          "name": "Transforming Engineers: How we grew AI coding adoption at Plaid",
+          "desc": "How we scaled our AI engineering program to help all Plaid engineers become AI power users",
+          "detail": "How we scaled our AI engineering program to help all Plaid engineers become AI power users",
+          "url": "https://plaid.com/blog/ai-coding-adoption-plaid/",
+          "stars": null,
+          "emoji": "💵",
+          "meta": "Plaid · 2025"
+        },
+        {
+          "name": "Fine-Tuning Transaction User Models",
+          "desc": "Learn how we combine transaction embeddings with tabular data using supervised fine-tuning…",
+          "detail": "Learn how we combine transaction embeddings with tabular data using supervised fine-tuning and joint fusion. Our DCNv2-based architecture outperforms LightGBM, advancing the use of foundation models for customer behavior modeling at Nubank.",
+          "url": "https://building.nubank.com/fine-tuning-transaction-user-models/",
+          "stars": null,
+          "emoji": "🪙",
+          "meta": "Nubank · 2025"
+        },
+        {
+          "name": "RoBERTa Model for Merchant Categorization at Square",
+          "desc": "Square's ML-driven merchant categorization improves accuracy by 30%, enhancing product…",
+          "detail": "Square's ML-driven merchant categorization improves accuracy by 30%, enhancing product experiences, strategy, and payments.",
+          "url": "https://developer.squareup.com/blog/roberta-model-for-merchant-categorization-at-square/",
+          "stars": null,
+          "emoji": "💵",
+          "meta": "Square · 2025"
+        }
+      ]
+    },
+    {
+      "key": "media-and-streaming",
+      "label": "Media and streaming",
+      "color": {
+        "c": "#5B3D87",
+        "bg": "#F3EFFA"
+      },
+      "icon": "🎬",
+      "items": [
+        {
+          "name": "Accelerating Video Quality Control at Netflix with Pixel Error Detection",
+          "desc": "By Leo Isikdogan, Jesse Korosi, Zile Liao, Nagendra Kamath, Ananya Poddar",
+          "detail": "By Leo Isikdogan, Jesse Korosi, Zile Liao, Nagendra Kamath, Ananya Poddar",
+          "url": "https://netflixtechblog.com/accelerating-video-quality-control-at-netflix-with-pixel-error-detection-47ef7af7ca2e",
+          "stars": null,
+          "emoji": "📺",
+          "meta": "Netflix · 2025"
+        },
+        {
+          "name": "Round 2: A Survey of Causal Inference Applications at Netflix",
+          "desc": "At Netflix, we want to ensure that every current and future member finds content that…",
+          "detail": "At Netflix, we want to ensure that every current and future member finds content that thrills them today and excites them to come back for…",
+          "url": "https://netflixtechblog.com/round-2-a-survey-of-causal-inference-applications-at-netflix-fd78328ee0bb",
+          "stars": null,
+          "emoji": "🎬",
+          "meta": "Netflix · 2024"
+        },
+        {
+          "name": "Evolving from Rule-based Classifier: Machine Learning Powered Auto Remediation in Netflix Data Platform",
+          "desc": "by Binbing Hou, Stephanie Vezich Tamayo, Xiao Chen, Liang Tian, Troy Ristow, Haoyuan Wang…",
+          "detail": "by Binbing Hou, Stephanie Vezich Tamayo, Xiao Chen, Liang Tian, Troy Ristow, Haoyuan Wang, Snehal Chennuru, Pawan Dixit",
+          "url": "https://netflixtechblog.com/evolving-from-rule-based-classifier-machine-learning-powered-auto-remediation-in-netflix-data-039d5efd115b",
+          "stars": null,
+          "emoji": "🎞",
+          "meta": "Netflix · 2024"
+        },
+        {
+          "name": "Reverse Searching Netflix’s Federated Graph",
+          "desc": "By Ricky Gardiner, Alex Hutter, Damir Svrtan and Katie Lefevre",
+          "detail": "By Ricky Gardiner, Alex Hutter, Damir Svrtan and Katie Lefevre",
+          "url": "https://netflixtechblog.com/reverse-searching-netflixs-federated-graph-222ac5d23576",
+          "stars": null,
+          "emoji": "📸",
+          "meta": "Netflix · 2024"
+        },
+        {
+          "name": "Experimenting with Handwriting Recognition for The New York Times Crossword",
+          "desc": "Exploring the ability to write in the New York Times Crosswords app on each respective…",
+          "detail": "Exploring the ability to write in the New York Times Crosswords app on each respective platform for at NYT's annual hackathon project week.",
+          "url": "https://open.nytimes.com/experimenting-with-handwriting-recognition-for-new-york-times-crossword-a78e08fec08f",
+          "stars": null,
+          "emoji": "🍿",
+          "meta": "New York Times · 2024"
+        }
+      ]
+    },
+    {
+      "key": "travel",
+      "label": "Travel",
+      "color": {
+        "c": "#C94B6E",
+        "bg": "#FDF0F3"
+      },
+      "icon": "🗽",
+      "items": [
+        {
+          "name": "Unlocking the Power of Customization: How Our Enrichment System Transforms Recommendation Data Enrichments",
+          "desc": "Enrich recommendation data",
+          "detail": "Enrich recommendation data",
+          "url": "https://medium.com/booking-com-development/unlocking-the-power-of-customization-how-our-enrichment-system-transforms-recommendation-data-e71832fc4ef4",
+          "stars": null,
+          "emoji": "✈️",
+          "meta": "Booking · 2025"
+        },
+        {
+          "name": "Embedding-Based Retrieval for Airbnb Search",
+          "desc": "Our journey in applying embedding-based retrieval techniques to build an accurate and…",
+          "detail": "Our journey in applying embedding-based retrieval techniques to build an accurate and scalable candidate retrieval system for Airbnb Homes…",
+          "url": "https://medium.com/airbnb-engineering/embedding-based-retrieval-for-airbnb-search-aabebfc85839",
+          "stars": null,
+          "emoji": "✈️",
+          "meta": "Airbnb · 2025"
+        },
+        {
+          "name": "How we aggregate 70 billion prices to show price context to our users",
+          "desc": "Price comparison at scale",
+          "detail": "Price comparison at scale",
+          "url": "https://tech.trivago.com/post/2025-02-13-how-we-aggregate-70-billion-prices-to-show-price-context-to-our-users",
+          "stars": null,
+          "emoji": "✈️",
+          "meta": "Trivago · 2025"
+        },
+        {
+          "name": "Contextual Property Embeddings for Corse-grained Personalization",
+          "desc": "Incorporating traveler loyalty into hotel search",
+          "detail": "Incorporating traveler loyalty into hotel search",
+          "url": "https://medium.com/expedia-group-tech/contextual-property-embeddings-for-corse-grained-personalization-c56e9cda44a5",
+          "stars": null,
+          "emoji": "🏨",
+          "meta": "Expedia · 2025"
+        },
+        {
+          "name": "Learning Embeddings for Lodging Travel Concepts",
+          "desc": "Enabling semantic search and personalized recommendations",
+          "detail": "Enabling semantic search and personalized recommendations",
+          "url": "https://medium.com/expedia-group-tech/learning-embeddings-for-lodging-travel-concepts-99165700cdbd",
+          "stars": null,
+          "emoji": "🗺",
+          "meta": "Expedia · 2024"
+        }
+      ]
+    },
+    {
+      "key": "social-networks",
+      "label": "Social networks",
+      "color": {
+        "c": "#DC2626",
+        "bg": "#FDECEC"
+      },
+      "icon": "❤️",
+      "items": [
+        {
+          "name": "Finding AI-generated (deepfake) faces in the wild",
+          "desc": "AI-based image generation has continued to rapidly improve, producing increasingly more…",
+          "detail": "AI-based image generation has continued to rapidly improve, producing increasingly more realistic images with fewer obvious visual flaws. AI-generated images are being used to create fake online profiles which in turn are being used for spam, fraud, and disinformation campaigns. As the general…",
+          "url": "https://arxiv.org/abs/2311.08577",
+          "stars": null,
+          "emoji": "🫂",
+          "meta": "LinkedIn · 2024"
+        },
+        {
+          "name": "Candidate Generation in a Large Scale Graph Recommendation System: People You May Know",
+          "desc": "Suggest new connections on social network",
+          "detail": "Suggest new connections on social network",
+          "url": "https://www.linkedin.com/blog/engineering/recommendations/candidate-generation-in-a-large-scale-graph-recommendation-system-people-you-may-know",
+          "stars": null,
+          "emoji": "📢",
+          "meta": "LinkedIn · 2024"
+        },
+        {
+          "name": "Retrieval-Augmented Generation with Knowledge Graphs for Customer Service Question Answering",
+          "desc": "Answer technical customer support questions",
+          "detail": "Answer technical customer support questions",
+          "url": "https://arxiv.org/pdf/2404.17723",
+          "stars": null,
+          "emoji": "👥",
+          "meta": "Linkedin · 2024"
+        },
+        {
+          "name": "Building a Large-Scale Recommendation System: People You May Know",
+          "desc": "Suggest new connections on social network",
+          "detail": "Suggest new connections on social network",
+          "url": "https://www.linkedin.com/blog/engineering/recommendations/building-a-large-scale-recommendation-system-people-you-may-know",
+          "stars": null,
+          "emoji": "📱",
+          "meta": "LinkedIn · 2024"
+        },
+        {
+          "name": "Augmenting our content moderation efforts through machine learning and dynamic content prioritization",
+          "desc": "Detect harmful content",
+          "detail": "Detect harmful content",
+          "url": "https://engineering.linkedin.com/blog/2023/augmenting-our-content-moderation-efforts-through-machine-learni",
+          "stars": null,
+          "emoji": "📢",
+          "meta": "Linkedin · 2023"
+        }
+      ]
+    }
+  ]
+}

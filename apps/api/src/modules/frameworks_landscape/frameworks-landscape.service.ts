@@ -39,7 +39,15 @@ export interface Landscape {
 }
 
 /** 지원 페이지 화이트리스트(경로 조작 방지) */
-export const LANDSCAPE_PAGES = ['frameworks', 'prompting'] as const;
+export const LANDSCAPE_PAGES = [
+  'frameworks',
+  'prompting',
+  'case-studies',
+  'domain-applications',
+  'product-discovery',
+  'model-updates',
+  'benchmarks-datasets',
+] as const;
 export type LandscapePage = (typeof LANDSCAPE_PAGES)[number];
 export function isLandscapePage(p: string): p is LandscapePage {
   return (LANDSCAPE_PAGES as readonly string[]).includes(p);

@@ -1,0 +1,455 @@
+{
+  "page": "benchmarks-datasets",
+  "generatedAt": "2026-07-31T18:10:39.290Z",
+  "source": "research/entities.json",
+  "categories": [
+    {
+      "key": "language-understanding-reasoning",
+      "label": "Language Understanding & Reasoning",
+      "color": {
+        "c": "#4B78F0",
+        "bg": "#EEF2FD"
+      },
+      "icon": "📝",
+      "items": [
+        {
+          "name": "MMLU",
+          "desc": "We propose a new test to measure a text model's multitask accuracy. The test covers 57…",
+          "detail": "We propose a new test to measure a text model's multitask accuracy. The test covers 57 tasks including elementary mathematics, US history, computer science, law, and more. To attain high accuracy on this test, models must possess extensive world knowledge and problem solving ability. We find that…",
+          "url": "https://arxiv.org/abs/2009.03300",
+          "stars": null,
+          "emoji": "❓",
+          "meta": ""
+        },
+        {
+          "name": "MMLU-Pro",
+          "desc": "In the age of large-scale language models, benchmarks like the Massive Multitask Language…",
+          "detail": "In the age of large-scale language models, benchmarks like the Massive Multitask Language Understanding (MMLU) have been pivotal in pushing the boundaries of what AI can achieve in language comprehension and reasoning across diverse domains. However, as models continue to improve, their performance…",
+          "url": "https://arxiv.org/abs/2406.01574",
+          "stars": null,
+          "emoji": "💭",
+          "meta": ""
+        },
+        {
+          "name": "ARC",
+          "desc": "We present a new question set, text corpus, and baselines assembled to encourage AI…",
+          "detail": "We present a new question set, text corpus, and baselines assembled to encourage AI research in advanced question answering. Together, these constitute the AI2 Reasoning Challenge (ARC), which requires far more powerful knowledge and reasoning than previous challenges such as SQuAD or SNLI. The ARC…",
+          "url": "https://arxiv.org/abs/1803.05457",
+          "stars": null,
+          "emoji": "📖",
+          "meta": ""
+        },
+        {
+          "name": "ARC-AGI",
+          "desc": "ARC Prize Foundation is a nonprofit advancing open-source AGI research through benchmarks…",
+          "detail": "ARC Prize Foundation is a nonprofit advancing open-source AGI research through benchmarks & prizes.",
+          "url": "https://arcprize.org/",
+          "stars": null,
+          "emoji": "❓",
+          "meta": ""
+        },
+        {
+          "name": "ARC-AGI-2",
+          "desc": "ARC Prize Foundation is a nonprofit advancing open-source AGI research through benchmarks…",
+          "detail": "ARC Prize Foundation is a nonprofit advancing open-source AGI research through benchmarks & prizes.",
+          "url": "https://arcprize.org/",
+          "stars": null,
+          "emoji": "❓",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "agent-tool-use",
+      "label": "Agent & Tool Use",
+      "color": {
+        "c": "#2E8B6F",
+        "bg": "#E7F4EF"
+      },
+      "icon": "🤖",
+      "items": [
+        {
+          "name": "GAIA",
+          "desc": "We introduce GAIA, a benchmark for General AI Assistants that, if solved, would represent…",
+          "detail": "We introduce GAIA, a benchmark for General AI Assistants that, if solved, would represent a milestone in AI research. GAIA proposes real-world questions that require a set of fundamental abilities such as reasoning, multi-modality handling, web browsing, and generally tool-use proficiency. GAIA…",
+          "url": "https://arxiv.org/abs/2311.12983",
+          "stars": null,
+          "emoji": "🧭",
+          "meta": ""
+        },
+        {
+          "name": "WebArena",
+          "desc": "With advances in generative AI, there is now potential for autonomous agents to manage…",
+          "detail": "With advances in generative AI, there is now potential for autonomous agents to manage daily tasks via natural language commands. However, current agents are primarily created and tested in simplified synthetic environments, leading to a disconnect with real-world scenarios. In this paper, we build…",
+          "url": "https://arxiv.org/abs/2307.13854",
+          "stars": null,
+          "emoji": "🕹",
+          "meta": ""
+        },
+        {
+          "name": "ToolBench",
+          "desc": "Recent studies on software tool manipulation with large language models (LLMs) mostly…",
+          "detail": "Recent studies on software tool manipulation with large language models (LLMs) mostly rely on closed model APIs. The industrial adoption of these models is substantially constrained due to the security and robustness risks in exposing information to closed LLM API services. In this paper, we ask…",
+          "url": "https://arxiv.org/abs/2305.16504",
+          "stars": null,
+          "emoji": "🤖",
+          "meta": ""
+        },
+        {
+          "name": "AgentBench",
+          "desc": "The potential of Large Language Model (LLM) as agents has been widely acknowledged…",
+          "detail": "The potential of Large Language Model (LLM) as agents has been widely acknowledged recently. Thus, there is an urgent need to quantitatively \\textit{evaluate LLMs as agents} on challenging tasks in interactive environments. We present AgentBench, a multi-dimensional benchmark that consists of 8…",
+          "url": "https://arxiv.org/abs/2308.03688",
+          "stars": null,
+          "emoji": "⚡",
+          "meta": ""
+        },
+        {
+          "name": "TAU-bench",
+          "desc": "Existing benchmarks do not test language agents on their interaction with human users or…",
+          "detail": "Existing benchmarks do not test language agents on their interaction with human users or ability to follow domain-specific rules, both of which are vital for deploying them in real world applications. We propose $τ$-bench, a benchmark emulating dynamic conversations between a user (simulated by…",
+          "url": "https://arxiv.org/abs/2406.12045",
+          "stars": null,
+          "emoji": "🕹",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "code-generation",
+      "label": "Code Generation",
+      "color": {
+        "c": "#7C3AED",
+        "bg": "#F3EFFA"
+      },
+      "icon": "🐍",
+      "items": [
+        {
+          "name": "HumanEval",
+          "desc": "We introduce Codex, a GPT language model fine-tuned on publicly available code from…",
+          "detail": "We introduce Codex, a GPT language model fine-tuned on publicly available code from GitHub, and study its Python code-writing capabilities. A distinct production version of Codex powers GitHub Copilot. On HumanEval, a new evaluation set we release to measure functional correctness for synthesizing…",
+          "url": "https://arxiv.org/abs/2107.03374",
+          "stars": null,
+          "emoji": "🧱",
+          "meta": ""
+        },
+        {
+          "name": "MBPP",
+          "desc": "This paper explores the limits of the current generation of large language models for…",
+          "detail": "This paper explores the limits of the current generation of large language models for program synthesis in general purpose programming languages. We evaluate a collection of such models (with between 244M and 137B parameters) on two new benchmarks, MBPP and MathQA-Python, in both the few-shot and…",
+          "url": "https://arxiv.org/abs/2108.07732",
+          "stars": null,
+          "emoji": "🐍",
+          "meta": ""
+        },
+        {
+          "name": "SWE-bench",
+          "desc": "Language models have outpaced our ability to evaluate them effectively, but for their…",
+          "detail": "Language models have outpaced our ability to evaluate them effectively, but for their future development it is essential to study the frontier of their capabilities. We find real-world software engineering to be a rich, sustainable, and challenging testbed for evaluating the next generation of…",
+          "url": "https://arxiv.org/abs/2310.06770",
+          "stars": null,
+          "emoji": "💻",
+          "meta": ""
+        },
+        {
+          "name": "SWE-bench Verified",
+          "desc": "Language models have outpaced our ability to evaluate them effectively, but for their…",
+          "detail": "Language models have outpaced our ability to evaluate them effectively, but for their future development it is essential to study the frontier of their capabilities. We find real-world software engineering to be a rich, sustainable, and challenging testbed for evaluating the next generation of…",
+          "url": "https://arxiv.org/abs/2310.06770",
+          "stars": null,
+          "emoji": "💻",
+          "meta": ""
+        },
+        {
+          "name": "LiveCodeBench",
+          "desc": "Large Language Models (LLMs) applied to code-related applications have emerged as a…",
+          "detail": "Large Language Models (LLMs) applied to code-related applications have emerged as a prominent field, attracting significant interest from both academia and industry. However, as new and improved LLMs are developed, existing evaluation benchmarks (e.g., HumanEval, MBPP) are no longer sufficient for…",
+          "url": "https://arxiv.org/abs/2403.07974",
+          "stars": null,
+          "emoji": "🐍",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "multimodal-vision-language",
+      "label": "Multimodal (Vision + Language)",
+      "color": {
+        "c": "#0194E2",
+        "bg": "#E6F4FD"
+      },
+      "icon": "🎞",
+      "items": [
+        {
+          "name": "MMMU",
+          "desc": "We introduce MMMU: a new benchmark designed to evaluate multimodal models on massive…",
+          "detail": "We introduce MMMU: a new benchmark designed to evaluate multimodal models on massive multi-discipline tasks demanding college-level subject knowledge and deliberate reasoning. MMMU includes 11.5K meticulously collected multimodal questions from college exams, quizzes, and textbooks, covering six…",
+          "url": "https://arxiv.org/abs/2311.16502",
+          "stars": null,
+          "emoji": "🎞",
+          "meta": ""
+        },
+        {
+          "name": "VQAv2",
+          "desc": "Problems at the intersection of vision and language are of significant importance both as…",
+          "detail": "Problems at the intersection of vision and language are of significant importance both as challenging research questions and for the rich set of applications they enable. However, inherent structure in our world and bias in our language tend to be a simpler signal for learning than visual…",
+          "url": "https://arxiv.org/abs/1612.00837",
+          "stars": null,
+          "emoji": "🎞",
+          "meta": ""
+        },
+        {
+          "name": "TextVQA",
+          "desc": "Studies have shown that a dominant class of questions asked by visually impaired users on…",
+          "detail": "Studies have shown that a dominant class of questions asked by visually impaired users on images of their surroundings involves reading text in the image. But today's VQA models can not read! Our paper takes a first step towards addressing this problem. First, we introduce a new \"TextVQA\" dataset…",
+          "url": "https://arxiv.org/abs/1904.08920",
+          "stars": null,
+          "emoji": "🧿",
+          "meta": ""
+        },
+        {
+          "name": "DocVQA",
+          "desc": "We present a new dataset for Visual Question Answering (VQA) on document images called…",
+          "detail": "We present a new dataset for Visual Question Answering (VQA) on document images called DocVQA. The dataset consists of 50,000 questions defined on 12,000+ document images. Detailed analysis of the dataset in comparison with similar datasets for VQA and reading comprehension is presented. We report…",
+          "url": "https://arxiv.org/abs/2007.00398",
+          "stars": null,
+          "emoji": "👁",
+          "meta": ""
+        },
+        {
+          "name": "ChartQA",
+          "desc": "Charts are very popular for analyzing data. When exploring charts, people often ask a…",
+          "detail": "Charts are very popular for analyzing data. When exploring charts, people often ask a variety of complex reasoning questions that involve several logical and arithmetic operations. They also commonly refer to visual features of a chart in their questions. However, most existing datasets do not…",
+          "url": "https://arxiv.org/abs/2203.10244",
+          "stars": null,
+          "emoji": "👁",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "safety-alignment",
+      "label": "Safety & Alignment",
+      "color": {
+        "c": "#D4854A",
+        "bg": "#FEF3E2"
+      },
+      "icon": "🔏",
+      "items": [
+        {
+          "name": "TruthfulQA",
+          "desc": "We propose a benchmark to measure whether a language model is truthful in generating…",
+          "detail": "We propose a benchmark to measure whether a language model is truthful in generating answers to questions. The benchmark comprises 817 questions that span 38 categories, including health, law, finance and politics. We crafted questions that some humans would answer falsely due to a false belief or…",
+          "url": "https://arxiv.org/abs/2109.07958",
+          "stars": null,
+          "emoji": "🧯",
+          "meta": ""
+        },
+        {
+          "name": "BBQ",
+          "desc": "It is well documented that NLP models learn social biases, but little work has been done…",
+          "detail": "It is well documented that NLP models learn social biases, but little work has been done on how these biases manifest in model outputs for applied tasks like question answering (QA). We introduce the Bias Benchmark for QA (BBQ), a dataset of question sets constructed by the authors that highlight…",
+          "url": "https://arxiv.org/abs/2110.08193",
+          "stars": null,
+          "emoji": "🚨",
+          "meta": ""
+        },
+        {
+          "name": "ToxiGen",
+          "desc": "Toxic language detection systems often falsely flag text that contains minority group…",
+          "detail": "Toxic language detection systems often falsely flag text that contains minority group mentions as toxic, as those groups are often the targets of online hate. Such over-reliance on spurious correlations also causes systems to struggle with detecting implicitly toxic language. To help mitigate these…",
+          "url": "https://arxiv.org/abs/2203.09509",
+          "stars": null,
+          "emoji": "🛡",
+          "meta": ""
+        },
+        {
+          "name": "HarmBench",
+          "desc": "Automated red teaming holds substantial promise for uncovering and mitigating the risks…",
+          "detail": "Automated red teaming holds substantial promise for uncovering and mitigating the risks associated with the malicious use of large language models (LLMs), yet the field lacks a standardized evaluation framework to rigorously assess new methods. To address this issue, we introduce HarmBench, a…",
+          "url": "https://arxiv.org/abs/2402.04249",
+          "stars": null,
+          "emoji": "⚖️",
+          "meta": ""
+        },
+        {
+          "name": "WMDP",
+          "desc": "The White House Executive Order on Artificial Intelligence highlights the risks of large…",
+          "detail": "The White House Executive Order on Artificial Intelligence highlights the risks of large language models (LLMs) empowering malicious actors in developing biological, cyber, and chemical weapons. To measure these risks of malicious use, government institutions and major AI labs are developing…",
+          "url": "https://arxiv.org/abs/2403.03218",
+          "stars": null,
+          "emoji": "🛡",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "math-quantitative-reasoning",
+      "label": "Math & Quantitative Reasoning",
+      "color": {
+        "c": "#5B3D87",
+        "bg": "#F3EFFA"
+      },
+      "icon": "❓",
+      "items": [
+        {
+          "name": "GSM8K",
+          "desc": "State-of-the-art language models can match human performance on many tasks, but they…",
+          "detail": "State-of-the-art language models can match human performance on many tasks, but they still struggle to robustly perform multi-step mathematical reasoning. To diagnose the failures of current models and support research, we introduce GSM8K, a dataset of 8.5K high quality linguistically diverse grade…",
+          "url": "https://arxiv.org/abs/2110.14168",
+          "stars": null,
+          "emoji": "🗣",
+          "meta": ""
+        },
+        {
+          "name": "MATH",
+          "desc": "Many intellectual endeavors require mathematical problem solving, but this skill remains…",
+          "detail": "Many intellectual endeavors require mathematical problem solving, but this skill remains beyond the capabilities of computers. To measure this ability in machine learning models, we introduce MATH, a new dataset of 12,500 challenging competition mathematics problems. Each problem in MATH has a full…",
+          "url": "https://arxiv.org/abs/2103.03874",
+          "stars": null,
+          "emoji": "📝",
+          "meta": ""
+        },
+        {
+          "name": "MathVista",
+          "desc": "Large Language Models (LLMs) and Large Multimodal Models (LMMs) exhibit impressive…",
+          "detail": "Large Language Models (LLMs) and Large Multimodal Models (LMMs) exhibit impressive problem-solving skills in many tasks and domains, but their ability in mathematical reasoning in visual contexts has not been systematically studied. To bridge this gap, we present MathVista, a benchmark designed to…",
+          "url": "https://arxiv.org/abs/2310.02255",
+          "stars": null,
+          "emoji": "❓",
+          "meta": ""
+        },
+        {
+          "name": "MGSM",
+          "desc": "We evaluate the reasoning abilities of large language models in multilingual settings. We…",
+          "detail": "We evaluate the reasoning abilities of large language models in multilingual settings. We introduce the Multilingual Grade School Math (MGSM) benchmark, by manually translating 250 grade-school math problems from the GSM8K dataset (Cobbe et al., 2021) into ten typologically diverse languages. We…",
+          "url": "https://arxiv.org/abs/2210.03057",
+          "stars": null,
+          "emoji": "📝",
+          "meta": ""
+        },
+        {
+          "name": "Minerva Math",
+          "desc": "Language models have achieved remarkable performance on a wide range of tasks that…",
+          "detail": "Language models have achieved remarkable performance on a wide range of tasks that require natural language understanding. Nevertheless, state-of-the-art models have generally struggled with tasks that require quantitative reasoning, such as solving mathematics, science, and engineering problems at…",
+          "url": "https://arxiv.org/abs/2206.14858",
+          "stars": null,
+          "emoji": "🗣",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "long-context",
+      "label": "Long Context",
+      "color": {
+        "c": "#C94B6E",
+        "bg": "#FDF0F3"
+      },
+      "icon": "🗂",
+      "items": [
+        {
+          "name": "RULER",
+          "desc": "The needle-in-a-haystack (NIAH) test, which examines the ability to retrieve a piece of…",
+          "detail": "The needle-in-a-haystack (NIAH) test, which examines the ability to retrieve a piece of information (the \"needle\") from long distractor texts (the \"haystack\"), has been widely adopted to evaluate long-context language models (LMs). However, this simple retrieval-based test is indicative of only a…",
+          "url": "https://arxiv.org/abs/2404.06654",
+          "stars": null,
+          "emoji": "🪢",
+          "meta": ""
+        },
+        {
+          "name": "Needle in a Haystack",
+          "desc": "Doing simple retrieval from LLM models at various context lengths to measure accuracy -…",
+          "detail": "Doing simple retrieval from LLM models at various context lengths to measure accuracy - gkamradt/needle-in-a-haystack",
+          "url": "https://github.com/gkamradt/LLMTest_NeedleInAHaystack",
+          "stars": null,
+          "emoji": "📏",
+          "meta": ""
+        },
+        {
+          "name": "L-Eval",
+          "desc": "Recently, there has been growing interest in extending the context length of large…",
+          "detail": "Recently, there has been growing interest in extending the context length of large language models (LLMs), aiming to effectively process long inputs of one turn or conversations with more extensive histories. While proprietary models such as GPT-4 and Claude can largely preserve the reasoning…",
+          "url": "https://arxiv.org/abs/2307.11088",
+          "stars": null,
+          "emoji": "🗂",
+          "meta": ""
+        },
+        {
+          "name": "LongBench",
+          "desc": "Although large language models (LLMs) demonstrate impressive performance for many…",
+          "detail": "Although large language models (LLMs) demonstrate impressive performance for many language tasks, most of them can only handle texts a few thousand tokens long, limiting their applications on longer sequence inputs, such as books, reports, and codebases. Recent works have proposed methods to…",
+          "url": "https://arxiv.org/abs/2308.14508",
+          "stars": null,
+          "emoji": "📜",
+          "meta": ""
+        },
+        {
+          "name": "InfiniteBench",
+          "desc": "Processing and reasoning over long contexts is crucial for many practical applications of…",
+          "detail": "Processing and reasoning over long contexts is crucial for many practical applications of Large Language Models (LLMs), such as document comprehension and agent construction. Despite recent strides in making LLMs process contexts with more than 100K tokens, there is currently a lack of a…",
+          "url": "https://arxiv.org/abs/2402.13718",
+          "stars": null,
+          "emoji": "🧵",
+          "meta": ""
+        }
+      ]
+    },
+    {
+      "key": "multilingual",
+      "label": "Multilingual",
+      "color": {
+        "c": "#DC2626",
+        "bg": "#FDECEC"
+      },
+      "icon": "🈶",
+      "items": [
+        {
+          "name": "Global MMLU",
+          "desc": "We’re on a journey to advance and democratize artificial intelligence through open source…",
+          "detail": "We’re on a journey to advance and democratize artificial intelligence through open source and open science.",
+          "url": "https://huggingface.co/datasets/CohereForAI/Global-MMLU",
+          "stars": null,
+          "emoji": "🌐",
+          "meta": ""
+        },
+        {
+          "name": "FLORES-200",
+          "desc": "Driven by the goal of eradicating language barriers on a global scale, machine…",
+          "detail": "Driven by the goal of eradicating language barriers on a global scale, machine translation has solidified itself as a key focus of artificial intelligence research today. However, such efforts have coalesced around a small subset of languages, leaving behind the vast majority of mostly low-resource…",
+          "url": "https://arxiv.org/abs/2207.04672",
+          "stars": null,
+          "emoji": "🔤",
+          "meta": ""
+        },
+        {
+          "name": "Belebele",
+          "desc": "We present Belebele, a multiple-choice machine reading comprehension (MRC) dataset…",
+          "detail": "We present Belebele, a multiple-choice machine reading comprehension (MRC) dataset spanning 122 language variants. Significantly expanding the language coverage of natural language understanding (NLU) benchmarks, this dataset enables the evaluation of text models in high-, medium-, and low-resource…",
+          "url": "https://arxiv.org/abs/2308.16884",
+          "stars": null,
+          "emoji": "🗨",
+          "meta": ""
+        },
+        {
+          "name": "XLSum",
+          "desc": "Contemporary works on abstractive text summarization have focused primarily on…",
+          "detail": "Contemporary works on abstractive text summarization have focused primarily on high-resource languages like English, mostly due to the limited availability of datasets for low/mid-resource ones. In this work, we present XL-Sum, a comprehensive and diverse dataset comprising 1 million professionally…",
+          "url": "https://arxiv.org/abs/2106.13822",
+          "stars": null,
+          "emoji": "📣",
+          "meta": ""
+        },
+        {
+          "name": "XCOPA",
+          "desc": "In order to simulate human language capacity, natural language processing systems must be…",
+          "detail": "In order to simulate human language capacity, natural language processing systems must be able to reason about the dynamics of everyday situations, including their possible causes and effects. Moreover, they should be able to generalise the acquired world knowledge to new languages, modulo cultural…",
+          "url": "https://arxiv.org/abs/2005.00333",
+          "stars": null,
+          "emoji": "🗺",
+          "meta": ""
+        }
+      ]
+    }
+  ]
+}

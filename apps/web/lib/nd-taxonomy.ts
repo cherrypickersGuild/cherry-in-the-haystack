@@ -106,7 +106,9 @@ export const ND_GROUPS: NDGroup[] = [
     desc: "실제 도메인 적용과 시장 사례 그룹. (우선순위)",
     basis: ["cat"],
     star: true,
-    children: ["domain-applications", "case-studies", "product-discovery"],
+    // Engineering Blocks 패턴: 헤더 클릭 → 전체 Cases 카탈로그(메뉴엔 숨김), 서브 = 카테고리별 Best 랜드스케이프
+    children: ["case-studies", "domain-applications", "product-discovery"],
+    landingId: "cases-catalog",
   },
   {
     key: "research",
@@ -114,7 +116,9 @@ export const ND_GROUPS: NDGroup[] = [
     ko: "연구·모델",
     desc: "기초 연구·모델 출시·평가 리소스를 추적하는 그룹.",
     basis: ["cat"],
+    // Engineering Blocks / Cases 패턴: 헤더 클릭 → 전체 Research 카탈로그(메뉴엔 숨김), 서브 = 기존 항목
     children: ["model-updates", "papers", "benchmarks-datasets"],
+    landingId: "research-catalog",
   },
   {
     key: "discourse",
@@ -153,6 +157,17 @@ export const ND_ITEMS: NDItem[] = [
 
   /* ── Research & Models ── */
   {
+    // 메뉴엔 안 보이는 그룹 랜딩(전체 카탈로그). Research & Models 헤더 클릭 시 뜬다.
+    id: "research-catalog",
+    label: "Research & Models",
+    ko: "연구·모델 전체",
+    group: "research",
+    desc: "기초 연구·모델·평가 리소스 전체 카탈로그 — Papers·Model Updates·Benchmarks & Datasets 3분류, 기관/카테고리별.",
+    basis: ["cat"],
+    note: "Research 그룹 랜딩(Engineering Blocks의 Building Blocks와 같은 역할)",
+    existing: true,
+  },
+  {
     id: "model-updates",
     label: "Model Updates",
     ko: "모델 업데이트",
@@ -172,6 +187,7 @@ export const ND_ITEMS: NDItem[] = [
     desc: "학회 논문·학계 돌파구·새 기법. 직접 큐레이션하지 않고 외부 링크로 연결. 예) NeurIPS, ICML spotlight. (+조감도 landscape)",
     basis: ["cat"],
     note: "Cherry Category (260530)에 정의 · 외부 링크 · +조감도(landscape)",
+    existing: true,
   },
   {
     id: "benchmarks-datasets",
@@ -182,6 +198,7 @@ export const ND_ITEMS: NDItem[] = [
     desc: "벤치마크 결과·신규 데이터셋·평가 도구·리더보드(큐레이션 링크). 예) MMLU 갱신, LM-eval-harness. (+조감도 landscape)",
     basis: ["cat"],
     note: "Cherry Category (260530)에 정의 · +조감도(landscape)",
+    existing: true,
   },
 
   /* ── Engineering Blocks ── */
@@ -245,6 +262,17 @@ export const ND_ITEMS: NDItem[] = [
 
   /* ── Cases (우선순위) ── */
   {
+    // 메뉴엔 안 보이는 그룹 랜딩(전체 카탈로그). Cases 헤더 클릭 시 뜬다.
+    id: "cases-catalog",
+    label: "Cases",
+    ko: "사례 전체",
+    group: "cases",
+    desc: "실제 AI 활용 사례 전체 카탈로그 — Case Studies·Domain Applications·Product Discovery 3분류, 도메인별.",
+    basis: ["cat"],
+    note: "Cases 그룹 랜딩(Engineering Blocks의 Building Blocks와 같은 역할)",
+    existing: true,
+  },
+  {
     id: "domain-applications",
     label: "Domain Applications",
     ko: "도메인 응용",
@@ -253,6 +281,7 @@ export const ND_ITEMS: NDItem[] = [
     desc: "도메인별 개선된 솔루션/프롬프트/워크플로, 도메인별 AI 활용 짧은 뉴스. 예) 콘텐츠 제작·학교·정신건강 도메인 사례.",
     basis: ["cat"],
     note: "3문서 모두 Cases 3분할(대표: Cherry Category 260530). 구 PRD는 Case Studies 1개였으나 현행 PRD에서 3분할로 정정됨",
+    existing: true,
   },
   {
     id: "case-studies",
@@ -274,6 +303,7 @@ export const ND_ITEMS: NDItem[] = [
     desc: "AI로 실생활 문제를 푸는 솔루션 모음(개발자 생산성 도구는 제외 → Dev Tools). 예) 이력서 빌더·의료 영상 스크리너.",
     basis: ["cat"],
     note: "3문서 모두 Cases 3분할에 포함(대표: Cherry Category 260530)",
+    existing: true,
   },
 
   /* ── Discourse ── */

@@ -11,8 +11,10 @@ import { fetchLanding, fetchLandingArticles, LandingResponse, LandingTopArticle 
 import { useAuthTick, getAccessToken, decodeToken, clearAccessToken } from "@/lib/auth"
 import { NDFrameworksPage } from "@/components/cherry/nd-frameworks-page"
 import { NDPromptingPage } from "@/components/cherry/nd-prompting-page"
-import { NDModelUpdatesPage } from "@/components/cherry/nd-model-updates-page"
-import { NDCaseStudiesPage } from "@/components/cherry/nd-case-studies-page"
+import { NDCasesPage } from "@/components/cherry/nd-cases-page"
+import { NDCasesListPage } from "@/components/cherry/nd-cases-articles-page"
+import { NDCasesBestPage } from "@/components/cherry/nd-cases-best-page"
+import { NDResearchPage, NDPapersPage, NDResearchLandscapePage } from "@/components/cherry/nd-research-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
 import { HandbookPlaceholder } from "@/components/cherry/handbook-placeholder"
 import { NDSpecPage } from "@/components/cherry/nd-spec-page"
@@ -92,10 +94,28 @@ export default function CherryApp() {
         return <NDPromptingPage />
 
       case "model-updates":
-        return <NDModelUpdatesPage />
+        return <NDResearchLandscapePage page="model-updates" />
+
+      case "papers":
+        return <NDPapersPage />
+
+      case "benchmarks-datasets":
+        return <NDResearchLandscapePage page="benchmarks-datasets" />
+
+      case "cases-catalog":
+        return <NDCasesPage />
+
+      case "research-catalog":
+        return <NDResearchPage />
 
       case "case-studies":
-        return <NDCaseStudiesPage />
+        return <NDCasesListPage page="case-studies" />
+
+      case "domain-applications":
+        return <NDCasesBestPage category="domain-applications" />
+
+      case "product-discovery":
+        return <NDCasesBestPage category="product-discovery" />
 
       case "building-blocks":
         return <NDBuildingBlocksPage />
@@ -343,8 +363,8 @@ export default function CherryApp() {
           style={{ backgroundColor: "#FBFAF8" }}
           id="main-content"
         >
-          {/* 가로 표준은 1000px. Landscape 4단 페이지(Frameworks/Prompting)만 1160px 허용. */}
-          <div className={`w-full ${activeNav === "frameworks" || activeNav === "prompting" ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
+          {/* 가로 표준은 1000px. Landscape 4단 페이지(Frameworks/Prompting/Cases Best)만 1160px. */}
+          <div className={`w-full ${["frameworks", "prompting", "domain-applications", "product-discovery", "model-updates", "benchmarks-datasets"].includes(activeNav) ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
             {renderContent()}
           </div>
         </main>

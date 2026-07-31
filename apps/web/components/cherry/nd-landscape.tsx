@@ -24,14 +24,20 @@ export type LandscapeEntity = {
   stars: number | null
   spotlight: boolean
   emoji: string
+  /** 스타 대신 표시할 메타(예: "Uber · 2025"). Cases 등 스타 없는 데이터용 */
+  meta?: string
 }
-export type LandscapeCategory = { code: string; name: string; entities: LandscapeEntity[] }
+/** 카드별 색상·아이콘을 데이터가 직접 줄 수 있음(Cases). 없으면 code로 폴백. */
+export type LandscapeCategory = {
+  code: string; name: string; entities: LandscapeEntity[]
+  color?: { c: string; bg: string }; icon?: string
+}
 
 type ApiItem = {
   name: string; desc: string; detail?: string; url: string | null
-  stars: number | null; emoji: string
+  stars: number | null; emoji: string; meta?: string
 }
-type ApiCard = { key: string; label: string; items: ApiItem[] }
+type ApiCard = { key: string; label: string; items: ApiItem[]; color?: { c: string; bg: string }; icon?: string }
 type ApiLandscape = { categories: ApiCard[] }
 
 /* ── 카드(key) → 색상 (Frameworks + Prompting 전체) ── */
@@ -57,6 +63,9 @@ const CAT_COLOR: Record<string, CatColor> = {
   skill_specs: { c: "#DC2626", bg: "#FDECEC" },
 }
 const catColor = (code: string): CatColor => CAT_COLOR[code] ?? { c: "#9E97B3", bg: "#F3F1F6" }
+/** 카드 색/아이콘 — 데이터가 주면 그것, 아니면 code 기반 폴백 */
+const colorOf = (cat: LandscapeCategory): CatColor => cat.color ?? catColor(cat.code)
+const iconOf = (cat: LandscapeCategory): string => cat.icon ?? CAT_EMOJI[cat.code] ?? "•"
 
 /* 카드(key) → 폴백 이모지 */
 const CAT_EMOJI: Record<string, string> = {
@@ -71,15 +80,14 @@ const fmtStars = (n: number) =>
   n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : `${n}`
 
 /* ── 엔티티 행 (카드 안 미리보기 — 표시 전용) ── */
-function EntityRow({ e, code }: { e: LandscapeEntity; code: string }) {
-  const col = catColor(code)
+function EntityRow({ e, col, fallbackEmoji }: { e: LandscapeEntity; col: CatColor; fallbackEmoji: string }) {
   return (
     <span className="flex items-center gap-3 border-t border-[#F1EFF5] py-[11px] first:border-t-0">
       <span
         className="flex flex-shrink-0 items-center justify-center rounded-[9px] border text-[18px] leading-none"
         style={{ width: 36, height: 36, background: col.bg, borderColor: "#E4E1EE" }}
       >
-        {e.emoji || CAT_EMOJI[code] || "•"}
+        {e.emoji || fallbackEmoji}
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline justify-between gap-[10px]">
@@ -89,11 +97,13 @@ function EntityRow({ e, code }: { e: LandscapeEntity; code: string }) {
           >
             {e.name}
           </span>
-          {e.stars != null && (
+          {e.stars != null ? (
             <span className="flex-shrink-0 text-[11.5px] font-extrabold text-[#C7791B]">
               ★ {fmtStars(e.stars)}
             </span>
-          )}
+          ) : e.meta ? (
+            <span className="max-w-[45%] flex-shrink-0 truncate text-[10.5px] text-[#9E97B3]">{e.meta}</span>
+          ) : null}
         </span>
         {e.desc && (
           <span className="mt-[2px] block truncate text-[11.5px] leading-[1.4] text-[#6E6A78]">
@@ -113,6 +123,8 @@ function CategoryCard({
   cat: LandscapeCategory
   onOpen: (cat: LandscapeCategory) => void
 }) {
+  const col = colorOf(cat)
+  const fb = iconOf(cat)
   return (
     <button
       type="button"
@@ -138,7 +150,7 @@ function CategoryCard({
       </div>
       <div className="flex flex-col">
         {cat.entities.map((e) => (
-          <EntityRow key={e.name} e={e} code={cat.code} />
+          <EntityRow key={e.name} e={e} col={col} fallbackEmoji={fb} />
         ))}
       </div>
     </button>
@@ -147,7 +159,8 @@ function CategoryCard({
 
 /* ── 카테고리 상세 모달 — 카드 안 top5 전부 상세히 + 각각 링크 ── */
 function CategoryModal({ cat, onClose }: { cat: LandscapeCategory; onClose: () => void }) {
-  const col = catColor(cat.code)
+  const col = colorOf(cat)
+  const fb = iconOf(cat)
 
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => ev.key === "Escape" && onClose()
@@ -170,7 +183,7 @@ function CategoryModal({ cat, onClose }: { cat: LandscapeCategory; onClose: () =
             className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[9px] text-[15px]"
             style={{ background: col.bg, color: col.c }}
           >
-            {CAT_EMOJI[cat.code] ?? "•"}
+            {fb}
           </span>
           <h3 className="flex-1 text-[18px] font-extrabold tracking-[-0.3px] text-[#1A1626]">
             {cat.name}
@@ -193,7 +206,7 @@ function CategoryModal({ cat, onClose }: { cat: LandscapeCategory; onClose: () =
                   className="flex flex-shrink-0 items-center justify-center rounded-[12px] border text-[26px] leading-none"
                   style={{ width: 52, height: 52, background: col.bg, borderColor: "#E4E1EE" }}
                 >
-                  {e.emoji || CAT_EMOJI[cat.code] || "•"}
+                  {e.emoji || fb}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-2">
@@ -211,11 +224,13 @@ function CategoryModal({ cat, onClose }: { cat: LandscapeCategory; onClose: () =
                         TOP PICK
                       </span>
                     )}
-                    {e.stars != null && (
+                    {e.stars != null ? (
                       <span className="text-[11.5px] font-extrabold text-[#C7791B]">
                         ★ {fmtStars(e.stars)}
                       </span>
-                    )}
+                    ) : e.meta ? (
+                      <span className="truncate text-[11px] text-[#9E97B3]">{e.meta}</span>
+                    ) : null}
                     {e.url && (
                       <span className="ml-auto flex-shrink-0 text-[12px] font-bold text-[#7B5EA7] opacity-0 transition-opacity group-hover:opacity-100">
                         Visit ↗
@@ -265,13 +280,16 @@ export function RisingStar({ pageKey }: { pageKey: string }) {
       .then((d: ApiLandscape) => {
         if (!alive) return
         let best: { it: ApiItem; catLabel: string; code: string } | null = null
+        let firstItem: { it: ApiItem; catLabel: string; code: string } | null = null
         for (const c of d.categories || []) {
           for (const it of c.items || []) {
+            if (!firstItem) firstItem = { it, catLabel: c.label, code: c.key }
             if (it.stars == null) continue
             if (!best || it.stars > (best.it.stars ?? -1)) best = { it, catLabel: c.label, code: c.key }
           }
         }
-        setTop(best)
+        // 스타가 있으면 최다, 없으면(도메인형 등) 대표(첫) 1개를 featured로.
+        setTop(best ?? firstItem)
       })
       .catch(() => {})
     return () => {
@@ -292,7 +310,7 @@ export function RisingStar({ pageKey }: { pageKey: string }) {
         HOT
       </span>
       <span className="mb-[8px] mt-[6px] block text-[11px] font-bold text-[#7B5EA7]">
-        Most starred right now
+        {it.stars != null ? "Most starred right now" : "Featured pick"}
       </span>
       <div className="flex items-center gap-2">
         <h3 className="text-[22px] font-extrabold tracking-[-0.4px] text-[#1A1626]">{it.name}</h3>
@@ -337,6 +355,8 @@ export function LandscapeSection({ pageKey }: { pageKey: string }) {
           .map((c) => ({
             code: c.key,
             name: c.label,
+            color: c.color,
+            icon: c.icon,
             entities: c.items.map((it, i) => ({
               name: it.name,
               desc: it.desc,
@@ -344,6 +364,7 @@ export function LandscapeSection({ pageKey }: { pageKey: string }) {
               url: it.url,
               stars: it.stars,
               emoji: it.emoji,
+              meta: it.meta,
               spotlight: i === 0,
             })),
           }))

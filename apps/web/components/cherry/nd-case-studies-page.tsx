@@ -137,6 +137,33 @@ function SideCatGroupSection({ group }: { group: SideCatGroup }) {
 }
 
 /* ─────────────────────────────────────────────
+   기사 목록만 (헤더 없이) — Case Studies Best 페이지 하단에 삽입용.
+   원래 Case Studies 페이지의 DB 기사 목록(fetchCaseStudies)을 그대로 재사용.
+───────────────────────────────────────────── */
+export function CaseStudiesArticleList() {
+  const [groups, setGroups] = useState<CaseStudiesCategoryGroup[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchCaseStudies()
+      .then((data) => setGroups(data.groups))
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
+
+  const sideCatGroups = regroupBySideCategory(groups)
+  if (loading) return <p className="text-[13px] text-[#9E97B3]">Loading…</p>
+  if (sideCatGroups.length === 0) return <p className="text-[13px] text-[#9E97B3]">No case studies found.</p>
+  return (
+    <>
+      {sideCatGroups.map((g) => (
+        <SideCatGroupSection key={g.code ?? "__none__"} group={g} />
+      ))}
+    </>
+  )
+}
+
+/* ─────────────────────────────────────────────
    Main Page
 ───────────────────────────────────────────── */
 export function NDCaseStudiesPage() {

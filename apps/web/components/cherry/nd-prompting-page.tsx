@@ -22,22 +22,22 @@ export function NDPromptingPage() {
         </p>
       </div>
 
-      <div className="mb-4 mt-[36px] flex items-baseline gap-[10px]">
+      {/* Rising Star — 맨 위 (Frameworks Best와 일관) */}
+      <div className="max-w-[940px]">
+        <div className="mb-4 mt-[36px] flex items-baseline gap-[10px]">
+          <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">Rising Star</h2>
+          <span className="text-[12.5px] text-[#9E97B3]">Most starred right now</span>
+        </div>
+        <RisingStar pageKey="prompting" />
+      </div>
+
+      <div className="mb-4 mt-[52px] flex items-baseline gap-[10px]">
         <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">Landscape</h2>
         <span className="text-[12.5px] text-[#9E97B3]">
           Prompting &amp; skills across the ecosystem — click a theme for details
         </span>
       </div>
       <LandscapeSection pageKey="prompting" />
-
-      <div className="max-w-[940px]">
-        {/* Rising Star — 스타 최다(초기 시딩) */}
-        <div className="mb-4 mt-[52px] flex items-baseline gap-[10px]">
-          <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">Rising Star</h2>
-          <span className="text-[12.5px] text-[#9E97B3]">Most starred right now</span>
-        </div>
-        <RisingStar pageKey="prompting" />
-      </div>
 
       <div className="h-8" aria-hidden />
     </div>
