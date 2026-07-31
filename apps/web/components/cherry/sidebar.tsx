@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Cherry as CherryLucide } from "lucide-react"
 import {
@@ -243,6 +243,30 @@ const SECTIONS: SectionDef[] = [
 ]
 
 /* ─────────────────────────────────────────────
+   아코디언용 역참조 — "활성 페이지 → 펼칠 그룹"
+   - PARENT_OF: 자식 id → 부모 그룹 id (모든 섹션: ND 4그룹 + Learning Basics/Advanced)
+   - LANDING_OF: ND 그룹의 landingId(헤더 클릭 시 이동하는 카탈로그) → 그룹 key
+   활성 그룹을 여기서 계산하므로 펼침을 따로 저장하지 않아도 "활성만 열림"이 보장된다.
+───────────────────────────────────────────── */
+const PARENT_OF: Record<string, string> = {}
+for (const section of SECTIONS) {
+  for (const item of section.items) {
+    if (item.children?.length) {
+      for (const c of item.children) PARENT_OF[c.id] = item.id
+    }
+  }
+}
+const LANDING_OF: Record<string, string> = {}
+for (const g of ND_GROUPS) {
+  if (g.landingId) LANDING_OF[g.landingId] = g.key
+}
+
+/** 지금 활성인 페이지가 속한 (펼쳐야 할) 그룹 id. 어느 그룹에도 안 속하면 null → 전부 접힘. */
+function groupOfActive(active: string): string | null {
+  return PARENT_OF[active] ?? LANDING_OF[active] ?? null
+}
+
+/* ─────────────────────────────────────────────
    Cherry Icon (로고) — 기존 export 유지
 ───────────────────────────────────────────── */
 export function CherryIcon({ className }: { className?: string }) {
@@ -367,42 +391,10 @@ export function Sidebar({
   className?: string
   hideLogo?: boolean
 }) {
-  const COLLAPSE_KEY = "cherry_sidebar_collapsed"
-  // 전 그룹 기본 접힘 — 메뉴가 간결하게 시작.
-  // 사용자가 펼친 상태는 그룹별로 localStorage에 각각 저장·복원된다.
-  const DEFAULT_COLLAPSED: Record<string, boolean> = {
-    basics: true,
-    advanced: true,
-    research: true,
-    eng: true,
-    cases: true,
-    discourse: true,
-  }
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(DEFAULT_COLLAPSED)
-  const [hydrated, setHydrated] = useState(false)
-
-  // mount 시 1회만 복원.
-  // ⚠️ 저장값을 통째로 교체하면 안 된다 — 기존 사용자의 저장값엔 신규 그룹 키가 없어
-  //    undefined(=펼침)가 되어 기본값이 안 먹는다. 반드시 기본값과 '병합'한다.
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(COLLAPSE_KEY)
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        if (parsed && typeof parsed === "object") {
-          setCollapsed({ ...DEFAULT_COLLAPSED, ...parsed })
-        }
-      }
-    } catch { /* noop */ }
-    setHydrated(true)
-  }, [])
-
-  useEffect(() => {
-    if (!hydrated) return
-    try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(collapsed)) } catch {}
-  }, [collapsed, hydrated])
-
-  const toggle = (id: string) => setCollapsed((c) => ({ ...c, [id]: !c[id] }))
+  // 아코디언: "지금 보고 있는 페이지가 속한 그룹" 하나만 펼친다.
+  // 펼침을 저장하지 않고 active에서 파생 → "활성만 열림, 나머지 닫힘"이 구조상 보장.
+  // 어느 그룹에도 안 속한 페이지(Overview·Digest·Utility·Shop 등)면 null → 전부 접힘.
+  const activeGroupId = groupOfActive(active)
 
   return (
     <aside
@@ -480,20 +472,20 @@ export function Sidebar({
                 )
               }
 
-              const isC = !!collapsed[item.id]
+              const isC = activeGroupId !== item.id
               return (
                 <div key={item.id}>
                   <ItemButton
                     item={item}
                     isActive={false}
                     isCollapsed={isC}
-                    // 본문 클릭 = 이동만. 접기/펴기는 화살표(onToggle) 전용.
+                    // 행 전체 클릭 = 그 그룹으로 이동. 이동하면 그 그룹만 펼쳐지고 나머진 닫힌다(아코디언).
+                    // 화살표는 여닫기 버튼이 아니라 방향 표시등(onToggle 없음).
                     onClick={() => {
                       const g = getNDGroup(item.id)
                       if (g) onSelect(g.landingId ?? g.children[0])
                       else if (item.children?.length) onSelect(item.children[0].id)
                     }}
-                    onToggle={() => toggle(item.id)}
                   />
                   {/* 목업 .children — 단순 좌측 선 */}
                   {!isC && (
