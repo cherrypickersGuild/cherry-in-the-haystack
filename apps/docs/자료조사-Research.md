@@ -112,3 +112,32 @@ curl -sL https://raw.githubusercontent.com/BenchGecko/awesome-llm-benchmarks/mai
 
 ## 7. 규모 주의
 Research 총 208(Cases 914보다 작음). 특히 papers 62. 볼륨 확대 시 dair-ai/ML-Papers-of-the-Week 등 추가 소스 병합 가능.
+
+---
+
+## 8. Model Updates 인기 순위표 & 로고 (HuggingFace 실측)
+
+Model Updates 페이지 상단의 순위표(원본 "Major Players" 포디움 디자인 재현)는 **HuggingFace 실측 인기**로 만든다. "오픈 모델 출시 수"는 인기가 아니므로 쓰지 않는다.
+
+### 8.1 순위 기준 — HF 다운로드
+- 수집한 model-updates 기관(`company`)을 **HF author handle**로 매핑(HANDLE 맵). 예: `Alibaba→Qwen`, `DeepSeek→deepseek-ai`, `Meta→meta-llama`, `Mistral AI→mistralai`, `Google→google`, `Microsoft→microsoft`, `OpenBMB→openbmb`, `Stability AI→stabilityai`, `Shanghai AI Laboratory→internlm`, `01-ai→01-ai`, `Cohere→CohereLabs`, `Nvidia→nvidia`, `AllenAI→allenai`, `Apple→apple`, `ElutherAI→EleutherAI`, `BLOOM→bigscience`, `Zhipu AI→THUDM`, `RWKV Foundation→RWKV` …
+- 각 기관의 **대표(최다운로드) text-generation 모델**을 HF API로:
+  `https://huggingface.co/api/models?author={handle}&filter=text-generation&sort=downloads&direction=-1&limit=3`
+  → 상위 모델의 `id`·`downloads`·`likes`.
+- ⚠️ **`filter=text-generation` 필수** — 없으면 google 최상위가 `electra`(구형 BERT류, 다운로드만 큼)로 잡혀 왜곡된다.
+- **순위 = 대표 모델 다운로드순.** 화면엔 **7위까지**(포디움: #1 lg·#2·#3 md·나머지 sm). 지표는 다운로드·좋아요.
+- 시계열(주간 변동%)은 정적 데이터라 없음 → 변동 화살표 미표시.
+
+### 8.2 로고(대표 아이콘) 수집 — HF org 아바타
+- 각 패밀리의 **공식 로고 = HuggingFace org 아바타**. 임의 이모지 금지.
+- `https://huggingface.co/api/organizations/{handle}/overview` → `avatarUrl` → 이미지 다운로드 → **로컬 저장** `apps/web/public/logos/model/{slug}.{ext}` (외부 CDN 이미지 CSP 회피). `model-rank.json`의 `logo`에 로컬 경로.
+- 원본 Model Updates의 `CATEGORY_LOGOS`(`/logos/openai.svg` 등)와 동일하게 **로컬 이미지**를 `<img>`로 렌더.
+
+### 8.3 산출물 & 스크립트
+- 출력: `apps/web/public/research/model-rank.json`
+  ```jsonc
+  { "generatedAt","source", "ranks": [ { "rank","family","org","model","model_url","downloads","likes","logo" } ] }
+  ```
+  스냅샷(HF 통계는 변동).
+- 스크립트: `fetch-model-rank.cjs`(순위·다운로드·좋아요) → `add-logos.cjs`(org 아바타 다운로드).
+- 컴포넌트: `nd-research-page.tsx`의 `ModelPopularityRank` / `PopCard` — page==="model-updates"일 때 Rising Star 아래에 렌더.
