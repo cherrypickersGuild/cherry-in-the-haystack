@@ -1,0 +1,74 @@
+{
+  "_note": "Discourse 페이지별 화면 구성. 6개 전부 기사형(kind=article). 컴포넌트 하드코딩 금지.",
+  "_card": {
+    "title": "name",
+    "summary": ["summary", "description"],
+    "summaryLines": 3,
+    "badge": "company",
+    "tags": { "field": "tags", "max": 3 },
+    "meta": ["source_type", "date"]
+  },
+  "regulations-policy-compliance": {
+    "title": "Regulations · Policy · Compliance",
+    "subtitle": "AI policy, regulation, standards, and governance frameworks — by area. Every entry links to the source.",
+    "sectionTitle": "Frameworks & Standards",
+    "tabs": { "includeAll": false, "orderBy": "count" },
+    "card": { "title": "name", "summary": ["summary", "description"], "summaryLines": 3, "badge": "company", "tags": { "field": "tags", "max": 3 }, "meta": ["source_type", "date"] },
+    "sourceTypeLabels": { "framework": "Framework", "event": "Event", "org": "Org", "market-map": "Market map", "article": "Article", "newsletter": "Newsletter" }
+  },
+  "community": {
+    "title": "Community",
+    "subtitle": "AI conferences, events, and community gatherings — by region.",
+    "sectionTitle": "Events & Conferences",
+    "tabs": { "includeAll": false, "orderBy": "count" },
+    "card": { "title": "name", "summary": ["summary", "description"], "summaryLines": 3, "badge": "company", "tags": { "field": "tags", "max": 3 }, "meta": ["source_type", "date"] },
+    "sourceTypeLabels": { "framework": "Framework", "event": "Event", "org": "Org", "market-map": "Market map", "article": "Article", "newsletter": "Newsletter" }
+  },
+  "big-tech-trends": {
+    "title": "Big Tech Trends",
+    "subtitle": "Strategic AI moves of major labs and big tech — official research & product blogs to watch.",
+    "sectionTitle": "Players to Watch",
+    "tabs": { "includeAll": false, "orderBy": "count" },
+    "card": { "title": "name", "summary": ["summary", "description"], "summaryLines": 3, "badge": "company", "tags": { "field": "tags", "max": 3 }, "meta": ["source_type", "date"] },
+    "sourceTypeLabels": { "framework": "Framework", "event": "Event", "org": "Blog", "market-map": "Market map", "article": "Article", "newsletter": "Newsletter" }
+  },
+  "market-investment": {
+    "title": "Market & Investment",
+    "subtitle": "AI market maps, VC theses, and investment landscapes — by year. Every entry links to the source.",
+    "sectionTitle": "Market Maps",
+    "tabs": { "includeAll": false, "orderBy": "count" },
+    "domainMap": {
+      "Q1 2024": "2024", "Q2 2024": "2024", "Q3 2024": "2024", "Q4 2024": "2024",
+      "Q1 2025": "2025", "Q2 2025": "2025", "Q3 2025": "2025", "Q4 2025": "2025",
+      "Q1 2026": "2026", "Q2 2026": "2026", "Q3 2026": "2026"
+    },
+    "card": { "title": "name", "summary": ["summary", "description"], "summaryLines": 3, "badge": "company", "tags": { "field": "tags", "max": 3 }, "meta": ["source_type", "date"] },
+    "sourceTypeLabels": { "framework": "Framework", "event": "Event", "org": "Org", "market-map": "Market map", "article": "Article", "newsletter": "Newsletter" }
+  },
+  "technical-deep-dives": {
+    "title": "Technical Deep Dives",
+    "subtitle": "Long-form engineering write-ups and system-design analyses — by topic. Distinct from Cases.",
+    "sectionTitle": "Deep Dives",
+    "tabs": { "includeAll": false, "orderBy": "count", "fallbackLabel": "Other ML" },
+    "domainMap": {
+      "Data Quality": "Data & Features", "Data Engineering": "Data & Features", "Data Discovery": "Data & Features", "Feature Stores": "Data & Features",
+      "Classification": "Prediction", "Regression": "Prediction", "Forecasting": "Prediction", "Anomaly Detection": "Prediction",
+      "Recommendation": "RecSys & Search", "Search & Ranking": "RecSys & Search", "Embeddings": "RecSys & Search",
+      "Natural Language Processing": "NLP & LLMs", "Sequence Modelling": "NLP & LLMs", "Generation": "NLP & LLMs", "Information Extraction": "NLP & LLMs",
+      "Computer Vision": "Vision & Audio", "Audio": "Vision & Audio",
+      "MLOps Platforms": "MLOps & Infra", "Model Management": "MLOps & Infra", "Infra": "MLOps & Infra", "Efficiency": "MLOps & Infra", "Optimization": "MLOps & Infra",
+      "Validation and A/B Testing": "Practices & Testing", "Practices": "Practices & Testing", "Team structure": "Practices & Testing", "Fails": "Practices & Testing", "Ethics": "Practices & Testing", "Privacy-preserving Machine Learning": "Practices & Testing",
+      "Reinforcement Learning": "Other ML", "Graph": "Other ML", "Weak Supervision": "Other ML"
+    },
+    "card": { "title": "name", "summary": ["summary", "description"], "summaryLines": 3, "badge": "company", "tags": { "field": "tags", "max": 3 }, "meta": ["source_type", "date"] },
+    "sourceTypeLabels": { "framework": "Framework", "event": "Event", "org": "Org", "market-map": "Market map", "article": "Article", "newsletter": "Newsletter" }
+  },
+  "insights-opinions": {
+    "title": "Insights & Opinions",
+    "subtitle": "AI newsletters and opinion sources — thought leadership and trend analysis, by focus.",
+    "sectionTitle": "Newsletters & Sources",
+    "tabs": { "includeAll": false, "orderBy": "count" },
+    "card": { "title": "name", "summary": ["summary", "description"], "summaryLines": 3, "badge": "company", "tags": { "field": "tags", "max": 3 }, "meta": ["source_type", "date"] },
+    "sourceTypeLabels": { "framework": "Framework", "event": "Event", "org": "Org", "market-map": "Market map", "article": "Article", "newsletter": "Newsletter" }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "_note": "Research 페이지별 화면 구성 단일 소스. 컴포넌트 하드코딩 금지.",
+  "papers": {
+    "title": "Papers",
+    "subtitle": "Milestone LLM papers grouped by research theme. Every entry links to the original paper.",
+    "sectionTitle": "Papers",
+    "tabs": { "includeAll": false, "orderBy": "count" },
+    "card": {
+      "title": "name",
+      "summary": ["summary", "description"],
+      "summaryLines": 3,
+      "badge": "company",
+      "tags": { "field": "tags", "max": 3 },
+      "meta": ["source_type", "date"]
+    },
+    "sourceTypeLabels": { "paper": "Paper", "model": "Model", "benchmark": "Benchmark" }
+  },
+  "model-updates": {
+    "title": "Model Updates",
+    "subtitle": "Open model releases by organization.",
+    "sectionTitle": "Models",
+    "tabs": { "includeAll": false, "orderBy": "count" },
+    "card": {
+      "title": "name",
+      "summary": ["summary", "description"],
+      "summaryLines": 3,
+      "badge": "company",
+      "tags": { "field": "tags", "max": 3 },
+      "meta": ["source_type", "date"]
+    },
+    "sourceTypeLabels": { "paper": "Paper", "model": "Model", "benchmark": "Benchmark" }
+  },
+  "benchmarks-datasets": {
+    "title": "Benchmarks & Datasets",
+    "subtitle": "LLM benchmarks and datasets by category.",
+    "sectionTitle": "Benchmarks",
+    "tabs": { "includeAll": false, "orderBy": "count" },
+    "card": {
+      "title": "name",
+      "summary": ["summary", "description"],
+      "summaryLines": 3,
+      "badge": "company",
+      "tags": { "field": "tags", "max": 3 },
+      "meta": ["source_type", "date"]
+    },
+    "sourceTypeLabels": { "paper": "Paper", "model": "Model", "benchmark": "Benchmark" }
+  }
+}
