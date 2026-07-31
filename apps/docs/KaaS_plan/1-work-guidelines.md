@@ -57,7 +57,7 @@
 | 카탈로그 기획 | `apps/docs/publish/catalog-page-spec.md` | 카탈로그 UI 스펙 |
 | 콘솔 기획 | `apps/docs/publish/query-page-spec.md` | 플로팅 콘솔 UI 스펙 |
 | 멀티에이전트 기획 | `apps/docs/publish/multi-agent-spec.md` | 멀티에이전트 스펙 |
-| 체크리스트 | `apps/docs/agent_read/cherry_kaas_dev_checklist.html` | Day별 진행 현황 |
+| 체크리스트 | `apps/docs/legacy-docs/cherry_kaas_dev_checklist.html` | Day별 진행 현황 |
 | 진행검수서 | `apps/docs/KaaS_plan/2-implementation-guide.md` | 단계별 구현 가이드 |
 | 검수표 | `apps/docs/KaaS_plan/3-checklist-table.md` | 진행/테스트/검수 체크 |
 | 로그 | `apps/docs/KaaS_plan/4-progress-log.md` | 대화별 작업 기록 |

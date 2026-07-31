@@ -60,7 +60,7 @@ frameworks · prompting · case-studies · domain-applications · product-discov
 ## 3) DB / 기타
 
 - **DB 스키마·마이그레이션 변경 없음**(이 세션). staged_mock 신규 없음.
-- 🔴 로컬·프로덕션 Supabase PG 공유 · `BENCH_KEY_SECRET` 불변 — 07-13/agent-policy와 동일.
+- 🔴 로컬·프로덕션 Supabase PG 공유 · `BENCH_KEY_SECRET` 불변 — 07-13/작업지침(§7)와 동일.
 - 구 Model Updates DB 순위 API(`/api/stats/model-updates-rank`, patch-notes)는 **여전히 존재**하나, 프론트 Model Updates 페이지는 이제 이걸 안 쓰고 **정적 랜드스케이프 + HF 순위 JSON**을 쓴다(frontend-status 참조). 삭제하지 않았음.
 
 ---
@@ -68,4 +68,4 @@ frameworks · prompting · case-studies · domain-applications · product-discov
 ## 4) 참고 문서
 - 전체 백엔드 구조·엔드포인트: `api-backend-status-2026-07-13.md`
 - 프론트 현황: `frontend-status-2026-08-01.md`
-- 콘텐츠 수집·재현: `../콘텐츠-수집-분류-페이지구성-방법론.md` + `../자료조사-*.md`
+- 콘텐츠 수집·재현: `콘텐츠-수집-분류-페이지구성-방법론.md` + `자료조사-*.md`

@@ -1,6 +1,6 @@
 # 프론트엔드 현황 (기준일: 2026-08-01)
 
-> `apps/web`(Next.js 16 App Router). 이 세션의 초점은 **Newly Discovered 4개 그룹(Engineering·Cases·Research & Models·Discourse)의 콘텐츠 페이지 시스템**. 백엔드는 `api-backend-status-2026-08-01.md`, 인수인계 요약은 `../handoff/handoff-2026-08-01.md`.
+> `apps/web`(Next.js 16 App Router). 이 세션의 초점은 **Newly Discovered 4개 그룹(Engineering·Cases·Research & Models·Discourse)의 콘텐츠 페이지 시스템**. 백엔드는 `api-backend-status-2026-08-01.md`, 인수인계 요약은 `handoff-2026-08-01.md`.
 
 ---
 
@@ -63,7 +63,7 @@
 ### 4-1. 대표 픽 (Featured) — `FEATURED_CFG` (nd-cases-articles-page.tsx)
 - 페이지 맨 위 1개 자동 선정(결정적). 점수: 요약(>40자)+5 · 인기주제(name/domain/tags)+3 · 인지도회사(company)+2 · 유명엔티티(name)+4.
 - pool: `date`에 연도 있으면 **최신 연/분기**, 없으면 전체.
-- 대상 8분류(case-studies·papers·discourse 6). 라벨·가중 집합은 분류마다 다름. **기준 정본은 `../자료조사-*.md`**.
+- 대상 8분류(case-studies·papers·discourse 6). 라벨·가중 집합은 분류마다 다름. **기준 정본은 `자료조사-*.md`**.
 - ⚠️ **보완**: `FEATURED_CFG`가 코드 하드코딩 → pages.json 이전 여지. og:description이 저자 나열이면 픽 품질 저하(요약 품질 필터 필요).
 
 ### 4-2. Model Updates 인기 순위표 — `ModelPopularityRank`/`PopCard`
@@ -87,12 +87,12 @@
 - **요약 커버리지 미완**: Discourse 82%(LinkedIn/Uber/Google/ACM 차단), Papers 2건(GPT-1/2, S2 429). 폴백은 제목/description — 지어내지 않음.
 - **FEATURED_CFG·prominent 리스트 하드코딩** → JSON 이전 + 유지보수.
 - **`nd-model-updates-page.tsx` 미사용** — 삭제/보존 결정 필요.
-- 기존 무관 tsc 에러(`kaas-admin-page.tsx`·`kaas-dashboard-page.tsx`) — agent-policy §6, 우리 작업과 무관.
+- 기존 무관 tsc 에러(`kaas-admin-page.tsx`·`kaas-dashboard-page.tsx`) — 작업지침 §7, 우리 작업과 무관.
 - 브라우저 프리뷰 불안정(read_page 빈응답) — 결정적 로직은 node 재현으로 검증 권장.
 
 ---
 
 ## 7) 참고 문서
-- 방법론: `../콘텐츠-수집-분류-페이지구성-방법론.md`
-- 재현 가이드: `../자료조사-Cases.md` · `../자료조사-Research.md` · `../자료조사-Discourse.md`
-- 백엔드: `api-backend-status-2026-08-01.md` · 인수인계: `../handoff/handoff-2026-08-01.md`
+- 방법론: `콘텐츠-수집-분류-페이지구성-방법론.md`
+- 재현 가이드: `자료조사-Cases.md` · `자료조사-Research.md` · `자료조사-Discourse.md`
+- 백엔드: `api-backend-status-2026-08-01.md` · 인수인계: `handoff-2026-08-01.md`

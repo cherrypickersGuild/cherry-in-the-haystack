@@ -64,7 +64,7 @@
 - `apps/docs/publish/query-page-spec.md`
 - `apps/web/components/cherry/kaas-catalog-page.tsx` (Purchase/Follow 버튼)
 - `apps/web/components/cherry/kaas-console.tsx` (Action 타입, 드롭다운)
-- `apps/docs/agent_read/cherry_kaas_dev_checklist.html` (전면 업데이트)
+- `apps/docs/legacy-docs/cherry_kaas_dev_checklist.html` (전면 업데이트)
 
 **이슈:**
 - Cherry 아이콘 SVG → Lucide Cherry로 변경 시 디자인 열화 → 사용자 지시로 Lucide 유지
@@ -207,7 +207,7 @@
    - 이유: apps/ 외 공유 디렉토리(packages/) 수정 금지 정책
    - KaaS 모듈 내부 서브디렉토리로 통합
 2. 기획서 5개 파일에서 경로 참조 일괄 수정:
-   - `apps/docs/agent_read/cherry_kaas_dev_checklist.html`
+   - `apps/docs/legacy-docs/cherry_kaas_dev_checklist.html`
    - `apps/docs/KaaS_plan/2-implementation-guide.md` (8곳)
    - `apps/docs/KaaS/architecture.md` (3곳)
    - `apps/docs/KaaS/epics.md` (1곳)
@@ -218,7 +218,7 @@
 
 **변경 파일:**
 - `apps/api/src/modules/kaas/chain-adapter/` (interface.ts, mock-adapter.ts, status-adapter.ts, index.ts)
-- `apps/docs/agent_read/cherry_kaas_dev_checklist.html`
+- `apps/docs/legacy-docs/cherry_kaas_dev_checklist.html`
 - `apps/docs/KaaS_plan/2-implementation-guide.md`
 - `apps/docs/KaaS/architecture.md`
 - `apps/docs/KaaS/epics.md`
@@ -253,7 +253,7 @@
 
 **변경 파일:**
 - apps/api/src/modules/kaas/kaas-credit.controller.ts (UnauthorizedException)
-- apps/docs/agent_read/cherry_kaas_dev_checklist.html (Day 2+3 완료)
+- apps/docs/legacy-docs/cherry_kaas_dev_checklist.html (Day 2+3 완료)
 - apps/docs/KaaS_plan/3-checklist-table.md (전체 업데이트)
 - apps/docs/KaaS_plan/4-progress-log.md (이 로그)
 
