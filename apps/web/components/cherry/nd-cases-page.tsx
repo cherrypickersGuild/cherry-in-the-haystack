@@ -281,7 +281,7 @@ export function NDCasesPage({ initialCategory = "case-studies" }: { initialCateg
         ))}
       </div>
 
-      {/* 카테고리 탭 */}
+      {/* 카테고리 탭 (원래 언더라인 스타일) */}
       <div className="mb-5 flex flex-wrap gap-[6px] border-b" style={{ borderColor: "#E4E1EE" }}>
         {CATS.map((c) => {
           const on = c.key === active

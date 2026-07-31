@@ -1,0 +1,216 @@
+{
+  "generatedAt": "2026-07-31T19:29:53.636Z",
+  "source": "HuggingFace API (top text-generation model per family, by downloads)",
+  "ranks": [
+    {
+      "family": "Alibaba",
+      "org": "Qwen",
+      "model": "Qwen3-0.6B",
+      "model_url": "https://huggingface.co/Qwen/Qwen3-0.6B",
+      "downloads": 28619510,
+      "likes": 1469,
+      "rank": 1,
+      "logo": "/logos/model/qwen.jpeg"
+    },
+    {
+      "family": "Nvidia",
+      "org": "nvidia",
+      "model": "Qwen3.6-35B-A3B-NVFP4",
+      "model_url": "https://huggingface.co/nvidia/Qwen3.6-35B-A3B-NVFP4",
+      "downloads": 10277948,
+      "likes": 525,
+      "rank": 2,
+      "logo": "/logos/model/nvidia.png"
+    },
+    {
+      "family": "Meta",
+      "org": "meta-llama",
+      "model": "Llama-3.2-1B-Instruct",
+      "model_url": "https://huggingface.co/meta-llama/Llama-3.2-1B-Instruct",
+      "downloads": 10193506,
+      "likes": 1549,
+      "rank": 3,
+      "logo": "/logos/model/meta-llama.png"
+    },
+    {
+      "family": "DeepSeek",
+      "org": "deepseek-ai",
+      "model": "DeepSeek-R1",
+      "model_url": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
+      "downloads": 9574228,
+      "likes": 13529,
+      "rank": 4,
+      "logo": "/logos/model/deepseek-ai.png"
+    },
+    {
+      "family": "Google",
+      "org": "google",
+      "model": "gemma-3-1b-it",
+      "model_url": "https://huggingface.co/google/gemma-3-1b-it",
+      "downloads": 3995573,
+      "likes": 1073,
+      "rank": 5,
+      "logo": "/logos/model/google.png"
+    },
+    {
+      "family": "ElutherAI",
+      "org": "EleutherAI",
+      "model": "pythia-160m",
+      "model_url": "https://huggingface.co/EleutherAI/pythia-160m",
+      "downloads": 2401179,
+      "likes": 45,
+      "rank": 6,
+      "logo": "/logos/model/eleutherai.png"
+    },
+    {
+      "family": "Apple",
+      "org": "apple",
+      "model": "OpenELM-1_1B-Instruct",
+      "model_url": "https://huggingface.co/apple/OpenELM-1_1B-Instruct",
+      "downloads": 1562138,
+      "likes": 75,
+      "rank": 7,
+      "logo": "/logos/model/apple.jpeg"
+    },
+    {
+      "family": "Microsoft",
+      "org": "microsoft",
+      "model": "Phi-3.5-vision-instruct",
+      "model_url": "https://huggingface.co/microsoft/Phi-3.5-vision-instruct",
+      "downloads": 1261702,
+      "likes": 737,
+      "rank": 8,
+      "logo": "/logos/model/microsoft.png"
+    },
+    {
+      "family": "Mistral AI",
+      "org": "mistralai",
+      "model": "Mistral-7B-Instruct-v0.2",
+      "model_url": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2",
+      "downloads": 1259845,
+      "likes": 3193,
+      "rank": 9,
+      "logo": "/logos/model/mistralai.png"
+    },
+    {
+      "family": "BLOOM",
+      "org": "bigscience",
+      "model": "bloomz-560m",
+      "model_url": "https://huggingface.co/bigscience/bloomz-560m",
+      "downloads": 948069,
+      "likes": 137,
+      "rank": 10,
+      "logo": "/logos/model/bigscience.png"
+    },
+    {
+      "family": "OpenBMB",
+      "org": "openbmb",
+      "model": "MiniCPM5-1B",
+      "model_url": "https://huggingface.co/openbmb/MiniCPM5-1B",
+      "downloads": 743224,
+      "likes": 1024,
+      "rank": 11,
+      "logo": "/logos/model/openbmb.png"
+    },
+    {
+      "family": "AllenAI",
+      "org": "allenai",
+      "model": "OLMo-2-0425-1B",
+      "model_url": "https://huggingface.co/allenai/OLMo-2-0425-1B",
+      "downloads": 599707,
+      "likes": 80,
+      "rank": 12,
+      "logo": "/logos/model/allenai.png"
+    },
+    {
+      "family": "Shanghai AI Laboratory",
+      "org": "internlm",
+      "model": "Intern-S1-Pro",
+      "model_url": "https://huggingface.co/internlm/Intern-S1-Pro",
+      "downloads": 368423,
+      "likes": 279,
+      "rank": 13,
+      "logo": "/logos/model/internlm.png"
+    },
+    {
+      "family": "BigCode",
+      "org": "bigcode",
+      "model": "tiny_starcoder_py",
+      "model_url": "https://huggingface.co/bigcode/tiny_starcoder_py",
+      "downloads": 250497,
+      "likes": 74,
+      "rank": 14,
+      "logo": "/logos/model/bigcode.png"
+    },
+    {
+      "family": "Moonshot AI",
+      "org": "moonshotai",
+      "model": "Kimi-K2-Instruct",
+      "model_url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
+      "downloads": 184682,
+      "likes": 2371,
+      "rank": 15,
+      "logo": "/logos/model/moonshotai.jpeg"
+    },
+    {
+      "family": "Stability AI",
+      "org": "stabilityai",
+      "model": "stablelm-3b-4e1t",
+      "model_url": "https://huggingface.co/stabilityai/stablelm-3b-4e1t",
+      "downloads": 77091,
+      "likes": 315,
+      "rank": 16,
+      "logo": "/logos/model/stabilityai.png"
+    },
+    {
+      "family": "Cohere",
+      "org": "CohereLabs",
+      "model": "North-Mini-Code-1.0-fp8",
+      "model_url": "https://huggingface.co/CohereLabs/North-Mini-Code-1.0-fp8",
+      "downloads": 35726,
+      "likes": 31,
+      "rank": 17,
+      "logo": "/logos/model/coherelabs.png"
+    },
+    {
+      "family": "Baichuan",
+      "org": "baichuan-inc",
+      "model": "Baichuan2-7B-Chat",
+      "model_url": "https://huggingface.co/baichuan-inc/Baichuan2-7B-Chat",
+      "downloads": 25086,
+      "likes": 172,
+      "rank": 18,
+      "logo": "/logos/model/baichuan-inc.png"
+    },
+    {
+      "family": "01-ai",
+      "org": "01-ai",
+      "model": "Yi-6B-Chat",
+      "model_url": "https://huggingface.co/01-ai/Yi-6B-Chat",
+      "downloads": 22927,
+      "likes": 72,
+      "rank": 19,
+      "logo": "/logos/model/01-ai.png"
+    },
+    {
+      "family": "RWKV Foundation",
+      "org": "RWKV",
+      "model": "rwkv-4-169m-pile",
+      "model_url": "https://huggingface.co/RWKV/rwkv-4-169m-pile",
+      "downloads": 7494,
+      "likes": 8,
+      "rank": 20,
+      "logo": "/logos/model/rwkv.png"
+    },
+    {
+      "family": "xAI",
+      "org": "xai-org",
+      "model": "grok-1",
+      "model_url": "https://huggingface.co/xai-org/grok-1",
+      "downloads": 312,
+      "likes": 2432,
+      "rank": 21,
+      "logo": "/logos/model/xai-org.png"
+    }
+  ]
+}

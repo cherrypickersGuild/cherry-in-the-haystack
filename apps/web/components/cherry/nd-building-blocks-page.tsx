@@ -286,7 +286,7 @@ export function NDBuildingBlocksPage() {
         ))}
       </div>
 
-      {/* 서브카테고리 탭 */}
+      {/* 서브카테고리 탭 (원래 언더라인 스타일) */}
       <div className="mb-5 flex flex-wrap gap-[6px] border-b" style={{ borderColor: "#E4E1EE" }}>
         {data?.topics.map((t) => {
           const on = t.k === active
