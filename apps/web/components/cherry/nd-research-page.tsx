@@ -216,7 +216,7 @@ export function NDDiscoursePage() {
 export function NDPapersPage() {
   return (
     <div className="max-w-[940px]">
-      <CasesArticleList base="research" page="papers" header />
+      <CasesArticleList base="research" page="papers" header featured />
       <div className="h-8" aria-hidden />
     </div>
   )
@@ -226,7 +226,7 @@ export function NDPapersPage() {
 export function NDDiscourseArticlePage({ page }: { page: string }) {
   return (
     <div className="max-w-[940px]">
-      <CasesArticleList base="discourse" page={page} header />
+      <CasesArticleList base="discourse" page={page} header featured />
       <div className="h-8" aria-hidden />
     </div>
   )
