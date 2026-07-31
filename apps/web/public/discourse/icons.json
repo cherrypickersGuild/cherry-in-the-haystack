@@ -1,0 +1,35 @@
+{
+  "_note": "Discourse 카드 시각 토큰. 컴포넌트 하드코딩 금지.",
+  "palette": [
+    { "c": "#4B78F0", "bg": "#EEF2FD" },
+    { "c": "#2E8B6F", "bg": "#E7F4EF" },
+    { "c": "#7C3AED", "bg": "#F3EFFA" },
+    { "c": "#0194E2", "bg": "#E6F4FD" },
+    { "c": "#D4854A", "bg": "#FEF3E2" },
+    { "c": "#5B3D87", "bg": "#F3EFFA" },
+    { "c": "#C94B6E", "bg": "#FDF0F3" },
+    { "c": "#DC2626", "bg": "#FDECEC" }
+  ],
+  "neutral": { "c": "#6B6577", "bg": "#F3F1F6" },
+  "themePools": [
+    { "pattern": "security|threat", "emojis": ["🔒", "🛡", "🚨", "🔑", "🕵️", "🔐"] },
+    { "pattern": "governance|management", "emojis": ["🏛", "📋", "⚙️", "🗂", "📊", "🧭"] },
+    { "pattern": "risk", "emojis": ["⚠️", "🎯", "🧯", "📉", "🔎", "🚧"] },
+    { "pattern": "safety|frontier", "emojis": ["🛡", "🧯", "🚦", "🧪", "⚖️", "🔬"] },
+    { "pattern": "ethics|responsible", "emojis": ["⚖️", "🤝", "💠", "🧑‍⚖️", "🌱", "🫶"] },
+    { "pattern": "regulation|compliance|policy", "emojis": ["📜", "⚖️", "🏛", "✅", "🖊", "📑"] },
+    { "pattern": "evaluation|measurement|testing", "emojis": ["📊", "🧪", "✅", "📐", "📈", "🔬"] },
+    { "pattern": "north america|europe|asia|global|online", "emojis": ["🌐", "🗺", "📍", "🎟", "🧑‍🤝‍🧑", "📅"] },
+    { "pattern": "foundation model|labs", "emojis": ["🧠", "✨", "🤖", "🔮", "💠", "🧬"] },
+    { "pattern": "big tech", "emojis": ["🏢", "🧠", "⚙️", "🔷", "🟦", "🖥"] },
+    { "pattern": "open|platform", "emojis": ["🤗", "🔓", "🧩", "🛠", "🌀", "📦"] },
+    { "pattern": "global ai", "emojis": ["🌏", "🐋", "🐧", "🧠", "🔶", "🌐"] },
+    { "pattern": "2024|2025|2026|q\\d", "emojis": ["📈", "💰", "🗺", "📊", "🏦", "💹", "📉"] },
+    { "pattern": "recommendation|search|ranking|embedding", "emojis": ["🔍", "🎯", "📇", "🧭", "🗂", "⭐"] },
+    { "pattern": "nlp|language|sequence|generation|extraction", "emojis": ["💬", "📝", "🧠", "🔤", "🗣", "📖"] },
+    { "pattern": "vision|audio", "emojis": ["👁", "🖼", "🎨", "🔊", "🎙", "📷"] },
+    { "pattern": "mlops|infra|platform|efficiency|optim|model management", "emojis": ["⚙️", "🛠", "🚀", "🔧", "📦", "🧱"] },
+    { "pattern": "practice|testing|team|fails|privacy|data|feature|prediction|classification|forecast|anomaly", "emojis": ["🧪", "📊", "🧩", "🗃", "✅", "📐"] },
+    { "pattern": "newsletter|general|technical|business|enterprise|research|academic|education|tools|prompt|sales|marketing|creative|vertical|safety.*ethic|platform-specific", "emojis": ["📰", "✉️", "📬", "🗞", "📮", "📢", "💡"] }
+  ]
+}

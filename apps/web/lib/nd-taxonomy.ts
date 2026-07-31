@@ -134,6 +134,7 @@ export const ND_GROUPS: NDGroup[] = [
       "technical-deep-dives",
       "insights-opinions",
     ],
+    landingId: "discourse-catalog",
   },
 ]
 
@@ -308,10 +309,22 @@ export const ND_ITEMS: NDItem[] = [
 
   /* ── Discourse ── */
   {
+    // 메뉴엔 안 보이는 그룹 랜딩(전체 카탈로그). Discourse 헤더 클릭 시 뜬다.
+    id: "discourse-catalog",
+    label: "Discourse",
+    ko: "담론 전체",
+    group: "discourse",
+    desc: "AI 거버넌스·커뮤니티·빅테크·시장·기술심층·오피니언 전체 카탈로그.",
+    basis: ["cat"],
+    note: "Discourse 그룹 랜딩(Building Blocks와 같은 역할)",
+    existing: true,
+  },
+  {
     id: "regulations-policy-compliance",
     label: "Regulations · Policy · Compliance",
     ko: "규제·정책·컴플라이언스",
     tag: "regulations-policy-compliance",
+    existing: true,
     group: "discourse",
     desc: "AI 정책·규제·컴플라이언스·법적 선례·표준(ISO/IEC). 예) EU AI Act, FTC 가이드라인.",
     basis: ["cat"],
@@ -322,6 +335,7 @@ export const ND_ITEMS: NDItem[] = [
     label: "Community",
     ko: "커뮤니티",
     tag: "community",
+    existing: true,
     group: "discourse",
     desc: "사람·이벤트·밋업·오픈소스 마일스톤·기여자 스포트라이트.",
     basis: ["cat", "prd"],
@@ -345,6 +359,7 @@ export const ND_ITEMS: NDItem[] = [
     label: "Big Tech Trends",
     ko: "빅테크 동향",
     tag: "big-tech-trends",
+    existing: true,
     group: "discourse",
     desc: "빅테크의 전략적 움직임(모델 업데이트·투자 소식 제외). 예) 구글 AI 조직 개편, 메타 오픈소스 전략.",
     basis: ["cat"],
@@ -355,6 +370,7 @@ export const ND_ITEMS: NDItem[] = [
     label: "Market & Investment",
     ko: "시장·투자",
     tag: "market-investment",
+    existing: true,
     group: "discourse",
     desc: "벤처 투자·M&A·후원 등 AI 산업 자금 흐름. 예) LLM 스타트업 시리즈 A, AI 기업 인수.",
     basis: ["cat"],
@@ -365,6 +381,7 @@ export const ND_ITEMS: NDItem[] = [
     label: "Technical Deep Dives",
     ko: "기술 심층분석",
     tag: "technical-deep-dives",
+    existing: true,
     group: "discourse",
     desc: "롱폼 기술 아티클·시스템 설계 분석·성능 분석·비교 평가.",
     basis: ["cat"],
@@ -375,6 +392,7 @@ export const ND_ITEMS: NDItem[] = [
     label: "Insights & Opinions",
     ko: "인사이트·오피니언",
     tag: "insights-opinions",
+    existing: true,
     group: "discourse",
     desc: "오피니언 리더십·새 패턴·예측·트렌드 분석. 예) 'Why RAG won't scale'.",
     basis: ["cat"],

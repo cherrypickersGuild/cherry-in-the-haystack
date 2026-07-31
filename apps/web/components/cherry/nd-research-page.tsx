@@ -21,10 +21,18 @@ type Item = {
 type Col = { c: string; bg: string }
 type Icons = { palette: Col[]; neutral: Col; themePools?: { pattern: string; emojis: string[] }[] }
 
-const CATS = [
+const RESEARCH_CATS = [
   { key: "papers", label: "Papers" },
   { key: "model-updates", label: "Model Updates" },
   { key: "benchmarks-datasets", label: "Benchmarks & Datasets" },
+]
+const DISCOURSE_CATS = [
+  { key: "regulations-policy-compliance", label: "Regulations · Policy · Compliance" },
+  { key: "community", label: "Community" },
+  { key: "big-tech-trends", label: "Big Tech Trends" },
+  { key: "market-investment", label: "Market & Investment" },
+  { key: "technical-deep-dives", label: "Technical Deep Dives" },
+  { key: "insights-opinions", label: "Insights & Opinions" },
 ]
 
 function makeEmoji(icons: Icons | null) {
@@ -95,47 +103,58 @@ function GroupSection({ group, items, col, emojiOf }: { group: string; items: It
   )
 }
 
-/* ── 상위 블록: 카탈로그 ── */
-export function NDResearchPage() {
+/* ── 상위 블록: 카탈로그 (Research·Discourse 공용) ── */
+type CatDef = { key: string; label: string }
+type PageCfg = { domainMap?: Record<string, string>; tabs?: { fallbackLabel?: string } }
+
+function GroupCatalog({ base, cats, title, subtitle }: { base: string; cats: CatDef[]; title: string; subtitle: string }) {
   const [items, setItems] = useState<Item[] | null>(null)
   const [icons, setIcons] = useState<Icons | null>(null)
-  const [active, setActive] = useState("papers")
+  const [pages, setPages] = useState<Record<string, PageCfg>>({})
+  const [active, setActive] = useState(cats[0].key)
 
   useEffect(() => {
     Promise.all([
-      fetch("/research/entities.json").then((r) => r.json()),
-      fetch("/research/icons.json").then((r) => r.json()),
-    ]).then(([ent, ico]) => { setItems(ent.items); setIcons(ico) }).catch(() => setItems([]))
-  }, [])
+      fetch(`/${base}/entities.json`).then((r) => r.json()),
+      fetch(`/${base}/icons.json`).then((r) => r.json()),
+      fetch(`/${base}/pages.json`).then((r) => r.json()),
+    ]).then(([ent, ico, pg]) => { setItems(ent.items); setIcons(ico); setPages(pg) }).catch(() => setItems([]))
+  }, [base])
 
   const emojiOf = useMemo(() => makeEmoji(icons), [icons])
   const countOf = (k: string) => items?.filter((x) => x.category === k).length ?? 0
   const groups = useMemo(() => {
     if (!items) return [] as [string, Item[]][]
+    const cfg = pages[active]
+    const map = cfg?.domainMap
+    const fb = cfg?.tabs?.fallbackLabel ?? "Other"
+    const sectorOf = (dom: string) => (map ? (map[dom] ?? fb) : dom)
     const m = new Map<string, Item[]>()
     for (const it of items.filter((x) => x.category === active)) {
-      if (!m.has(it.domain)) m.set(it.domain, [])
-      m.get(it.domain)!.push(it)
+      const s = sectorOf(it.domain)
+      if (!m.has(s)) m.set(s, [])
+      m.get(s)!.push(it)
     }
     return [...m.entries()].sort((a, b) => b[1].length - a[1].length)
-  }, [items, active])
+  }, [items, active, pages])
 
   return (
     <div className="max-w-[1000px]">
-      <h1 className="mb-[2px] text-[26px] font-extrabold tracking-[-0.4px] text-[#1A1626]">Research &amp; Models - Building Blocks</h1>
-      <p className="mb-[18px] max-w-[780px] text-[14px] leading-[1.7] text-[#6E6A78]">
-        Foundational research, model releases, and evaluation resources — milestone papers, open models, and benchmarks. Every entry links to the original source.
-      </p>
+      <h1 className="mb-[2px] text-[26px] font-extrabold tracking-[-0.4px] text-[#1A1626]">{title}</h1>
+      <p className="mb-[18px] max-w-[780px] text-[14px] leading-[1.7] text-[#6E6A78]">{subtitle}</p>
 
-      <div className="mb-5 flex flex-wrap gap-[6px] border-b" style={{ borderColor: "#E4E1EE" }}>
-        {CATS.map((c) => {
+      {/* 카테고리 탭 — 여러 줄이 될 수 있어 채워진 pill 버튼(선택 뚜렷) */}
+      <div className="mb-6 flex flex-wrap gap-[8px]">
+        {cats.map((c) => {
           const on = c.key === active
           return (
             <button key={c.key} type="button" onClick={() => setActive(c.key)}
-              className="-mb-px flex cursor-pointer items-center gap-[7px] border-0 border-b-2 bg-transparent px-[14px] py-[9px] text-[13.5px] font-semibold transition-colors"
-              style={{ color: on ? "#C94B6E" : "#9E97B3", borderBottomColor: on ? "#C94B6E" : "transparent", borderBottomStyle: "solid" }}>
+              className="flex cursor-pointer items-center gap-[7px] rounded-[10px] border px-[13px] py-[7px] text-[13px] font-semibold transition-all"
+              style={{ background: on ? "#C94B6E" : "#FFFFFF", color: on ? "#FFFFFF" : "#6E6A78", borderColor: on ? "#C94B6E" : "#E4E1EE", boxShadow: on ? "0 2px 8px rgba(201,75,110,.22)" : "none" }}
+              onMouseEnter={(e) => { if (!on) { e.currentTarget.style.borderColor = "#C7B8E8"; e.currentTarget.style.color = "#1A1626" } }}
+              onMouseLeave={(e) => { if (!on) { e.currentTarget.style.borderColor = "#E4E1EE"; e.currentTarget.style.color = "#6E6A78" } }}>
               {c.label}
-              <span className="rounded-[9px] px-[7px] py-[1px] text-[10.5px] font-bold" style={{ background: on ? "#FDF0F3" : "#F3F1F6", color: on ? "#C94B6E" : "#6B6577" }}>{countOf(c.key)}</span>
+              <span className="rounded-[7px] px-[6px] py-[1px] text-[10.5px] font-bold" style={{ background: on ? "rgba(255,255,255,.22)" : "#F3F1F6", color: on ? "#FFFFFF" : "#9E97B3" }}>{countOf(c.key)}</span>
             </button>
           )
         })}
@@ -149,11 +168,33 @@ export function NDResearchPage() {
   )
 }
 
+export function NDResearchPage() {
+  return <GroupCatalog base="research" cats={RESEARCH_CATS}
+    title="Research & Models - Building Blocks"
+    subtitle="Foundational research, model releases, and evaluation resources — milestone papers, open models, and benchmarks. Every entry links to the original source." />
+}
+
+export function NDDiscoursePage() {
+  return <GroupCatalog base="discourse" cats={DISCOURSE_CATS}
+    title="Discourse - Building Blocks"
+    subtitle="AI governance, community, big-tech moves, market maps, technical deep dives, and opinions. Every entry links to the original source." />
+}
+
 /* ── 하위: Papers(기사형) ── */
 export function NDPapersPage() {
   return (
     <div className="max-w-[940px]">
       <CasesArticleList base="research" page="papers" header />
+      <div className="h-8" aria-hidden />
+    </div>
+  )
+}
+
+/* ── 하위: Discourse 기사형 (6개 카테고리 공용) ── */
+export function NDDiscourseArticlePage({ page }: { page: string }) {
+  return (
+    <div className="max-w-[940px]">
+      <CasesArticleList base="discourse" page={page} header />
       <div className="h-8" aria-hidden />
     </div>
   )

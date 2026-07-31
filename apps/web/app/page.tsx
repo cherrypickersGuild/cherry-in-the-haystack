@@ -14,7 +14,7 @@ import { NDPromptingPage } from "@/components/cherry/nd-prompting-page"
 import { NDCasesPage } from "@/components/cherry/nd-cases-page"
 import { NDCasesListPage } from "@/components/cherry/nd-cases-articles-page"
 import { NDCasesBestPage } from "@/components/cherry/nd-cases-best-page"
-import { NDResearchPage, NDPapersPage, NDResearchLandscapePage } from "@/components/cherry/nd-research-page"
+import { NDResearchPage, NDPapersPage, NDResearchLandscapePage, NDDiscoursePage, NDDiscourseArticlePage } from "@/components/cherry/nd-research-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
 import { HandbookPlaceholder } from "@/components/cherry/handbook-placeholder"
 import { NDSpecPage } from "@/components/cherry/nd-spec-page"
@@ -101,6 +101,17 @@ export default function CherryApp() {
 
       case "benchmarks-datasets":
         return <NDResearchLandscapePage page="benchmarks-datasets" />
+
+      case "discourse-catalog":
+        return <NDDiscoursePage />
+
+      case "regulations-policy-compliance":
+      case "community":
+      case "big-tech-trends":
+      case "market-investment":
+      case "technical-deep-dives":
+      case "insights-opinions":
+        return <NDDiscourseArticlePage page={activeNav} />
 
       case "cases-catalog":
         return <NDCasesPage />
