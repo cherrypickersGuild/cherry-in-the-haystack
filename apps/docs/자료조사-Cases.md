@@ -68,7 +68,27 @@ kind = (source_type === "product") ? "domain" : "article"
 
 - **도메인 정규화**: domain-applications 원본 65개 → `pages.json`의 `domainMap`으로 **17개**로 통합(예: `Software Dev`/`Web Development`/`IT` → `Software & IT`). 미매핑은 `Other`.
 
-## 7. 관련 파일
+## 7. 대표 기사 픽 (Featured Read) — 페이지 맨 위 1개
+
+Case Studies 페이지 최상단에 대표 기사 1개를 픽해 보여준다(스타/조회수 지표가 없으므로 보유 데이터로 점수화).
+
+**픽 기준 (결정적):**
+1. **최신 연도** 기사만 후보로 (date의 첫 4자리 연도 최대값. 예: 2025).
+2. 후보 중 **점수 최고 1개**:
+   - 요약(summary) 있음(길이 > 40): **+5**
+   - **인기 주제** 포함(제목·태그·domain에 `llm/agent/rag/generative/multimodal/prompt/fine-tune/diffusion/embedding/vector/gpt`): **+3**
+   - **인지도 회사**(Netflix·Uber·Meta·Google·Airbnb·LinkedIn·Instacart·DoorDash·Stripe·Dropbox·Pinterest·Amazon·Microsoft·Nvidia·Grammarly·Canva·Ramp 등): **+2**
+3. 동점이면 원본 순서(안정 정렬) → 매번 같은 결과.
+
+**표시:** `PICK` 뱃지 + **"Featured Read — Worth reading right now"** + 제목·요약·회사 배지·태그·연도. Rising Star와 같은 위치·톤이지만 기사라서 문구를 달리함.
+
+**구현:** `nd-cases-articles-page.tsx`의 `FEATURED_CFG["case-studies"]` + `CasesArticleList`(`featured` 프롭). 혼합 페이지(domain-applications/product-discovery)의 기사 섹션엔 미표시.
+
+**보완점(개선 여지):**
+- **요약 품질**: 픽된 기사의 `summary`가 og:description이라 가끔 **저자 나열**("Zhibo Fan | ML Engineer …")이 잡힌다. → 저자 나열형(이름·직함 패턴, `\|.*Engineer` 등)을 감점하거나, 실요약 있는 기사를 우선하도록 보정 여지.
+- **notable 회사 리스트**가 코드에 하드코딩 → 새 회사 등장 시 갱신 필요(방법론상 pages.json로 이전 여지, 아래 방법론 문서 참조).
+
+## 8. 관련 파일
 
 - 랜드스케이프 생성(도메인형): `apps/api/scripts/generate-cases-landscape.cjs` (kind=domain만, 정규화, best5)
 - 화면: `apps/web/components/cherry/nd-cases-page.tsx`·`nd-cases-articles-page.tsx`·`nd-cases-best-page.tsx`

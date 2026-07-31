@@ -62,3 +62,28 @@ curl -sL https://raw.githubusercontent.com/csarigoz/best-ai-newsletters/main/REA
 - source_type: `framework`·`event`·`org`·`market-map`·`article`·`newsletter`.
 - JSON 3층: `discourse/entities.json`(+summary+kind) · `icons.json`(색·이모지) · `pages.json`(6 카테고리 카드·탭·**domainMap**).
 - 화면: 상위 카탈로그 `NDDiscoursePage`(= 공용 `GroupCatalog`), 하위 6개 `NDDiscourseArticlePage`(= 공용 `CasesArticleList base="discourse"`). 6개 전부 기사형.
+
+---
+
+## 7. 대표 픽 (Featured) — 각 서브 페이지 맨 위 1개, 기준별
+
+6개 카테고리 각 페이지 최상단에 대표 1개를 픽한다. **데이터 성격이 갈려 기준이 다르다.** 재수집 시 이 기준대로 자동 선정된다(결정적).
+
+**공통 점수:** 요약(>40자) **+5**, 인기주제 매칭(name/domain/tags) **+3**, 인지도 회사(company) **+2**, 유명 엔티티 매칭(name) **+4**. 최고점 1개, 동점은 원본 순서.
+
+| category | 데이터 | 후보 pool | 가중 요소 | 라벨 |
+|---|---|---|---|---|
+| **market-investment** | 날짜 O(분기) | **최신 연도**(2026) | prominent: a16z·Andreessen·Sequoia·Bessemer·CB Insights·Air Street·Menlo·Coatue·"State of AI" / trending: agent·infrastructure·foundation·compute·inference·data center·hardware | **Featured Map** — "Fresh market view" |
+| **technical-deep-dives** | 날짜 O(연도) | **최신 연도** | trending: llm·agent·rag·generative·multimodal·prompt·fine-tune·embedding·ranking·recommendation / notable: Netflix·Uber·Meta·Google·Airbnb·LinkedIn·Instacart·DoorDash·Stripe·Dropbox·Pinterest·Amazon·Microsoft·Spotify·Lyft·Swiggy | **Featured Read** — "Deep dive worth your time" |
+| **regulations-policy-compliance** | 날짜 X | 전체 | prominent: NIST·ISO/IEC 42001·EU AI Act·MITRE ATLAS·OWASP | **Key Framework** — "The one to know" |
+| **community** | 날짜 X | 전체 | prominent: NeurIPS·ICML·ICLR·AI Action Summit·CVPR·ACL·AI Engineer | **Featured Event** — "Don't miss this" |
+| **big-tech-trends** | 날짜 X | 전체 | prominent: OpenAI·Anthropic·Google DeepMind·DeepMind | **Lab to Watch** — "Frontier player right now" |
+| **insights-opinions** | 날짜 X | 전체 | prominent: The Batch·Import AI·The Gradient·Latent Space·Ahead of AI·Interconnects | **Featured Newsletter** — "Worth subscribing" |
+
+**메커니즘:** `nd-cases-articles-page.tsx`의 `FEATURED_CFG` — 날짜 있으면 최신 연/분기 pool, 없으면 전체 pool → 위 점수. `NDDiscourseArticlePage`가 `featured`로 렌더. Cases(`Featured Read`)·Papers(`Featured Paper`)와 **동일 공용 로직**, 카테고리마다 가중 집합·라벨만 다름.
+
+**보완점(개선 여지):**
+- **technical-deep-dives**: 소스(applied-ml)에 2025 글이 없어 최신 연도(2024) pool이 좁고 픽이 밋밋. → pool을 **최근 2개 연도**로 넓히거나(trending 가중을 더 세게), 더 최신 소스 병합.
+- **market-investment**: 현재 pool을 "최신 연도(2026)"로 잡는데, 2026 안에 Q1~Q3가 섞임 → **최신 분기(Q3 2026)**로 더 좁히면 신선도↑.
+- **무날짜형(regulations·community·big-tech·insights)**: `prominent` 정규식에 **미매칭이면 요약만으로 임의 선택**됨. 유명 엔티티 리스트를 주기적으로 갱신해야 하고, 미매칭 시 폴백(예: 요약 길이·태그 다양성) 규칙을 추가하면 안정적.
+- prominent/notable/trending 집합이 코드(`FEATURED_CFG`)에 있음 → 방법론상 pages.json로 이전 여지(아래 방법론 문서).

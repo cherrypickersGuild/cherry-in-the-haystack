@@ -141,3 +141,24 @@ Model Updates 페이지 상단의 순위표(원본 "Major Players" 포디움 디
   스냅샷(HF 통계는 변동).
 - 스크립트: `fetch-model-rank.cjs`(순위·다운로드·좋아요) → `add-logos.cjs`(org 아바타 다운로드).
 - 컴포넌트: `nd-research-page.tsx`의 `ModelPopularityRank` / `PopCard` — page==="model-updates"일 때 Rising Star 아래에 렌더.
+
+---
+
+## 9. Papers 추천 논문 픽 (Featured Paper) — 페이지 맨 위 1개
+
+Papers 페이지 최상단에 추천 논문 1개를 픽한다. 마일스톤 논문은 시의성(최신 돌파구)이 중요하므로 **최신성 우선**.
+
+**픽 기준 (결정적, Cases와 같은 공용 로직):**
+1. **최신 연도** 논문만 후보 (date `YYYY-MM`의 연도 최대값. 현재 데이터에선 2025 = DeepSeek-R1 1편 → 자동 선정).
+2. 후보가 여럿이면 **점수 최고 1개**:
+   - 요약(초록) 있음: **+5**
+   - **인기 주제**(domain/제목/tags에 `reasoning·open models·multimodal·instruction·alignment·scaling·architecture·agent`): **+3**
+   - **대표 기관**(OpenAI·Google·Meta·DeepMind·DeepSeek·Microsoft·Mistral·Alibaba·Stanford·Ai2·NVIDIA·Anthropic): **+2**
+
+**표시:** `PICK` 뱃지 + **"Featured Paper — The latest milestone worth reading"** + 제목·초록·기관 배지·키워드·연월.
+
+**구현:** `nd-cases-articles-page.tsx`의 `FEATURED_CFG["papers"]`. Papers 페이지(`NDPapersPage` → `CasesArticleList base="research" page="papers" featured`)에서 렌더. Cases와 **동일 메커니즘**, 인기주제·대표기관 집합과 라벨만 다름.
+
+**보완점(개선 여지):**
+- **최신 연도에 논문이 1편뿐이면**(현재 2025=DeepSeek-R1 1편) 점수가 사실상 무의미 — 그냥 최신 1편 자동 선정. 최신성 외 **landmark 가중**(피인용 수·주제 대표성 등 외부 신호)을 더하면 "추천"의 근거가 강해진다.
+- Papers 볼륨(62)이 작아 픽 다양성도 작음 → §7의 소스 보강과 연동.
