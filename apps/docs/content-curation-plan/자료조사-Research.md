@@ -1,5 +1,7 @@
 # 자료조사 재현 가이드 — Research & Models
 
+> ⚠️ 2026-08-01 갱신: kind를 URL 기준으로 재판정(위 분포) + 혼합 도메인/논문 렌더로 변경.
+
 다른 에이전트가 **동일한 방식으로 Research & Models 데이터를 재수집**할 수 있도록 기록한다.
 상위 방법론은 [`콘텐츠-수집-분류-페이지구성-방법론.md`](./콘텐츠-수집-분류-페이지구성-방법론.md) 참조.
 
@@ -42,13 +44,13 @@ curl -sL https://raw.githubusercontent.com/BenchGecko/awesome-llm-benchmarks/mai
 
 ## 3. kind & 그룹축 (수집 시 명시 — 핵심)
 
-세 분류 모두 **단일 kind (혼합 없음)**.
+세 분류 모두 **kind 혼합**이다. kind는 **URL 기준으로 재판정**한다: arxiv/논문 링크 = `article`, 실제 사이트/HF/github/리더보드 = `domain`.
 
-| category | kind | source_type | 그룹축(`domain`) |
+| category | kind 분포 | source_type | 그룹축(`domain`) |
 |---|---|---|---|
-| papers | **article** (논문=글) | `paper` | **주제(Theme)** — 아래 3.1 |
-| model-updates | **domain** (모델=산출물) | `model` | **기관(org)** — `<summary>` 값 |
-| benchmarks-datasets | **domain** (리소스) | `benchmark` | **벤치마크 카테고리** — `##` 헤더 |
+| papers | **article 56 / domain 6** — 대부분 논문=article, 실제 프로젝트·제품 페이지 6개만 domain | `paper` | **주제(Theme)** — 아래 3.1 |
+| model-updates | **domain 70 / article 3** — 모델 실체=domain, arxiv 논문 링크 3개만 article | `model` | **기관(org)** — `<summary>` 값 |
+| benchmarks-datasets | **domain 10 / article 63** — 명명된 벤치마크라도 링크가 arxiv 논문이면 article. 실제 벤치마크 플랫폼·리더보드·데이터셋 사이트 10개만 domain, 논문 링크 63개는 article | `benchmark` | **벤치마크 카테고리** — `##` 헤더 |
 
 ### 3.1 Papers 주제 매핑 (키워드 → 8주제)
 키워드(`tags[0]`)가 62개 전부 고유라 탭으로 못 묶으므로 **8개 주제로 수작업 매핑**해 `domain`에 넣는다.
@@ -106,9 +108,9 @@ curl -sL https://raw.githubusercontent.com/BenchGecko/awesome-llm-benchmarks/mai
 | `research/icons.json` | 팔레트 + 벤치마크/기관/주제 테마 이모지 |
 | `research/pages.json` | papers(기사형) 카드 구성 등 |
 
-- **Papers(article)** → 기사형(pill 탭 = 8주제).
-- **Model Updates / Benchmarks(domain)** → 도메인형 랜드스케이프(기관 / 카테고리 8카드 × best5 + 모달).
-- 랜드스케이프 생성: `generate-research-landscape.cjs`(kind=domain만), 백엔드 `LANDSCAPE_PAGES`에 `model-updates`·`benchmarks-datasets` 등록 → `GET /api/<page>/landscape`.
+- **세 분류 모두 혼합 렌더**: 도메인 카드(프론트 정적 `StaticDomainLandscape`, `/research/entities.json`에서 kind=domain만) + 논문 목록(`CasesArticleList kind="article"`, 섹션명 "Papers").
+- **model-updates**는 HuggingFace **인기 순위표(Popularity)** 를 맨 위에 유지(§8).
+- 예전 백엔드 랜드스케이프(`LandscapeSection`/`RisingStar`, `generate-research-landscape.cjs`, `GET /api/<page>/landscape`)는 이제 안 씀 — 프론트 정적(`StaticDomainLandscape`)으로 전환.
 
 ## 7. 규모 주의
 Research 총 208(Cases 914보다 작음). 특히 papers 62. 볼륨 확대 시 dair-ai/ML-Papers-of-the-Week 등 추가 소스 병합 가능.
@@ -140,7 +142,7 @@ Model Updates 페이지 상단의 순위표(원본 "Major Players" 포디움 디
   ```
   스냅샷(HF 통계는 변동).
 - 스크립트: `fetch-model-rank.cjs`(순위·다운로드·좋아요) → `add-logos.cjs`(org 아바타 다운로드).
-- 컴포넌트: `nd-research-page.tsx`의 `ModelPopularityRank` / `PopCard` — page==="model-updates"일 때 Rising Star 아래에 렌더.
+- 컴포넌트: `nd-research-page.tsx`의 `ModelPopularityRank` / `PopCard` — page==="model-updates"일 때 **페이지 맨 위**에 렌더(도메인 카드·논문 목록보다 위). Rising Star는 제거됨.
 
 ---
 

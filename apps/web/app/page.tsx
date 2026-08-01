@@ -369,7 +369,7 @@ export default function CherryApp() {
           id="main-content"
         >
           {/* 가로 표준은 1000px. Landscape 페이지(Frameworks/Prompting/Cases Best/Research/Discourse 혼합)만 1160px. */}
-          <div className={`w-full ${["frameworks", "prompting", "domain-applications", "product-discovery", "model-updates", "benchmarks-datasets", "regulations-policy-compliance", "community", "big-tech-trends", "market-investment", "technical-deep-dives", "insights-opinions"].includes(activeNav) ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
+          <div className={`w-full ${["frameworks", "prompting", "domain-applications", "product-discovery", "model-updates", "benchmarks-datasets", "papers", "regulations-policy-compliance", "community", "big-tech-trends", "market-investment", "technical-deep-dives", "insights-opinions"].includes(activeNav) ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
             {renderContent()}
           </div>
         </main>

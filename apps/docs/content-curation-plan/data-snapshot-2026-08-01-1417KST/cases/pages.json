@@ -1,0 +1,164 @@
+{
+  "_note": "Cases 페이지별 화면 구성 단일 소스(제목·소개문·탭·카드필드·도메인 정규화). 컴포넌트 하드코딩 금지.",
+  "case-studies": {
+    "title": "Case Studies",
+    "subtitle": "Curated engineering case-study articles from companies running AI in production. Filter by industry — every entry links to the original source.",
+    "sectionTitle": "Curated Articles",
+    "groupBy": "sector",
+    "tabs": {
+      "includeAll": false,
+      "orderBy": "count"
+    },
+    "card": {
+      "title": "name",
+      "summary": [
+        "summary",
+        "description"
+      ],
+      "summaryLines": 3,
+      "badge": "company",
+      "tags": {
+        "field": "tags",
+        "max": 3
+      },
+      "meta": [
+        "source_type",
+        "date"
+      ]
+    },
+    "sourceTypeLabels": {
+      "engineering-blog": "Eng blog",
+      "blog": "Blog",
+      "conference": "Talk",
+      "paper": "Paper"
+    }
+  },
+  "domain-applications": {
+    "title": "Domain Applications",
+    "subtitle": "AI applied across industries and functions — browse by domain. Each entry links to the source.",
+    "sectionTitle": "Applications",
+    "groupBy": "sector",
+    "tabs": {
+      "includeAll": false,
+      "orderBy": "count",
+      "fallbackLabel": "Other"
+    },
+    "domainMap": {
+      "Education": "Education & Research",
+      "Education / Research": "Education & Research",
+      "Research": "Education & Research",
+      "Human Resources": "HR & Recruitment",
+      "Recruitment": "HR & Recruitment",
+      "Marketing": "Marketing & Sales",
+      "Sales": "Marketing & Sales",
+      "Social Media": "Marketing & Sales",
+      "Insurance": "Finance & Insurance",
+      "Finance": "Finance & Insurance",
+      "Health Insurance": "Finance & Insurance",
+      "Manufacturing": "Manufacturing",
+      "Supply chain": "Supply Chain & Logistics",
+      "Supply Chain": "Supply Chain & Logistics",
+      "Transportation": "Supply Chain & Logistics",
+      "Healthcare": "Healthcare & Life Sciences",
+      "Life sciences": "Healthcare & Life Sciences",
+      "IT": "Software & IT",
+      "Software Development": "Software & IT",
+      "Software Dev": "Software & IT",
+      "Web Development": "Software & IT",
+      "Game Development": "Software & IT",
+      "Development": "Software & IT",
+      "AI Development": "Software & IT",
+      "AI Framework": "Software & IT",
+      "AI Framework Support": "Software & IT",
+      "AI / QA": "Software & IT",
+      "Database Management": "Software & IT",
+      "Database Interaction": "Software & IT",
+      "Performance Evaluation": "Software & IT",
+      "Monitoring & Analytics": "Software & IT",
+      "Image Processing": "Software & IT",
+      "Data Extraction": "Software & IT",
+      "Workflow Orchestration": "Workflow & Automation",
+      "Intelligent Agents": "Workflow & Automation",
+      "AI Integration": "Workflow & Automation",
+      "Planning & Dev": "Workflow & Automation",
+      "Information Retrieval": "Information & Knowledge",
+      "Knowledge Management": "Information & Knowledge",
+      "Documentation": "Information & Knowledge",
+      "Multimedia AI": "Media & Content",
+      "Creative Writing": "Media & Content",
+      "Media & Content": "Media & Content",
+      "Media & Journalism": "Media & Content",
+      "Media & News": "Media & Content",
+      "Publishing & Media": "Media & Content",
+      "Entertainment": "Media & Content",
+      "Cybersecurity": "Security & Compliance",
+      "Privacy/Compliance": "Security & Compliance",
+      "Customer Service": "Customer Service",
+      "Customer Support": "Customer Service",
+      "Communication": "Customer Service",
+      "E-commerce": "Retail & E-commerce",
+      "Retail": "Retail & E-commerce",
+      "Public Sector": "Public Sector",
+      "Legal": "Legal",
+      "Legal Tech": "Legal"
+    },
+    "card": {
+      "title": "name",
+      "summary": [
+        "summary",
+        "description"
+      ],
+      "summaryLines": 3,
+      "badge": "company",
+      "tags": {
+        "field": "tags",
+        "max": 3
+      },
+      "meta": [
+        "source_type",
+        "date"
+      ]
+    },
+    "sourceTypeLabels": {
+      "engineering-blog": "Eng blog",
+      "blog": "Blog",
+      "conference": "Talk",
+      "paper": "Paper",
+      "product": "Product"
+    }
+  },
+  "product-discovery": {
+    "title": "Product Discovery",
+    "subtitle": "AI products and solutions tackling real-life problems, grouped by area. Each entry links to the source.",
+    "sectionTitle": "Products & Solutions",
+    "groupBy": "sector",
+    "tabs": {
+      "includeAll": false,
+      "orderBy": "count"
+    },
+    "card": {
+      "title": "name",
+      "summary": [
+        "summary",
+        "description"
+      ],
+      "summaryLines": 3,
+      "badge": "company",
+      "tags": {
+        "field": "tags",
+        "max": 3
+      },
+      "meta": [
+        "source_type",
+        "date"
+      ]
+    },
+    "sourceTypeLabels": {
+      "engineering-blog": "Eng blog",
+      "blog": "Blog",
+      "conference": "Talk",
+      "paper": "Paper",
+      "product": "Product"
+    }
+  }
+}

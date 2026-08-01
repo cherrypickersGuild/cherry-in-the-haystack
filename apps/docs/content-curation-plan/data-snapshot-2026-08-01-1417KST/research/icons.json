@@ -1,0 +1,38 @@
+{
+  "_note": "Research 카드 시각 토큰(색·이모지) 단일 소스. 컴포넌트 하드코딩 금지.",
+  "palette": [
+    { "c": "#4B78F0", "bg": "#EEF2FD" },
+    { "c": "#2E8B6F", "bg": "#E7F4EF" },
+    { "c": "#7C3AED", "bg": "#F3EFFA" },
+    { "c": "#0194E2", "bg": "#E6F4FD" },
+    { "c": "#D4854A", "bg": "#FEF3E2" },
+    { "c": "#5B3D87", "bg": "#F3EFFA" },
+    { "c": "#C94B6E", "bg": "#FDF0F3" },
+    { "c": "#DC2626", "bg": "#FDECEC" }
+  ],
+  "neutral": { "c": "#6B6577", "bg": "#F3F1F6" },
+  "themePools": [
+    { "pattern": "language understanding|reasoning", "emojis": ["🧠", "💭", "📖", "🗣", "🧩", "❓", "📝"] },
+    { "pattern": "math|quantitative", "emojis": ["🧮", "➗", "📐", "🔢", "📊", "🎯"] },
+    { "pattern": "code generation|coding", "emojis": ["💻", "⌨️", "🧑‍💻", "🐍", "🔧", "🧱"] },
+    { "pattern": "agent|tool use", "emojis": ["🤖", "🛠", "🧰", "🕹", "🧭", "⚡"] },
+    { "pattern": "safety|alignment", "emojis": ["🛡", "🔒", "⚖️", "🚨", "🧯", "🔏"] },
+    { "pattern": "multilingual", "emojis": ["🌐", "🗺", "🔤", "🈶", "🗨", "📣"] },
+    { "pattern": "multimodal|vision", "emojis": ["👁", "🖼", "🎨", "📷", "🎞", "🧿"] },
+    { "pattern": "long context", "emojis": ["📜", "📚", "🧵", "🗂", "🪢", "📏"] },
+    { "pattern": "frontier|emerging", "emojis": ["🚀", "🔭", "✨", "🌌", "🛰", "💫"] },
+    { "pattern": "architecture", "emojis": ["🏗", "🧩", "⚙️", "🔀", "🧬", "🔧"] },
+    { "pattern": "pretraining|lms", "emojis": ["🧠", "📚", "🔤", "🗿", "📖", "🧾"] },
+    { "pattern": "scaling|efficiency", "emojis": ["📈", "⚡", "🔋", "🏋️", "📊", "🧮"] },
+    { "pattern": "instruction|alignment", "emojis": ["🎯", "🧭", "🤝", "📐", "✅", "⚖️"] },
+    { "pattern": "evaluation|data", "emojis": ["📊", "🧪", "✅", "📋", "🔬", "📈"] },
+    { "pattern": "deepseek", "emojis": ["🐋", "🌊", "🔍", "🧠", "🧭"] },
+    { "pattern": "alibaba|qwen", "emojis": ["🐧", "🧠", "🔶", "🧩", "⚡"] },
+    { "pattern": "meta", "emojis": ["🦙", "♾", "🧠", "🔵", "🧩"] },
+    { "pattern": "mistral", "emojis": ["🌬", "🧠", "🍃", "🔹", "⚡"] },
+    { "pattern": "google|deepmind", "emojis": ["🔷", "🧠", "🌈", "🔬", "🧩"] },
+    { "pattern": "microsoft|nvidia", "emojis": ["🟦", "🧠", "⚙️", "🔋", "🧮"] },
+    { "pattern": "stability|stable", "emojis": ["🎨", "🖼", "🧠", "✨", "🌀"] },
+    { "pattern": "openai", "emojis": ["🧠", "✨", "🤖", "🔮", "💠"] }
+  ]
+}

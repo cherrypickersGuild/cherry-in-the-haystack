@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { LandscapeSection, RisingStar, StaticDomainLandscape } from "./nd-landscape"
+import { StaticDomainLandscape } from "./nd-landscape"
 import { CasesArticleList } from "./nd-cases-articles-page"
 
 /**
@@ -212,14 +212,9 @@ export function NDDiscoursePage() {
     subtitle="AI governance, community, big-tech moves, market maps, technical deep dives, and opinions. Every entry links to the original source." />
 }
 
-/* ── 하위: Papers(기사형) ── */
+/* ── 하위: Papers — 혼합(도메인 소수 + 논문 다수). 공용 혼합 렌더에 위임 ── */
 export function NDPapersPage() {
-  return (
-    <div className="max-w-[940px]">
-      <CasesArticleList base="research" page="papers" header featured />
-      <div className="h-8" aria-hidden />
-    </div>
-  )
+  return <NDResearchLandscapePage page="papers" />
 }
 
 /* ── 하위: Discourse 혼합 (6개 카테고리 공용) ──
@@ -352,35 +347,58 @@ function ModelPopularityRank() {
   )
 }
 
-/* ── 하위: Model Updates / Benchmarks(도메인형 랜드스케이프) ── */
+/* ── 하위: Research 혼합 (Papers / Model Updates / Benchmarks 공용) ──
+   항목별 kind에 따라 도메인 섹션(랜드스케이프 카드) + 논문 섹션(목록)으로 나눠 표시.
+   도메인은 프론트 정적(StaticDomainLandscape). model-updates는 인기 순위표를 맨 위에 유지. */
 export function NDResearchLandscapePage({ page }: { page: string }) {
-  const [meta, setMeta] = useState<{ title: string; subtitle: string } | null>(null)
-  useEffect(() => { fetch("/research/pages.json").then((r) => r.json()).then((p) => setMeta(p[page] ?? null)).catch(() => setMeta(null)) }, [page])
+  const [meta, setMeta] = useState<{ title: string; subtitle: string; dom: number; art: number } | null>(null)
+  useEffect(() => {
+    setMeta(null)
+    Promise.all([
+      fetch("/research/entities.json").then((r) => r.json()),
+      fetch("/research/pages.json").then((r) => r.json()),
+    ])
+      .then(([ent, pages]: [{ items: { category: string; kind: string }[] }, Record<string, { title?: string; subtitle?: string }>]) => {
+        const its = ent.items.filter((x) => x.category === page)
+        setMeta({
+          title: pages[page]?.title ?? "Research",
+          subtitle: pages[page]?.subtitle ?? "",
+          dom: its.filter((x) => x.kind === "domain").length,
+          art: its.filter((x) => x.kind === "article").length,
+        })
+      })
+      .catch(() => setMeta({ title: "Research", subtitle: "", dom: 0, art: 0 }))
+  }, [page])
+
+  if (!meta) return <p className="text-[13px] text-[#9E97B3]">Loading…</p>
+
   return (
     <div className="max-w-[1160px]">
       <div className="max-w-[940px]">
-        <h1 className="m-0 mb-[4px] text-[30px] font-extrabold leading-[1.1] tracking-[-0.6px] text-[#1A1626]">{meta?.title ?? "Research"}</h1>
-        <p className="mb-[30px] text-[13.5px] text-[#9E97B3]">{meta?.subtitle}</p>
+        <h1 className="m-0 mb-[4px] text-[30px] font-extrabold leading-[1.1] tracking-[-0.6px] text-[#1A1626]">{meta.title}</h1>
+        {meta.subtitle && <p className="mb-[30px] text-[13.5px] text-[#9E97B3]">{meta.subtitle}</p>}
       </div>
 
-      {/* ① 순위 — Model Updates 전용 HuggingFace 인기 순위 표 (맨 위) */}
+      {/* 순위 — Model Updates 전용 HuggingFace 인기 순위 표 (맨 위) */}
       {page === "model-updates" && <ModelPopularityRank />}
 
-      {/* ② Rising Star (도메인형이라 stars 없으면 대표 1개 featured) */}
-      <div className="max-w-[940px]">
-        <div className="mb-4 mt-[36px] flex items-baseline gap-[10px]">
-          <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">Rising Star</h2>
-          <span className="text-[12.5px] text-[#9E97B3]">One to watch right now</span>
-        </div>
-        <RisingStar pageKey={page} />
-      </div>
+      {/* 도메인 섹션 (kind=domain) */}
+      {meta.dom > 0 && (
+        <>
+          <div className="mb-4 mt-[36px] flex items-baseline gap-[10px]">
+            <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">Landscape</h2>
+            <span className="text-[12.5px] text-[#9E97B3]">By group · click a card for details</span>
+          </div>
+          <StaticDomainLandscape base="research" page={page} />
+        </>
+      )}
 
-      {/* ③ Landscape */}
-      <div className="mb-4 mt-[52px] flex items-baseline gap-[10px]">
-        <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">Landscape</h2>
-        <span className="text-[12.5px] text-[#9E97B3]">Top groups × best 5 · click a card for details</span>
-      </div>
-      <LandscapeSection pageKey={page} />
+      {/* 논문 섹션 (kind=article) */}
+      {meta.art > 0 && (
+        <div className={`max-w-[940px] ${meta.dom > 0 || page === "model-updates" ? "mt-[52px]" : ""}`}>
+          <CasesArticleList base="research" page={page} kind="article" sectionTitle="Papers" />
+        </div>
+      )}
       <div className="h-8" aria-hidden />
     </div>
   )

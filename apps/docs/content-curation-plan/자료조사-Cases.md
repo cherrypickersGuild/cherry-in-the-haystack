@@ -1,5 +1,7 @@
 # 자료조사 재현 가이드 — Cases
 
+> ⚠️ 2026-08-01 갱신: 전수 재판정 결과 domain-applications 6건 정정(위) + 도메인 섹션 프론트 정적 렌더로 전환.
+
 다른 에이전트가 **동일한 방식으로 Cases 데이터를 재수집**할 수 있도록, 출처·수집법·JSON 구성을 기록한다.
 상위 방법론은 [`콘텐츠-수집-분류-페이지구성-방법론.md`](./콘텐츠-수집-분류-페이지구성-방법론.md) 참조.
 
@@ -39,8 +41,9 @@ kind = (source_type === "product") ? "domain" : "article"
 ```
 - article: `engineering-blog` · `blog` · `conference` · `paper`
 - domain : `product`
-- 결과: case-studies 543 article / domain-applications 43 article·104 domain / product-discovery 101 article·123 domain
+- 결과: case-studies 543 article / domain-applications 37 article·110 domain / product-discovery 101 article·123 domain
   → case-studies=기사 단일, 나머지 둘=혼합.
+  - 2026-08-01 전수 재판정: 기존 분류가 거의 정확. domain-applications에서 blog로 잘못 붙었던 실제 제품/서비스 페이지 6건을 article→domain 정정(예: SAS 보안 솔루션·CoScale·MarketingOptimizer·CRAN R 패키지·Athlycs·Modeling Agency). → 43/104 → 37/110.
 
 ## 4. summary(요약) — 실측 스크래핑 (지어내지 않음)
 
@@ -92,3 +95,4 @@ Case Studies 페이지 최상단에 대표 기사 1개를 픽해 보여준다(�
 
 - 랜드스케이프 생성(도메인형): `apps/api/scripts/generate-cases-landscape.cjs` (kind=domain만, 정규화, best5)
 - 화면: `apps/web/components/cherry/nd-cases-page.tsx`·`nd-cases-articles-page.tsx`·`nd-cases-best-page.tsx`
+- **도메인 섹션 렌더링(2026-08-01 전환)**: 혼합 분류(domain-applications·product-discovery)의 도메인 섹션은 **백엔드 랜드스케이프 API → 프론트 정적 `StaticDomainLandscape`**(`nd-landscape` 소재, `nd-cases-best-page.tsx`에서 사용)로 전환. 도메인 카드 + `CasesArticleList kind="article"` 기사 목록 구조는 유지. 카드는 최대 5줄(4줄 + "+N more"), 카드 클릭 시 모달로 전체 표시.

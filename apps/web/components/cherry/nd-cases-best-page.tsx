@@ -1,6 +1,6 @@
 "use client"
 
-import { LandscapeSection, RisingStar } from "./nd-landscape"
+import { StaticDomainLandscape } from "./nd-landscape"
 import { CasesArticleList } from "./nd-cases-articles-page"
 
 /**
@@ -33,21 +33,12 @@ export function NDCasesBestPage({ category }: { category: string }) {
         <p className="mb-[30px] text-[13.5px] text-[#9E97B3]">{t.sub}</p>
       </div>
 
-      {/* ① Rising Star — 맨 위 (Frameworks Best와 동일 양식). 도메인형이라 stars 없으면 대표 1개 featured. */}
-      <div className="max-w-[940px]">
-        <div className="mb-4 mt-[28px] flex items-baseline gap-[10px]">
-          <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">Rising Star</h2>
-          <span className="text-[12.5px] text-[#9E97B3]">One to watch right now</span>
-        </div>
-        <RisingStar pageKey={category} />
-      </div>
-
-      {/* ② 도메인형 — 랜드스케이프 (kind=domain) */}
-      <div className="mb-4 mt-[52px] flex items-baseline gap-[10px]">
+      {/* 도메인형 — 프론트 정적 랜드스케이프 (kind=domain) */}
+      <div className="mb-4 mt-[8px] flex items-baseline gap-[10px]">
         <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">{t.domainLabel}</h2>
-        <span className="text-[12.5px] text-[#9E97B3]">Top domains × best 5 · click a card for details</span>
+        <span className="text-[12.5px] text-[#9E97B3]">By domain · click a card for details</span>
       </div>
-      <LandscapeSection pageKey={category} />
+      <StaticDomainLandscape base="cases" page={category} />
 
       {/* ② 기사형 — 관련 기사 목록 (kind=article) */}
       <div className="mt-[52px] max-w-[940px]">

@@ -9509,8 +9509,7 @@
       "url": "https://eng.uber.com/monitoring-data-quality-at-scale/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-monitoring-data-quality-at-scale-with-statis",
-      "summary": "Engineering write-up (Data Quality) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-monitoring-data-quality-at-scale-with-statis"
     },
     {
       "kind": "article",
@@ -9524,8 +9523,7 @@
       "url": "https://research.google/pubs/pub46178/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-data-management-challenges-in-production-mac",
-      "summary": "Engineering write-up (Data Quality) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-data-management-challenges-in-production-mac"
     },
     {
       "kind": "article",
@@ -9554,8 +9552,7 @@
       "url": "https://www.gojek.io/blog/meet-hodor-gojeks-upstream-data-quality-tool",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-meet-hodor-gojek-s-upstream-data-quality-too",
-      "summary": "Full write-up on Data Quality available at the source — open the link to read."
+      "id": "dsc-tec-meet-hodor-gojek-s-upstream-data-quality-too"
     },
     {
       "kind": "article",
@@ -9569,8 +9566,7 @@
       "url": "https://research.google/pubs/pub47967/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-data-validation-for-machine-learning",
-      "summary": "Engineering write-up (Data Quality) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-data-validation-for-machine-learning"
     },
     {
       "kind": "article",
@@ -9629,8 +9625,7 @@
       "url": "https://eng.uber.com/money-scale-strong-data/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-revolutionizing-money-movements-at-scale-wit",
-      "summary": "Engineering write-up (Data Engineering) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-revolutionizing-money-movements-at-scale-wit"
     },
     {
       "kind": "article",
@@ -9839,8 +9834,7 @@
       "url": "https://eng.uber.com/databook/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-databook-turning-big-data-into-knowledge-wit",
-      "summary": "Engineering write-up (Data Discovery) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-databook-turning-big-data-into-knowledge-wit"
     },
     {
       "kind": "article",
@@ -9899,8 +9893,7 @@
       "url": "https://engineering.linkedin.com/blog/2019/data-hub",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-datahub-a-generalized-metadata-search-discov",
-      "summary": "Engineering write-up (Data Discovery) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-datahub-a-generalized-metadata-search-discov"
     },
     {
       "kind": "article",
@@ -9944,8 +9937,7 @@
       "url": "https://eng.uber.com/metadata-insights-databook/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-turning-metadata-into-insights-with-databook",
-      "summary": "Engineering write-up (Data Discovery) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-turning-metadata-into-insights-with-databook"
     },
     {
       "kind": "article",
@@ -9959,8 +9951,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/datahub-popular-metadata-architectures-explained",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-datahub-popular-metadata-architectures-expla",
-      "summary": "Engineering write-up (Data Discovery) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-datahub-popular-metadata-architectures-expla"
     },
     {
       "kind": "article",
@@ -10049,8 +10040,7 @@
       "url": "https://engineering.linkedin.com/blog/2017/07/building-the-activity-graph--part-2",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-building-the-activity-graph-part-2-feature-s",
-      "summary": "Engineering write-up (Feature Stores) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-building-the-activity-graph-part-2-feature-s"
     },
     {
       "kind": "article",
@@ -10109,8 +10099,7 @@
       "url": "https://technology.condenast.com/story/accelerating-machine-learning-with-the-feature-store-service",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-accelerating-machine-learning-with-the-featu",
-      "summary": "Full write-up on Feature Stores available at the source — open the link to read."
+      "id": "dsc-tec-accelerating-machine-learning-with-the-featu"
     },
     {
       "kind": "article",
@@ -10124,8 +10113,7 @@
       "url": "https://www.gojek.io/blog/feast-bridging-ml-models-and-data",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-feast-bridging-ml-models-and-data",
-      "summary": "Full write-up on Feature Stores available at the source — open the link to read."
+      "id": "dsc-tec-feast-bridging-ml-models-and-data"
     },
     {
       "kind": "article",
@@ -10154,8 +10142,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/feed-typed-ai-features",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-rapid-experimentation-through-standardizatio",
-      "summary": "Engineering write-up (Feature Stores) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-rapid-experimentation-through-standardizatio"
     },
     {
       "kind": "article",
@@ -10214,8 +10201,7 @@
       "url": "https://eng.uber.com/optimal-feature-discovery-ml/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-optimal-feature-discovery-better-leaner-mach",
-      "summary": "Engineering write-up (Feature Stores) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-optimal-feature-discovery-better-leaner-mach"
     },
     {
       "kind": "article",
@@ -10244,8 +10230,7 @@
       "url": "https://engineering.linkedin.com/blog/2022/near-real-time-features-for-near-real-time-personalization",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-near-real-time-features-for-near-real-time-p",
-      "summary": "Engineering write-up (Feature Stores) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-near-real-time-features-for-near-real-time-p"
     },
     {
       "kind": "article",
@@ -10259,8 +10244,7 @@
       "url": "https://engineering.linkedin.com/blog/2022/open-sourcing-feathr---linkedin-s-feature-store-for-productive-m",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-open-sourcing-feathr-linkedin-s-feature-stor",
-      "summary": "Engineering write-up (Feature Stores) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-open-sourcing-feathr-linkedin-s-feature-stor"
     },
     {
       "kind": "article",
@@ -10319,8 +10303,7 @@
       "url": "https://research.google/pubs/pub36678/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-prediction-of-advertiser-churn-for-google-ad",
-      "summary": "Engineering write-up (Classification) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-prediction-of-advertiser-churn-for-google-ad"
     },
     {
       "kind": "article",
@@ -10334,8 +10317,7 @@
       "url": "https://engineering.linkedin.com/research/2011/high-precision-phrase-based-document-classification-on-a-modern-scale",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-high-precision-phrase-based-document-classif",
-      "summary": "Engineering write-up (Classification) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-high-precision-phrase-based-document-classif"
     },
     {
       "kind": "article",
@@ -10349,8 +10331,7 @@
       "url": "https://dl.acm.org/doi/10.14778/2733004.2733024",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-chimera-large-scale-classification-using-mac",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-chimera-large-scale-classification-using-mac"
     },
     {
       "kind": "article",
@@ -10484,8 +10465,7 @@
       "url": "https://dl.acm.org/doi/10.1145/2396761.2396838",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-large-scale-item-categorization-for-e-commer",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-large-scale-item-categorization-for-e-commer"
     },
     {
       "kind": "article",
@@ -10559,8 +10539,7 @@
       "url": "https://eng.uber.com/neural-networks/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-engineering-extreme-event-forecasting-at-ube",
-      "summary": "Engineering write-up (Forecasting) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-engineering-extreme-event-forecasting-at-ube"
     },
     {
       "kind": "article",
@@ -10574,8 +10553,7 @@
       "url": "https://eng.uber.com/forecasting-introduction/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-forecasting-at-uber-an-introduction",
-      "summary": "Engineering write-up (Forecasting) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-forecasting-at-uber-an-introduction"
     },
     {
       "kind": "article",
@@ -10589,8 +10567,7 @@
       "url": "https://eng.uber.com/transforming-financial-forecasting-machine-learning/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-transforming-financial-forecasting-with-data",
-      "summary": "Engineering write-up (Forecasting) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-transforming-financial-forecasting-with-data"
     },
     {
       "kind": "article",
@@ -10634,8 +10611,7 @@
       "url": "https://eng.uber.com/orbit/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-introducing-orbit-an-open-source-package-for",
-      "summary": "Engineering write-up (Forecasting) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-introducing-orbit-an-open-source-package-for"
     },
     {
       "kind": "article",
@@ -10649,8 +10625,7 @@
       "url": "https://engineering.linkedin.com/blog/2021/greykite--a-flexible--intuitive--and-fast-forecasting-library",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-greykite-a-flexible-intuitive-and-fast-forec",
-      "summary": "Engineering write-up (Forecasting) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-greykite-a-flexible-intuitive-and-fast-forec"
     },
     {
       "kind": "article",
@@ -10679,8 +10654,7 @@
       "url": "https://eng.uber.com/deepeta-how-uber-predicts-arrival-times/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-deepeta-how-uber-predicts-arrival-times-usin",
-      "summary": "Engineering write-up (Forecasting) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-deepeta-how-uber-predicts-arrival-times-usin"
     },
     {
       "kind": "article",
@@ -10694,8 +10668,7 @@
       "url": "https://ieeexplore.ieee.org/document/1167344",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-amazon-com-recommendations-item-to-item-coll",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-amazon-com-recommendations-item-to-item-coll"
     },
     {
       "kind": "article",
@@ -10724,8 +10697,7 @@
       "url": "https://notes.variogram.com/2012/12/11/how-music-recommendation-works-and-doesnt-work/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-how-music-recommendation-works-and-doesn-t-w",
-      "summary": "Full write-up on Recommendation available at the source — open the link to read."
+      "id": "dsc-tec-how-music-recommendation-works-and-doesn-t-w"
     },
     {
       "kind": "article",
@@ -10739,8 +10711,7 @@
       "url": "https://dl.acm.org/doi/10.1145/2507157.2507210",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-learning-to-rank-recommendations-with-the-k-",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-learning-to-rank-recommendations-with-the-k-"
     },
     {
       "kind": "article",
@@ -10814,8 +10785,7 @@
       "url": "https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/45530.pdf",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-deep-neural-networks-for-youtube-recommendat",
-      "summary": "Full write-up on Recommendation available at the source — open the link to read."
+      "id": "dsc-tec-deep-neural-networks-for-youtube-recommendat"
     },
     {
       "kind": "article",
@@ -10859,8 +10829,7 @@
       "url": "https://engineering.linkedin.com/blog/2016/12/personalized-recommendations-in-linkedin-learning",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-personalized-recommendations-in-linkedin-lea",
-      "summary": "Engineering write-up (Recommendation) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-personalized-recommendations-in-linkedin-lea"
     },
     {
       "kind": "article",
@@ -10919,8 +10888,7 @@
       "url": "https://papers.nips.cc/paper/7266-a-meta-learning-perspective-on-cold-start-recommendations-for-items",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-a-meta-learning-perspective-on-cold-start-re",
-      "summary": "Full write-up on Recommendation available at the source — open the link to read."
+      "id": "dsc-tec-a-meta-learning-perspective-on-cold-start-re"
     },
     {
       "kind": "article",
@@ -10964,8 +10932,7 @@
       "url": "https://cloud.google.com/blog/products/ai-machine-learning/how-20th-century-fox-uses-ml-to-predict-a-movie-audience",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-how-20th-century-fox-uses-ml-to-predict-a-mo",
-      "summary": "Full write-up on Recommendation available at the source — open the link to read."
+      "id": "dsc-tec-how-20th-century-fox-uses-ml-to-predict-a-mo"
     },
     {
       "kind": "article",
@@ -10979,8 +10946,7 @@
       "url": "https://dl.acm.org/doi/10.1145/3240323.3240372",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-calibrated-recommendations",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-calibrated-recommendations"
     },
     {
       "kind": "article",
@@ -10994,8 +10960,7 @@
       "url": "https://eng.uber.com/uber-eats-recommending-marketplace/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-food-discovery-with-uber-eats-recommending-f",
-      "summary": "Engineering write-up (Recommendation) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-food-discovery-with-uber-eats-recommending-f"
     },
     {
       "kind": "article",
@@ -11009,8 +10974,7 @@
       "url": "https://dl.acm.org/doi/10.1145/3240323.3240354",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-explore-exploit-and-explain-personalizing-ex",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-explore-exploit-and-explain-personalizing-ex"
     },
     {
       "kind": "article",
@@ -11084,8 +11048,7 @@
       "url": "https://www.tripadvisor.com/engineering/personalized-recommendations-for-experiences-using-deep-learning/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-personalized-recommendations-for-experiences",
-      "summary": "Full write-up on Recommendation available at the source — open the link to read."
+      "id": "dsc-tec-personalized-recommendations-for-experiences"
     },
     {
       "kind": "article",
@@ -11099,8 +11062,7 @@
       "url": "https://ai.facebook.com/blog/powered-by-ai-instagrams-explore-recommender-system/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-powered-by-ai-instagram-s-explore-recommende",
-      "summary": "Full write-up on Recommendation available at the source — open the link to read."
+      "id": "dsc-tec-powered-by-ai-instagram-s-explore-recommende"
     },
     {
       "kind": "article",
@@ -11129,8 +11091,7 @@
       "url": "https://eng.uber.com/uber-eats-graph-learning/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-food-discovery-with-uber-eats-using-graph-le",
-      "summary": "Engineering write-up (Recommendation) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-food-discovery-with-uber-eats-using-graph-le"
     },
     {
       "kind": "article",
@@ -11144,8 +11105,7 @@
       "url": "http://sigir.org/afirm2019/slides/16.%20Friday%20-%20Music%20Recommendation%20at%20Spotify%20-%20Ben%20Carterette.pdf",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-music-recommendation-at-spotify",
-      "summary": "Full write-up on Recommendation available at the source — open the link to read."
+      "id": "dsc-tec-music-recommendation-at-spotify"
     },
     {
       "kind": "article",
@@ -11159,8 +11119,7 @@
       "url": "https://dropbox.tech/machine-learning/using-machine-learning-to-predict-what-file-you-need-next-part-2",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-using-machine-learning-to-predict-what-file-",
-      "summary": "Full write-up on Recommendation available at the source — open the link to read."
+      "id": "dsc-tec-using-machine-learning-to-predict-what-file-"
     },
     {
       "kind": "article",
@@ -11174,8 +11133,7 @@
       "url": "https://dl.acm.org/doi/pdf/10.1145/3357384.3357817",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-learning-to-be-relevant-evolution-of-a-cours",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-learning-to-be-relevant-evolution-of-a-cours"
     },
     {
       "kind": "article",
@@ -11204,8 +11162,7 @@
       "url": "https://www.amazon.science/publications/p-companion-a-principled-framework-for-diversified-complementary-product-recommendation",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-p-companion-a-framework-for-diversified-comp",
-      "summary": "Full write-up on Recommendation available at the source — open the link to read."
+      "id": "dsc-tec-p-companion-a-framework-for-diversified-comp"
     },
     {
       "kind": "article",
@@ -11249,8 +11206,7 @@
       "url": "https://dl.acm.org/doi/10.1145/3383313.3412238",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-purs-personalized-unexpected-recommender-sys",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-purs-personalized-unexpected-recommender-sys"
     },
     {
       "kind": "article",
@@ -11339,8 +11295,7 @@
       "url": "https://dl.acm.org/doi/10.1145/3383313.3412248",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-contextual-and-sequential-user-embeddings-fo",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-contextual-and-sequential-user-embeddings-fo"
     },
     {
       "kind": "article",
@@ -11369,8 +11324,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/building-a-heterogeneous-social-network-recommendation-system",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-building-a-heterogeneous-social-network-reco",
-      "summary": "Engineering write-up (Recommendation) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-building-a-heterogeneous-social-network-reco"
     },
     {
       "kind": "article",
@@ -11429,8 +11383,7 @@
       "url": "https://research.google/pubs/pub50257/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-mixed-negative-sampling-for-learning-two-tow",
-      "summary": "Engineering write-up (Recommendation) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-mixed-negative-sampling-for-learning-two-tow"
     },
     {
       "kind": "article",
@@ -11459,8 +11412,7 @@
       "url": "https://dl.acm.org/doi/10.1145/3383313.3412235",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-a-case-study-of-session-based-recommendation",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-a-case-study-of-session-based-recommendation"
     },
     {
       "kind": "article",
@@ -11474,8 +11426,7 @@
       "url": "https://dl.acm.org/doi/10.1145/3383313.3411550",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-balancing-relevance-and-discovery-to-inspire",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-balancing-relevance-and-discovery-to-inspire"
     },
     {
       "kind": "article",
@@ -11879,8 +11830,7 @@
       "url": "https://eng.uber.com/uber-eats-query-understanding/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-food-discovery-with-uber-eats-building-a-que",
-      "summary": "Engineering write-up (Search & Ranking) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-food-discovery-with-uber-eats-building-a-que"
     },
     {
       "kind": "article",
@@ -11954,8 +11904,7 @@
       "url": "https://engineering.linkedin.com/blog/2019/04/ai-behind-linkedin-recruiter-search-and-recommendation-systems",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-the-ai-behind-linkedin-recruiter-search-and-",
-      "summary": "Engineering write-up (Search & Ranking) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-the-ai-behind-linkedin-recruiter-search-and-"
     },
     {
       "kind": "article",
@@ -11969,8 +11918,7 @@
       "url": "https://engineering.linkedin.com/blog/2019/02/learning-hiring-preferences--the-ai-behind-linkedin-jobs",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-learning-hiring-preferences-the-ai-behind-li",
-      "summary": "Engineering write-up (Search & Ranking) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-learning-hiring-preferences-the-ai-behind-li"
     },
     {
       "kind": "article",
@@ -11984,8 +11932,7 @@
       "url": "https://ai.facebook.com/blog/neural-code-search-ml-based-code-search-using-natural-language-queries/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-neural-code-search-ml-based-code-search-usin",
-      "summary": "Full write-up on Search & Ranking available at the source — open the link to read."
+      "id": "dsc-tec-neural-code-search-ml-based-code-search-usin"
     },
     {
       "kind": "article",
@@ -12014,8 +11961,7 @@
       "url": "https://dl.acm.org/doi/10.1145/3357384.3357809",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-cross-domain-attention-network-with-wasserst",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-cross-domain-attention-network-with-wasserst"
     },
     {
       "kind": "article",
@@ -12059,8 +12005,7 @@
       "url": "https://bytes.grubhub.com/search-query-embeddings-using-query2vec-f5931df27d79",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-query2vec-search-query-expansion-with-query-",
-      "summary": "Full write-up on Search & Ranking available at the source — open the link to read."
+      "id": "dsc-tec-query2vec-search-query-expansion-with-query-"
     },
     {
       "kind": "article",
@@ -12074,8 +12019,7 @@
       "url": "http://research.baidu.com/Public/uploads/5d12eca098d40.pdf",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-mobius-towards-the-next-generation-of-query-",
-      "summary": "Full write-up on Search & Ranking available at the source — open the link to read."
+      "id": "dsc-tec-mobius-towards-the-next-generation-of-query-"
     },
     {
       "kind": "article",
@@ -12134,8 +12078,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/quality-matches-via-personalized-ai",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-quality-matches-via-personalized-ai-for-hire",
-      "summary": "Engineering write-up (Search & Ranking) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-quality-matches-via-personalized-ai-for-hire"
     },
     {
       "kind": "article",
@@ -12149,8 +12092,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/understanding-feed-dwell-time",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-understanding-dwell-time-to-improve-linkedin",
-      "summary": "Engineering write-up (Search & Ranking) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-understanding-dwell-time-to-improve-linkedin"
     },
     {
       "kind": "article",
@@ -12164,8 +12106,7 @@
       "url": "https://dl.acm.org/doi/abs/10.1145/3394486.3403391",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-ads-allocation-in-feed-via-constrained-optim",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-ads-allocation-in-feed-via-constrained-optim"
     },
     {
       "kind": "article",
@@ -12209,8 +12150,7 @@
       "url": "https://tech.wayfair.com/data-science/2020/01/bayesian-product-ranking-at-wayfair",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-bayesian-product-ranking-at-wayfair",
-      "summary": "Full write-up on Search & Ranking available at the source — open the link to read."
+      "id": "dsc-tec-bayesian-product-ranking-at-wayfair"
     },
     {
       "kind": "article",
@@ -12239,8 +12179,7 @@
       "url": "https://dl.acm.org/doi/abs/10.1145/3394486.3403372",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-shop-the-look-building-a-large-scale-visual-",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-shop-the-look-building-a-large-scale-visual-"
     },
     {
       "kind": "article",
@@ -12269,8 +12208,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/gdmix--a-deep-ranking-personalization-framework",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-gdmix-a-deep-ranking-personalization-framewo",
-      "summary": "Engineering write-up (Search & Ranking) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-gdmix-a-deep-ranking-personalization-framewo"
     },
     {
       "kind": "article",
@@ -12284,8 +12222,7 @@
       "url": "https://codeascraft.com/2020/10/29/bringing-personalized-search-to-etsy/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-bringing-personalized-search-to-etsy",
-      "summary": "Full write-up on Search & Ranking available at the source — open the link to read."
+      "id": "dsc-tec-bringing-personalized-search-to-etsy"
     },
     {
       "kind": "article",
@@ -12419,8 +12356,7 @@
       "url": "https://codeascraft.com/2021/03/23/how-we-built-a-context-specific-bidding-system-for-etsy-ads/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-how-we-built-a-context-specific-bidding-syst",
-      "summary": "Full write-up on Search & Ranking available at the source — open the link to read."
+      "id": "dsc-tec-how-we-built-a-context-specific-bidding-syst"
     },
     {
       "kind": "article",
@@ -12524,8 +12460,7 @@
       "url": "https://www.etsy.com/codeascraft/deep-learning-for-search-ranking-at-etsy",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-deep-learning-for-search-ranking-at-etsy",
-      "summary": "Full write-up on Search & Ranking available at the source — open the link to read."
+      "id": "dsc-tec-deep-learning-for-search-ranking-at-etsy"
     },
     {
       "kind": "article",
@@ -12539,8 +12474,7 @@
       "url": "https://eng.calm.com/posts/search-at-calm",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-search-at-calm",
-      "summary": "Full write-up on Search & Ranking available at the source — open the link to read."
+      "id": "dsc-tec-search-at-calm"
     },
     {
       "kind": "article",
@@ -12719,8 +12653,7 @@
       "url": "https://dl.acm.org/doi/10.1145/3383313.3411477",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-the-embeddings-that-came-in-from-the-cold-im",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-the-embeddings-that-came-in-from-the-cold-im"
     },
     {
       "kind": "article",
@@ -12764,8 +12697,7 @@
       "url": "https://dl.acm.org/doi/10.1145/2872427.2883062",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-abusive-language-detection-in-online-user-co",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-abusive-language-detection-in-online-user-co"
     },
     {
       "kind": "article",
@@ -12779,8 +12711,7 @@
       "url": "https://research.google/pubs/pub45189/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-smart-reply-automated-response-suggestion-fo",
-      "summary": "Engineering write-up (Natural Language Processing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-smart-reply-automated-response-suggestion-fo"
     },
     {
       "kind": "article",
@@ -12794,8 +12725,7 @@
       "url": "https://engineering.linkedin.com/blog/2017/10/building-smart-replies-for-member-messages",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-building-smart-replies-for-member-messages",
-      "summary": "Engineering write-up (Natural Language Processing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-building-smart-replies-for-member-messages"
     },
     {
       "kind": "article",
@@ -12809,8 +12739,7 @@
       "url": "https://engineering.linkedin.com/blog/2019/04/how-natural-language-processing-help-support",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-how-natural-language-processing-helps-linked",
-      "summary": "Engineering write-up (Natural Language Processing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-how-natural-language-processing-helps-linked"
     },
     {
       "kind": "article",
@@ -12854,8 +12783,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/open-sourcing-detext",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-detext-a-deep-nlp-framework-for-intelligent-",
-      "summary": "Engineering write-up (Natural Language Processing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-detext-a-deep-nlp-framework-for-intelligent-"
     },
     {
       "kind": "article",
@@ -13019,8 +12947,7 @@
       "url": "http://research.baidu.com/Blog/index-view?id=142",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-the-state-of-the-art-open-domain-chatbot-in-",
-      "summary": "Full write-up on Natural Language Processing available at the source — open the link to read."
+      "id": "dsc-tec-the-state-of-the-art-open-domain-chatbot-in-"
     },
     {
       "kind": "article",
@@ -13064,8 +12991,7 @@
       "url": "https://blog.einstein.ai/gedi/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-gedi-a-powerful-new-method-for-controlling-l",
-      "summary": "Full write-up on Natural Language Processing available at the source — open the link to read."
+      "id": "dsc-tec-gedi-a-powerful-new-method-for-controlling-l"
     },
     {
       "kind": "article",
@@ -13304,8 +13230,7 @@
       "url": "https://engineering.linkedin.com/blog/2021/using-deep-learning-to-detect-abusive-sequences-of-member-activi",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-using-deep-learning-to-detect-abusive-sequen",
-      "summary": "Engineering write-up (Sequence Modelling) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-using-deep-learning-to-detect-abusive-sequen"
     },
     {
       "kind": "article",
@@ -13319,8 +13244,7 @@
       "url": "https://dropbox.tech/machine-learning/creating-a-modern-ocr-pipeline-using-computer-vision-and-deep-learning",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-creating-a-modern-ocr-pipeline-using-compute",
-      "summary": "Full write-up on Computer Vision available at the source — open the link to read."
+      "id": "dsc-tec-creating-a-modern-ocr-pipeline-using-compute"
     },
     {
       "kind": "article",
@@ -13364,8 +13288,7 @@
       "url": "https://deepomatic.com/en/how-we-improved-computer-vision-metrics-by-more-than-5-percent-only-by-cleaning-labelling-errors/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-how-we-improved-computer-vision-metrics-by-m",
-      "summary": "Full write-up on Computer Vision available at the source — open the link to read."
+      "id": "dsc-tec-how-we-improved-computer-vision-metrics-by-m"
     },
     {
       "kind": "article",
@@ -13754,8 +13677,7 @@
       "url": "https://dennybritz.com/blog/ai-trading/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-building-ai-trading-systems",
-      "summary": "Full write-up on Reinforcement Learning available at the source — open the link to read."
+      "id": "dsc-tec-building-ai-trading-systems"
     },
     {
       "kind": "article",
@@ -13829,8 +13751,7 @@
       "url": "https://engineering.linkedin.com/blog/2019/isolation-forest",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-detecting-and-preventing-abuse-on-linkedin-u",
-      "summary": "Engineering write-up (Anomaly Detection) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-detecting-and-preventing-abuse-on-linkedin-u"
     },
     {
       "kind": "article",
@@ -13859,8 +13780,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/fighting-harassment",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-the-technology-behind-fighting-harassment-on",
-      "summary": "Engineering write-up (Anomaly Detection) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-the-technology-behind-fighting-harassment-on"
     },
     {
       "kind": "article",
@@ -13904,8 +13824,7 @@
       "url": "https://www.usenix.org/conference/opml20/presentation/ueta",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-auto-content-moderation-in-c2c-e-commerce",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-auto-content-moderation-in-c2c-e-commerce"
     },
     {
       "kind": "article",
@@ -13949,8 +13868,7 @@
       "url": "https://eng.uber.com/project-radar-intelligent-early-fraud-detection/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-project-radar-intelligent-early-fraud-detect",
-      "summary": "Engineering write-up (Anomaly Detection) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-project-radar-intelligent-early-fraud-detect"
     },
     {
       "kind": "article",
@@ -14009,8 +13927,7 @@
       "url": "https://engineering.linkedin.com/blog/2016/10/building-the-linkedin-knowledge-graph",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-building-the-linkedin-knowledge-graph",
-      "summary": "Engineering write-up (Graph) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-building-the-linkedin-knowledge-graph"
     },
     {
       "kind": "article",
@@ -14114,8 +14031,7 @@
       "url": "https://dl.acm.org/doi/10.1145/3394486.3403370",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-simclusters-community-based-representations-",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-simclusters-community-based-representations-"
     },
     {
       "kind": "article",
@@ -14144,8 +14060,7 @@
       "url": "https://ojs.aaai.org/index.php/AAAI/article/view/17796",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-jel-applying-end-to-end-neural-entity-linkin",
-      "summary": "Full write-up on Graph available at the source — open the link to read."
+      "id": "dsc-tec-jel-applying-end-to-end-neural-entity-linkin"
     },
     {
       "kind": "article",
@@ -14159,8 +14074,7 @@
       "url": "https://www.amazon.science/blog/how-aws-uses-graph-neural-networks-to-meet-customer-needs",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-how-aws-uses-graph-neural-networks-to-meet-c",
-      "summary": "Full write-up on Graph available at the source — open the link to read."
+      "id": "dsc-tec-how-aws-uses-graph-neural-networks-to-meet-c"
     },
     {
       "kind": "article",
@@ -14189,8 +14103,7 @@
       "url": "https://ieeexplore.ieee.org/document/8259801",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-the-data-and-science-behind-grabshare-carpoo",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-the-data-and-science-behind-grabshare-carpoo"
     },
     {
       "kind": "article",
@@ -14204,8 +14117,7 @@
       "url": "https://eng.uber.com/uber-eats-trip-optimization/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-how-trip-inferences-and-machine-learning-opt",
-      "summary": "Engineering write-up (Optimization) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-how-trip-inferences-and-machine-learning-opt"
     },
     {
       "kind": "article",
@@ -14264,8 +14176,7 @@
       "url": "https://dropbox.tech/machine-learning/using-machine-learning-to-index-text-from-billions-of-images",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-using-machine-learning-to-index-text-from-bi",
-      "summary": "Full write-up on Information Extraction available at the source — open the link to read."
+      "id": "dsc-tec-using-machine-learning-to-index-text-from-bi"
     },
     {
       "kind": "article",
@@ -14339,8 +14250,7 @@
       "url": "https://dl.acm.org/doi/abs/10.1145/3299869.3314036",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-snorkel-drybell-a-case-study-in-deploying-we",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-snorkel-drybell-a-case-study-in-deploying-we"
     },
     {
       "kind": "article",
@@ -14354,8 +14264,7 @@
       "url": "https://dl.acm.org/doi/abs/10.1145/3329486.3329492",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-osprey-weak-supervision-of-imbalanced-extrac",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-osprey-weak-supervision-of-imbalanced-extrac"
     },
     {
       "kind": "article",
@@ -14384,8 +14293,7 @@
       "url": "https://www.aaai.org/ojs/index.php/AAAI/article/view/5011",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-bootstrapping-conversational-agents-with-wea",
-      "summary": "Full write-up on Weak Supervision available at the source — open the link to read."
+      "id": "dsc-tec-bootstrapping-conversational-agents-with-wea"
     },
     {
       "kind": "article",
@@ -14444,8 +14352,7 @@
       "url": "https://graphics.pixar.com/library/SuperResolution/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-deep-learned-super-resolution-for-feature-fi",
-      "summary": "Full write-up on Generation available at the source — open the link to read."
+      "id": "dsc-tec-deep-learned-super-resolution-for-feature-fi"
     },
     {
       "kind": "article",
@@ -14549,8 +14456,7 @@
       "url": "https://research.google/pubs/pub36500/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-overlapping-experiment-infrastructure-more-b",
-      "summary": "Engineering write-up (Validation and A/B Testing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-overlapping-experiment-infrastructure-more-b"
     },
     {
       "kind": "article",
@@ -14639,8 +14545,7 @@
       "url": "https://eng.uber.com/experimentation-platform/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-building-an-intelligent-experimentation-plat",
-      "summary": "Engineering write-up (Validation and A/B Testing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-building-an-intelligent-experimentation-plat"
     },
     {
       "kind": "article",
@@ -14684,8 +14589,7 @@
       "url": "https://eng.uber.com/analyzing-experiment-outcomes/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-analyzing-experiment-outcomes-beyond-average",
-      "summary": "Engineering write-up (Validation and A/B Testing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-analyzing-experiment-outcomes-beyond-average"
     },
     {
       "kind": "article",
@@ -14699,8 +14603,7 @@
       "url": "https://eng.uber.com/xp/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-under-the-hood-of-uber-s-experimentation-pla",
-      "summary": "Engineering write-up (Validation and A/B Testing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-under-the-hood-of-uber-s-experimentation-pla"
     },
     {
       "kind": "article",
@@ -14744,8 +14647,7 @@
       "url": "https://better.engineering/modeling-conversion-rates-and-saving-millions-of-dollars-using-kaplan-meier-and-gamma-distributions/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-modeling-conversion-rates-and-saving-million",
-      "summary": "Full write-up on Validation and A/B Testing available at the source — open the link to read."
+      "id": "dsc-tec-modeling-conversion-rates-and-saving-million"
     },
     {
       "kind": "article",
@@ -14759,8 +14661,7 @@
       "url": "https://engineering.linkedin.com/blog/2019/06/detecting-interference--an-a-b-test-of-a-b-tests",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-detecting-interference-an-a-b-test-of-a-b-te",
-      "summary": "Engineering write-up (Validation and A/B Testing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-detecting-interference-an-a-b-test-of-a-b-te"
     },
     {
       "kind": "article",
@@ -14774,8 +14675,7 @@
       "url": "https://eng.uber.com/oed-pyro-release/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-announcing-a-new-framework-for-designing-opt",
-      "summary": "Engineering write-up (Validation and A/B Testing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-announcing-a-new-framework-for-designing-opt"
     },
     {
       "kind": "article",
@@ -14879,8 +14779,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/making-the-linkedin-experimentation-engine-20x-faster",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-making-the-linkedin-experimentation-engine-2",
-      "summary": "Engineering write-up (Validation and A/B Testing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-making-the-linkedin-experimentation-engine-2"
     },
     {
       "kind": "article",
@@ -14894,8 +14793,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/our-evolution-towards-t-rex--the-prehistory-of-experimentation-i",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-our-evolution-towards-t-rex-the-prehistory-o",
-      "summary": "Engineering write-up (Validation and A/B Testing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-our-evolution-towards-t-rex-the-prehistory-o"
     },
     {
       "kind": "article",
@@ -14939,8 +14837,7 @@
       "url": "https://doordash.engineering/2020/09/09/experimentation-analysis-platform-mvp/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-supporting-rapid-product-iteration-with-an-e",
-      "summary": "Full write-up on Validation and A/B Testing available at the source — open the link to read."
+      "id": "dsc-tec-supporting-rapid-product-iteration-with-an-e"
     },
     {
       "kind": "article",
@@ -15224,8 +15121,7 @@
       "url": "https://booking.ai/overtracking-and-trigger-analysis-how-to-reduce-sample-sizes-and-increase-the-sensitivity-of-71755bad0e5f",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-overtracking-and-trigger-analysis-reducing-s",
-      "summary": "Full write-up on Validation and A/B Testing available at the source — open the link to read."
+      "id": "dsc-tec-overtracking-and-trigger-analysis-reducing-s"
     },
     {
       "kind": "article",
@@ -15269,8 +15165,7 @@
       "url": "https://www.uber.com/blog/supercharging-a-b-testing-at-uber/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-supercharging-a-b-testing-at-uber",
-      "summary": "Engineering write-up (Validation and A/B Testing) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-supercharging-a-b-testing-at-uber"
     },
     {
       "kind": "article",
@@ -15299,8 +15194,7 @@
       "url": "https://www.usenix.org/conference/opml20/presentation/cepoi",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-runway-model-lifecycle-management-at-netflix",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-runway-model-lifecycle-management-at-netflix"
     },
     {
       "kind": "article",
@@ -15314,8 +15208,7 @@
       "url": "https://www.usenix.org/conference/opml20/presentation/wenzel",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-managing-ml-models-scale-intuit-s-ml-platfor",
-      "summary": "Research paper — open the source link for the abstract and full text."
+      "id": "dsc-tec-managing-ml-models-scale-intuit-s-ml-platfor"
     },
     {
       "kind": "article",
@@ -15404,8 +15297,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/building-inclusive-products-through-a-b-testing",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-building-inclusive-products-through-a-b-test",
-      "summary": "Engineering write-up (Ethics) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-building-inclusive-products-through-a-b-test"
     },
     {
       "kind": "article",
@@ -15419,8 +15311,7 @@
       "url": "https://engineering.linkedin.com/blog/2020/lift-addressing-bias-in-large-scale-ai-applications",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-lift-a-scalable-framework-for-measuring-fair",
-      "summary": "Engineering write-up (Ethics) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-lift-a-scalable-framework-for-measuring-fair"
     },
     {
       "kind": "article",
@@ -15464,8 +15355,7 @@
       "url": "https://engineering.linkedin.com/blog/2022/a-closer-look-at-how-linkedin-integrates-fairness-into-its-ai-pr",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-a-closer-look-at-how-linkedin-integrates-fai",
-      "summary": "Engineering write-up (Ethics) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-a-closer-look-at-how-linkedin-integrates-fai"
     },
     {
       "kind": "article",
@@ -15494,8 +15384,7 @@
       "url": "https://eng.uber.com/elastic-xgboost-ray/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-elastic-distributed-training-with-xgboost-on",
-      "summary": "Engineering write-up (Infra) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-elastic-distributed-training-with-xgboost-on"
     },
     {
       "kind": "article",
@@ -15509,8 +15398,7 @@
       "url": "https://eng.uber.com/michelangelo-machine-learning-platform/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-meet-michelangelo-uber-s-machine-learning-pl",
-      "summary": "Engineering write-up (MLOps Platforms) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-meet-michelangelo-uber-s-machine-learning-pl"
     },
     {
       "kind": "article",
@@ -15539,8 +15427,7 @@
       "url": "https://instagram-engineering.com/core-modeling-at-instagram-a51e0158aa48",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-core-modeling-at-instagram",
-      "summary": "Full write-up on MLOps Platforms available at the source — open the link to read."
+      "id": "dsc-tec-core-modeling-at-instagram"
     },
     {
       "kind": "article",
@@ -15659,8 +15546,7 @@
       "url": "https://www.etsy.com/codeascraft/redesigning-etsys-machine-learning-platform/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-redesigning-etsy-s-machine-learning-platform",
-      "summary": "Full write-up on MLOps Platforms available at the source — open the link to read."
+      "id": "dsc-tec-redesigning-etsy-s-machine-learning-platform"
     },
     {
       "kind": "article",
@@ -15674,8 +15560,7 @@
       "url": "https://www.etsy.com/codeascraft/building-a-platform-for-serving-recommendations-at-etsy",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-building-a-platform-for-serving-recommendati",
-      "summary": "Full write-up on MLOps Platforms available at the source — open the link to read."
+      "id": "dsc-tec-building-a-platform-for-serving-recommendati"
     },
     {
       "kind": "article",
@@ -15689,8 +15574,7 @@
       "url": "https://engineering.linkedin.com/blog/2022/darwin--data-science-and-artificial-intelligence-workbench-at-li",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-darwin-data-science-and-artificial-intellige",
-      "summary": "Engineering write-up (MLOps Platforms) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-darwin-data-science-and-artificial-intellige"
     },
     {
       "kind": "article",
@@ -15764,8 +15648,7 @@
       "url": "https://www.binance.com/en/blog/all/using-mlops-to-build-a-realtime-endtoend-machine-learning-pipeline-3820048062346322706",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-using-mlops-to-build-a-real-time-end-to-end-",
-      "summary": "Full write-up on MLOps Platforms available at the source — open the link to read."
+      "id": "dsc-tec-using-mlops-to-build-a-real-time-end-to-end-"
     },
     {
       "kind": "article",
@@ -15779,8 +15662,7 @@
       "url": "https://www.zillow.com/tech/serving-machine-learning-models-efficiently-at-scale-at-zillow/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-serving-machine-learning-models-efficiently-",
-      "summary": "Full write-up on MLOps Platforms available at the source — open the link to read."
+      "id": "dsc-tec-serving-machine-learning-models-efficiently-"
     },
     {
       "kind": "article",
@@ -15839,8 +15721,7 @@
       "url": "https://research.google/pubs/pub43146/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-machine-learning-the-high-interest-credit-ca",
-      "summary": "Engineering write-up (Practices) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-machine-learning-the-high-interest-credit-ca"
     },
     {
       "kind": "article",
@@ -15854,8 +15735,7 @@
       "url": "https://developers.google.com/machine-learning/guides/rules-of-ml",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-rules-of-machine-learning-best-practices-for",
-      "summary": "Full write-up on Practices available at the source — open the link to read."
+      "id": "dsc-tec-rules-of-machine-learning-best-practices-for"
     },
     {
       "kind": "article",
@@ -15869,8 +15749,7 @@
       "url": "http://sites.computer.org/debull/A18dec/p5.pdf",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-on-challenges-in-machine-learning-model-mana",
-      "summary": "Full write-up on Practices available at the source — open the link to read."
+      "id": "dsc-tec-on-challenges-in-machine-learning-model-mana"
     },
     {
       "kind": "article",
@@ -15884,8 +15763,7 @@
       "url": "https://booking.ai/https-booking-ai-machine-learning-production-3ee8fe943c70",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-machine-learning-in-production-the-booking-c",
-      "summary": "Full write-up on Practices available at the source — open the link to read."
+      "id": "dsc-tec-machine-learning-in-production-the-booking-c"
     },
     {
       "kind": "article",
@@ -15899,8 +15777,7 @@
       "url": "https://booking.ai/150-successful-machine-learning-models-6-lessons-learned-at-booking-com-681e09107bec",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-150-successful-machine-learning-models-6-les",
-      "summary": "Full write-up on Practices available at the source — open the link to read."
+      "id": "dsc-tec-150-successful-machine-learning-models-6-les"
     },
     {
       "kind": "article",
@@ -15944,8 +15821,7 @@
       "url": "https://eng.uber.com/continuous-integration-deployment-ml/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-continuous-integration-and-deployment-for-ma",
-      "summary": "Engineering write-up (Practices) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-continuous-integration-and-deployment-for-ma"
     },
     {
       "kind": "article",
@@ -15959,8 +15835,7 @@
       "url": "https://eng.uber.com/tuning-model-performance/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-tuning-model-performance",
-      "summary": "Engineering write-up (Practices) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-tuning-model-performance"
     },
     {
       "kind": "article",
@@ -16064,8 +15939,7 @@
       "url": "https://www.uber.com/en-PL/blog/ml-education-at-uber/",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-ml-education-at-uber-frameworks-inspired-by-",
-      "summary": "Engineering write-up (Practices) — this source blocks preview extraction, so open the link to read the full article."
+      "id": "dsc-tec-ml-education-at-uber-frameworks-inspired-by-"
     },
     {
       "kind": "article",
@@ -16094,8 +15968,7 @@
       "url": "https://towardsdatascience.com/what-is-the-most-effective-way-to-structure-a-data-science-team-498041b88dae",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-what-is-the-most-effective-way-to-structure-",
-      "summary": "Full write-up on Team structure available at the source — open the link to read."
+      "id": "dsc-tec-what-is-the-most-effective-way-to-structure-"
     },
     {
       "kind": "article",
@@ -16289,8 +16162,7 @@
       "url": "https://www.wired.co.uk/article/police-violence-prediction-ndas",
       "source_type": "article",
       "source": "applied-ml",
-      "id": "dsc-tec-a-british-ai-tool-to-predict-violent-crime-i",
-      "summary": "Full write-up on Fails available at the source — open the link to read."
+      "id": "dsc-tec-a-british-ai-tool-to-predict-violent-crime-i"
     },
     {
       "kind": "domain",

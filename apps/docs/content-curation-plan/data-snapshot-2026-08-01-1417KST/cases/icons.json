@@ -1,0 +1,28 @@
+{
+  "_note": "Cases 카드 시각 토큰(색·이모지) 단일 소스. 컴포넌트에 하드코딩 금지 — 여기만 고친다.",
+  "palette": [
+    { "c": "#4B78F0", "bg": "#EEF2FD" },
+    { "c": "#2E8B6F", "bg": "#E7F4EF" },
+    { "c": "#7C3AED", "bg": "#F3EFFA" },
+    { "c": "#0194E2", "bg": "#E6F4FD" },
+    { "c": "#D4854A", "bg": "#FEF3E2" },
+    { "c": "#5B3D87", "bg": "#F3EFFA" },
+    { "c": "#C94B6E", "bg": "#FDF0F3" },
+    { "c": "#DC2626", "bg": "#FDECEC" }
+  ],
+  "neutral": { "c": "#6B6577", "bg": "#F3F1F6" },
+  "themePools": [
+    { "pattern": "health|medic|clinical|patient|pharma|biotech|diagnos", "emojis": ["🏥", "💊", "🩺", "🧬", "🩻", "🧪", "🫀", "🦠"] },
+    { "pattern": "financ|fintech|bank|trading|invest|insurance|payment|credit", "emojis": ["💰", "💳", "📈", "🏦", "💵", "🪙", "📊", "🧾"] },
+    { "pattern": "educat|learn|academia|tutor|school|student|course", "emojis": ["🎓", "📚", "✏️", "🧑‍🏫", "📖", "🧮", "🖍", "📝"] },
+    { "pattern": "legal|\\blaw\\b|compliance|privacy|contract|court", "emojis": ["⚖️", "📜", "🏛", "🔏", "📝", "🗂", "👨‍⚖️"] },
+    { "pattern": "e-?commerce|retail|shopping|store", "emojis": ["🛒", "🛍", "🏬", "💳", "📦", "🏷", "🧾"] },
+    { "pattern": "deliver|mobility|transport|logistic|supply|driving|route|fleet", "emojis": ["🚚", "📦", "🗺", "🛵", "🚛", "🧭", "📍"] },
+    { "pattern": "social|network|community|feed", "emojis": ["💬", "👥", "📱", "❤️", "🔔", "📢", "🫂"] },
+    { "pattern": "media|streaming|entertain|content", "emojis": ["🎬", "📺", "🍿", "🎞", "📸", "🎙", "🎭"] },
+    { "pattern": "gaming|game|player", "emojis": ["🎮", "🕹", "👾", "🎲", "🏆", "🎯"] },
+    { "pattern": "travel|hospitality|tourism|hotel", "emojis": ["✈️", "🏨", "🗺", "🧳", "🏖", "🗽", "🧭"] },
+    { "pattern": "security|cyber|threat|fraud", "emojis": ["🔒", "🛡", "🔑", "🚨", "🕵️", "🔐", "⚠️"] },
+    { "pattern": "\\btech\\b|software|developer|engineering|code", "emojis": ["💻", "⌨️", "🖥", "🔌", "🧑‍💻", "🧩", "🛠"] }
+  ]
+}
