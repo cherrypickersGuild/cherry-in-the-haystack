@@ -3,7 +3,7 @@
   "generatedAt": "2026-07-31T18:48:11.984Z",
   "items": [
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The foundational US framework, built on four functions: Govern, Map, Measure, and Manage.",
       "tags": [],
@@ -17,7 +17,7 @@
       "id": "dsc-reg-nist-ai-100-1-ai-risk-management-framework"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The first certifiable management-system standard for establishing AI governance, increasingly used as EU AI Act conformity evidence.",
       "tags": [],
@@ -32,7 +32,7 @@
       "summary": "Information technology — Artificial intelligence — Management system"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Defines processes for managing the AI lifecycle from conception through development, operation, and retirement.",
       "tags": [],
@@ -47,7 +47,7 @@
       "summary": "Information technology — Artificial intelligence — AI system life cycle processes"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Interactive companion to the AI RMF with suggested actions and references for each function and subcategory.",
       "tags": [],
@@ -76,7 +76,7 @@
       "id": "dsc-reg-nist-ai-100-5-a-plan-for-global-engagement-o"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Vendor-agnostic readiness framework from WWT and NVIDIA spanning six domains, from GRC to model and infrastructure security.",
       "tags": [],
@@ -91,7 +91,7 @@
       "summary": "ARMOR (AI Readiness Model for Operational Resilience) is WWT’s comprehensive, vendor-agnostic AI security framework. ARMOR empowers organizations to secure AI deployments across the entire lifecycle, aligning with industry standards and enabling confident, rapid adoption. Covering seven…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Rigorous risk identification, analysis, evaluation, and treatment methodology built for frontier AI systems.",
       "tags": [],
@@ -106,7 +106,7 @@
       "summary": "The recent development of powerful AI systems has highlighted the need for robust risk management frameworks in the AI industry. Although companies have begun to implement safety frameworks, current approaches often lack the systematic rigor found in other high-risk industries. This paper presents…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Guidance on AI-specific risk management processes, aligned with the ISO 31000 standard.",
       "tags": [],
@@ -121,7 +121,7 @@
       "summary": "Information technology — Artificial intelligence — Guidance on risk management"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Sector-specific framework from the Cyber Risk Institute with 230 control objectives, aligned to the NIST AI RMF.",
       "tags": [],
@@ -149,7 +149,7 @@
       "id": "dsc-reg-nist-ai-800-4-challenges-to-the-monitoring-o"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Structured taxonomy of AI risks across input, inference, output, and non-technical categories.",
       "tags": [],
@@ -164,7 +164,7 @@
       "summary": "The page you requested cannot be displayed (HTTP response code 403)"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "MAS-led consortium framework defining seven generative-AI risk dimensions for financial services.",
       "tags": [],
@@ -179,7 +179,7 @@
       "summary": "Find out about Project MindForge, a collaborative project between financial industry partners and technology partners to discuss about the risks and opportunities of generative AI technology in financial sector."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "ATT&CK-style knowledge base of real-world adversarial tactics, techniques, and case studies for AI systems.",
       "tags": [],
@@ -193,7 +193,7 @@
       "id": "dsc-reg-mitre-atlas"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The authoritative taxonomy of evasion, poisoning, privacy, and abuse attacks across predictive and generative AI.",
       "tags": [],
@@ -207,7 +207,7 @@
       "id": "dsc-reg-nist-ai-100-2-adversarial-machine-learning-t"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Living, community-maintained catalog of AI security threats, vulnerabilities, and controls across ML, generative, and agentic systems.",
       "tags": [],
@@ -237,7 +237,7 @@
       "summary": "ENISA is the EU agency dedicated to enhancing cybersecurity in Europe. They offer guidance, tools, and resources to safeguard citizens and businesses from cyber threats."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Three-layer model covering cybersecurity foundations, AI-specific security, and sector-specific practices.",
       "tags": [],
@@ -252,7 +252,7 @@
       "summary": "ENISA is the EU agency dedicated to enhancing cybersecurity in Europe. They offer guidance, tools, and resources to safeguard citizens and businesses from cyber threats."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The most-referenced list of critical LLM vulnerabilities, from prompt injection to excessive agency and model theft.",
       "tags": [],
@@ -267,7 +267,7 @@
       "summary": "Identifying the Top Security Risks Associated with Generative AI"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "97 risks and 73 controls across 13 AI system components, mapped to MITRE ATLAS, OWASP, NIST, and ISO.",
       "tags": [],
@@ -282,7 +282,7 @@
       "summary": "An actionable framework to manage AI security"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Six core elements for securing AI systems across the lifecycle, aligned with NIST AI RMF and MITRE ATLAS.",
       "tags": [],
@@ -297,7 +297,7 @@
       "summary": "Explore the six core elements of Google’s Secure AI Framework and how it helps address AI model security, risk management and privacy concerns."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Treats AI security and AI safety as complementary dimensions of one unified risk framework.",
       "tags": [],
@@ -312,7 +312,7 @@
       "summary": "The New Baseline for AI Security AI is no longer an experimental capability or a back-office automation tool: it is becoming a core operational layer"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The top security risks for autonomous and agentic AI, covering planning, tool use, and multi-agent communication.",
       "tags": [],
@@ -327,7 +327,7 @@
       "summary": "The OWASP Top 10 for Agentic Applications 2026 is a globally peer-reviewed framework that identifies the most critical security risks facing autonomous and agentic AI systems. Developed through extensive collaboration with more than 100 industry experts, researchers, and practitioners, the list…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Enterprise recipe for building, deploying, and operating trustworthy agentic AI with policy enforcement and guardrails.",
       "tags": [],
@@ -342,7 +342,7 @@
       "summary": "As large language models (LLMs) power more agentic systems capable of performing autonomous actions, tool use, and reasoning, enterprises are drawn to their flexibility and low inference costs."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The first certifiable AI agent standard, spanning data, security, safety, reliability, accountability, and transparency, with crosswalks to NIST, ISO, OWASP,…",
       "tags": [],
@@ -357,7 +357,7 @@
       "summary": "AIUC-1 is the world's first AI agent standard. Designed to unlock enterprise adoption. Covers all enterprise concerns. Built with trusted institutions."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Cloud Security Alliance specification for securing autonomous agent actions at runtime, with eleven agentic threat classes.",
       "tags": [],
@@ -372,7 +372,7 @@
       "summary": "The runtime security standard for autonomous AI agents. Specification, conformance requirements, and a registry of builders."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Cloud Security Alliance control matrix (18 domains, 243 control objectives) for securing AI workloads, mapped to the Cloud Controls Matrix.",
       "tags": [],
@@ -387,7 +387,7 @@
       "summary": "The AI Controls Matrix is a vendor-neutral framework for secure, responsible AI systems in the cloud. Based on CCM and aligned with ISO 42001, NIST AI, & more."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Structured roadmap for building and measuring an enterprise AI security program, feeding the STAR for AI certification pathway.",
       "tags": [],
@@ -402,7 +402,7 @@
       "summary": "CSA’s AI Security Maturity Model (AISMM) provides a practical AI security maturity roadmap. Build and assess a comprehensive enterprise AI security program."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Maps the NIST CSF 2.0 onto AI systems with a Secure, Defend, and Thwart structure (initial public draft).",
       "tags": [],
@@ -416,7 +416,7 @@
       "id": "dsc-reg-nist-ir-8596-cybersecurity-framework-profile"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Ongoing project mapping the SP 800-53 control catalog to AI use cases with tailored control selections.",
       "tags": [],
@@ -431,7 +431,7 @@
       "summary": "Recent Updates January 8, 2026: To facilitate discussion at the Cyber AI Profile Workshop #2 on January 14, 2026, an annotated outline (discussion draft) of Control Overlays for Securing AI Systems: Using and Fine-Tuning Predictive AI is available..."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Applies the Secure Software Development Framework to generative-AI model development and supply-chain integrity.",
       "tags": [],
@@ -445,7 +445,7 @@
       "id": "dsc-reg-nist-sp-800-218a-ssdf-community-profile-for-"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Defines AI Safety Levels (ASL-1 to ASL-4) with escalating safeguards as frontier model capabilities increase.",
       "tags": [],
@@ -460,7 +460,7 @@
       "summary": "An update to Anthropic's policy to mitigate catastrophic risks from AI"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Evaluates frontier model risk across cybersecurity, CBRN, persuasion, and model autonomy, with deployment thresholds.",
       "tags": [],
@@ -475,7 +475,7 @@
       "summary": "Sharing our updated framework for measuring and protecting against severe harm from frontier AI capabilities."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The first government-issued governance framework built specifically for agentic AI, from Singapore's IMDA.",
       "tags": [],
@@ -489,7 +489,7 @@
       "id": "dsc-reg-singapore-model-ai-governance-framework-for-"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Companion to the AI RMF identifying 13 generative-AI risks with over 400 suggested actions.",
       "tags": [],
@@ -503,7 +503,7 @@
       "id": "dsc-reg-nist-ai-600-1-generative-ai-profile"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Draft framework for addressing CBRN, cyber, and disinformation misuse risks of powerful foundation models.",
       "tags": [],
@@ -531,7 +531,7 @@
       "id": "dsc-reg-nist-ai-100-4-reducing-risks-posed-by-synthe"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Five foundational principles adopted by 46+ countries and embedded in the EU AI Act and national strategies.",
       "tags": [],
@@ -546,7 +546,7 @@
       "summary": "OECD.AI helps countries and shape trustworthy AI with the OECD AI Principles. It gives access to 900+ national AI policies and initiatives, live data about AI and a blog about AI policy."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The broadest international AI ethics instrument, adopted by all 193 UNESCO member states.",
       "tags": [],
@@ -561,7 +561,7 @@
       "summary": "UNESCO promotes ethical AI through global recommendations, guiding responsible design, development, and use of artificial intelligence."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Standards process for embedding ethical value considerations into system design from concept onward.",
       "tags": [],
@@ -576,7 +576,7 @@
       "summary": "A set of processes by which organizations can include consideration of ethical values throughout the stages of concept exploration and development is established by this standard. Management and engineering in transparent communication with selected stakeholders for ethical values elicitation and…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Technical report surveying AI bias, transparency, accountability, and human-oversight concerns.",
       "tags": [],
@@ -591,7 +591,7 @@
       "summary": "Information technology — Artificial intelligence — Overview of ethical and societal concerns"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Enterprise responsible-AI framework built on six principles, operationalized through committee oversight and impact assessments.",
       "tags": [],
@@ -605,7 +605,7 @@
       "id": "dsc-reg-cisco-responsible-ai-framework"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The internal governance standard Microsoft applies to its own AI products, published as an enterprise reference.",
       "tags": [],
@@ -619,7 +619,7 @@
       "id": "dsc-reg-microsoft-responsible-ai-standard-v2"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The world's first comprehensive, legally binding AI law, using a risk-based classification with phased enforcement through 2026.",
       "tags": [],
@@ -633,7 +633,7 @@
       "id": "dsc-reg-eu-ai-act"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "European Commission code letting general-purpose AI model providers demonstrate EU AI Act compliance.",
       "tags": [],
@@ -648,7 +648,7 @@
       "summary": "The code of practice helps industry comply with the AI Act legal obligations on safety, transparency and copyright of general-purpose AI models."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "European Commission self-assessment checklist covering the seven requirements for trustworthy AI.",
       "tags": [],
@@ -663,7 +663,7 @@
       "summary": "On the 17 of July 2020, the High-Level Expert Group on Artificial Intelligence (AI HLEG) presented their final Assessment List for Trustworthy Artificial Intelligence."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "The certifiable ISMS standard that provides the baseline security controls AI-specific frameworks build upon.",
       "tags": [],
@@ -678,7 +678,7 @@
       "summary": "Information security, cybersecurity and privacy protection — Information security management systems — Requirements"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "CISA and G7 joint guidance defining what an AI-specific SBOM must contain for supply-chain transparency.",
       "tags": [],
@@ -692,7 +692,7 @@
       "id": "dsc-reg-software-bill-of-materials-for-ai-minimum-el"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Open-source platform for testing AI system resilience to adversarial attacks.",
       "tags": [],
@@ -706,7 +706,7 @@
       "id": "dsc-reg-nist-dioptra"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "First open standard for trustworthiness testing across application, model, infrastructure, and data layers.",
       "tags": [],
@@ -721,7 +721,7 @@
       "summary": "Methodology to perform an AI System Assessment"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Quantifiable scoring methodology for AI vulnerabilities, extending CVSS with an agentic-AI risk score (in development).",
       "tags": [],
@@ -736,7 +736,7 @@
       "summary": "OWASP AI Vulnerability Scoring System (AIVSS) on the main website for The OWASP Foundation. OWASP is a nonprofit foundation that works to improve the security of software."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Grades general-purpose chat AI across twelve hazard categories using 24,000+ test prompts per language.",
       "tags": [],
@@ -765,7 +765,7 @@
       "id": "dsc-reg-nist-ai-700-1-genai-pilot-study-on-text-to-t"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Draft best practices for evaluating LLMs and AI agents through automated benchmarks.",
       "tags": [],
@@ -780,7 +780,7 @@
       "summary": "Comments Sought on Initial Public Draft of NIST AI 800-2 through March 31"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Methods for assessing neural-network robustness against adversarial inputs and distributional shift.",
       "tags": [],
@@ -795,7 +795,7 @@
       "summary": "Artificial Intelligence (AI) — Assessment of the robustness of neural networks — Part 1: Overview"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "London",
       "description": "London (UK)",
       "tags": [],
@@ -810,7 +810,7 @@
       "summary": "The UK's Open Technology Conference, now in its 4th year, will be held across the UK, first in Edinburgh, on 5th June, focusing on the AI stack, working up from Compute through Models and Agents to user experiences and ROI"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Paris",
       "description": "Paris (France)",
       "tags": [],
@@ -824,7 +824,7 @@
       "id": "dsc-com-ai-action-summit"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Santa Clara, CA",
       "description": "Santa Clara, CA (USA); 18-20 [Online](https://aidevworld.com)",
       "tags": [],
@@ -839,7 +839,7 @@
       "summary": "AI DevWorld 2027: The premier conference for AI & machine learning developers, co-located with DeveloperWeek. Feb 9–11, Santa Clara, CA."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "New York, NY",
       "description": "New York, NY (USA)",
       "tags": [],
@@ -854,7 +854,7 @@
       "summary": "Join 3,000 engineers and leaders building with AI. June 3 - 5, 2025, San Francisco."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Las Vegas, NV",
       "description": "Las Vegas, NV (USA)",
       "tags": [],
@@ -869,7 +869,7 @@
       "summary": "HumanX is the only AI event you need — now on two continents. Join 9,000+ global AI leaders in San Francisco (April 6–9) and Amsterdam (September 22–24) for the conversations, connections, and insights that define the industry."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Hanoi",
       "description": "Hanoi (Viet Nam)",
       "tags": [],
@@ -884,7 +884,7 @@
       "summary": "Semiconductor and AI leaders from technology and policy sectors are gathering to explore the convergence of these critical 21st-century industries, driving innovation and strengthening ecosystem partnerships."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "San Francisco, CA",
       "description": "San Francisco, CA (USA)",
       "tags": [],
@@ -899,7 +899,7 @@
       "summary": "Join us for a transformative experience in building with AI in San Francisco on April 28-29, 2026."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Durham, NC",
       "description": "Durham, NC (USA)",
       "tags": [],
@@ -913,7 +913,7 @@
       "id": "dsc-com-all-things-open-ai"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "San Jose, CA",
       "description": "San Jose, CA (USA)",
       "tags": [],
@@ -928,7 +928,7 @@
       "summary": "Watch the Best of NVIDIA GTC on demand"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "",
       "tags": [],
@@ -943,7 +943,7 @@
       "summary": "The AI agent conference for enterprises. 4,000+ executives, founders, and AI leaders. May 17-18, 2027 at the New York Hilton Midtown, New York City."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "",
       "tags": [],
@@ -958,7 +958,7 @@
       "summary": "Don't miss Google I/O, featuring product launches, innovations, and insights. Tune in for the live keynotes and sessions."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "",
       "tags": [],
@@ -973,7 +973,7 @@
       "summary": "Join the AI Compute Summit to explore the technology, energy and infrastructure challenges shaping the future of AI and global computing capacity."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "<a href=\"https://paris-conference.com/papers-submit/\"><img alt=\"AI Ethics Conference\" src=\"https://img.shields.io/static/v1?label=CFP&message=until%201-May-2025&color=red\"></a>",
       "description": "<a href=\"https://paris-conference.com/papers-submit/\"><img alt=\"AI Ethics Conference\"…",
       "tags": [],
@@ -988,7 +988,7 @@
       "summary": "The Paris Conference on AI & Digital Ethics Registration PCAIDE 2026 – June 11-12 Co-organised with Mines Paris – Université PSL The Paris Conference is a cross-disciplinary and cross-sectoral meeting [&hellip;]"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Toronto",
       "description": "Toronto (Canada)",
       "tags": [],
@@ -1003,7 +1003,7 @@
       "summary": "Toronto Tech Week is a citywide celebration of the people building what's next. From May 25-29, 2026, founders, investors, operators, and builders from Canadian tech will take over Toronto for hundreds of independent community-led events."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "NYC, NY",
       "description": "NYC, NY (USA) <a href=\"https://wp.nyu.edu/sccpc/abstract-submission/\"><img alt=\"AI4Chemistry…",
       "tags": [],
@@ -1017,7 +1017,7 @@
       "id": "dsc-com-nyc-ai4chemistry-summit"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "New York, NY",
       "description": "New York, NY (USA)",
       "tags": [],
@@ -1032,7 +1032,7 @@
       "summary": "The Beam Summit brings together experts and community to share the exciting ways they are using, changing, and advancing Apache Beam and the world of data and stream processing."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "(Singapore) <a href=\"https://beamsummit.org/cfp-2025/\"><img alt=\"AI 4 X Conference\"…",
       "tags": [],
@@ -1047,7 +1047,7 @@
       "summary": "Abstract Submission is Now Open! The best abstracts will receive a poster prize of up to SGD $200! Click Here Conference Starts In Day Hour Minute Second Sign up for email updates and other news from AI 4 X!"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Vancouver",
       "description": "Vancouver (Canada) <a href=\"https://icml.cc/Conferences/2025/CallForPapers/\"><img alt=\"ICML\"…",
       "tags": [],
@@ -1061,7 +1061,7 @@
       "id": "dsc-com-icml-international-conference-on-machine-lea"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Hyderabad, India",
       "description": "Hyderabad, India",
       "tags": [],
@@ -1076,7 +1076,7 @@
       "summary": "Open Source Summit India unites the open source ecosystem, offering a platform for collaboration, knowledge-sharing, and exploring innovative solutions."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Montreal",
       "description": "Montreal (Canada)",
       "tags": [],
@@ -1091,7 +1091,7 @@
       "summary": "Explore the ALL IN 2025 program featuring keynote speakers, AI sessions, panel discussions, and innovations."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "South Bend, IN",
       "description": "South Bend, IN (US) <a…",
       "tags": [],
@@ -1106,7 +1106,7 @@
       "summary": "The Lucy Family Institute for Data & Society at the University of Notre Dame was delighted to host the inaugural RISE AI Conference on October 6-8, 2025,"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "",
       "tags": [],
@@ -1121,7 +1121,7 @@
       "summary": "A universe of events and platforms focused on open source, open tech and the open web."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "San Francisco, CA",
       "description": "San Francisco, CA (USA",
       "tags": [],
@@ -1136,7 +1136,7 @@
       "summary": "The premier event driving the future of open source AI - bringing together pioneers, researchers, and developers to shape what’s next."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Mountain View, CA",
       "description": "Mountain View, CA (USA) <a href=\"https://techequity-ai.org/become-a-speaker/\"><img alt=\"CFP RISE AI…",
       "tags": [],
@@ -1151,7 +1151,7 @@
       "summary": "Silicon Valley’s go-to AI monthly forums, summits, and workshops."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "San Francisco, CA",
       "description": "San Francisco, CA (USA) <a href=\"https://sessionize.com/by-the-bay\"><img alt=\"CFP AI By the Bay\"…",
       "tags": [],
@@ -1166,7 +1166,7 @@
       "summary": "November 17th - 19th, 2025 | Three days of advanced technical sessions and engineering insights from the practical innovators in AI and data"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Las Vegas, NV",
       "description": "Las Vegas, NV (USA)",
       "tags": [],
@@ -1181,7 +1181,7 @@
       "summary": "Join 60,000+ attendees at AWS re:Invent 2026, the largest cloud and AI conference. 2,200+ sessions on generative AI, machine learning, serverless, and more. Nov 30-Dec 4, Las Vegas. Register now."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "San Diego, CA",
       "description": "San Diego, CA (USA)",
       "tags": [],
@@ -1195,7 +1195,7 @@
       "id": "dsc-com-neurips"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "",
       "tags": [],
@@ -1210,7 +1210,7 @@
       "summary": "The Fortieth AAAI Conference on Artificial Intelligence will be held in Singapore in 2026."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "OpenAI",
       "description": "OpenAI — official AI research & product blog.",
       "tags": [],
@@ -1225,7 +1225,7 @@
       "summary": "Stay up to speed on the rapid advancement of AI technology and the benefits it offers to humanity."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Anthropic",
       "description": "Anthropic — official AI research & product blog.",
       "tags": [],
@@ -1240,7 +1240,7 @@
       "summary": "Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Google DeepMind",
       "description": "Google DeepMind — official AI research & product blog.",
       "tags": [],
@@ -1255,7 +1255,7 @@
       "summary": "Discover our latest AI breakthroughs, projects, and updates."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Mistral AI",
       "description": "Mistral AI — official AI research & product blog.",
       "tags": [],
@@ -1270,7 +1270,7 @@
       "summary": "Read our blogs to stay up to date on the latest news and research from Mistral."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "xAI",
       "description": "xAI — official AI research & product blog.",
       "tags": [],
@@ -1285,7 +1285,7 @@
       "summary": "SpaceXAI builds Grok, an AI chatbot with voice chat, image and video generation, real-time search, and advanced reasoning. Try Grok at grok.com."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Cohere",
       "description": "Cohere — official AI research & product blog.",
       "tags": [],
@@ -1300,7 +1300,7 @@
       "summary": "Explore our collection of insightful blog posts covering a diverse range of generative AI topics. Our articles offer in-depth analyses, expert opinions, and practical advice to inform and inspire."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Google Research",
       "description": "Google Research — official AI research & product blog.",
       "tags": [],
@@ -1314,7 +1314,7 @@
       "id": "dsc-big-google-research"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Meta AI",
       "description": "Meta AI — official AI research & product blog.",
       "tags": [],
@@ -1329,7 +1329,7 @@
       "summary": "Stay up to date on the latest artificial intelligence news from Meta."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Microsoft Research",
       "description": "Microsoft Research — official AI research & product blog.",
       "tags": [],
@@ -1344,7 +1344,7 @@
       "summary": "The Microsoft Research blog provides in-depth views and perspectives from our researchers, scientists and engineers, plus announcements about noteworthy events, scholarships, and fellowships designed for academic and scientific communities."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Amazon Science",
       "description": "Amazon Science — official AI research & product blog.",
       "tags": [],
@@ -1359,7 +1359,7 @@
       "summary": "Technical deep-dives and perspectives from our scientists who are pushing boundaries across multiple scientific disciplines while solving real-world challenges. Explore how our teams combine research excellence, world-class data, and advanced infrastructure to create transformative customer…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Apple ML",
       "description": "Apple ML — official AI research & product blog.",
       "tags": [],
@@ -1374,7 +1374,7 @@
       "summary": "Apple machine learning teams are engaged in state of the art research in machine learning and artificial intelligence. Learn about the latest advancements."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "NVIDIA",
       "description": "NVIDIA — official AI research & product blog.",
       "tags": [],
@@ -1388,7 +1388,7 @@
       "id": "dsc-big-nvidia"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "IBM Research",
       "description": "IBM Research — official AI research & product blog.",
       "tags": [],
@@ -1403,7 +1403,7 @@
       "summary": "The IBM Research blog is the home for stories told by the researchers, scientists, and engineers inventing What’s Next in science and technology."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Hugging Face",
       "description": "Hugging Face — official AI research & product blog.",
       "tags": [],
@@ -1418,7 +1418,7 @@
       "summary": "We’re on a journey to advance and democratize artificial intelligence through open source and open science."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Stability AI",
       "description": "Stability AI — official AI research & product blog.",
       "tags": [],
@@ -1433,7 +1433,7 @@
       "summary": "Discover the latest product announcements, company updates, and industry news with Stability AI. We build the foundation to activate humanity’s potential."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Databricks",
       "description": "Databricks — official AI research & product blog.",
       "tags": [],
@@ -1448,7 +1448,7 @@
       "summary": "Read the Databricks All category on the company blog for the latest employee stories and events."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Together AI",
       "description": "Together AI — official AI research & product blog.",
       "tags": [],
@@ -1463,7 +1463,7 @@
       "summary": "Explore Together AI's latest product launches, research papers, and technical guides on AI inference, fine-tuning, and GPU infrastructure."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Alibaba (Qwen)",
       "description": "Alibaba (Qwen) — official AI research & product blog.",
       "tags": [],
@@ -1477,7 +1477,7 @@
       "id": "dsc-big-alibaba-qwen"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "DeepSeek",
       "description": "DeepSeek — official AI research & product blog.",
       "tags": [],
@@ -1492,7 +1492,7 @@
       "summary": "The DeepSeek API uses an API format compatible with OpenAI/Anthropic. By modifying the configuration, you can use the OpenAI/Anthropic SDK or softwares compatible with the OpenAI/Anthropic API to access the DeepSeek API."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Baidu",
       "description": "Baidu — official AI research & product blog.",
       "tags": [],
@@ -1506,7 +1506,7 @@
       "id": "dsc-big-baidu"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Naver",
       "description": "Naver — official AI research & product blog.",
       "tags": [],
@@ -1626,7 +1626,7 @@
       "summary": "Part 2: A market map of where enterprise agentic AI value is accruing"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Open Future Forum",
       "description": "",
       "tags": [],
@@ -1641,7 +1641,7 @@
       "summary": "A workflow-based map of 64 CFO and finance AI vendors, paired with first-party demand signals from the Open Future Forum community. Edition 1, July 2026."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Dentaiware",
       "description": "",
       "tags": [],
@@ -1715,7 +1715,7 @@
       "id": "dsc-mar-israeli-physical-ai-map"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Richard Stiennon",
       "description": "",
       "tags": [],
@@ -1760,7 +1760,7 @@
       "summary": "119 pages. 3 market maps. 33 sub-segments. We just mapped the entire AI economy. Read Mapping the AI Economy: https://lnkd.in/gakuG_Sr In our latest report, Mapping the AI Economy, we provide a comprehensive view of the AI market across AI Infrastructure, Horizontal AI, and Vertical AI,…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "CB Insights",
       "description": "",
       "tags": [],
@@ -1790,7 +1790,7 @@
       "summary": "Agents can now do real work when wrapped in the right tools, permissions, and harness. The next infrastructure fight is over memory, identity, and compute."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Cala",
       "description": "",
       "tags": [],
@@ -1880,7 +1880,7 @@
       "summary": "💊 Big Pharma is making billion-dollar bets on AI-designed drugs. → Lilly, @Novartis &amp; J&amp;J partnered with @IsomorphicLabs → Lilly launched a major AI drug discovery initiative with NVIDIA We mapped 110+ startups across 8 layers of the AI drug discovery stack 👇 [🧵 1/10]"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "CB Insights",
       "description": "",
       "tags": [],
@@ -1968,7 +1968,7 @@
       "id": "dsc-mar-the-rebel-alliance"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Cloud Security Alliance",
       "description": "",
       "tags": [],
@@ -1982,7 +1982,7 @@
       "id": "dsc-mar-agentic-ai-security-innovator-market-map"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Drone Industry Insights",
       "description": "",
       "tags": [],
@@ -2102,7 +2102,7 @@
       "summary": "🔎 Which startups are worth watching right now? In the second edition of The Future in Focus, the investors behind the report, RAISE Ventures, Atlantic, KOMPAS VC, Lowercarbon Capital, Maze, Norrsken VC, and SET Ventures, have highlighted a group of early-stage companies at the frontier of AI,…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "RankMyAI",
       "description": "",
       "tags": [],
@@ -2176,7 +2176,7 @@
       "summary": "Global Cleaning Robots Market & Supply Chain Map (2026) Most people think cleaning robots are just consumer devices. They’re not. They’re becoming part of the physical automation infrastructure. 📊 Market reality * ~$21–22B market in 2026 * Projected $70B+ long term * Driven by labor shortages +…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Notable Capital",
       "description": "",
       "tags": [],
@@ -2206,7 +2206,7 @@
       "summary": "Over the last several weeks, I've been extending some of my Workforce Capability Curve thinking into the emerging AI-native workforce and learning infrastructure landscape. What started as a simple market mapping exercise is beginning to feel like something larger. This is no longer just…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "CB Insights",
       "description": "",
       "tags": [],
@@ -2221,7 +2221,7 @@
       "summary": "CB Insights is launching the 10th annual AI 100 — our ranking of the world’s top emerging AI companies based on CB Insights’ predictive signals. From the infrastructure layer to enterprise and industry-specific applications, this year’s winners are shaping how industries think, decide, and act."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Ally Bell",
       "description": "",
       "tags": [],
@@ -2235,7 +2235,7 @@
       "id": "dsc-mar-blue-bottle-x-vc-sf"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Dealroom.co",
       "description": "",
       "tags": [],
@@ -2324,7 +2324,7 @@
       "summary": "Breaking down the AI agent stack, from infrastructure to applications, and the companies shaping its future."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Grove Ventures",
       "description": "",
       "tags": [],
@@ -2413,7 +2413,7 @@
       "summary": "The Memento and the Machine"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Legaltech Hub",
       "description": "",
       "tags": [],
@@ -2471,7 +2471,7 @@
       "id": "dsc-mar-global-robotics-industry-funding-report-down"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Greater Zurich Area",
       "description": "",
       "tags": [],
@@ -2516,7 +2516,7 @@
       "summary": "Drug development has long been a process of trial-and-error to test biological hypotheses against clinical reality. Despite advancements in science and technology, the timeline from target ID to a clinical candidate still often takes more than five years, and nearly 90% of drugs that enter clinical…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "XAnge",
       "description": "",
       "tags": [],
@@ -2576,7 +2576,7 @@
       "summary": "𝟲𝟭% 𝗼𝗳 𝗼𝗿𝗴𝗮𝗻𝗶𝘇𝗮𝘁𝗶𝗼𝗻𝘀 𝘀𝗮𝘆 𝘁𝗵𝗲𝗶𝗿 𝗔𝗜 𝗮𝗽𝗽𝘀 𝗮𝗿𝗲 𝗮𝗹𝗿𝗲𝗮𝗱𝘆 𝗯𝗲𝗶𝗻𝗴 𝘁𝗮𝗿𝗴𝗲𝘁𝗲𝗱 𝗯𝘆 𝗮𝘁𝘁𝗮𝗰𝗸𝗲𝗿𝘀. So we spent the last few months mapping the companies racing to secure AI - 66 in total. Swipe to see what we found. Get the full market map here 👉…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Cory Bolotsky",
       "description": "",
       "tags": [],
@@ -2666,7 +2666,7 @@
       "summary": "The AI market is moving really fast, and I get tons of incredibly talented founders. The hardest thing is saying no. So I’m publishing…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Artemis",
       "description": "",
       "tags": [],
@@ -2785,7 +2785,7 @@
       "summary": "Explore the rise of European consumer AI startups. This market map highlights AI-native companies founded since 2023 across education, finance, health, creativity, and more, and explains the structural shifts shaping the next generation of consumer technology."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Olivia Moore — a16z",
       "description": "",
       "tags": [],
@@ -2918,7 +2918,7 @@
       "id": "dsc-mar-insurtech-market-update"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Legaltech Hub",
       "description": "",
       "tags": [],
@@ -2933,7 +2933,7 @@
       "summary": "AsofFebruary 26, 2026, there were299solutions in the LTH Directory that incorporated AIagents. We have created an interactivemapof these solutions and the categories theyoperatein for your exploration."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "The LegalTech Fund",
       "description": "",
       "tags": [],
@@ -3007,7 +3007,7 @@
       "summary": "A field guide to where robotics is being deployed across Europe, why each sector matters, and how the enabling technology stack underneath makes it all possible."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Topology.vc",
       "description": "",
       "tags": [],
@@ -3169,7 +3169,7 @@
       "summary": "Check out the recent company compilation by Huiguang Liu of VCBeat @dongmaiwang . In any other case, I would be very unhappy to see Insilico on this list since we are a global company, not a local company, which uses China as a vertically-integrated platform for drug discovery,"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "MapCo",
       "description": "",
       "tags": [],
@@ -3318,7 +3318,7 @@
       "id": "dsc-mar-the-ai-shopping-market-map"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Lightwheel",
       "description": "",
       "tags": [],
@@ -3392,7 +3392,7 @@
       "summary": "Europe is quietly building world-class GTM tools. And it's growing fast. Here's a market map of Europe with the top 35 GTM companies: My Favorites: - HeyReach.io - LinkedIn Sequencer (🇲🇰) - Findymail - Email Finder (🇫🇷) - BetterContact - Phone Number Data (🇫🇷) - n8n - Automation (🇩🇪) -…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Kenn So — Generational",
       "description": "",
       "tags": [],
@@ -3569,7 +3569,7 @@
       "summary": "AI Inference Hardware Market Map 2026 – A first pass at mapping the landscape 📊 The inference pain point is real. With models scaling from 7B to 400B+ parameters, delivering low-latency, sustainable inference across edge devices, enterprise clusters, and hyperscale clouds has become…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "CB Insights",
       "description": "",
       "tags": [],
@@ -3644,7 +3644,7 @@
       "summary": "India is running thousands of Hospital AI pilots — yet fewer than 1 in 5 turn into recurring revenue. And after speaking with founders + buyers, the pattern is consistent: Pilots don’t fail because the model is weak. They fail because the conversion system is missing. So I mapped what actually…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "eaidb",
       "description": "",
       "tags": [],
@@ -3688,7 +3688,7 @@
       "summary": "For all the fears of over-investment, AI is spreading across enterprises at a pace with no precedent in modern software history."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "CB Insights",
       "description": "",
       "tags": [],
@@ -3733,7 +3733,7 @@
       "summary": "Insights into the evolving energy management market and how BGV’s investment thesis guides early bets on decentralized, AI-driven energy solutions."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Inovia Capital",
       "description": "",
       "tags": [],
@@ -3763,7 +3763,7 @@
       "summary": "In financial services, AI is no longer a futuristic idea — it’s part of daily business. By 2027, the sector is expected to spend nearly $100B on AI. But this excitement is tempered by legacy systems, governance requirements, and hard-to-measure ROI. A new wave of startups is emerging to overcome…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "The LegalTech Fund",
       "description": "",
       "tags": [],
@@ -3823,7 +3823,7 @@
       "summary": "From autonomous agents to humanoid robots, here’s a visual guide to the companies reshaping enterprise AI, infrastructure, and industry applications."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Malika Aubakirova & Alex Atallah & Chris Clark & Justin Summerville & Anjney Midha — a16z & OpenRouter",
       "description": "",
       "tags": [],
@@ -3838,7 +3838,7 @@
       "summary": "Read OpenRouter's 2025 State of AI report — an empirical 100 trillion token study of real LLM usage, model trends, and developer insights."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Mike Overell — New Literacies",
       "description": "",
       "tags": [],
@@ -3868,7 +3868,7 @@
       "summary": "Authors: Kim Dang, Jess Burley, Christoph Gras, Sam Baker"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "CB Insights",
       "description": "",
       "tags": [],
@@ -3883,7 +3883,7 @@
       "summary": "Using CB Insights predictive intelligence, we map 400+ promising AI agent startups across 16 categories to evaluate for build, buy, and partnership opportunities."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Reliable Agents",
       "description": "",
       "tags": [],
@@ -3928,7 +3928,7 @@
       "summary": "An overview of how to overcome AI hallucination, context rot and amnesia by using Context Portability, Knowledge Graphs and Ontologies, and Search APIs"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "It's Pronounced Data",
       "description": "",
       "tags": [],
@@ -3942,7 +3942,7 @@
       "id": "dsc-mar-2025-data-research-information-services-land"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Epoch AI",
       "description": "",
       "tags": [],
@@ -3972,7 +3972,7 @@
       "summary": "This is the 4th post in NosTerra Venture Capital's series on the energy → compute value chain. Today, we examine the next layer: The Power Grid. 💡 Context: AI’s Grid Collision Course Data center energy use, which already makes up 4-5% of U.S. demand, is forecasted to more than double by 2030 on…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Emerging Defense",
       "description": "",
       "tags": [],
@@ -4167,7 +4167,7 @@
       "summary": "With millions of unfilled positions and increasing threat volumes, cybersecurity is facing a scale challenge that only AI agents can solve."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Techoperators Venture Capital",
       "description": "",
       "tags": [],
@@ -4227,7 +4227,7 @@
       "summary": "Explore Theory Ventures' first-party survey research: original data and insights on AI adoption, software, and go-to-market from operators and buyers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Accel",
       "description": "",
       "tags": [],
@@ -4242,7 +4242,7 @@
       "summary": "As Ai is redefining the world of technology and unleashing an unprecedented wave of innovation, a race to build Ai data centers has started, forecasting $4T of investments in the next four years. The \"Accel 2025 Globalscape: Race for compute\" dives into the private and public markets to put this…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Jenny Xiao & Jay Zhao & and Liang Wu — Leonis Capital",
       "description": "",
       "tags": [],
@@ -4257,7 +4257,7 @@
       "summary": "Leonis Capital is a conviction-led venture capital firm investing in technical founders at the earliest stages. Backed by original research and deep technical insight."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Artificial Analysis",
       "description": "",
       "tags": [],
@@ -4345,7 +4345,7 @@
       "summary": "Unsere aktualisierte Market Map ist da! Im ständig wachsenden Legal Tech-Kosmos kann man schnell mal den Überblick verlieren. Unsere Market Map sorgt für Orientierung und ist dabei tagesaktuell. Angebunden an unseren Toolfinder (https://lnkd.in/eFn-VAZV), ist sie nach Nutzer sowie Kategorie…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Remagine Ventures",
       "description": "",
       "tags": [],
@@ -4464,7 +4464,7 @@
       "summary": "Generative AI is revolutionizing software development, with AI coding assistants and agentic tools transforming how 30 million developers plan, code, review, and deploy software worldwide. From productivity gains worth trillions in global GDP to a fast-evolving startup ecosystem, the AI coding…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Jennifer Bemert — XAnge",
       "description": "",
       "tags": [],
@@ -4492,7 +4492,7 @@
       "id": "dsc-mar-evals-are-the-new-moat-and-rl-turns-them-int"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "CB Insights",
       "description": "",
       "tags": [],
@@ -4537,7 +4537,7 @@
       "summary": "For too long, enterprise resource planning and accounting systems have been defined by complexity, high cost and stale data, operating more as check-the-box utilities than strategic enablers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "The Private Markets Forum",
       "description": "",
       "tags": [],
@@ -4611,7 +4611,7 @@
       "summary": "The limit of AI is compute. Especially when it comes to inference... Reasoning AI, demanding 100-1000x more compute than simple chatbots, faces a bottleneck: GPUs optimized for parallel training struggle with sequential inference workloads. NVIDIA projects a $3-4T AI infrastructure market by 2030,…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Synaptic",
       "description": "",
       "tags": [],
@@ -4641,7 +4641,7 @@
       "summary": "I recently published a market map on the in-store AI & computer vision landscape. I got a lot of great feedback and suggestions for companies I should add. Based on that, I updated the map (see below). I'll keep updating this over time so let me know if there are additional companies I should…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Merphi",
       "description": "",
       "tags": [],
@@ -4715,7 +4715,7 @@
       "summary": "🔷 We built a Semiconductor Market Map. Why? We're tracking a tectonic shift in the chip industry. A new breed of custom, hyper-focused chips are taking over. The sharpest engineers and boldest VCs are flocking now. Check top highlights below ↓🧵 We built this landscape in a 1-day sprint: → Specter…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Matt Turck & Aman Kabeer — Firstmark",
       "description": "",
       "tags": [],
@@ -4730,7 +4730,7 @@
       "summary": "The 2025 MAD (ML/AI/Data) Landscape is the definitive market map of companies and products in machine learning, artificial intelligence and data, compiled by FirstMark."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Redpoint Ventures",
       "description": "",
       "tags": [],
@@ -4745,7 +4745,7 @@
       "summary": "Get Redpoint Ventures’ exclusive outlook on AI applications with the 2025 AI 64 report."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Greenfield & TechCrunch Disrupt",
       "description": "",
       "tags": [],
@@ -4952,7 +4952,7 @@
       "summary": "Quick one for the database folks: Canaccord Genuity just put out a DBMS market map. If you don’t know them, Canaccord is a global investment bank that follows infra/software closely. They just published a snapshot of the DBMS ecosystem by ARR tiers. I’ve highlighted the time-series row (hi from…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Remarkable Ventures Climate",
       "description": "",
       "tags": [],
@@ -4996,7 +4996,7 @@
       "summary": "AI and software are reshaping dentistry - but most clinics still struggle with one simple question: where do we start? In the last couple of months I have talked to many dentists and dental professionals. They all face three big challenges when evaluating new technology: - Lack of clarity The…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Specter",
       "description": "",
       "tags": [],
@@ -5041,7 +5041,7 @@
       "summary": "Explore how AI is revolutionizing healthcare — from data activation and automation to creating 10× providers. A deep dive by Sapphire Ventures for 2025."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Legaltech Hub",
       "description": "",
       "tags": [],
@@ -5131,7 +5131,7 @@
       "summary": "A shift to systems of intelligence"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Theory Ventures",
       "description": "",
       "tags": [],
@@ -5205,7 +5205,7 @@
       "summary": "This piece benefited greatly from the thoughtful guidance and feedback of Meera Clark, Alex Bard, and Pat Chase. Thank you! If you’ve ever vibe-coded a web app, you probably have a newfound appreciation for designers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Patricia Haueiss",
       "description": "",
       "tags": [],
@@ -5295,7 +5295,7 @@
       "summary": "Autonomous, task-oriented \"AI agents\" capable of working independently has long been the field&rsquo;s north star. Yet despite considerable attention and effort, today's agents fall short of this vision."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "dealroom.co",
       "description": "",
       "tags": [],
@@ -5340,7 +5340,7 @@
       "summary": "Browsers are emerging as the ultimate frontend for using AI. Explore how AI browsers like Perplexity Comet, Dia, and others are reshaping our digital experience, triggering a high-stakes battle for control of the web's most critical gateway."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Olivia Moore & Daisy Zhao — a16z",
       "description": "",
       "tags": [],
@@ -5400,7 +5400,7 @@
       "summary": "I mapped 81 AI companies disrupting Wall Street. Save this - you'll reference it constantly. (Download the full excel with descriptions & links here: https://lnkd.in/eU_beSPt) The 5 categories reshaping finance: AI Agent Platforms (16 companies): Tools like Auquan and Hebbia that automate…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Alloy Alchemist Fund",
       "description": "",
       "tags": [],
@@ -5520,7 +5520,7 @@
       "summary": "So Stellaris Venture Partners created a Market Map on SDLC - because that’s what VCs do 🙂 But here’s the part that genuinely surprised me: before Stellaris, I had assumed such reports often provide a macro view (which, to be fair, is sometimes necessary for VCs to cover ground at scale - more on…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Sierra Ventures",
       "description": "",
       "tags": [],
@@ -5759,7 +5759,7 @@
       "summary": "The $800 Billion U.S. property & casualty (P&C) insurance industry is one of the economy’s most essential sectors. Yet, despite its importance, the technology supporting the sector remains vastly outdated."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Legaltech Hub",
       "description": "",
       "tags": [],
@@ -5774,7 +5774,7 @@
       "summary": "As of July 17, 2025, there were 133 solutions in the LTH Directory that incorporated AI Agents. We have created an interactive map of these solutions and the categories they operate in for your exploration."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Specter",
       "description": "",
       "tags": [],
@@ -5938,7 +5938,7 @@
       "summary": "AI has entered a new chapter: from hype to hands-on. Creating and scaling AI products is now the pivotal arena for competitive edge. ICONIQ's 2025 State of AI report, shifts focus from AI adoption to the how-to of AI execution, unpacking what it takes to conceive, deliver, and scale AI-powered…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Chris Millisits",
       "description": "",
       "tags": [],
@@ -6027,7 +6027,7 @@
       "summary": "AI is transforming healthcare. But it also brings new risks: performance gaps, hallucinations, bias, and non-determinism now threaten patient safety, trigger regulatory scrutiny, and expose organizations to legal and financial risk. Most healthcare organizations still lack the in-house expertise…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "AlbionVC",
       "description": "",
       "tags": [],
@@ -6131,7 +6131,7 @@
       "summary": "The assumptions underpinning traditional penetration testing are starting to bend, and a new generation of AI-driven approaches is emerging."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "James Berthoty — Latio",
       "description": "",
       "tags": [],
@@ -6251,7 +6251,7 @@
       "summary": "We collected all the current AI tools and workflows and put them together in this AI storytelling market map."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "b2venture",
       "description": "",
       "tags": [],
@@ -6339,7 +6339,7 @@
       "id": "dsc-mar-the-future-of-biological-foundation-models-a"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "CB Insights",
       "description": "",
       "tags": [],
@@ -6354,7 +6354,7 @@
       "summary": "Discover 200+ companies applying AI to discover and develop new therapeutics, from project inception through commercialization."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Lightspeed",
       "description": "",
       "tags": [],
@@ -6383,7 +6383,7 @@
       "summary": "AI Chips and GPUs: The Strategic Bottleneck Behind AI Growth Layer 1 of our AI Stack Market Map highlights a critical truth: AI is nothing without compute. GPUs and custom AI chips are the engines of every training run, every inference call. But access isn’t equal. The U.S. and China are racing to…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "AlbionVC & Beauhurst",
       "description": "",
       "tags": [],
@@ -6666,7 +6666,7 @@
       "summary": "AI is no longer a futuristic concept for HR; it’s here today, transforming how companies attract, hire, and retain talent."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Antler",
       "description": "",
       "tags": [],
@@ -6681,7 +6681,7 @@
       "summary": "How AI is transforming sales | Antler"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Georgian",
       "description": "",
       "tags": [],
@@ -6755,7 +6755,7 @@
       "id": "dsc-mar-llm-stack-market-map"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Norwest",
       "description": "",
       "tags": [],
@@ -6859,7 +6859,7 @@
       "summary": "The healthcare industry stands at a pivotal moment. Facing complex challenges including labor shortages, clinician burnout, declining profitability, and low satisfaction, healthcare stakeholders are eager for solutions that can improve efficiency and effectiveness. During this time of heightened…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Elion",
       "description": "",
       "tags": [],
@@ -6903,7 +6903,7 @@
       "summary": "⚖️ Gen AI is well on its way to democratize legal services. From accessible legal research, to contract automation, to patent drafting – AI is fundamentally reshaping legal tech. Here’s a quick map to key segments and standout startups in the space! [🧵 1/6]"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Tracxn",
       "description": "",
       "tags": [],
@@ -6963,7 +6963,7 @@
       "summary": "As enterprises race to deploy GenAI and LLMs, the risks around privacy, misuse, and model manipulation are no longer hypothetical—they're already here. This is why SACR is sharing our collaborative full market map of many AI security vendors building tools to secure enterprise AI across: 1️⃣…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Forbes",
       "description": "",
       "tags": [],
@@ -7023,7 +7023,7 @@
       "summary": "What happens when AI doesn&rsquo;t just generate content, but embodies it? I tested over 20 AI avatar products to understand what&rsquo;s working and what's next."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "XAnge",
       "description": "",
       "tags": [],
@@ -7038,7 +7038,7 @@
       "summary": "AI‑enabled Salestech – XAnge deep dive on separating hype from real impact, guiding founders on choosing tools that truly enhance sales effectiveness."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "CroAI",
       "description": "",
       "tags": [],
@@ -7097,7 +7097,7 @@
       "summary": "Mapping the key players in generative AI, player analytics, automated QA, and operational efficiency for modern game studios"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "The Wealth Mosaic",
       "description": "",
       "tags": [],
@@ -7111,7 +7111,7 @@
       "id": "dsc-mar-the-ai-wealthtech-market-map-april-2025"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "CB Insights",
       "description": "",
       "tags": [],
@@ -7126,7 +7126,7 @@
       "summary": "Discover 170+ AI agent startups across 26 categories, as well as CB Insights' outlook on AI agents’ progress, limitations, and future directions."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Antler",
       "description": "",
       "tags": [],
@@ -7141,7 +7141,7 @@
       "summary": "AI is ushering in a new era where messaging, spend and targeting self-optimize across channels — giving rise to an entirely new class of marketing tools."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Antler",
       "description": "",
       "tags": [],
@@ -7156,7 +7156,7 @@
       "summary": "From AI Assistants to Full Automation: The Future of Fintech"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "AI Agents Directory",
       "description": "",
       "tags": [],
@@ -7231,7 +7231,7 @@
       "summary": "We explore what MCP is, how it changes the way AI interacts with tools, what developers are already building, and the challenges that still need solving."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Auchenberg",
       "description": "",
       "tags": [],
@@ -7274,7 +7274,7 @@
       "id": "dsc-mar-zero-or-hero-a-technical-framework-for-valui"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "a16z",
       "description": "",
       "tags": [],
@@ -7289,7 +7289,7 @@
       "summary": "Which AI apps are people actively using? What&rsquo;s actually making money, beyond being popular? We analyzed the data."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "IoT Analytics",
       "description": "",
       "tags": [],
@@ -7349,7 +7349,7 @@
       "summary": "Software has been the favored child for Silicon Valley for decades; Hardware relegated to a niche. But AI is rewriting the playbook."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Protege",
       "description": "",
       "tags": [],
@@ -7394,7 +7394,7 @@
       "summary": "Headline’s perspective on investing in AI-centric infrastructure software. Learn how Headline evaluates opportunities in this evolving space, from open source roots to real-world product-market fit."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Forum Ventures",
       "description": "",
       "tags": [],
@@ -7439,7 +7439,7 @@
       "summary": "A Detailed Product and Vendor Guide on How to Secure AI in 2025 for Practitioners and Security Leaders"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Forum Ventures",
       "description": "",
       "tags": [],
@@ -7747,7 +7747,7 @@
       "summary": "Looking at the landscape of startups and investors"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Merphi",
       "description": "",
       "tags": [],
@@ -7761,7 +7761,7 @@
       "id": "dsc-mar-categorization-of-robots"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "a16z",
       "description": "",
       "tags": [],
@@ -7776,7 +7776,7 @@
       "summary": "What products are builders using to make websites and web apps with AI? A deep dive into how these products work, their limitations, and the features on the horizon."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Inc42",
       "description": "",
       "tags": [],
@@ -7791,7 +7791,7 @@
       "summary": "India is home to more than 100 GenAI startups and these startups have raised more than $1.5 Bn since 2020."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Backlinko",
       "description": "",
       "tags": [],
@@ -7836,7 +7836,7 @@
       "summary": "Unlike previous generations of software, new cognitive architectures enable AI agents to dynamically automate end-to-end processes."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Dawn Capital",
       "description": "",
       "tags": [],
@@ -7985,7 +7985,7 @@
       "summary": "🔥 Hot off the press! Our 1Q'25 Cybersecurity + AI Startup Market Map is here. 85+ startups, 2 pages now. Categories like AI for Identity, App & Data Security, Threat Hunting, Protecting AI, etc. Each logo links directly to the startup website. Free to download. What’s happening in Cybersecurity +…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Dawn Capital",
       "description": "",
       "tags": [],
@@ -8089,7 +8089,7 @@
       "id": "dsc-mar-ai-trends-2024"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Brandon Dixon — Applied GAI in Security",
       "description": "",
       "tags": [],
@@ -8149,7 +8149,7 @@
       "summary": "Private equity firms are seeing major changes through AI adoption, with new tools cutting manual work by 60% while making operations more accurate across deal sourcing, due diligence, and portfolio management. The switch to AI solutions shows clear benefits - mid-sized firms save over $2M yearly,…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Ascend",
       "description": "",
       "tags": [],
@@ -8164,7 +8164,7 @@
       "summary": "By: Nate Bek At the start of the year, we spotlighted Seattle’s understated position as one of AI’s most influential hubs. Since sharing that market map, the scene has evolved dramatically. A wave of AI startup formation and funding has followed breakthroughs in OpenAI’s GPT models and open-sour"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "eaidb.org",
       "description": "",
       "tags": [],
@@ -8178,7 +8178,7 @@
       "id": "dsc-mar-the-responsible-ai-ecosystem-fy-2024-market-"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Letta",
       "description": "",
       "tags": [],
@@ -8208,7 +8208,7 @@
       "summary": "As AI turns labor into software, the opportunity to productize external professional services has become a hot topic. However, we believe there is also substantial opportunity in productizing internal work within organizations."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Foundation Capital",
       "description": "",
       "tags": [],
@@ -8268,7 +8268,7 @@
       "summary": "Health system AI market map"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "PitchBook",
       "description": "",
       "tags": [],
@@ -8357,7 +8357,7 @@
       "id": "dsc-mar-deep-tech-market-map-the-future-of-aerospace"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "OpenOcean",
       "description": "",
       "tags": [],
@@ -8417,7 +8417,7 @@
       "summary": "An overview of the history, technology, and companies exposed to the AI data center buildout"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "PitchBook",
       "description": "",
       "tags": [],
@@ -8536,7 +8536,7 @@
       "summary": "Unlike previous generations of software, new cognitive architectures enable AI agents to dynamically automate end-to-end processes."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "E2B.dev",
       "description": "",
       "tags": [],
@@ -8551,7 +8551,7 @@
       "summary": "A list of AI autonomous agents. Contribute to e2b-dev/awesome-ai-agents development by creating an account on GitHub."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Climactic",
       "description": "",
       "tags": [],
@@ -8565,7 +8565,7 @@
       "id": "dsc-mar-climate-ai-market"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "IVP",
       "description": "",
       "tags": [],
@@ -8638,7 +8638,7 @@
       "id": "dsc-mar-the-future-of-voice-our-thoughts-on-how-it-w"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "American Family Ventures",
       "description": "",
       "tags": [],
@@ -8667,7 +8667,7 @@
       "summary": "Canada’s AI sector has experienced rapid growth in recent years, driven by active investors, innovative companies, and leading research hubs. From autonomous driving technology to agritech, Canadian AI startups have been attracting significant VC interest in recent years in line with the global AI…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Lightspeed",
       "description": "",
       "tags": [],
@@ -8903,7 +8903,7 @@
       "summary": "Explore the evolution of AI tooling and its potential worldwide impacts, with expert insights from 2024 reflecting on our predictions from 2018."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "IVP",
       "description": "",
       "tags": [],
@@ -8917,7 +8917,7 @@
       "id": "dsc-mar-the-ivp-enterprise-ai-55-2024-edition"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "PitchBook",
       "description": "",
       "tags": [],
@@ -8962,7 +8962,7 @@
       "summary": "Explore how technology is reshaping the legal landscape and the implications for businesses and legal professionals alike."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "The LegalTech Fund",
       "description": "",
       "tags": [],
@@ -8977,7 +8977,7 @@
       "summary": "We are thrilled to share the latest version of our LegalTech Generative AI market map! Generative AI is revolutionizing how law firms and companies operate, providing innovative solutions across various facets of the legal practice. With use cases exponentially growing and over $850M in capital…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Deutsche Telekom Israel",
       "description": "",
       "tags": [],
@@ -9184,7 +9184,7 @@
       "summary": "Breaking Down the AI Applications Market for Private Capital Investing"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Reimagine Ventures",
       "description": "",
       "tags": [],
@@ -9244,7 +9244,7 @@
       "summary": "Lots of Opportunity to Contribute and Benefit in Open Source AI"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Tangram Vision",
       "description": "",
       "tags": [],
@@ -9259,7 +9259,7 @@
       "summary": "The 2024 Perception Industry Map covers 105 companies developing hardware and software for robots, AVs and more."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Sequoia",
       "description": "",
       "tags": [],
@@ -9289,7 +9289,7 @@
       "summary": "The French tech ecosystem showed remarkable resilience during its first modern downturn in 2023. What is driving growth in these sectors? Below, we provide an overview of the five categories we think will be most influential in 2024 and the French tech companies we believe are leading the way."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "MMC",
       "description": "",
       "tags": [],
@@ -9378,7 +9378,7 @@
       "id": "dsc-mar-mastering-ai-governance-and-security"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Matt Turck — Firstmark",
       "description": "",
       "tags": [],
@@ -9763,7 +9763,7 @@
       "summary": "At DoorDash, real time events are an important data source to gain insight into our business but building a system capable of handling billions of real time events is challenging."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "",
       "tags": [],
@@ -9778,7 +9778,7 @@
       "summary": "Apache Atlas – Data Governance and Metadata framework for Hadoop"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "",
       "tags": [],
@@ -15490,7 +15490,7 @@
       "summary": "Authors: Vinay Kakade, Shiraz Zaman"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Coveo",
       "description": "",
       "tags": [],
@@ -16165,7 +16165,7 @@
       "id": "dsc-tec-a-british-ai-tool-to-predict-violent-crime-i"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": "Partnership on AI",
       "description": "",
       "tags": [],
@@ -16180,7 +16180,7 @@
       "summary": "The starting point for information about the AI Incident Database"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Essential AI trend updates to keep you in the know",
       "tags": [],
@@ -16194,7 +16194,7 @@
       "id": "dsc-ins-the-neuron"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Get the latest AI news, understand why it matters, and learn how to apply it in your work",
       "tags": [],
@@ -16209,7 +16209,7 @@
       "summary": "Get the most important AI news, tools, and breakthroughs — curated daily. Join millions reading The Rundown to stay ahead in artificial intelligence."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Daily 3-minute briefings on everything you need to know about AI and tech",
       "tags": [],
@@ -16224,7 +16224,7 @@
       "summary": "Join 75,000+ readers learning from a Data and AI leader in 3-minute briefings on everything you need to know about AI and tech."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Boost your productivity and career with AI insights",
       "tags": [],
@@ -16239,7 +16239,7 @@
       "summary": "Keep up with the latest AI news, trends, and tools in just 3 minutes a day. Join 1,500,000+ professionals."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Daily digest of AI, machine learning, and data science news",
       "tags": [],
@@ -16254,7 +16254,7 @@
       "summary": "TLDR is the free daily newsletter with the most interesting stories in startups, tech and programming!"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Daily AI updates in fun, casual, and easy-to-digest format",
       "tags": [],
@@ -16269,7 +16269,7 @@
       "summary": "I write a newsletter about startups and investing—for ai builders of all levels. I record mini-tutorials, write about tools I’m testing, share my insights and give you a peek behind the digital curtain from an exited founder turned investor. Click to read Ben's Bites, a Substack publication with…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Daily hot takes, expert opinions, and interactive polls (in HubSpot Media Network)",
       "tags": [],
@@ -16284,7 +16284,7 @@
       "summary": "The hottest AI newsletter around. News, opinions, polls and so much more. Join us for free!"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Weekly deep dives into cutting-edge AI projects and trends (3x per week)",
       "tags": [],
@@ -16299,7 +16299,7 @@
       "summary": "Curated weekly analysis of the latest AI projects, products, and news"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Daily AI news, written by humans",
       "tags": [],
@@ -16314,7 +16314,7 @@
       "summary": "A maturity model, newsletter, and practical program for building durable AI proficiency."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Daily comprehensive AI updates with tools and tutorials",
       "tags": [],
@@ -16329,7 +16329,7 @@
       "summary": "Get smarter about AI in 5 minutes | Join 100,000+ people from Google, OpenAI, Notion, Apple."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Weekly authoritative coverage from Andrew Ng's DeepLearning.AI",
       "tags": [],
@@ -16344,7 +16344,7 @@
       "summary": "Learn AI with DeepLearning.AI"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Weekly analysis and updates on AI policy and research",
       "tags": [],
@@ -16359,7 +16359,7 @@
       "summary": "Import AI is a weekly newsletter about artificial intelligence based on detailed analysis of cutting-edge research. Click to read Import AI, by Jack Clark, a Substack publication with hundreds of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Expert insights on machine learning best practices",
       "tags": [],
@@ -16374,7 +16374,7 @@
       "summary": "The Institute for Ethical AI Alignment & Safety is a research centre developing practical, open-source frameworks that help technologists, industry and policymakers build, evaluate and govern AI systems that are safe, aligned and accountable."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Daily digest for engineers with coding tips and trending repos",
       "tags": [],
@@ -16389,7 +16389,7 @@
       "summary": "AlphaSignal brings AI & ML engineers daily news, peer networking, and access to webinars, workshops, and training. Join 300,000+ engineers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Weekly no-BS approach to AI with practical applications",
       "tags": [],
@@ -16404,7 +16404,7 @@
       "summary": "The best source to stay up-to-date with the developments in the machine learning, artificial intelligence, and data science world. Trusted by 165,000 professionals from the main AI labs, universities, and enterprises. Click to read TheSequence, by Jesus Rodriguez, a Substack publication with…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Technical insights for AI engineers on model training and infrastructure (Top 10 US Tech podcast)",
       "tags": [],
@@ -16419,7 +16419,7 @@
       "summary": "The AI Engineer newsletter + Top technical AI podcast. How leading labs build Agents, Models, Infra, & AI for Science. See https://latent.space/about for highlights from Greg Brockman, Andrej Karpathy, George Hotz, Simon Willison, Soumith Chintala et al! Click to read Latent.Space, a Substack…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "No-fluff AI insights for 10,000+ enterprise leaders (actionable strategies and real-world use cases)",
       "tags": [],
@@ -16434,7 +16434,7 @@
       "summary": "Your go-to source for no-fluff AI insights, real-world use cases, and actionable strategies for 10,000+ enterprise leaders. Beyond hype. Beyond theory. Beyond doubt."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Practical look at how businesses use AI with case studies",
       "tags": [],
@@ -16449,7 +16449,7 @@
       "summary": "Become the AI expert at your company. Get practical workflows and templates that save time, cut costs, make money, and prove your value. I give you the playbook, you get the results. Deal?​​​​​​​​​​​​​​​​. Click to read AI Adopters Club, by Kamil Banc, a Substack publication with tens of thousands…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Research trends and practical developments by Sebastian Raschka, PhD",
       "tags": [],
@@ -16464,7 +16464,7 @@
       "summary": "Ahead of AI focuses on machine learning and AI research and is read by more than 200,000 researchers and practitioners who want to stay ahead in a rapidly evolving field. Click to read Ahead of AI, by Sebastian Raschka, PhD, a Substack publication with hundreds of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Newsletter written partly with AI, covering industry trends",
       "tags": [],
@@ -16479,7 +16479,7 @@
       "summary": "Subscribe to the AI News newsletter to receive exclusive AI technology news, trends and insights, membership offers and event invites."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Strategic AI briefings for business decision makers (weekly, action-focused)",
       "tags": [],
@@ -16494,7 +16494,7 @@
       "summary": "I've felt what happens when you say AI out loud in certain creative rooms. Part alien, part monkey, part creator — I write about what's really changing for the people who make things. Subscribers get The Creator's AI Licensing Guide. Click to read The AI Optimist, by Declan Dunn, a Substack…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Daily newsletter on AI news and tools (3x per week)",
       "tags": [],
@@ -16509,7 +16509,7 @@
       "summary": "The #1 AI newsletter. Read and trusted by over 2.5 million readers, including employees at Google, Microsoft, Meta, Salesforce, Intel, Samsung, Zoom, Wix, HubSpot, Nebius, Suno, Zapier, as well as thousands of AI influencers and enthusiasts."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Comprehensive roundup of AI tools, news, and monetization strategies",
       "tags": [],
@@ -16524,7 +16524,7 @@
       "summary": "Everything you need to know in AI news and tools"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Learn to save time and earn more with AI (5-minute daily updates)",
       "tags": [],
@@ -16539,7 +16539,7 @@
       "summary": "You don’t need to be technical. Just informed. From Fortune 500 to first-time startups — 400,000 read The AI Report to lead with confidence."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "AI tools integration into business processes",
       "tags": [],
@@ -16554,7 +16554,7 @@
       "summary": "Welcome to 'The AI Break' – where we serve you hot slices of AI news in a 5mn coffee break. Join over 100k AI individuals + Get Access to our AI & Automation Resources. Click to read The AI Break, a Substack publication with hundreds of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Discover AI-powered marketing and productivity hacks (100K+ readers)",
       "tags": [],
@@ -16569,7 +16569,7 @@
       "summary": "How 100,000+ leaders at Microsoft, Google, and BlackRock stay ahead on AI"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "",
       "tags": [],
@@ -16584,7 +16584,7 @@
       "summary": "AIM offers AI Marketing insights that boost your campaigns and keep you ahead of the competition."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Biweekly updates on AI marketing tools and techniques",
       "tags": [],
@@ -16599,7 +16599,7 @@
       "summary": "AI-assisted marketing tools and techniques delivered bi-weekly. Read by teams at Apple, Microsoft, Fidelity, Lyft, and Forrester. For the risk-takers, opportunists, and future marketing leaders."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "AI applications in marketing",
       "tags": [],
@@ -16614,7 +16614,7 @@
       "summary": "Want to learn more about AI in marketing? We've got you covered with exclusive info, news and company spotlights you can't find elsewhere."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Learn by doing with daily 30-minute AI challenges",
       "tags": [],
@@ -16629,7 +16629,7 @@
       "summary": "Read practical insights on AI adoption, capability building, and team behaviour change to apply better AI workflows in real business contexts."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Educational content with tutorials and diverse perspectives",
       "tags": [],
@@ -16644,7 +16644,7 @@
       "summary": "Towards AI's thoughts on the week's biggest AI developments. All major AI news, models, tools and papers covered. Read by over 130,000 AI Practitioners, Industry Professionals and AI Students. Click to read Towards AI Newsletter, a Substack publication."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Monthly insights on AI and education by Dr. Sarah Johnson",
       "tags": [],
@@ -16658,7 +16658,7 @@
       "id": "dsc-ins-ai-for-education"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Newsletter exploring AI and education through reflection and insights",
       "tags": [],
@@ -16673,7 +16673,7 @@
       "summary": "A newsletter from Dr. Lance Eaton exploring AI and education through reflection, conversation, and sharing of insights, challenges, and insights. Click to read AI + Education = Simplified, by Lance Eaton, a Substack publication with tens of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Advancements in predictive analytics and machine learning for healthcare",
       "tags": [],
@@ -16688,7 +16688,7 @@
       "summary": "AI in Healthcare is the leading source of information on the latest developments in the use of artificial intelligence in healthcare. We provide coverage of AI-powered medical devices, software, and algorithms, as well as the ethical and regulatory challenges surrounding the use of AI in healthcare."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Weekly updates from American Medical Association on healthcare AI",
       "tags": [],
@@ -16703,7 +16703,7 @@
       "summary": "Get the latest news from the AMA on topics that matter to you with the AMA's free newsletters. Learn more."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Research and applications of AI in clinical medicine",
       "tags": [],
@@ -16717,7 +16717,7 @@
       "id": "dsc-ins-nejm-ai"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Stanford Medicine's monthly AI in biomedical landscape",
       "tags": [],
@@ -16732,7 +16732,7 @@
       "summary": "Stanford Health Care delivers the highest levels of care and compassion. SHC treats cancer, heart disease, brain disorders, primary care issues, and many more."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Healthcare AI applications and medical research",
       "tags": [],
@@ -16747,7 +16747,7 @@
       "summary": "STAT explores the use of AI in medicine, looking at the promise and peril of artificial intelligence in medical and health care settings."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Responsible AI in health with global nonprofit perspective",
       "tags": [],
@@ -16761,7 +16761,7 @@
       "id": "dsc-ins-healthai-newsletter"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Semiconductor industry research crucial for AI development",
       "tags": [],
@@ -16776,7 +16776,7 @@
       "summary": "SemiVision is a semiconductor industry research institution committed to transforming analysis into vision through comprehensive insights into the semiconductor ecosystem. Click to read SEMIVISION @_@, a Substack publication with tens of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "AI from human-centric perspective with ethical contexts",
       "tags": [],
@@ -16791,7 +16791,7 @@
       "summary": "A blog about AI that's actually about people. Click to read The Algorithmic Bridge, by Alberto Romero, a Substack publication with tens of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Weekly concise updates on AI research and developments",
       "tags": [],
@@ -16806,7 +16806,7 @@
       "summary": "Weekly text and audio summaries of the most interesting AI news, as well as editorials commenting on recent events. Click to read Last Week in AI, a Substack publication with hundreds of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Weekly research, policy, and education updates from Stanford",
       "tags": [],
@@ -16820,7 +16820,7 @@
       "id": "dsc-ins-stanford-hai-newsletter"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Academic AI research with democratizing knowledge focus",
       "tags": [],
@@ -16835,7 +16835,7 @@
       "summary": "Biweekly updates covering recent AI news and research. Click to read The Gradient, a Substack publication with tens of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Computer vision, edge AI, and embedded vision",
       "tags": [],
@@ -16850,7 +16850,7 @@
       "summary": "About Insights Edge AI and Vision Insights is our bi-weekly newsletter, delivering the latest technology, applications, markets, and trends in edge AI and vision right to your inbox. To receive Insights, please register via the “Subscribe to the Edge AI and Vision Insights Newsletter” section in…"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Data science and ML research with practical applications",
       "tags": [],
@@ -16865,7 +16865,7 @@
       "summary": "Your home for data science and AI. The world’s leading publication for data science, data analytics, data engineering, machine learning, and artificial intelligence professionals."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Teaching writers how to use AI for content creation",
       "tags": [],
@@ -16880,7 +16880,7 @@
       "summary": "The leading paid newsletter for ChatGPT & Claude prompts, and how to turn AI platforms into your own personal Digital Writing Assistant. Click to read Write With AI, a Substack publication with hundreds of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Generative AI-focused content covering tools, prompts, and news (weekly)",
       "tags": [],
@@ -16895,7 +16895,7 @@
       "summary": "Weekly insights on AI tools, workflows, and visual innovation. Used by creators, studios, and production teams. Click to read Visually AI by Heather Cooper, a Substack publication with tens of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "AI art news, interviews, and creative resources",
       "tags": [],
@@ -16910,7 +16910,7 @@
       "summary": "A free, once–weekly e-mail newsletter round-up of AI art news, interviews and resources."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "AI safety research and societal-scale risks",
       "tags": [],
@@ -16925,7 +16925,7 @@
       "summary": "The latest news on AI Safety. Click to read AI Safety Newsletter, by Center for AI Safety, a Substack publication with tens of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Technical safety research and publications",
       "tags": [],
@@ -16940,7 +16940,7 @@
       "summary": "ML Safety Research News. Click to read ML Safety Newsletter, a Substack publication with tens of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "AI security policy and emerging technology governance",
       "tags": [],
@@ -16955,7 +16955,7 @@
       "summary": "The place to find CSET's publications, reports, and people"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Critical analysis debunking AI hype and examining limitations",
       "tags": [],
@@ -16970,7 +16970,7 @@
       "summary": "Analyzing AI as transformative but normal technology, not superintelligence. Click to read AI as Normal Technology, a Substack publication with tens of thousands of subscribers."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "AI research breakthroughs and technical publications",
       "tags": [],
@@ -16985,7 +16985,7 @@
       "summary": "Discover our latest AI breakthroughs, projects, and updates."
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Weekly tech news on AI, cloud and beyond",
       "tags": [],
@@ -17000,7 +17000,7 @@
       "summary": "The page you requested cannot be displayed (HTTP response code 403)"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "AI hardware, applications, enterprise solutions",
       "tags": [],
@@ -17014,7 +17014,7 @@
       "id": "dsc-ins-nvidia-deep-learning-ai"
     },
     {
-      "kind": "article",
+      "kind": "domain",
       "company": null,
       "description": "Technical AI research from leading university lab",
       "tags": [],

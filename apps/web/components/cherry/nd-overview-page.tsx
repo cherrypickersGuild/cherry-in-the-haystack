@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 import { API_URL } from "@/lib/auth"
+import { CategoryTreemap } from "@/components/cherry/buzz-treemap"
+import { fetchLanding, LandingResponse } from "@/lib/api"
 
 /**
  * Newly Discovered — Overview
@@ -82,46 +84,76 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
 const HERO_INTERVAL_MS = 10_000
 
 function HeroCarousel({ items }: { items: Item[] }) {
-  const [active, setActive] = useState(0)
+  const n = items.length
+  const [active, setActive] = useState(0) // 실제 인덱스(인디케이터용)
   const [paused, setPaused] = useState(false)
   const trackRef = useRef<HTMLDivElement>(null)
+  const jumpingRef = useRef(false) // 클론→실제 순간이동 중엔 onScroll 무시
+  const idleRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const el = e.currentTarget
-    setActive(Math.round(el.scrollLeft / el.clientWidth))
+  /* 무한 순환: 양끝에 클론을 둔다 → [마지막 클론, ...실제, 첫 클론].
+     실제 슬라이드는 rawIndex 1..n. 끝을 넘어가면 옆에서 슬라이드로 들어오고(클론),
+     스크롤이 멈춘 뒤 동일하게 생긴 실제 슬라이드로 순간 이동해 이음매를 없앤다. */
+  const loop = n > 1
+  const slides = loop ? [items[n - 1], ...items, items[0]] : items
+
+  const rawToReal = (raw: number) => (!loop ? 0 : raw <= 0 ? n - 1 : raw >= n + 1 ? 0 : raw - 1)
+  const rawIndex = () => {
+    const el = trackRef.current
+    return el && el.clientWidth ? Math.round(el.scrollLeft / el.clientWidth) : loop ? 1 : 0
   }
+  const goRaw = (raw: number, smooth = true) => {
+    const el = trackRef.current
+    if (el) el.scrollTo({ left: raw * el.clientWidth, behavior: smooth ? "smooth" : "auto" })
+  }
+  const next = () => goRaw(rawIndex() + 1)
+  const prev = () => goRaw(rawIndex() - 1)
+  const goToReal = (i: number) => goRaw(loop ? i + 1 : i)
 
-  /** i가 범위를 벗어나면 순환(wrap)한다 — 마지막 다음은 처음 */
-  const goTo = (i: number, smooth = true) => {
+  // 마운트 시 첫 실제 슬라이드(rawIndex 1)로 위치. 레이아웃 준비 안 됐으면 다음 프레임 재시도.
+  useEffect(() => {
+    if (!loop) return
     const el = trackRef.current
     if (!el) return
-    const n = items.length
-    const idx = ((i % n) + n) % n
-    el.scrollTo({ left: idx * el.clientWidth, behavior: smooth ? "smooth" : "auto" })
+    const place = () => {
+      if (el.clientWidth === 0) { requestAnimationFrame(place); return }
+      jumpingRef.current = true
+      el.scrollLeft = el.clientWidth
+      requestAnimationFrame(() => { jumpingRef.current = false })
+    }
+    place()
+  }, [loop])
+
+  // 스크롤이 멈춘 뒤 클론 위에 있으면 실제 슬라이드로 순간 이동(이음매 제거)
+  const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (jumpingRef.current) return
+    const el = e.currentTarget
+    setActive(rawToReal(Math.round(el.scrollLeft / el.clientWidth)))
+    if (!loop) return
+    if (idleRef.current) clearTimeout(idleRef.current)
+    idleRef.current = setTimeout(() => {
+      const raw = Math.round(el.scrollLeft / el.clientWidth)
+      if (raw !== 0 && raw !== n + 1) return
+      jumpingRef.current = true
+      el.scrollLeft = (raw === 0 ? n : 1) * el.clientWidth
+      requestAnimationFrame(() => { jumpingRef.current = false })
+    }, 130)
   }
 
-  /* 자동 재생 — 10초마다 다음 장, 끝나면 처음으로 순환.
-     · 마우스를 올리거나(paused) 탭이 백그라운드면 멈춘다.
-     · 사용자가 '동작 줄이기'를 켜두었으면 자동 재생하지 않는다(접근성). */
+  /* 자동 재생 — 10초마다 다음 장(순환). hover/백그라운드/동작줄이기면 멈춤.
+     trackRef만 참조해 DOM 스크롤 위치 기준으로 전진 → 클론+onScroll 리셋이 순환 처리. */
   useEffect(() => {
-    if (items.length <= 1 || paused) return
+    if (n <= 1 || paused) return
     if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return
-
     const id = setInterval(() => {
       if (document.hidden) return
-      setActive((cur) => {
-        const next = (cur + 1) % items.length
-        const el = trackRef.current
-        if (el) {
-          // 마지막 → 처음으로 돌아갈 때는 긴 역방향 애니메이션이 어색하므로 즉시 이동
-          el.scrollTo({ left: next * el.clientWidth, behavior: next === 0 ? "auto" : "smooth" })
-        }
-        return next
-      })
+      const el = trackRef.current
+      if (!el || !el.clientWidth) return
+      const raw = Math.round(el.scrollLeft / el.clientWidth)
+      el.scrollTo({ left: (raw + 1) * el.clientWidth, behavior: "smooth" })
     }, HERO_INTERVAL_MS)
-
     return () => clearInterval(id)
-  }, [items.length, paused])
+  }, [n, paused])
 
   return (
     <div
@@ -131,29 +163,25 @@ function HeroCarousel({ items }: { items: Item[] }) {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      {/* 좌우 화살표 — 가늘게, hover 시 드러남 */}
-      {active > 0 && (
-        <button
-          type="button"
-          aria-label="Previous"
-          onClick={() => goTo(active - 1)}
-          className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 opacity-0 transition-opacity duration-200 group-hover/hero:opacity-100"
-          style={{ background: "rgba(255,255,255,.18)", backdropFilter: "blur(8px)" }}
-        >
-          <Chevron dir="left" />
-        </button>
-      )}
-      {active < items.length - 1 && (
-        <button
-          type="button"
-          aria-label="Next"
-          onClick={() => goTo(active + 1)}
-          className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 opacity-0 transition-opacity duration-200 group-hover/hero:opacity-100"
-          style={{ background: "rgba(255,255,255,.18)", backdropFilter: "blur(8px)" }}
-        >
-          <Chevron dir="right" />
-        </button>
-      )}
+      {/* 좌우 화살표 — 가늘게, hover 시 드러남. 양끝에서도 항상 표시(순환 이동) */}
+      <button
+        type="button"
+        aria-label="Previous"
+        onClick={prev}
+        className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 opacity-0 transition-opacity duration-200 group-hover/hero:opacity-100"
+        style={{ background: "rgba(255,255,255,.18)", backdropFilter: "blur(8px)" }}
+      >
+        <Chevron dir="left" />
+      </button>
+      <button
+        type="button"
+        aria-label="Next"
+        onClick={next}
+        className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 opacity-0 transition-opacity duration-200 group-hover/hero:opacity-100"
+        style={{ background: "rgba(255,255,255,.18)", backdropFilter: "blur(8px)" }}
+      >
+        <Chevron dir="right" />
+      </button>
 
       <div
         ref={trackRef}
@@ -162,9 +190,12 @@ function HeroCarousel({ items }: { items: Item[] }) {
         style={{ gap: 16, scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         <style>{`.hero-track::-webkit-scrollbar{display:none}`}</style>
-        {items.map((h, idx) => (
+        {slides.map((h, idx) => {
+          // 그라디언트는 실제 인덱스 기준(클론도 원본 색 그대로)
+          const gi = loop ? (idx - 1 + n) % n : idx
+          return (
           <a
-            key={h.i + h.n}
+            key={idx}
             href={h.u}
             target="_blank"
             rel="noopener noreferrer"
@@ -176,7 +207,7 @@ function HeroCarousel({ items }: { items: Item[] }) {
               boxShadow: "0 10px 34px rgba(45,20,70,.18)",
             }}
           >
-            <div className="flex flex-col p-[30px_32px]" style={{ background: HERO_GRADIENTS[idx % HERO_GRADIENTS.length][0] }}>
+            <div className="flex flex-col p-[30px_32px]" style={{ background: HERO_GRADIENTS[gi % HERO_GRADIENTS.length][0] }}>
               <div className="text-[11.5px] font-extrabold uppercase tracking-[1.2px] opacity-70">Pick of the week</div>
               <h3 className="mt-3 text-[34px] font-extrabold leading-[1.12] tracking-[-0.8px]">{h.n}</h3>
               <p className="mt-3 max-w-[34ch] text-[14px] leading-[1.6] opacity-[.86]">{h.d}</p>
@@ -195,7 +226,7 @@ function HeroCarousel({ items }: { items: Item[] }) {
             </div>
             <div
               className="relative flex items-center justify-center overflow-hidden"
-              style={{ background: HERO_GRADIENTS[idx % HERO_GRADIENTS.length][1] }}
+              style={{ background: HERO_GRADIENTS[gi % HERO_GRADIENTS.length][1] }}
             >
               <span
                 className="absolute rounded-full"
@@ -211,7 +242,8 @@ function HeroCarousel({ items }: { items: Item[] }) {
               </span>
             </div>
           </a>
-        ))}
+          )
+        })}
       </div>
 
       {/* 인디케이터 */}
@@ -221,7 +253,7 @@ function HeroCarousel({ items }: { items: Item[] }) {
             key={i}
             type="button"
             aria-label={`Go to slide ${i + 1}`}
-            onClick={() => goTo(i)}
+            onClick={() => goToReal(i)}
             className="cursor-pointer border-0 p-0 transition-all"
             style={{
               width: i === active ? 20 : 6,
@@ -338,6 +370,12 @@ const toItem = (c: CfgItem): Item => ({
 export function NDOverviewPage() {
   const [cfg, setCfg] = useState<OverviewConfig | null>(null)
   const [error, setError] = useState(false)
+  // Buzz Distribution 트리맵 데이터(Digest에서 이관). 실패해도 트리맵은 STATIC 폴백으로 렌더.
+  const [landing, setLanding] = useState<LandingResponse | null>(null)
+
+  useEffect(() => {
+    fetchLanding().then(setLanding).catch(() => {})
+  }, [])
 
   useEffect(() => {
     fetch(`${API_URL}/api/overview/config`, { cache: "no-store" })
@@ -405,6 +443,10 @@ export function NDOverviewPage() {
       {/* 새로 추가됨 */}
       <SectionHead title={cfg.justAdded.label} desc={cfg.justAdded.sub} />
       <ItemRows items={cfg.justAdded.items.map(toItem)} />
+
+      {/* Buzz Distribution — Digest에서 이관. Hero·Worth a Look·Just Added 다음 위치 */}
+      <SectionHead title="Buzz Distribution" desc="This week's activity by category" />
+      <CategoryTreemap items={landing?.treemap} showHeader={false} />
 
       {/* 아래로 반복되는 블록 (배너 있는 블록만 배너 렌더) */}
       {cfg.blocks.map((b, i) => (

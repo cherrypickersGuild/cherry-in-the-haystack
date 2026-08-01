@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Cherry as CherryLucide } from "lucide-react"
 import {
@@ -148,14 +148,6 @@ const ND_UTILITY_IC: Record<string, string> = {
 
 const SECTIONS: SectionDef[] = [
   {
-    id: "digest",
-    label: "DIGEST",
-    items: [
-      { id: "highlight", ic: "home", label: "This Week's Highlights" },
-      { id: "patch-notes", ic: "file", label: "Patch Notes" },
-    ],
-  },
-  {
     id: "newly-discovered",
     label: "NEWLY DISCOVERED",
     items: [
@@ -240,31 +232,15 @@ const SECTIONS: SectionDef[] = [
       { id: "kaas-arena", ic: "trophy", label: "Arena" },
     ],
   },
+  {
+    // "This Week's Highlights" 메뉴는 삭제. Patch Notes만 남겨 맨 아래로 이동.
+    id: "digest",
+    label: "DIGEST",
+    items: [
+      { id: "patch-notes", ic: "file", label: "Patch Notes" },
+    ],
+  },
 ]
-
-/* ─────────────────────────────────────────────
-   아코디언용 역참조 — "활성 페이지 → 펼칠 그룹"
-   - PARENT_OF: 자식 id → 부모 그룹 id (모든 섹션: ND 4그룹 + Learning Basics/Advanced)
-   - LANDING_OF: ND 그룹의 landingId(헤더 클릭 시 이동하는 카탈로그) → 그룹 key
-   활성 그룹을 여기서 계산하므로 펼침을 따로 저장하지 않아도 "활성만 열림"이 보장된다.
-───────────────────────────────────────────── */
-const PARENT_OF: Record<string, string> = {}
-for (const section of SECTIONS) {
-  for (const item of section.items) {
-    if (item.children?.length) {
-      for (const c of item.children) PARENT_OF[c.id] = item.id
-    }
-  }
-}
-const LANDING_OF: Record<string, string> = {}
-for (const g of ND_GROUPS) {
-  if (g.landingId) LANDING_OF[g.landingId] = g.key
-}
-
-/** 지금 활성인 페이지가 속한 (펼쳐야 할) 그룹 id. 어느 그룹에도 안 속하면 null → 전부 접힘. */
-function groupOfActive(active: string): string | null {
-  return PARENT_OF[active] ?? LANDING_OF[active] ?? null
-}
 
 /* ─────────────────────────────────────────────
    Cherry Icon (로고) — 기존 export 유지
@@ -355,9 +331,14 @@ function ItemButton({
           aria-label={onToggle ? (isCollapsed ? "펼치기" : "접기") : undefined}
           className={
             "flex flex-shrink-0 items-center justify-center rounded-md" +
-            (onToggle ? " cursor-pointer hover:bg-black/5" : "")
+            (onToggle ? " cursor-pointer hover:bg-black/10" : "")
           }
-          style={{ width: 22, height: 22, marginRight: -4, color }}
+          // 넓은 전용 접기/펴기 존: 행 높이 전체 + 폭 40px (원래 22px라 누르기 좁았음).
+          style={
+            onToggle
+              ? { width: 40, alignSelf: "stretch", marginTop: -8, marginBottom: -8, marginRight: -10, color }
+              : { width: 22, height: 22, marginRight: -4, color }
+          }
         >
           <span
             className="flex"
@@ -391,10 +372,43 @@ export function Sidebar({
   className?: string
   hideLogo?: boolean
 }) {
-  // 아코디언: "지금 보고 있는 페이지가 속한 그룹" 하나만 펼친다.
-  // 펼침을 저장하지 않고 active에서 파생 → "활성만 열림, 나머지 닫힘"이 구조상 보장.
-  // 어느 그룹에도 안 속한 페이지(Overview·Digest·Utility·Shop 등)면 null → 전부 접힘.
-  const activeGroupId = groupOfActive(active)
+  // 멀티오픈: 여러 그룹을 동시에 펼쳐둘 수 있다. 자동으로 닫지 않으므로 메뉴가 튀지 않는다.
+  // 펼친 상태는 그룹별로 localStorage에 저장·복원.
+  const COLLAPSE_KEY = "cherry_sidebar_collapsed"
+  // 기본 전부 접힘 — 메뉴가 간결하게 시작.
+  const DEFAULT_COLLAPSED: Record<string, boolean> = {
+    basics: true,
+    advanced: true,
+    research: true,
+    eng: true,
+    cases: true,
+    discourse: true,
+  }
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(DEFAULT_COLLAPSED)
+  const [hydrated, setHydrated] = useState(false)
+
+  // mount 시 1회 복원. 기존 저장값에 없는 신규 그룹 키가 undefined(=펼침)가 되지 않도록 기본값과 '병합'.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(COLLAPSE_KEY)
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (parsed && typeof parsed === "object") {
+          setCollapsed({ ...DEFAULT_COLLAPSED, ...parsed })
+        }
+      }
+    } catch { /* noop */ }
+    setHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
+    try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(collapsed)) } catch {}
+  }, [collapsed, hydrated])
+
+  // 화살표(넓은 전용 존) = 접기/펴기 토글. 본문 클릭 = 이동 + 펼치기(닫진 않음 → 안 튐).
+  const toggle = (id: string) => setCollapsed((c) => ({ ...c, [id]: !c[id] }))
+  const open = (id: string) => setCollapsed((c) => (c[id] === false ? c : { ...c, [id]: false }))
 
   return (
     <aside
@@ -472,20 +486,22 @@ export function Sidebar({
                 )
               }
 
-              const isC = activeGroupId !== item.id
+              const isC = !!collapsed[item.id]
               return (
                 <div key={item.id}>
                   <ItemButton
                     item={item}
                     isActive={false}
                     isCollapsed={isC}
-                    // 행 전체 클릭 = 그 그룹으로 이동. 이동하면 그 그룹만 펼쳐지고 나머진 닫힌다(아코디언).
-                    // 화살표는 여닫기 버튼이 아니라 방향 표시등(onToggle 없음).
+                    // 본문 클릭 = 이동 + 펼치기(절대 닫지 않음 → 메뉴가 튀지 않음).
+                    // 접기는 오른쪽 넓은 화살표 존(onToggle)이 전담.
                     onClick={() => {
+                      open(item.id)
                       const g = getNDGroup(item.id)
                       if (g) onSelect(g.landingId ?? g.children[0])
                       else if (item.children?.length) onSelect(item.children[0].id)
                     }}
+                    onToggle={() => toggle(item.id)}
                   />
                   {/* 목업 .children — 단순 좌측 선 */}
                   {!isC && (

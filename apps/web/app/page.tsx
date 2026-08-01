@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { Sidebar, CherryIcon } from "@/components/cherry/sidebar"
 import { MobileSidebar } from "@/components/cherry/mobile-sidebar"
 import { PageHeader } from "@/components/cherry/page-header"
-import { CategoryTreemap } from "@/components/cherry/buzz-treemap"
 import { PatchNotesPage } from "@/components/cherry/patch-notes-page"
 import { fetchLanding, fetchLandingArticles, LandingResponse, LandingTopArticle } from "@/lib/api"
 import { useAuthTick, getAccessToken, decodeToken, clearAccessToken } from "@/lib/auth"
@@ -36,7 +35,7 @@ const STATIC_MOMENTUM = [
 ]
 
 export default function CherryApp() {
-  const [activeNav, setActiveNav] = useState("highlight")
+  const [activeNav, setActiveNav] = useState("nd-overview")
   const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder">("dashboard")
   const [marketConceptId, setMarketConceptId] = useState<string | null>(null)
   const [landing, setLanding] = useState<LandingResponse | null>(null)
@@ -200,20 +199,16 @@ export default function CherryApp() {
             {/* Page header: title + toggle */}
             <PageHeader />
 
-            {/* Category treemap + Side panel row */}
-            <div className="flex flex-col lg:flex-row gap-4 mb-6">
-              {/* Treemap */}
-              <div className="flex-1">
-                <CategoryTreemap items={landing?.treemap} />
-              </div>
-
-              {/* Side panel: Trending Momentum */}
-              <div className="w-full lg:w-[260px] lg:flex-shrink-0">
-                <p className="text-[13px] uppercase font-bold tracking-[0.5px] text-text-secondary mb-3">
-                  Trending Momentum
-                </p>
-                <div className="space-y-2.5">
-                  {(() => {
+            {/* Trending Momentum — 전폭 3열 (Buzz Distribution은 Overview로 이관) */}
+            <section aria-labelledby="momentum-heading" className="mb-6">
+              <p
+                id="momentum-heading"
+                className="text-[13px] uppercase font-bold tracking-[0.5px] text-text-secondary mb-3"
+              >
+                Trending Momentum
+              </p>
+              <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+                {(() => {
                     const entities = landing && landing.topMomentumEntities.length > 0
                       ? landing.topMomentumEntities
                       : STATIC_MOMENTUM
@@ -252,9 +247,8 @@ export default function CherryApp() {
                       )
                     })
                   })()}
-                </div>
               </div>
-            </div>
+            </section>
 
             {/* Top picks this week */}
             <section aria-labelledby="top-picks-heading">
@@ -374,8 +368,8 @@ export default function CherryApp() {
           style={{ backgroundColor: "#FBFAF8" }}
           id="main-content"
         >
-          {/* 가로 표준은 1000px. Landscape 4단 페이지(Frameworks/Prompting/Cases Best)만 1160px. */}
-          <div className={`w-full ${["frameworks", "prompting", "domain-applications", "product-discovery", "model-updates", "benchmarks-datasets"].includes(activeNav) ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
+          {/* 가로 표준은 1000px. Landscape 페이지(Frameworks/Prompting/Cases Best/Research/Discourse 혼합)만 1160px. */}
+          <div className={`w-full ${["frameworks", "prompting", "domain-applications", "product-discovery", "model-updates", "benchmarks-datasets", "regulations-policy-compliance", "community", "big-tech-trends", "market-investment", "technical-deep-dives", "insights-opinions"].includes(activeNav) ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
             {renderContent()}
           </div>
         </main>

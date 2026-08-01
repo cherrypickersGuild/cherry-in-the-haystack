@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { LandscapeSection, RisingStar } from "./nd-landscape"
+import { LandscapeSection, RisingStar, StaticDomainLandscape } from "./nd-landscape"
 import { CasesArticleList } from "./nd-cases-articles-page"
 
 /**
@@ -222,11 +222,55 @@ export function NDPapersPage() {
   )
 }
 
-/* ── 하위: Discourse 기사형 (6개 카테고리 공용) ── */
+/* ── 하위: Discourse 혼합 (6개 카테고리 공용) ──
+   항목별 kind에 따라 도메인 섹션(랜드스케이프 카드) + 기사 섹션(목록)으로 나눠 표시.
+   Product Discovery(nd-cases-best-page)와 동일한 표현. 도메인은 프론트 정적(StaticDomainLandscape). */
 export function NDDiscourseArticlePage({ page }: { page: string }) {
+  const [meta, setMeta] = useState<{ title: string; subtitle: string; dom: number; art: number } | null>(null)
+
+  useEffect(() => {
+    setMeta(null)
+    Promise.all([
+      fetch(`/discourse/entities.json`).then((r) => r.json()),
+      fetch(`/discourse/pages.json`).then((r) => r.json()),
+    ])
+      .then(([ent, pages]: [{ items: { category: string; kind: string }[] }, Record<string, { title?: string; subtitle?: string }>]) => {
+        const its = ent.items.filter((x) => x.category === page)
+        setMeta({
+          title: pages[page]?.title ?? "Discourse",
+          subtitle: pages[page]?.subtitle ?? "",
+          dom: its.filter((x) => x.kind === "domain").length,
+          art: its.filter((x) => x.kind === "article").length,
+        })
+      })
+      .catch(() => setMeta({ title: "Discourse", subtitle: "", dom: 0, art: 0 }))
+  }, [page])
+
+  if (!meta) return <p className="text-[13px] text-[#9E97B3]">Loading…</p>
+
   return (
-    <div className="max-w-[940px]">
-      <CasesArticleList base="discourse" page={page} header featured />
+    <div className="max-w-[1160px]">
+      <div className="max-w-[940px]">
+        <h1 className="m-0 mb-[4px] text-[30px] font-extrabold leading-[1.1] tracking-[-0.6px] text-[#1A1626]">{meta.title}</h1>
+        {meta.subtitle && <p className="mb-[30px] text-[13.5px] text-[#9E97B3]">{meta.subtitle}</p>}
+      </div>
+
+      {meta.dom > 0 && (
+        <>
+          <div className="mb-4 mt-[8px] flex items-baseline gap-[10px]">
+            <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.3px] text-[#1A1626]">Landscape</h2>
+            <span className="text-[12.5px] text-[#9E97B3]">By domain · click a card for details</span>
+          </div>
+          <StaticDomainLandscape base="discourse" page={page} />
+        </>
+      )}
+
+      {meta.art > 0 && (
+        <div className={`max-w-[940px] ${meta.dom > 0 ? "mt-[52px]" : ""}`}>
+          <CasesArticleList base="discourse" page={page} kind="article" sectionTitle="Related Articles" />
+        </div>
+      )}
+
       <div className="h-8" aria-hidden />
     </div>
   )
@@ -250,7 +294,7 @@ function PopCard({ r, size }: { r: RankRow; size: "lg" | "md" | "sm" }) {
         style={{ backgroundColor: lg ? "#F3EFFA" : "#FFFFFF", borderColor: lg ? "#C7B8E8" : "#E4E1EE", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
         {/* 다운로드 뱃지 (원본 change% 뱃지 자리) */}
         <span className="absolute top-3 right-3 rounded-full px-1.5 py-0.5 text-[9px] font-bold" style={{ backgroundColor: lg ? "#FFFFFF" : "#F3EFFA", color: "#5B3D87" }}>
-          {fmtNum(r.downloads)} ↓
+          {fmtNum(r.downloads)}
         </span>
         {/* #순위 (원본과 동일 위치) */}
         <span className={`absolute bottom-3 right-3 ${size === "sm" ? "text-[9px]" : "text-[11px]"} font-bold text-[#9E97B3]`}>#{r.rank}</span>

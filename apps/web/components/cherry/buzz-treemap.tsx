@@ -178,7 +178,7 @@ function CustomizedContent(props: any) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function CategoryTreemap({ items }: { items?: LandingTreemapItem[] }) {
+export function CategoryTreemap({ items, showHeader = true }: { items?: LandingTreemapItem[]; showHeader?: boolean }) {
   const isMobile = useIsMobile()
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
 
@@ -201,20 +201,22 @@ export function CategoryTreemap({ items }: { items?: LandingTreemapItem[] }) {
 
   return (
     <div className="flex flex-col">
-      <div className="mb-3 flex items-end justify-between">
-        <p
-          className="text-[12px] font-semibold uppercase tracking-[0.14em] text-text-secondary"
-          style={{ fontFamily: TREEMAP_FONT_STACK }}
-        >
-          Buzz Distribution
-        </p>
-        <span
-          className="text-[11px] text-text-muted"
-          style={{ fontFamily: TREEMAP_FONT_STACK, letterSpacing: "0.02em" }}
-        >
-          {data.length} sectors
-        </span>
-      </div>
+      {showHeader && (
+        <div className="mb-3 flex items-end justify-between">
+          <p
+            className="text-[12px] font-semibold uppercase tracking-[0.14em] text-text-secondary"
+            style={{ fontFamily: TREEMAP_FONT_STACK }}
+          >
+            Buzz Distribution
+          </p>
+          <span
+            className="text-[11px] text-text-muted"
+            style={{ fontFamily: TREEMAP_FONT_STACK, letterSpacing: "0.02em" }}
+          >
+            {data.length} sectors
+          </span>
+        </div>
+      )}
 
       <div
         className="rounded-2xl border border-border/80 overflow-hidden p-[6px] shadow-card"

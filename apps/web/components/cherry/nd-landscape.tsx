@@ -149,9 +149,15 @@ function CategoryCard({
         <span className="text-[11px] font-extrabold text-[#9E97B3]">{cat.entities.length}</span>
       </div>
       <div className="flex flex-col">
-        {cat.entities.map((e) => (
+        {/* 카드 미리보기는 최대 5줄: 5개 초과면 4개 + "More"(나머지 개수). 전체는 모달에서. */}
+        {(cat.entities.length > 5 ? cat.entities.slice(0, 4) : cat.entities).map((e) => (
           <EntityRow key={e.name} e={e} col={col} fallbackEmoji={fb} />
         ))}
+        {cat.entities.length > 5 && (
+          <span className="flex items-center justify-center gap-1 border-t border-[#F1EFF5] py-[11px] text-[12px] font-bold text-[#7B5EA7]">
+            +{cat.entities.length - 4} more
+          </span>
+        )}
       </div>
     </button>
   )
@@ -339,10 +345,27 @@ export function RisingStar({ pageKey }: { pageKey: string }) {
   )
 }
 
-/* ── 공용 섹션: <pageKey> landscape를 API에서 읽어 카드 그리드 + 모달 ── */
+/* ── 표시 전용 그리드 (카드 + 모달). 데이터 출처(백엔드/정적)와 무관하게 재사용 ── */
+export function LandscapeGrid({ categories }: { categories: LandscapeCategory[] }) {
+  const [selected, setSelected] = useState<LandscapeCategory | null>(null)
+  return (
+    <>
+      <div
+        className="grid gap-[12px]"
+        style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}
+      >
+        {categories.map((cat) => (
+          <CategoryCard key={cat.code} cat={cat} onOpen={setSelected} />
+        ))}
+      </div>
+      {selected && <CategoryModal cat={selected} onClose={() => setSelected(null)} />}
+    </>
+  )
+}
+
+/* ── 공용 섹션: <pageKey> landscape를 API(백엔드)에서 읽어 그리드 렌더 ── */
 export function LandscapeSection({ pageKey }: { pageKey: string }) {
   const [categories, setCategories] = useState<LandscapeCategory[]>([])
-  const [selected, setSelected] = useState<LandscapeCategory | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -379,18 +402,74 @@ export function LandscapeSection({ pageKey }: { pageKey: string }) {
   if (categories.length === 0) {
     return <p className="text-[13px] text-[#9E97B3]">Loading…</p>
   }
+  return <LandscapeGrid categories={categories} />
+}
 
-  return (
-    <>
-      <div
-        className="grid gap-[12px]"
-        style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}
-      >
-        {categories.map((cat) => (
-          <CategoryCard key={cat.code} cat={cat} onOpen={setSelected} />
-        ))}
-      </div>
-      {selected && <CategoryModal cat={selected} onClose={() => setSelected(null)} />}
-    </>
-  )
+/* ── 프론트 정적 도메인 랜드스케이프 ──
+   백엔드 없이 /<base>/entities.json 의 kind==="domain" 항목을 domain별로 묶어 그리드로 렌더.
+   (Discourse 등 프론트 정적 데이터의 혼합 분류 도메인 섹션용) */
+type StaticEntity = {
+  id: string; category: string; domain: string; name: string
+  description: string; url: string; kind: string; source_type: string; tags?: string[]
+}
+type ThemePool = { pattern: string; emojis: string[] }
+type StaticIcons = { palette: CatColor[]; neutral: CatColor; themePools?: ThemePool[] }
+
+/* 카탈로그(GroupCatalog)의 makeEmoji와 동일 로직 — 아이콘이 카탈로그와 일치하도록.
+   그룹(domain)으로 themePool을 고르고, 이름을 해시해 그 풀에서 다양하게 뽑는다. */
+function makeEmojiFn(pools?: ThemePool[]) {
+  const compiled: [RegExp, string[]][] = (pools ?? []).map((p) => [new RegExp(p.pattern, "i"), p.emojis])
+  const FB = ["🔬", "🧠", "📈", "🧩", "📊", "✨", "📚", "🧪"]
+  return (name: string, group: string): string => {
+    let pool = FB
+    for (const [re, p] of compiled) if (re.test(group)) { pool = p; break }
+    let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0
+    return pool[h % pool.length]
+  }
+}
+
+export function StaticDomainLandscape({ base, page }: { base: string; page: string }) {
+  const [cats, setCats] = useState<LandscapeCategory[] | null>(null)
+
+  useEffect(() => {
+    let alive = true
+    setCats(null)
+    Promise.all([
+      fetch(`/${base}/entities.json`).then((r) => r.json()),
+      fetch(`/${base}/icons.json`).then((r) => r.json()),
+    ])
+      .then(([ent, ico]: [{ items: StaticEntity[] }, StaticIcons]) => {
+        if (!alive) return
+        const items = ent.items.filter((x) => x.category === page && x.kind === "domain")
+        const groups = new Map<string, StaticEntity[]>()
+        for (const it of items) {
+          const g = groups.get(it.domain) ?? []
+          g.push(it); groups.set(it.domain, g)
+        }
+        const ordered = [...groups.entries()].sort((a, b) => b[1].length - a[1].length)
+        const emojiOf = makeEmojiFn(ico.themePools)
+        const mapped: LandscapeCategory[] = ordered.map(([domain, list], i) => ({
+          code: `dom-${i}`,
+          name: domain,
+          color: ico.palette[i % ico.palette.length],
+          icon: emojiOf(domain, domain),
+          entities: list.map((it, j) => ({
+            name: it.name,
+            desc: it.description,
+            detail: it.description,
+            url: it.url || null,
+            stars: null,
+            emoji: emojiOf(it.name, domain),
+            spotlight: j === 0,
+          })),
+        }))
+        setCats(mapped)
+      })
+      .catch(() => setCats([]))
+    return () => { alive = false }
+  }, [base, page])
+
+  if (!cats) return <p className="text-[13px] text-[#9E97B3]">Loading…</p>
+  if (cats.length === 0) return null
+  return <LandscapeGrid categories={cats} />
 }
