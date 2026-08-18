@@ -6,158 +6,70 @@ import { BookOpen, Clock, Bell } from "lucide-react"
    Topic metadata
 ───────────────────────────────────────────── */
 const TOPIC_META: Record<string, { title: string; section: "BASICS" | "ADVANCED"; description: string }> = {
-  // ───────── BASICS (24 topics) ─────────
-  "foundations": {
-    title: "Foundations of LLM Systems",
-    section: "BASICS",
-    description: "Transformer architecture, tokenization & vocabulary design, pretraining objectives, fine-tuning, alignment, and inference & decoding."
-  },
+  // ───────── BASICS (6 topics) ─────────
+  // PRD `docs/PRD/product-scope.md` §1 Basics 에 명시된 토픽만. 제목은 PRD 문구 기준.
   "prompting-reasoning": {
-    title: "Prompting & Reasoning",
+    title: "Prompting Techniques & Patterns",
     section: "BASICS",
     description: "Prompt design principles, few-shot / zero-shot prompting, chain-of-thought, self-consistency, structured output prompting, and prompt templates & versioning."
   },
-  "model-selection": {
-    title: "Model Selection & Benchmarking",
-    section: "BASICS",
-    description: "Model capability benchmarking, latency vs cost tradeoffs, provider comparison, model families & sizes, and choosing the right model per task."
-  },
-  "context-engineering": {
-    title: "Context Engineering",
-    section: "BASICS",
-    description: "Context window management, rolling context windows, prompt compression & summarization, retrieval injection strategies, context prioritization, and long context handling."
-  },
   "rag-systems": {
-    title: "Retrieval-Augmented Systems (RAG)",
+    title: "Retrieval-Augmented Generation (RAG)",
     section: "BASICS",
-    description: "Embeddings, vector databases, chunking strategies, retrieval algorithms, RAG pipelines, and RAG evaluation."
+    description: "Chunking strategies, retrieval algorithms, RAG pipelines, and RAG evaluation."
   },
-  "knowledge-systems": {
-    title: "Knowledge Systems",
+  "fine-tuning": {
+    title: "Fine-tuning Strategies",
     section: "BASICS",
-    description: "Knowledge bases, GraphRAG, knowledge graph construction, semantic triples, dynamic knowledge graphs, and knowledge freshness & updating."
-  },
-  "memory": {
-    title: "Memory Architectures",
-    section: "BASICS",
-    description: "Short-term memory, long-term memory, semantic memory, episodic memory, experience replay memory, and note-taking systems."
+    description: "Supervised fine-tuning, instruction tuning, training data preparation, and deciding when to fine-tune versus prompt or retrieve."
   },
   "agents-reasoning": {
-    title: "Agents & Reasoning Systems",
+    title: "Agent Architectures",
     section: "BASICS",
     description: "Reflex agents, ReAct agents, planner–executor agents, query decomposition agents, reflection agents, and deep research agents."
   },
-  "agent-orchestration": {
-    title: "Agent Orchestration",
+  "embeddings": {
+    title: "Embeddings & Vector Databases",
     section: "BASICS",
-    description: "Task decomposition, planning strategies, multi-step reasoning flows, execution loops, error handling & retry logic, and human-in-the-loop systems."
-  },
-  "tool-use": {
-    title: "Tool Use & Integration",
-    section: "BASICS",
-    description: "Tool calling, tool selection, tool parameterization, API integration patterns, and external knowledge access."
-  },
-  "system-architecture": {
-    title: "System Architecture & Infrastructure",
-    section: "BASICS",
-    description: "LLM APIs & hosting, caching, streaming & batching, queue systems, observability & logging, and deployment patterns."
-  },
-  "performance-optimization": {
-    title: "Performance Optimization",
-    section: "BASICS",
-    description: "Latency optimization, cost optimization, prompt optimization, model distillation, caching strategies, and throughput scaling."
-  },
-  "reliability-safety": {
-    title: "Reliability & Safety",
-    section: "BASICS",
-    description: "Guardrails, output validation, hallucination mitigation, fallback systems, monitoring & alerting, and adversarial robustness."
-  },
-  "data-engineering": {
-    title: "Data Engineering for LLMs",
-    section: "BASICS",
-    description: "Dataset collection, data cleaning & filtering, synthetic data generation, data labeling pipelines, and dataset versioning & quality control."
-  },
-  "multi-agent-systems": {
-    title: "Multi-Agent Systems",
-    section: "BASICS",
-    description: "Agent communication protocols, role assignment, coordination strategies, conflict resolution, and emergent behavior."
-  },
-  "applications": {
-    title: "Applications & Productization",
-    section: "BASICS",
-    description: "Chat applications, autonomous systems, knowledge assistants, research agents, and workflow automation."
+    description: "Embedding models and vector representations, vector database indexing, similarity search, and choosing embeddings per task."
   },
   "evaluation-systems": {
-    title: "Evaluation Systems",
+    title: "Evaluation Methodologies",
     section: "BASICS",
     description: "Evaluation pipelines (offline/online), evaluation metrics, A/B testing, LLM-as-a-judge, continuous evaluation loops, human feedback, qualitative evaluation (vibe checks), safety & robustness evaluation, and benchmark vs real-world gap."
   },
-  "failure-modes": {
-    title: "Failure Modes & Debugging",
-    section: "BASICS",
-    description: "Hallucination taxonomy, retrieval failure modes, tool use failures, agent loop failures, context overflow, cost explosion patterns, and debugging workflows."
-  },
-  "control-plane": {
-    title: "Control Plane & Protocols",
-    section: "BASICS",
-    description: "Model Context Protocol (MCP), tool interoperability standards, agent capability specs, tool registry systems, and execution control layers."
-  },
-  "data-flywheel": {
-    title: "Data Flywheel & Learning Systems",
-    section: "BASICS",
-    description: "Data flywheel architecture, production feedback collection, online learning loops, continuous retraining loops, and eval-driven retraining."
-  },
-  "multimodal": {
-    title: "Multimodal Systems",
-    section: "BASICS",
-    description: "Vision-language models, voice agents, multimodal retrieval, diffusion pipelines, and cross-modal reasoning."
-  },
-  "codegen-ai-dev": {
-    title: "Code Generation & AI-assisted Development",
-    section: "BASICS",
-    description: "Codegen systems, agent coding systems, auto-debugging, and AI-assisted dev workflow."
-  },
-  "security-adversarial": {
-    title: "Security & Adversarial Systems",
-    section: "BASICS",
-    description: "Prompt injection, tool injection, data poisoning (RAG), output exploits, and secure execution."
-  },
-  "human-ai-ux": {
-    title: "Human–AI Interaction & UX",
-    section: "BASICS",
-    description: "Interaction design, trust calibration, explainability, HITL patterns, and cognitive load optimization."
-  },
 
-  // ───────── ADVANCED ─────────
+  // ───────── ADVANCED (6 topics) ─────────
+  // PRD `docs/PRD/product-scope.md` §2 Advanced 에 명시된 토픽만.
   "chain-of-thought": {
-    title: "Chain-of-Thought",
+    title: "Advanced Prompting",
     section: "ADVANCED",
-    description: "Step-by-step reasoning, self-consistency, tree-of-thought, and advanced reasoning techniques."
+    description: "Chain-of-thought and step-by-step reasoning, self-consistency, tree-of-thought, and constitutional AI."
   },
   "multi-hop-rag": {
-    title: "Multi-hop RAG",
+    title: "Multi-hop RAG & Hybrid Search",
     section: "ADVANCED",
-    description: "Iterative retrieval, query decomposition, multi-step reasoning over documents, and complex QA pipelines."
+    description: "Iterative retrieval, query decomposition, hybrid dense + sparse search, multi-step reasoning over documents, and complex QA pipelines."
   },
   "peft-lora": {
     title: "PEFT / LoRA / QLoRA",
     section: "ADVANCED",
     description: "Parameter-efficient fine-tuning, low-rank adaptation, quantized training, and efficient model customization."
   },
+  "agent-topologies": {
+    title: "Multi-Agent Orchestration",
+    section: "ADVANCED",
+    description: "Multi-agent topologies, parallel execution, sequential chains, graph-based workflows, and coordination between agents."
+  },
   "custom-embeddings": {
-    title: "Custom Embeddings",
+    title: "Custom Embedding Models",
     section: "ADVANCED",
     description: "Training domain-specific embeddings, contrastive learning, and optimizing retrieval for specialized use cases."
   },
   "adversarial-eval": {
-    title: "Adversarial Evaluation",
+    title: "Adversarial Evaluation & Benchmarking",
     section: "ADVANCED",
     description: "Red-teaming, jailbreak testing, robustness evaluation, and stress-testing LLM systems."
-  },
-  "agent-topologies": {
-    title: "Agent Topologies",
-    section: "ADVANCED",
-    description: "Single-agent systems, multi-agent systems, parallel execution, sequential chains, and graph-based workflows."
   },
 }
 

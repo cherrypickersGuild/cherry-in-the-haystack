@@ -158,38 +158,20 @@ export default function CherryApp() {
           setActiveNav("kaas-catalog")
         }} />
 
-      // BASICS (24 topics)
-      case "foundations":
+      // BASICS (6 topics) — PRD product-scope.md §1 에 명시된 토픽
       case "prompting-reasoning":
-      case "model-selection":
-      case "context-engineering":
       case "rag-systems":
-      case "knowledge-systems":
-      case "memory":
+      case "fine-tuning":
       case "agents-reasoning":
-      case "agent-orchestration":
-      case "tool-use":
-      case "system-architecture":
-      case "performance-optimization":
-      case "reliability-safety":
-      case "data-engineering":
-      case "multi-agent-systems":
-      case "applications":
+      case "embeddings":
       case "evaluation-systems":
-      case "failure-modes":
-      case "control-plane":
-      case "data-flywheel":
-      case "multimodal":
-      case "codegen-ai-dev":
-      case "security-adversarial":
-      case "human-ai-ux":
-      // ADVANCED
+      // ADVANCED (6 topics) — PRD product-scope.md §2 에 명시된 토픽
       case "chain-of-thought":
       case "multi-hop-rag":
       case "peft-lora":
+      case "agent-topologies":
       case "custom-embeddings":
       case "adversarial-eval":
-      case "agent-topologies":
         return <HandbookPlaceholder topicId={activeNav} />
 
       case "highlight":
