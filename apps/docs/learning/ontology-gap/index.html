@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learning 개념 구현 준비도 &amp; 갭 리포트</title>
+<!-- 생성물: 직접 수정 금지 (scripts/learning/ontology-gap.cjs) -->
+<style>
+:root{--card:#fff;--secondary:#F2F0F7;--border:#E4E1EE;--cherry:#C94B6E;--cherry-soft:#FDF0F3;--cherry-border:#F2C4CE;
+--violet:#7B5EA7;--violet-soft:#F3EFFA;--violet-border:#C7B8E8;--tp:#1A1626;--ts:#6B6480;--tm:#9E97B3;--green:#2D7A5E}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#FAF9FC;color:#3D3652;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;line-height:1.5;padding:24px 16px 60px}
+.wrap{max-width:1240px;margin:0 auto}
+h1{font-size:22px;color:var(--tp);margin-bottom:4px}
+.sub{font-size:12px;color:var(--ts);margin-bottom:18px}
+.banner{background:#FFF8E6;border:1px solid #F0D9A0;border-radius:10px;padding:12px 14px;font-size:12px;color:#7A5A16;margin-bottom:20px}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+.kpi{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.kpi .n{font-size:22px;font-weight:800;color:var(--tp)}
+.kpi .l{font-size:11px;color:var(--tm);margin-top:2px}
+.card{background:var(--violet-soft);border:1px solid var(--violet-border);border-radius:12px;padding:18px;margin-bottom:18px}
+.card h2{font-size:15px;color:var(--tp);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card h3{font-size:12px;color:var(--violet);margin:16px 0 6px;text-transform:uppercase;letter-spacing:.4px}
+.slug{font-size:10px;font-weight:700;background:var(--secondary);color:var(--ts);padding:2px 6px;border-radius:5px}
+.cnt{font-size:11px;color:var(--violet);font-weight:700}
+.meta{font-size:11px;color:var(--ts);margin-top:4px}
+.hot{color:var(--cherry)}
+table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border-radius:8px;overflow:hidden}
+th{background:#EDE8F5;color:var(--tp);text-align:left;padding:7px 9px;font-size:11px;white-space:nowrap}
+td{padding:7px 9px;border-top:1px solid var(--border);color:var(--ts);vertical-align:top}
+td code,.meta code{background:var(--secondary);padding:1px 5px;border-radius:4px;color:var(--tp);font-size:11px}
+.scroll{overflow-x:auto}
+.tag{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap}
+.tag.miss{background:var(--cherry-soft);color:var(--cherry);border:1px solid var(--cherry-border)}
+.tag.alias{background:#FFF4E5;color:#B26B22;border:1px solid #F0D0A6}
+.tag.rel{background:#E8F0FB;color:#2C5FA8;border:1px solid #BDD3F0}
+.tag.gaptype{background:#EDE8F5;color:var(--violet);border:1px solid var(--violet-border)}
+.tag.warn{background:#F7F5FA;color:var(--ts);border:1px solid var(--border)}
+.tag.ok{background:#E6F4EC;color:var(--green);border:1px solid #B8DFC9}
+.tag.pend{background:#fff;color:var(--tm);border:1px dashed var(--border)}
+.note-s{font-size:10px;color:var(--tm);font-weight:400}
+.todo{margin:0;padding-left:20px;font-size:12px;color:var(--ts);background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 12px 12px 30px}
+.todo li{margin-bottom:5px}
+</style></head><body><div class="wrap">
+<h1>Learning 개념 — 구현 준비도 &amp; 갭 리포트</h1>
+<p class="sub">개념 JSON(화면 정본) ↔ 라이브 GraphDB ↔ handbook 원문 3자 대조. 하위 개념 <b>전수 조사</b>.</p>
+
+<div class="banner">
+  <b>이 파일은 <code>scripts/learning/ontology-gap.cjs</code> 가 생성합니다. 직접 수정하지 마세요.</b><br>
+  · <b>①표</b> = 각 하위 개념으로 <b>화면을 만들 수 있는지</b> · <b>②표</b> = 보완할 갭 · <b>③</b> = 그래서 무엇을 할지<br>
+  · 판정은 <code>decisions.json</code> 에 남기면 재생성해도 보존됩니다. <b>승인된 제안만</b> Phase 4 역주입 입력.
+  · <b>책 문단</b> = <code>handbook.paragraph_chunk</code>(300자 이상) 매칭 수 = Cherries 재료. 3개 이상이면 FULL 후보.
+</div>
+
+<div class="sum">
+  <div class="kpi"><div class="n">2</div><div class="l">개념 페이지</div></div>
+  <div class="kpi"><div class="n">18</div><div class="l">하위 개념(조사 대상)</div></div>
+  <div class="kpi"><div class="n">13</div><div class="l">FULL 후보</div></div>
+  <div class="kpi"><div class="n">1</div><div class="l">OUTLINE 가능</div></div>
+  <div class="kpi"><div class="n">4</div><div class="l">보완 없이는 불가</div></div>
+  <div class="kpi"><div class="n">29</div><div class="l">갭 총계</div></div>
+  <div class="kpi"><div class="n">11/302</div><div class="l">COVERAGE</div></div>
+</div>
+
+<section class="card">
+  <h2>Embeddings & Vector Databases <span class="slug">embeddings</span>
+      <span class="cnt">하위 9 · 갭 15</span></h2>
+  <p class="meta">ontology <code>Embedding</code> ·
+     상위 EmbeddingLayer ·
+     cherries 5
+     · <b class="hot">중복 도출: Reranking×2</b></p>
+
+  <h3>① 하위 개념 구현 준비도 <span class="note-s">— 이 개념으로 화면을 만들 수 있나</span></h3>
+  <div class="scroll"><table>
+    <tr><th>하위 개념</th><th>온톨로지 노드</th><th>설명</th><th>자기<br>하위</th><th>책<br>문단</th><th>판정</th><th>부족한 것</th></tr>
+    <tr>
+      <td><b>RAG</b><br><span class="note-s">RELATED</span></td>
+      <td><code>RAG</code></td>
+      <td>923자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">4</td>
+      <td style="text-align:center">—</td>
+      <td><span class="tag rel">OUTLINE 가능</span></td>
+      <td>· 상위(Embedding)와 관계 없음 → 트리플 추가<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Finetuning</b><br><span class="note-s">RELATED</span></td>
+      <td><code>Finetuning</code></td>
+      <td>632자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">6</td>
+      <td style="text-align:center">74</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 상위(Embedding)와 관계 없음 → 트리플 추가<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Semantic Representation</b><br><span class="note-s">SUBTOPIC</span></td>
+      <td><code>Semantic Representation</code></td>
+      <td>379자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">0</td>
+      <td style="text-align:center">17</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 자기 하위 개념 0 → 03 Child Concepts 빈 섹션<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Token Embedding</b><br><span class="note-s">SUBTOPIC</span></td>
+      <td><code>TokenEmbedding</code></td>
+      <td>901자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">0</td>
+      <td style="text-align:center">72</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 자기 하위 개념 0 → 03 Child Concepts 빈 섹션<br>· 상위(Embedding)와 관계 없음 → 트리플 추가<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Position Embedding</b><br><span class="note-s">SUBTOPIC</span></td>
+      <td><code>PositionEmbedding</code></td>
+      <td>677자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">0</td>
+      <td style="text-align:center">72</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 자기 하위 개념 0 → 03 Child Concepts 빈 섹션<br>· 상위(Embedding)와 관계 없음 → 트리플 추가<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Vector Databases</b><br><span class="note-s">RELATED</span></td>
+      <td><code>Vector Database</code></td>
+      <td>441자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">0</td>
+      <td style="text-align:center">46</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 자기 하위 개념 0 → 03 Child Concepts 빈 섹션<br>· 상위(Embedding)와 관계 없음 → 트리플 추가<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Similarity Search</b><br><span class="note-s">SUBTOPIC</span></td>
+      <td><code>Similarity Search</code></td>
+      <td>728자 <span class="tag ok">EN</span></td>
+      <td style="text-align:center">0</td>
+      <td style="text-align:center">139</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 자기 하위 개념 0 → 03 Child Concepts 빈 섹션<br>· 상위(Embedding)와 관계 없음 → 트리플 추가</td>
+    </tr>
+<tr>
+      <td><b>Chunking</b><br><span class="note-s">RELATED</span></td>
+      <td><code>Chunking</code></td>
+      <td>424자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">0</td>
+      <td style="text-align:center">14</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 자기 하위 개념 0 → 03 Child Concepts 빈 섹션<br>· 상위(Embedding)와 관계 없음 → 트리플 추가<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Reranking</b><br><span class="note-s">EXTENDS</span></td>
+      <td><span class="tag miss">없음</span></td>
+      <td><span class="tag warn">없음</span></td>
+      <td style="text-align:center">—</td>
+      <td style="text-align:center">7</td>
+      <td><span class="tag miss">불가</span></td>
+      <td>· 온톨로지 노드 신설<br>· (단, 책에 7개 문단 있음 — 근거는 확보 가능)</td>
+    </tr>
+  </table></div>
+
+  <h3>② 보완해야 할 갭</h3>
+  <div class="scroll"><table>
+    <tr><th>대상</th><th>유형</th><th>사실 (기계 판정)</th><th>제안 (미확정)</th><th>판정</th></tr>
+    <tr><td>Embedding ↔ RAG</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>RELATED</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>RAG (RELATED)</td><td><span class="tag gaptype">RELATION_TYPE_GAP</span></td>
+        <td><code>rdfs:subClassOf</code> 뿐 — <code>RELATED</code> 표현 불가</td><td>Phase 5 에서 <code>llm:related</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Embedding ↔ Finetuning</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>RELATED</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Finetuning (RELATED)</td><td><span class="tag gaptype">RELATION_TYPE_GAP</span></td>
+        <td><code>rdfs:subClassOf</code> 뿐 — <code>RELATED</code> 표현 불가</td><td>Phase 5 에서 <code>llm:related</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Token Embedding</td><td><span class="tag alias">LABEL_ALIAS</span></td>
+        <td>온톨로지 라벨 <code>TokenEmbedding</code></td><td>별칭 <code>Token Embedding</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Embedding ↔ TokenEmbedding</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>SUBTOPIC</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Position Embedding</td><td><span class="tag alias">LABEL_ALIAS</span></td>
+        <td>온톨로지 라벨 <code>PositionEmbedding</code></td><td>별칭 <code>Position Embedding</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Embedding ↔ PositionEmbedding</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>SUBTOPIC</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Vector Databases</td><td><span class="tag alias">LABEL_ALIAS</span></td>
+        <td>온톨로지 라벨 <code>Vector Database</code></td><td>별칭 <code>Vector Databases</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Embedding ↔ Vector Database</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>RELATED</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Vector Databases (RELATED)</td><td><span class="tag gaptype">RELATION_TYPE_GAP</span></td>
+        <td><code>rdfs:subClassOf</code> 뿐 — <code>RELATED</code> 표현 불가</td><td>Phase 5 에서 <code>llm:related</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Embedding ↔ Similarity Search</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>SUBTOPIC</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Embedding ↔ Chunking</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>RELATED</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Chunking (RELATED)</td><td><span class="tag gaptype">RELATION_TYPE_GAP</span></td>
+        <td><code>rdfs:subClassOf</code> 뿐 — <code>RELATED</code> 표현 불가</td><td>Phase 5 에서 <code>llm:related</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Reranking</td><td><span class="tag miss">MISSING_NODE</span></td>
+        <td>온톨로지에 <b>없음</b></td><td><code>Embedding</code> 의 하위로 신설 · 책 문단 7개 확보됨</td><td><span class="tag pend">미검토</span></td></tr>
+  </table></div>
+
+  <h3>③ 이 페이지를 완성하려면</h3>
+  <ol class="todo"><li><b>Reranking</b> 온톨로지 신설 — 안 하면 이 카드는 계속 <code>SOON</code>(클릭 불가)</li><li>OUTLINE JSON 생성 <b>8개</b> — 데이터는 이미 있음, 생성만 하면 링크가 열림: RAG, Finetuning, Semantic Representation, Token Embedding, Position Embedding, Vector Databases, Similarity Search, Chunking</li><li>FULL 승격 후보 <b>7개</b>(evidence 3개 이상): Finetuning(74), Semantic Representation(17), Token Embedding(72), Position Embedding(72), Vector Databases(46), Similarity Search(139), Chunking(14)</li><li>상위-하위 관계 트리플 추가 <b>7건</b>: RAG, Finetuning, TokenEmbedding, PositionEmbedding, Vector Database, Similarity Search, Chunking</li></ol>
+</section>
+<section class="card">
+  <h2>Retrieval-Augmented Generation (RAG) <span class="slug">rag</span>
+      <span class="cnt">하위 9 · 갭 14</span></h2>
+  <p class="meta">ontology <code>RAG</code> ·
+     상위 AugmentationTechnique ·
+     cherries 7
+     · <b class="hot">중복 도출: Reranking×2</b></p>
+
+  <h3>① 하위 개념 구현 준비도 <span class="note-s">— 이 개념으로 화면을 만들 수 있나</span></h3>
+  <div class="scroll"><table>
+    <tr><th>하위 개념</th><th>온톨로지 노드</th><th>설명</th><th>자기<br>하위</th><th>책<br>문단</th><th>판정</th><th>부족한 것</th></tr>
+    <tr>
+      <td><b>Embeddings</b><br><span class="note-s">PREREQUISITE</span></td>
+      <td><code>Embedding</code></td>
+      <td>857자 <span class="tag ok">EN</span></td>
+      <td style="text-align:center">1</td>
+      <td style="text-align:center">72</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 상위(RAG)와 관계 없음 → 트리플 추가</td>
+    </tr>
+<tr>
+      <td><b>Vector Databases</b><br><span class="note-s">PREREQUISITE</span></td>
+      <td><code>Vector Database</code></td>
+      <td>441자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">0</td>
+      <td style="text-align:center">46</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 자기 하위 개념 0 → 03 Child Concepts 빈 섹션<br>· 상위(RAG)와 관계 없음 → 트리플 추가<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Chunking</b><br><span class="note-s">SUBTOPIC</span></td>
+      <td><code>Chunking</code></td>
+      <td>424자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">0</td>
+      <td style="text-align:center">14</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 자기 하위 개념 0 → 03 Child Concepts 빈 섹션<br>· 상위(RAG)와 관계 없음 → 트리플 추가<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Hybrid Search</b><br><span class="note-s">SUBTOPIC</span></td>
+      <td><code>HybridRetrieval</code></td>
+      <td>631자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">0</td>
+      <td style="text-align:center">195</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 자기 하위 개념 0 → 03 Child Concepts 빈 섹션<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Dense / Sparse Retrieval</b><br><span class="note-s">SUBTOPIC</span></td>
+      <td><code>DenseRetrieval</code></td>
+      <td>684자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">0</td>
+      <td style="text-align:center">83</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 자기 하위 개념 0 → 03 Child Concepts 빈 섹션<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+<tr>
+      <td><b>Reranking</b><br><span class="note-s">EXTENDS</span></td>
+      <td><span class="tag miss">없음</span></td>
+      <td><span class="tag warn">없음</span></td>
+      <td style="text-align:center">—</td>
+      <td style="text-align:center">7</td>
+      <td><span class="tag miss">불가</span></td>
+      <td>· 온톨로지 노드 신설<br>· (단, 책에 7개 문단 있음 — 근거는 확보 가능)</td>
+    </tr>
+<tr>
+      <td><b>Contextual Retrieval</b><br><span class="note-s">EXTENDS</span></td>
+      <td><span class="tag miss">없음</span></td>
+      <td><span class="tag warn">없음</span></td>
+      <td style="text-align:center">—</td>
+      <td style="text-align:center">83</td>
+      <td><span class="tag miss">불가</span></td>
+      <td>· 온톨로지 노드 신설<br>· (단, 책에 83개 문단 있음 — 근거는 확보 가능)</td>
+    </tr>
+<tr>
+      <td><b>GraphRAG</b><br><span class="note-s">EXTENDS</span></td>
+      <td><span class="tag miss">없음</span></td>
+      <td><span class="tag warn">없음</span></td>
+      <td style="text-align:center">—</td>
+      <td style="text-align:center">14</td>
+      <td><span class="tag miss">불가</span></td>
+      <td>· 온톨로지 노드 신설<br>· (단, 책에 14개 문단 있음 — 근거는 확보 가능)</td>
+    </tr>
+<tr>
+      <td><b>Finetuning</b><br><span class="note-s">RELATED</span></td>
+      <td><code>Finetuning</code></td>
+      <td>632자 <span class="tag alias">KO</span></td>
+      <td style="text-align:center">6</td>
+      <td style="text-align:center">74</td>
+      <td><span class="tag ok">FULL 후보</span></td>
+      <td>· 상위(RAG)와 관계 없음 → 트리플 추가<br>· 설명이 한글 — 영문 사이트 노출 정책 확인</td>
+    </tr>
+  </table></div>
+
+  <h3>② 보완해야 할 갭</h3>
+  <div class="scroll"><table>
+    <tr><th>대상</th><th>유형</th><th>사실 (기계 판정)</th><th>제안 (미확정)</th><th>판정</th></tr>
+    <tr><td>Embeddings</td><td><span class="tag alias">LABEL_ALIAS</span></td>
+        <td>온톨로지 라벨 <code>Embedding</code></td><td>별칭 <code>Embeddings</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>RAG ↔ Embedding</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>PREREQUISITE</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Embeddings (PREREQUISITE)</td><td><span class="tag gaptype">RELATION_TYPE_GAP</span></td>
+        <td><code>rdfs:subClassOf</code> 뿐 — <code>PREREQUISITE</code> 표현 불가</td><td>Phase 5 에서 <code>llm:prerequisite</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Vector Databases</td><td><span class="tag alias">LABEL_ALIAS</span></td>
+        <td>온톨로지 라벨 <code>Vector Database</code></td><td>별칭 <code>Vector Databases</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>RAG ↔ Vector Database</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>PREREQUISITE</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Vector Databases (PREREQUISITE)</td><td><span class="tag gaptype">RELATION_TYPE_GAP</span></td>
+        <td><code>rdfs:subClassOf</code> 뿐 — <code>PREREQUISITE</code> 표현 불가</td><td>Phase 5 에서 <code>llm:prerequisite</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>RAG ↔ Chunking</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>SUBTOPIC</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Hybrid Search</td><td><span class="tag alias">LABEL_ALIAS</span></td>
+        <td>온톨로지 라벨 <code>HybridRetrieval</code></td><td>별칭 <code>Hybrid Search</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Dense / Sparse Retrieval</td><td><span class="tag alias">LABEL_ALIAS</span></td>
+        <td>온톨로지 라벨 <code>DenseRetrieval</code></td><td>별칭 <code>Dense / Sparse Retrieval</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Reranking</td><td><span class="tag miss">MISSING_NODE</span></td>
+        <td>온톨로지에 <b>없음</b></td><td><code>RAG</code> 의 하위로 신설 · 책 문단 7개 확보됨</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Contextual Retrieval</td><td><span class="tag miss">MISSING_NODE</span></td>
+        <td>온톨로지에 <b>없음</b></td><td><code>RAG</code> 의 하위로 신설 · 책 문단 83개 확보됨</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>GraphRAG</td><td><span class="tag miss">MISSING_NODE</span></td>
+        <td>온톨로지에 <b>없음</b></td><td><code>RAG</code> 의 하위로 신설 · 책 문단 14개 확보됨</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>RAG ↔ Finetuning</td><td><span class="tag rel">MISSING_RELATION</span></td>
+        <td>두 노드는 있으나 <b>연결 없음</b></td><td><code>RELATED</code> 관계 추가</td><td><span class="tag pend">미검토</span></td></tr>
+<tr><td>Finetuning (RELATED)</td><td><span class="tag gaptype">RELATION_TYPE_GAP</span></td>
+        <td><code>rdfs:subClassOf</code> 뿐 — <code>RELATED</code> 표현 불가</td><td>Phase 5 에서 <code>llm:related</code> 추가</td><td><span class="tag pend">미검토</span></td></tr>
+  </table></div>
+
+  <h3>③ 이 페이지를 완성하려면</h3>
+  <ol class="todo"><li><b>Reranking</b> 온톨로지 신설 — 안 하면 이 카드는 계속 <code>SOON</code>(클릭 불가)</li><li><b>Contextual Retrieval</b> 온톨로지 신설 — 안 하면 이 카드는 계속 <code>SOON</code>(클릭 불가)</li><li><b>GraphRAG</b> 온톨로지 신설 — 안 하면 이 카드는 계속 <code>SOON</code>(클릭 불가)</li><li>OUTLINE JSON 생성 <b>6개</b> — 데이터는 이미 있음, 생성만 하면 링크가 열림: Embeddings, Vector Databases, Chunking, Hybrid Search, Dense / Sparse Retrieval, Finetuning</li><li>FULL 승격 후보 <b>6개</b>(evidence 3개 이상): Embeddings(72), Vector Databases(46), Chunking(14), Hybrid Search(195), Dense / Sparse Retrieval(83), Finetuning(74)</li><li>상위-하위 관계 트리플 추가 <b>4건</b>: Embedding, Vector Database, Chunking, Finetuning</li></ol>
+</section>
+
+<section class="card">
+  <h2>온톨로지 전역 품질 <span class="cnt">DATA_QUALITY</span></h2>
+  <p class="meta">개념 JSON 과 무관하게 그래프 자체에서 관측된 항목</p>
+  <div class="scroll"><table>
+    <tr><th>대상</th><th>사실</th><th>제안 (미확정)</th></tr>
+    <tr><td>설명 언어</td>
+        <td>설명 308개 중 <b>280개(91%)가 한글 포함</b></td>
+        <td>영문 사이트 정책 결정 — 그대로 노출 / 영문 병기 / 번역</td></tr>
+    <tr><td>중복 라벨</td>
+        <td><code>Alignment</code>(4), <code>InferenceOptimization</code>(4)</td>
+        <td>클래스당 라벨 1개로 정리</td></tr>
+  </table></div>
+</section>
+
+</div></body></html>

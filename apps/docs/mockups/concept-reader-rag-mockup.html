@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept Reader — RAG (실데이터 목업)</title>
+<style>
+:root{
+  --card:#FFFFFF; --secondary:#F2F0F7; --border:#E4E1EE;
+  --cherry:#C94B6E; --cherry-soft:#FDF0F3; --cherry-border:#F2C4CE;
+  --violet:#7B5EA7; --violet-soft:#F3EFFA; --violet-border:#C7B8E8;
+  --text-primary:#1A1626; --text-secondary:#6B6480; --text-body:#3D3652; --text-muted:#9E97B3;
+  --green:#2D7A5E; --orange:#D4854A; --gray:#9E97B3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#FAF9FC;color:var(--text-body);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+ -webkit-font-smoothing:antialiased;line-height:1.5}
+.wrap{max-width:1060px;margin:0 auto;padding:0 16px}
+.note{background:#FFF8E6;border:1px solid #F0D9A0;border-radius:10px;padding:12px 14px;margin:18px 0;font-size:12px;color:#7A5A16}
+.note b{color:#5C4310}
+
+/* ── 2열 레이아웃 (concept-reader-page.tsx 구조) ── */
+.page{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+@media(min-width:1000px){.page{flex-direction:row;align-items:flex-start}}
+main.reading{flex:1;max-width:700px;padding:32px 40px}
+@media(max-width:999px){main.reading{padding:22px 18px;max-width:100%}}
+aside.panel{width:100%;padding:22px 16px;border-top:1px solid var(--border)}
+@media(min-width:1000px){aside.panel{width:280px;flex-shrink:0;border-top:0;border-left:1px solid var(--border)}}
+
+.badge-section{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;
+ font-size:10px;font-weight:700;background:var(--violet-soft);color:var(--violet);margin-bottom:12px}
+h1.title{font-size:28px;font-weight:800;color:var(--text-primary);letter-spacing:-.5px;line-height:1.2}
+.titlerow{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);margin-bottom:32px}
+.meta .sep{color:var(--border)}
+.meta .draft{color:var(--orange);font-weight:600}
+
+.sechead{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.sechead .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);white-space:nowrap}
+.sechead .rule{flex:1;height:1px;background:var(--border)}
+.sechead + .subtle{font-size:11px;color:var(--text-muted);margin:-8px 0 16px}
+section{margin-bottom:40px}
+
+.prose p{font-size:14px;color:var(--text-body);line-height:1.75;margin-bottom:16px}
+.prose strong{color:var(--text-primary);font-weight:600}
+
+/* 02 Cherries */
+.cherry{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--cherry);
+ border-radius:8px;padding:14px 16px;margin-bottom:10px}
+.cherry .src{font-size:12px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.cherry .loc{font-size:10px;color:var(--text-muted);margin-bottom:8px;padding-left:20px}
+.cherry .body{font-size:12px;color:var(--text-secondary);line-height:1.65}
+
+/* 03 Child Concepts */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:left;cursor:pointer;position:relative}
+.cc:hover{border-color:var(--cherry)}
+.cc .type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.cc .lab{font-size:13px;font-weight:600;color:var(--text-primary);margin-top:2px}
+.cc .desc{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.5}
+.cc{display:block;text-decoration:none;padding-right:56px}
+.cc.t1{border-color:var(--violet-border);background:#FCFBFE}
+.cc.t2{border-color:var(--border)}
+.cc.t3{border-style:dashed;border-color:#E0B4C2;background:#FDFBFC;cursor:not-allowed;opacity:.75}
+.tier{position:absolute;top:9px;right:9px;font-size:8px;font-weight:800;letter-spacing:.4px;
+ padding:2px 5px;border-radius:4px;background:var(--violet-soft);color:var(--violet);border:1px solid var(--violet-border)}
+.tier.out{background:var(--secondary);color:var(--text-muted);border-color:var(--border)}
+.tier.soon{background:var(--cherry-soft);color:var(--cherry);border-color:var(--cherry-border)}
+/* 브레드크럼 */
+.crumb{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);margin-bottom:14px}
+.crumb a{color:var(--text-secondary);text-decoration:none}
+.crumb a:hover{color:var(--cherry)}
+.crumb .sep{color:var(--border)}
+
+/* 04 References */
+.ref{position:relative;padding-left:16px;border-left:2px solid var(--border);margin-bottom:18px}
+.ref.first{border-left-color:var(--cherry)}
+.ref .pin{position:absolute;left:-5px;top:0;width:8px;height:8px;border-radius:50%;background:var(--border)}
+.ref.first .pin{background:var(--cherry)}
+.ref .stage{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+.ref.first .stage{color:var(--cherry)}
+.ref .rt{font-size:13px;font-weight:700;color:var(--text-primary);margin-top:2px}
+.ref .learn{font-size:12px;color:var(--text-muted);line-height:1.55;margin-top:4px}
+.ref .learn b{color:var(--text-secondary)}
+.ref .adds{font-size:11px;font-style:italic;color:var(--violet);margin-top:4px}
+.ref .where{font-size:10px;color:var(--text-muted);margin-top:3px}
+
+/* 사이드 패널 */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.card .ch{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:12px}
+.legend{font-size:9px;color:var(--text-muted);display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.legend div{display:flex;align-items:center;gap:8px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+.digest{background:var(--cherry-soft);border:1px solid var(--cherry-border);border-radius:12px;padding:14px;margin-bottom:16px}
+.digest .t{font-size:10px;font-weight:700;color:var(--cherry);margin-bottom:4px}
+.digest .n{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.digest .s{font-size:11px;color:var(--text-muted);margin-bottom:8px}
+.digest a{font-size:11px;font-weight:600;color:var(--cherry);text-decoration:none}
+.contrib{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.av{width:28px;height:28px;border-radius:50%;background:var(--secondary);display:flex;align-items:center;justify-content:center;
+ font-size:10px;font-weight:700;color:var(--text-secondary)}
+.contrib .nm{font-size:12px;font-weight:500;color:var(--text-primary)}
+.contrib .ro{font-size:10px;color:var(--text-muted)}
+
+/* 갭 오버레이 (기획용) */
+.gapbox{margin:26px 0 60px;border:2px dashed var(--violet-border);border-radius:14px;background:var(--violet-soft);padding:22px}
+.gapbox h2{font-size:15px;color:var(--violet);margin-bottom:4px}
+.gapbox .sub{font-size:11px;color:var(--text-secondary);margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border-radius:8px;overflow:hidden}
+th{background:#EDE8F5;color:var(--text-primary);text-align:left;padding:8px 10px;font-size:11px;font-weight:700}
+td{padding:8px 10px;border-top:1px solid var(--border);color:var(--text-secondary);vertical-align:top}
+td code{background:var(--secondary);padding:1px 5px;border-radius:4px;font-size:11px;color:var(--text-primary)}
+.tag{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700}
+.tag.miss{background:var(--cherry-soft);color:var(--cherry);border:1px solid var(--cherry-border)}
+.tag.alias{background:#FFF4E5;color:#B26B22;border:1px solid #F0D0A6}
+.tag.ok{background:#E6F4EC;color:var(--green);border:1px solid #B8DFC9}
+.tag.gaptype{background:#EDE8F5;color:var(--violet);border:1px solid var(--violet-border)}
+.scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="note">
+  <b>기획용 목업 · 2026-08-19</b> — 레이아웃은 <code>concept-reader-page.tsx</code> 정본을 그대로 따르고,
+  <b>내용은 전부 실제 DB(<code>handbook.paragraph_chunk</code>, 4권 3,054조각)에서 뽑은 원문 기반</b>입니다.
+  Child Concepts의 GraphDB 실재 여부도 로컬 GraphDB(302개)에 실제 질의한 결과입니다.
+  본문은 제품 UI 언어에 맞춰 영문으로 작성했습니다(PRD: 콘텐츠는 원문 언어 유지).
+  <br>· 기여자 이름은 <b>임시 자리표시자</b>입니다(<code>handbook.knowledge_verification_contributor</code> 0행).
+  <br>· Child Concepts 뱃지 — <b>FULL</b>=4섹션 정식(12개) · <b>OUTLINE</b>=온톨로지 기반 자동 생성 · <b>SOON</b>=온톨로지 미등록(갭).
+</div>
+
+<!-- ═══════════ 개념 페이지 ═══════════ -->
+<div class="page">
+  <main class="reading">
+    <div class="crumb">
+      <a href="#">Learning</a><span class="sep">›</span>
+      <a href="#">Basics</a><span class="sep">›</span>
+      <span style="color:var(--text-primary);font-weight:600">RAG</span>
+    </div>
+    <span class="badge-section">Basics</span>
+
+    <div class="titlerow">
+      <h1 class="title">Retrieval-Augmented Generation (RAG)</h1>
+    </div>
+
+    <div class="meta">
+      <span>Updated Aug 19, 2026</span><span class="sep">·</span>
+      <span>7 cherries from 3 books</span><span class="sep">·</span>
+      <span class="draft">Draft — pending review</span><span class="sep">·</span>
+      <span>9 min read</span>
+    </div>
+
+    <!-- 01 Overview -->
+    <section>
+      <div class="sechead"><span class="lbl">01 — Overview</span><span class="rule"></span></div>
+      <div class="prose">
+        <p>Retrieval-Augmented Generation supplies a language model with documents fetched at
+        <strong>inference time</strong> instead of encoding knowledge into its weights. A query is routed to one or
+        more external stores, relevant passages are retrieved and placed in the context window, and the model
+        generates its answer grounded in that retrieved material.</p>
+        <p><strong>Why it matters:</strong> knowledge that changes weekly, or that belongs to one organization,
+        cannot be baked into a model economically. RAG lets an application stay current and domain-specific without
+        retraining, and it gives every claim a traceable source — which is what makes hallucination detectable rather
+        than merely likely.</p>
+        <p><strong>The shape of the work:</strong> <em>route → retrieve → rerank → generate</em>. The interesting
+        engineering is not in the generation step. It is in chunking strategy, retrieval quality, and how much of a
+        finite context window each retrieved passage deserves.</p>
+      </div>
+    </section>
+
+    <!-- 02 Cherries -->
+    <section>
+      <div class="sechead"><span class="lbl">02 — Cherries</span><span class="rule"></span></div>
+      <p class="subtle">Key insights from ingested sources — each covers a distinct, non-overlapping aspect of RAG</p>
+
+      <div class="cherry">
+        <p class="src">🍒 LLM Engineers Handbook</p>
+        <p class="loc">Ch.4 RAG Feature Pipeline › Pre-retrieval</p>
+        <p class="body">Retrieval starts before retrieval. A <b>query router</b> decides <i>where</i> to look — vector DB,
+        a SQL database via query translation, or a web API — and, critically, <b>whether context is needed at all</b>,
+        avoiding redundant calls to external storage. The same router can select the prompt template for the task.</p>
+      </div>
+
+      <div class="cherry">
+        <p class="src">🍒 AI Engineering — Chip Huyen</p>
+        <p class="loc">Ch.6 RAG and Agents › Retrieval Optimization</p>
+        <p class="body">Chunking by <b>tokens</b> (using the generator's own tokenizer) makes chunks easier to work with
+        downstream, since sizes line up with the model's limits. The cost is that token boundaries fall at arbitrary
+        points in the text — the unit that is convenient for the model is not the unit that carries meaning.</p>
+      </div>
+
+      <div class="cherry">
+        <p class="src">🍒 LLM Engineers Handbook</p>
+        <p class="loc">Ch.4 RAG Feature Pipeline › Retrieval</p>
+        <p class="body"><b>Hybrid search</b> blends keyword and vector retrieval. Keyword search wins when the answer must
+        contain an exact term; vector search wins on general semantic similarity and struggles with exact matches.
+        An <code>alpha</code> parameter controls the balance between the two.</p>
+      </div>
+
+      <div class="cherry">
+        <p class="src">🍒 AI Engineering — Chip Huyen</p>
+        <p class="loc">Ch.6 RAG and Agents › Retrieval Optimization</p>
+        <p class="body"><b>Context reranking is not search reranking.</b> In search, the exact rank of a result is what
+        matters. In context, order still matters but for a different reason — models process documents at the
+        beginning and end of a context better than those buried in the middle.</p>
+      </div>
+
+      <div class="cherry">
+        <p class="src">🍒 AI Engineering — Chip Huyen</p>
+        <p class="loc">Ch.6 RAG and Agents › Retrieval Optimization</p>
+        <p class="body"><b>Contextual Retrieval</b> (Anthropic, 2024): before indexing, generate a short 50–100 token
+        description that situates each chunk within its original document, prepend it to the chunk, and index the
+        augmented chunk. The retriever then sees a passage that carries its own context.</p>
+      </div>
+
+      <div class="cherry">
+        <p class="src">🍒 AI Engineering — Chip Huyen</p>
+        <p class="loc">Ch.7 Finetuning › Finetuning and RAG</p>
+        <p class="body"><b>There is no universal workflow.</b> After simple term-based retrieval, whether to move to more
+        complex retrieval or to finetuning depends on the application's actual failure modes — and evaluation criteria
+        should be defined <i>before</i> any adaptation step, not after.</p>
+      </div>
+
+      <div class="cherry">
+        <p class="src">🍒 Building Applications with AI Agents — Michael Albada</p>
+        <p class="loc">Ch.6 Knowledge and Memory › Promise and Peril of Dynamic Knowledge Graphs</p>
+        <p class="body">Million-token context windows enable <b>retrieval-free generation</b> for large documents, and
+        index-free RAG pushes chunking and relevance scoring inside the long-context model itself — no external vector
+        store or inverted index. Simpler pipelines, different trade-offs.</p>
+      </div>
+    </section>
+
+    <!-- 03 Child Concepts -->
+    <section>
+      <div class="sechead"><span class="lbl">03 — Child Concepts</span><span class="rule"></span></div>
+      <p class="subtle">Follow any concept to keep reading — every concept is its own page</p>
+
+      <div class="grid2">
+        <a class="cc t1" href="concept-reader-embeddings-mockup.html"><span class="tier">FULL</span><span class="type" style="color:var(--gray)">PREREQUISITE</span>
+          <p class="lab">Embeddings</p><p class="desc">Text → dense vector representation</p></a>
+        <a class="cc t2" href="#"><span class="tier out">OUTLINE</span><span class="type" style="color:var(--gray)">PREREQUISITE</span>
+          <p class="lab">Vector Databases</p><p class="desc">Stores and searches embeddings by similarity</p></a>
+        <a class="cc t2" href="#"><span class="tier out">OUTLINE</span><span class="type" style="color:var(--violet)">SUBTOPIC</span>
+          <p class="lab">Chunking</p><p class="desc">How documents are split before indexing</p></a>
+        <a class="cc t2" href="#"><span class="tier out">OUTLINE</span><span class="type" style="color:var(--violet)">SUBTOPIC</span>
+          <p class="lab">Hybrid Search</p><p class="desc">Blends dense vector + sparse keyword retrieval</p></a>
+        <a class="cc t2" href="#"><span class="tier out">OUTLINE</span><span class="type" style="color:var(--violet)">SUBTOPIC</span>
+          <p class="lab">Dense / Sparse Retrieval</p><p class="desc">The two retrieval families hybrid search combines</p></a>
+        <div class="cc t3"><span class="tier soon">SOON</span><span class="type" style="color:var(--green)">EXTENDS</span>
+          <p class="lab">Reranking</p><p class="desc">Post-retrieval re-scoring for context order</p></div>
+        <div class="cc t3"><span class="tier soon">SOON</span><span class="type" style="color:var(--green)">EXTENDS</span>
+          <p class="lab">Contextual Retrieval</p><p class="desc">Prepends generated context before indexing</p></div>
+        <div class="cc t3"><span class="tier soon">SOON</span><span class="type" style="color:var(--green)">EXTENDS</span>
+          <p class="lab">GraphRAG</p><p class="desc">Retrieval over a knowledge graph instead of flat chunks</p></div>
+        <a class="cc t1" href="#"><span class="tier">FULL</span><span class="type" style="color:var(--orange)">RELATED</span>
+          <p class="lab">Finetuning</p><p class="desc">The alternative adaptation path — chosen by failure mode</p></a>
+      </div>
+    </section>
+
+    <!-- 04 Progressive References -->
+    <section>
+      <div class="sechead"><span class="lbl">04 — Progressive References</span><span class="rule"></span></div>
+      <p class="subtle">MECE learning path — each reference adds what the previous didn't cover</p>
+
+      <div class="ref first"><span class="pin"></span>
+        <span class="stage">Start here</span>
+        <p class="rt">AI Engineering — Ch.6 "RAG and Agents"</p>
+        <p class="learn"><b>What you'll learn:</b> The retrieval-first mental model, and why chunking and reranking
+        decide output quality more than model choice does.</p>
+        <p class="adds">Adds: foundational mental model</p>
+        <p class="where">📚 In our library — Chip Huyen</p>
+      </div>
+
+      <div class="ref"><span class="pin"></span>
+        <span class="stage">Next →</span>
+        <p class="rt">LLM Engineers Handbook — Ch.4 "RAG Feature Pipeline"</p>
+        <p class="learn"><b>What you'll learn:</b> The pipeline as running code — query routing, batch vs streaming
+        ingestion, hybrid search with an alpha parameter.</p>
+        <p class="adds">Adds: implementation and operations</p>
+        <p class="where">📚 In our library</p>
+      </div>
+
+      <div class="ref"><span class="pin"></span>
+        <span class="stage">Then →</span>
+        <p class="rt">Anthropic — "Introducing Contextual Retrieval" (2024)</p>
+        <p class="learn"><b>What you'll learn:</b> A concrete technique for the failure the first two only name —
+        chunks that lose their meaning once separated from the document.</p>
+        <p class="adds">Adds: current state-of-the-art technique</p>
+        <p class="where">🔗 External</p>
+      </div>
+
+      <div class="ref"><span class="pin"></span>
+        <span class="stage">Deep dive →</span>
+        <p class="rt">Building Applications with AI Agents — Ch.6 "Knowledge and Memory"</p>
+        <p class="learn"><b>What you'll learn:</b> Where RAG is heading — GraphRAG over knowledge graphs, and whether
+        million-token contexts make external retrieval unnecessary.</p>
+        <p class="adds">Adds: the argument against the previous three</p>
+        <p class="where">📚 In our library — Michael Albada</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- side panel -->
+  <aside class="panel">
+    <div class="card">
+      <p class="ch">Learning Roadmap</p>
+      <svg viewBox="0 0 200 230" style="width:100%;height:auto">
+        <rect x="45" y="8" width="110" height="34" rx="8" fill="#fff" stroke="#C94B6E" stroke-width="2"/>
+        <text x="100" y="29" text-anchor="middle" font-size="11" font-weight="700" fill="#C94B6E">RAG</text>
+        <text x="100" y="52" text-anchor="middle" font-size="8" fill="#9E97B3">(you are here)</text>
+        <line x1="100" y1="44" x2="100" y2="66" stroke="#E4E1EE" stroke-width="1.5"/>
+        <polygon points="95,64 105,64 100,72" fill="#E4E1EE"/>
+        <rect x="20" y="76" width="160" height="42" rx="6" fill="#F2F0F7" stroke="#E4E1EE"/>
+        <text x="100" y="93" text-anchor="middle" font-size="9" fill="#9E97B3">Prerequisites</text>
+        <text x="58" y="109" text-anchor="middle" font-size="10" fill="#6B6480">Embeddings</text>
+        <text x="142" y="109" text-anchor="middle" font-size="10" fill="#6B6480">Vector DBs</text>
+        <line x1="100" y1="118" x2="100" y2="142" stroke="#E4E1EE" stroke-width="1.5" stroke-dasharray="4"/>
+        <polygon points="95,140 105,140 100,148" fill="#E4E1EE"/>
+        <text x="100" y="164" text-anchor="middle" font-size="8" font-weight="700" fill="#7B5EA7">EXTENDS</text>
+        <rect x="12" y="172" width="82" height="26" rx="5" fill="#F3EFFA" stroke="#C7B8E8" stroke-dasharray="3"/>
+        <text x="53" y="189" text-anchor="middle" font-size="9" fill="#7B5EA7">Reranking</text>
+        <rect x="104" y="172" width="84" height="26" rx="5" fill="#F3EFFA" stroke="#C7B8E8" stroke-dasharray="3"/>
+        <text x="146" y="189" text-anchor="middle" font-size="8" fill="#7B5EA7">Contextual Retr.</text>
+        <rect x="58" y="202" width="84" height="24" rx="5" fill="#F3EFFA" stroke="#C7B8E8" stroke-dasharray="3"/>
+        <text x="100" y="218" text-anchor="middle" font-size="9" fill="#7B5EA7">GraphRAG</text>
+      </svg>
+      <div class="legend">
+        <div><span class="sw" style="border:2px solid var(--cherry);background:#fff"></span> Cherry = Current</div>
+        <div><span class="sw" style="border:2px dashed var(--violet-border);background:var(--violet-soft)"></span> Dashed = Not yet in ontology</div>
+        <div><span class="sw" style="border:1px solid var(--border);background:var(--secondary)"></span> Gray = Prerequisite</div>
+      </div>
+    </div>
+
+    <div class="digest">
+      <p class="t">⚡ New in Digest</p>
+      <p class="n">Contextual Retrieval</p>
+      <p class="s">Extends RAG · Anthropic 2024</p>
+      <a href="#">See in Digest →</a>
+    </div>
+
+    <div class="card">
+      <p class="ch">Knowledge Team</p>
+      <div class="contrib"><div class="av">tj</div><div><p class="nm">tomatojams</p><p class="ro">Lead reviewer</p></div></div>
+      <div class="contrib"><div class="av">sm</div><div><p class="nm">soma</p><p class="ro">Evidence sourcing</p></div></div>
+      <a href="#" style="display:block;margin-top:10px;font-size:11px;font-weight:600;color:var(--cherry);text-decoration:none">+ 2 contributors</a>
+    </div>
+  </aside>
+</div>
+
+<!-- ═══════════ 갭 오버레이 ═══════════ -->
+<div class="gapbox">
+  <h2>이 화면에서 도출된 GraphDB 갭</h2>
+  <p class="sub">⚠️ 기획용 · 실제 화면에는 없습니다(별도 <code>ontology-gap/index.html</code>로 분리 예정). 최종적으로는 <code>ontology-gap/rag.md</code>가 스크립트로 생성됩니다.
+     아래는 로컬 GraphDB(302개)에 <code>infer=false</code>로 실제 질의한 결과입니다.</p>
+  <div class="scroll">
+  <table>
+    <tr><th>화면에 쓴 이름</th><th>GraphDB 상태</th><th>갭 유형</th><th>제안 <span style="font-weight:400">(미확정)</span></th></tr>
+    <tr><td>Embeddings</td><td><span class="tag ok">존재</span> <code>llm:Embedding</code></td><td><span class="tag alias">LABEL_ALIAS</span></td><td>별칭 <code>Embeddings</code> 추가</td></tr>
+    <tr><td>Vector Databases</td><td><span class="tag ok">존재</span> <code>llm:Vector Database</code></td><td><span class="tag alias">LABEL_ALIAS</span></td><td>별칭 <code>Vector Databases</code> 추가</td></tr>
+    <tr><td>Chunking</td><td><span class="tag ok">존재</span> <code>llm:Chunking</code></td><td>—</td><td>없음 (완전일치)</td></tr>
+    <tr><td>Hybrid Search</td><td><span class="tag ok">존재</span> <code>llm:HybridRetrieval</code></td><td><span class="tag alias">LABEL_ALIAS</span></td><td>별칭 <code>Hybrid Search</code> 추가</td></tr>
+    <tr><td>Dense / Sparse Retrieval</td><td><span class="tag ok">존재</span> <code>llm:DenseRetrieval</code>, <code>llm:SparseRetrieval</code></td><td>—</td><td>없음</td></tr>
+    <tr><td><b>Reranking</b></td><td><span class="tag miss">없음</span></td><td><span class="tag gaptype">MISSING_NODE</span></td><td><code>RAG</code>의 하위로 신설 · 근거: AI Engineering Ch.6</td></tr>
+    <tr><td><b>Contextual Retrieval</b></td><td><span class="tag miss">없음</span></td><td><span class="tag gaptype">MISSING_NODE</span></td><td><code>RAG</code>의 하위로 신설 · 근거: Anthropic 2024</td></tr>
+    <tr><td><b>GraphRAG</b></td><td><span class="tag miss">없음</span></td><td><span class="tag gaptype">MISSING_NODE</span></td><td><code>RAG</code> 또는 <code>KnowledgeGraph</code> 하위 — <b>상위 결정 필요</b></td></tr>
+    <tr><td>Finetuning</td><td><span class="tag ok">존재</span> <code>llm:Finetuning</code></td><td>—</td><td>없음</td></tr>
+    <tr><td colspan="2">관계 5종(PREREQUISITE/EXTENDS/RELATED)</td><td><span class="tag gaptype">RELATION_TYPE_GAP</span></td><td>GraphDB엔 <code>rdfs:subClassOf</code>뿐 → Phase 5에서 서술어 확장</td></tr>
+    <tr><td colspan="2"><code>Embedding</code>의 상위가 <code>EmbeddingLayer</code></td><td><span class="tag gaptype">HIERARCHY_MISMATCH</span></td><td>학습 관점에선 부품이 아니라 독립 개념 — 재배치 검토</td></tr>
+  </table>
+  </div>
+  <p style="font-size:11px;color:var(--text-secondary);margin-top:14px">
+    <b>요약</b> — 개념 9개 중 <b>신설 필요 3</b> · 별칭 필요 3 · 일치 3. 여기에 관계 유형 갭 1건, 계층 불일치 1건.
+    <b>이 한 화면을 만드는 것만으로 온톨로지 보완 항목 8건이 도출됐습니다.</b>
+  </p>
+</div>
+
+</div>
+</body>
+</html>

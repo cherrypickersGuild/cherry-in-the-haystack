@@ -1,0 +1,7 @@
+{
+  "generatedNote": "Learning 개념 페이지 인덱스. uiTopicId = sidebar.tsx / app.page.tsx 의 id, slug = concepts/<slug>.json",
+  "concepts": [
+    { "slug": "rag",        "uiTopicId": "rag-systems", "section": "BASICS", "title": "Retrieval-Augmented Generation (RAG)", "status": "full" },
+    { "slug": "embeddings", "uiTopicId": "embeddings",  "section": "BASICS", "title": "Embeddings & Vector Databases",        "status": "full" }
+  ]
+}

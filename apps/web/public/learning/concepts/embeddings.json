@@ -1,0 +1,63 @@
+{
+  "slug": "embeddings",
+  "section": "BASICS",
+  "title": "Embeddings & Vector Databases",
+  "menuLabel": "Embeddings",
+  "uiTopicId": "embeddings",
+  "ontology": { "node": "Embedding", "status": "existing", "parents": ["EmbeddingLayer"] },
+  "meta": { "updated": "2026-08-19", "readingMinutes": 7, "verified": false,
+            "contributors": [ { "handle": "tomatojams", "initials": "tj", "role": "Lead reviewer" },
+                              { "handle": "soma", "initials": "sm", "role": "Evidence sourcing" } ],
+            "extraContributors": 2 },
+  "overview": {
+    "definition": "An embedding maps a high-dimensional input — a word, a sentence, a document, an image, a user's interaction history — into a compact dense vector in a continuous space. Neural encoders (Transformers, CNNs, GNNs) or shallow models (Word2Vec, GloVe) are trained so that items with related meaning land close together, which turns \"is this similar?\" into arithmetic on vectors.",
+    "whyItMatters": "Nearly every retrieval system in this handbook rests on this one trick. RAG retrieves by embedding similarity. Agent memory is stored and recalled as embeddings. If the embedding is wrong for your domain, every layer built on top of it inherits that error — and no amount of prompt engineering downstream will recover it.",
+    "context": "The shape of the work: choose an embedding model, decide what unit of text becomes one vector, store the vectors somewhere that can search them quickly, and know where similarity stops being a good proxy for relevance."
+  },
+  "cherries": [
+    { "source": "Building Applications with AI Agents", "author": "Michael Albada", "locator": "Ch.6 Knowledge and Memory › Implementing Semantic Memory with Vector Stores", "chunkId": null,
+      "insight": "Embeddings are vector representations that capture meaning from usage in large corpora, not from a dictionary. Word2Vec, GloVe and BERT place semantically similar words near each other in a high-dimensional space; LLMs have since improved these models further." },
+    { "source": "Building Applications with AI Agents", "author": "Michael Albada", "locator": "Ch.6 Knowledge and Memory › Implementing Semantic Memory with Vector Stores", "chunkId": null,
+      "insight": "Vector stores — FAISS (Facebook AI Similarity Search), Annoy (Approximate Nearest Neighbors Oh Yeah) and others — exist because searching high-dimensional vectors is its own problem. They are built for fast approximate similarity search, which is what makes semantic memory retrievable at all." },
+    { "source": "LLM Engineers Handbook", "author": null, "locator": "Ch.4 RAG Feature Pipeline › Post-retrieval", "chunkId": null,
+      "insight": "Embedding similarity has a ceiling. A cross-encoder reranker scores the query against each retrieved chunk directly and finds relationships a similarity search cannot. But it is too expensive to run over the whole corpus — which is exactly why embeddings do the first pass and reranking does the second." },
+    { "source": "AI Engineering", "author": "Chip Huyen", "locator": "Ch.6 RAG and Agents › Retrieval Optimization", "chunkId": null,
+      "insight": "Choosing a vector database is partly choosing an embedding strategy: which embedding models and vector search algorithms it supports, how long indexing takes, what bulk add/delete throughput it offers, and whether pricing is per vector or per query." },
+    { "source": "LLM Engineers Handbook", "author": null, "locator": "Ch.4 RAG Feature Pipeline › OVM", "chunkId": null,
+      "insight": "Working with embeddings deserves the same discipline as working with a database. The book's OVM (Object–Vector Mapping) pattern mirrors ORM: domain objects carry their own vectors, so embedding and storage stop being ad-hoc glue scattered through the pipeline." }
+  ],
+  "childConcepts": [
+    { "label": "RAG", "ontologyNode": "RAG", "relation": "RELATED", "pageStatus": "full", "slug": "rag",
+      "why": "The main consumer of embedding-based retrieval" },
+    { "label": "Finetuning", "ontologyNode": "Finetuning", "relation": "RELATED", "pageStatus": "outline", "slug": null,
+      "why": "Adapting a model instead of retrieving context" },
+    { "label": "Semantic Representation", "ontologyNode": "Semantic Representation", "relation": "SUBTOPIC", "pageStatus": "outline", "slug": null,
+      "why": "Sentence-level vectors via SentenceTransformers" },
+    { "label": "Token Embedding", "ontologyNode": "TokenEmbedding", "relation": "SUBTOPIC", "pageStatus": "outline", "slug": null,
+      "why": "Per-token vectors inside the model" },
+    { "label": "Position Embedding", "ontologyNode": "PositionEmbedding", "relation": "SUBTOPIC", "pageStatus": "outline", "slug": null,
+      "why": "Encodes order, not meaning" },
+    { "label": "Vector Databases", "ontologyNode": "Vector Database", "relation": "RELATED", "pageStatus": "outline", "slug": null,
+      "why": "Stores and searches embeddings by similarity" },
+    { "label": "Similarity Search", "ontologyNode": "Similarity Search", "relation": "SUBTOPIC", "pageStatus": "outline", "slug": null,
+      "why": "Cosine / dot-product nearest-neighbour lookup" },
+    { "label": "Chunking", "ontologyNode": "Chunking", "relation": "RELATED", "pageStatus": "outline", "slug": null,
+      "why": "Decides what one vector represents" },
+    { "label": "Reranking", "ontologyNode": null, "relation": "EXTENDS", "pageStatus": "soon", "slug": null,
+      "why": "Cross-encoder scoring beyond vector similarity" }
+  ],
+  "references": [
+    { "order": 1, "stage": "START HERE", "title": "Building Applications with AI Agents — Ch.6 \"Knowledge and Memory\"", "url": null, "inLibrary": true, "byline": "Michael Albada",
+      "teaches": "What a vector actually represents, and why a vector store is a different kind of database rather than a table with extra columns.",
+      "addsOverPrevious": "foundational mental model" },
+    { "order": 2, "stage": "NEXT →", "title": "LLM Engineers Handbook — Ch.4 \"RAG Feature Pipeline\"", "url": null, "inLibrary": true, "byline": null,
+      "teaches": "Embeddings as production code — the OVM pattern, and where cross-encoder reranking picks up what similarity search misses.",
+      "addsOverPrevious": "implementation discipline and the limits of similarity" },
+    { "order": 3, "stage": "THEN →", "title": "AI Engineering — Ch.6 \"RAG and Agents\" › Retrieval Optimization", "url": null, "inLibrary": true, "byline": "Chip Huyen",
+      "teaches": "How to evaluate a retrieval stack — supported models, indexing time, query latency, and pricing shape.",
+      "addsOverPrevious": "selection criteria the first two assume you already have" },
+    { "order": 4, "stage": "DEEP DIVE →", "title": "MTEB — Massive Text Embedding Benchmark leaderboard", "url": "https://huggingface.co/spaces/mteb/leaderboard", "inLibrary": false, "byline": null,
+      "teaches": "Current model rankings per task, so the choice is made from measurements rather than from whichever model the tutorial used.",
+      "addsOverPrevious": "live empirical grounding" }
+  ]
+}

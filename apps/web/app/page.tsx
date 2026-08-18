@@ -34,10 +34,37 @@ const STATIC_MOMENTUM = [
   { entityId: "s3", entityName: "Gemini 2.0", categoryName: "Google Family", page: "MODEL_UPDATES", thisWeekCount: 8, prevWeekCount: 3, changePct: 166 },
 ]
 
+/* Learning: UI 토픽 id → 개념 JSON slug (public/learning/index.json 과 일치) */
+const CONCEPT_SLUG_BY_TOPIC: Record<string, string> = {
+  "rag-systems": "rag",
+  "embeddings": "embeddings",
+}
+/* 역방향: 개념 slug → 사이드바 토픽 id. 하위 개념을 누르면 그 개념의 "자기 페이지"로 가야 하므로,
+   메뉴 토픽인 개념은 해당 토픽 id 로 이동해 사이드바 하이라이트까지 맞춘다.
+   메뉴에 없는 개념(Tier 2)은 전용 상태 "concept" 로 연다. */
+const TOPIC_BY_CONCEPT_SLUG: Record<string, string> = Object.fromEntries(
+  Object.entries(CONCEPT_SLUG_BY_TOPIC).map(([topic, slug]) => [slug, topic]),
+)
+
 export default function CherryApp() {
   const [activeNav, setActiveNav] = useState("nd-overview")
   const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder">("dashboard")
   const [marketConceptId, setMarketConceptId] = useState<string | null>(null)
+  // Learning 개념 페이지: activeNav 와 별개로 "어느 개념인가"를 담는 파라미터 상태
+  // (marketConceptId 와 동일한 패턴 — taxonomy/switch 를 늘리지 않고 개념 간 이동)
+  const [conceptSlug, setConceptSlug] = useState<string | null>(null)
+
+  /* 개념 페이지 열기 — 메뉴 토픽이면 그 토픽 페이지로, 아니면 전용 개념 페이지로. */
+  const openConcept = (slug: string) => {
+    const topic = TOPIC_BY_CONCEPT_SLUG[slug]
+    if (topic) {
+      setConceptSlug(null)
+      setActiveNav(topic)
+    } else {
+      setConceptSlug(slug)
+      setActiveNav("concept")
+    }
+  }
   const [landing, setLanding] = useState<LandingResponse | null>(null)
   const [topArticles, setTopArticles] = useState<LandingTopArticle[]>([])
   const router = useRouter()
@@ -153,17 +180,29 @@ export default function CherryApp() {
         return <KaasArenaPage />
 
       case "concept-reader":
-        return <ConceptReaderPage onBuyOnMarket={(conceptId) => {
-          setMarketConceptId(conceptId)
-          setActiveNav("kaas-catalog")
-        }} />
+        return <ConceptReaderPage
+          slug={conceptSlug ?? "rag"}
+          onOpenConcept={openConcept}
+          onBuyOnMarket={(conceptId) => {
+            setMarketConceptId(conceptId)
+            setActiveNav("kaas-catalog")
+          }} />
 
-      // BASICS (6 topics) — PRD product-scope.md §1 에 명시된 토픽
-      case "prompting-reasoning":
+      /* 메뉴에 없는 개념(Tier 2)의 전용 페이지 상태 */
+      case "concept":
+        return <ConceptReaderPage slug={conceptSlug ?? "rag"} onOpenConcept={openConcept} />
+
+      // Learning 개념 페이지가 있는 토픽 (public/learning/concepts/<slug>.json)
       case "rag-systems":
+      case "embeddings":
+        return <ConceptReaderPage
+          slug={CONCEPT_SLUG_BY_TOPIC[activeNav]}
+          onOpenConcept={openConcept} />
+
+      // BASICS — 아직 개념 JSON 이 없는 토픽 (placeholder 유지)
+      case "prompting-reasoning":
       case "fine-tuning":
       case "agents-reasoning":
-      case "embeddings":
       case "evaluation-systems":
       // ADVANCED (6 topics) — PRD product-scope.md §2 에 명시된 토픽
       case "chain-of-thought":
