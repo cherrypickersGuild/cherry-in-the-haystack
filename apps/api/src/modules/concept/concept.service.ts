@@ -155,16 +155,30 @@ export class ConceptService {
     }));
   }
 
-  /** 기여자. 표가 비어 있으면 빈 배열(지어내지 않는다) */
+  /** 기여자 — 이 개념 페이지에 실제로 기여한 사람만.
+   *  content.concept_page_contributor 로 연결. 없으면 빈 배열(지어내지 않는다). */
   private async findContributors(node: string) {
     try {
       const { rows } = await this.knex.raw(
-        `SELECT * FROM handbook.knowledge_verification_contributor LIMIT 8`);
-      return rows.map((r: any) => ({
-        handle: r.handle ?? r.name ?? r.contributor_name ?? 'unknown',
-        initials: String(r.handle ?? r.name ?? '??').slice(0, 2).toLowerCase(),
-        role: r.role ?? null,
-      }));
+        `SELECT k.name, k.github_username, pc.role
+           FROM content.concept_page_contributor pc
+           JOIN content.concept_page p  ON p.id = pc.page_id
+           JOIN handbook.knowledge_verification_contributor k ON k.id = pc.contributor_id
+          WHERE p.ontology_node = :node AND p.surface = 'learning'
+            AND pc.revoked_at IS NULL AND k.revoked_at IS NULL
+          ORDER BY CASE pc.role
+                     WHEN 'Lead reviewer' THEN 1 WHEN 'Author' THEN 2
+                     WHEN 'Evidence sourcing' THEN 3 ELSE 4 END, k.name`,
+        { node },
+      );
+      return rows.map((r: any) => {
+        const handle = r.github_username || r.name;
+        return {
+          handle,
+          initials: String(handle).replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toLowerCase(),
+          role: r.role ?? null,
+        };
+      });
     } catch {
       return [];
     }

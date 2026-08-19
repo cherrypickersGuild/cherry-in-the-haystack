@@ -10,6 +10,17 @@
 | 0-2 **기준선 스냅샷 고정** | ✅ | `현재상태-스냅샷-2026-08-19.md` · 이후 수정 금지 |
 | 0-3 12개 토픽의 빈 섹션 명시 | ✅ | 11개 페이지에 빈 섹션 존재 |
 
+## Phase 0-A — 전달 패키지 (리서처 인계용)
+| 항목 | 상태 | 메모 |
+|---|---|---|
+| 0A-1 `researcher-package/작업안내.md` 작성 | ✅ | 필드 명세·제약·함정 포함 |
+| 0A-2 `concepts-to-fill.json` 생성 (305개 × 20필드) | ✅ | `scripts/learning/build-researcher-json.cjs` |
+| 0A-3 작성 대상 5필드 **DB 저장 경로 확보** | ✅ | displayTitle · overview · cherries · references · contributors |
+| 0A-4 기여자 연결 표 신설 + API 연동 | ✅ | `content.concept_page_contributor` · 삽입 테스트 통과 |
+| 0A-5 `bookParagraphsAvailable` 하위 개념명 포함 재집계 | ✅ | Advanced Prompting 0→65 등 |
+| 0A-6 JSON ↔ 안내서 ↔ 화면 코드 필드명 대조 | ✅ | references 8필드 완전 일치 |
+| 0A-7 [게이트] 리서처에게 전달 | - | 사용자 |
+
 ## Phase 1 — RAG 검수 🔍
 | 항목 | 상태 | 메모 |
 |---|---|---|

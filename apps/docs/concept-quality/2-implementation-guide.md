@@ -84,6 +84,25 @@ RAG 검수에서 나온 판단을 `품질기준.md`(신설 예정)에 남긴다.
 
 ---
 
+## 4-A. 기여자 기록 (2026-08-19 추가)
+
+Overview 는 인용이 아니라 **우리가 쓰는 글**이다(PRD §1 — Cherries 만 *"what the literature actually says"* 로 규정). 따라서 Overview 에 필요한 것은 출처가 아니라 **저자 기록**이다.
+
+- **연결 표 신설**: `content.concept_page_contributor` (`page_id` · `contributor_id` · `role` · `contributed_at`)
+  SQL: `docs/architecture/concept-page-contributor-2026-08-19.sql` (롤백본 동봉)
+- **역할 4종** — 원본 화면(`concept-reader-page.tsx`)의 3종 + Overview 작성용 `Author`.
+  `CHECK` 제약으로 **다른 값은 DB 가 거부**한다.
+  | 값 | 무엇을 한 사람 |
+  |---|---|
+  | `Author` | Overview 작성 |
+  | `Evidence sourcing` | Cherries 수집 |
+  | `Lead reviewer` | 전체 검수 |
+  | `Concept mapping` | 개념 관계 (보통 자동) |
+- **API**: `ConceptService.findContributors` 가 이 표를 조인해 **해당 개념의 기여자만** 반환(역할 순 정렬, `github_username` 우선). 없으면 빈 배열.
+- **화면**: 오른쪽 `Knowledge Team` 카드. 비면 점선 자리표시자 + "No reviewer recorded yet."
+
+⚠️ 리서처가 이름을 채워 보내면, 개발자가 **`handbook.knowledge_verification_contributor` 에 사람을 먼저 등록**한 뒤 연결 표에 넣는다.
+
 ## 5. 단계
 
 | Phase | 내용 | 산출물 |

@@ -102,3 +102,103 @@ RAG는 유일한 발행본이지만 **검증되지 않았다.**
 - 품질 기준·검수 절차 문서(본 폴더)
 - 링크 동작(소장 도서 목적지 포함)
 - 현황 리포트 생성기 + 기준선 대비 차이
+
+
+---
+
+## 8. 도달성 분석 (2026-08-19 · **기록만 · 구현하지 않음**)
+
+> 리서처 패키지에 페이지 구분 필드를 넣다가 드러난 **구조 문제**. 콘텐츠 품질 작업과는 별개이며, **지금 손대지 않는다.**
+
+### 8-1. 305개 중 226개는 화면에 도달할 수 없다
+
+화면에서 개념 X 페이지의 Child Concepts = **X 를 가리키는 개념들**이다. 따라서 메뉴 개념에서 출발해 링크를 타고 갈 수 있는 범위가 곧 "사용자가 볼 수 있는 페이지"다.
+
+| 구분 | 개수 | 뜻 |
+|---|---:|---|
+| **MENU** | 11 | 사이드바에서 바로 열림 (토픽 12개 중 `Embedding` 중복 제외) |
+| **LINKED** | 68 | 링크를 타고 들어가면 나옴 (1단계 41 · 2단계 25 · 3단계 2) |
+| **UNREACHABLE** | **226 (74%)** | **어느 화면에서도 도달 불가** |
+
+**원인**: 메뉴 12개가 온톨로지의 **중간 가지**(RAG·Finetuning 등)에 붙어 있다. 그 아래로는 내려갈 수 있으나 다른 가지(`ModelComponent` 84 · `ApplicationDomain` 32 등)로 건너갈 길이 없다.
+예: `Tokenization`·`ALBERT`·`ActivationFunction`·`Alignment` 는 온톨로지에 있지만 사용자가 볼 수 없다.
+
+### 8-2. 메뉴에 넣으면 열리는 개념 수 (실측)
+
+| 새로 열림 | 개념 | 메뉴명으로 쓴다면 |
+|---:|---|---|
+| **226** | `LLMConcept` | 온톨로지 최상위 — "All Concepts" 전체 탐색 입구. **1개로 100% 도달** |
+| 81 | `ModelComponent` | Model Components (토큰화·어텐션·임베딩층…) |
+| 32 | `ApplicationDomain` | Applications (NLU·NLG·추론·멀티모달) |
+| 26 | `AgentComponent` | Agent Components |
+| 25 | `Inference Optimization` | Inference Optimization (양자화·KV캐시·배칭) |
+| 24 | `ModelArchitecture` | Model Architecture |
+| 22 | `TrainingParadigm` | Training |
+| 18 | `Production-ready ML system` | Production Systems |
+| 15 | `SafetyAndAlignment` | Safety & Alignment |
+| 11 | `KnowledgeIntegration` | Knowledge & Memory |
+
+- 상위 4개(`ModelComponent`·`ApplicationDomain`·`AgentComponent`·`Inference Optimization`)만 넣어도 **164개**가 열려 도달률 26% → 약 80%.
+
+### 8-3. ⚠️ 이건 기획 변경이다
+
+후보들이 **PRD 의 Basics 목록과 축이 다르다.**
+
+| | 축 |
+|---|---|
+| PRD Basics 6 | **"무엇을 배우나"** — 프롬프팅·RAG·파인튜닝·에이전트·임베딩·평가 |
+| 위 후보들 | **"무엇으로 이루어졌나"** — 모델 부품·아키텍처·추론 최적화 |
+
+온톨로지는 학습 커리큘럼이 아니라 **책에서 추출한 기술 분류**이므로(`../learning/개념온톨로지-GraphDB-조사.md`), 1단계를 그대로 메뉴로 쓰면 PRD 가 정한 Learning 구조(`docs/PRD/product-scope.md` §1·§2)와 어긋난다.
+
+### 8-4. 선택지 (미결정)
+
+| | 방법 | 비고 |
+|---|---|---|
+| (가) | 그대로 둠 | 온톨로지엔 있으나 화면엔 안 나옴 |
+| (나) | 메뉴 토픽 추가 | **PRD 변경 필요** |
+| (다) | `LLMConcept` 기준 전체 탐색 화면 1개 | 메뉴 축을 안 건드리고 도달률 100% |
+
+**결정 시점**: 콘텐츠 품질 작업(A·B 등급 52개) 이후. **지금은 리서처 작업에 영향 없다** — 사용자가 실제로 보는 페이지는 A+B 52개뿐이다.
+
+
+---
+
+## 9. 체리 출처 범위 — 조사 결과 (2026-08-19 · **현행 유지**)
+
+### 9-1. 구조 — 외부 자료를 막고 있지 않다
+
+체리는 `handbook.paragraph_concept_link.paragraph_chunk_id`(NOT NULL)로 **소장 문헌의 문단**에 반드시 연결된다. 그래서 처음엔 "외부 자료를 쓰려면 스키마 변경이 필요하다"고 판단했으나 **틀렸다.**
+
+- `book_source_type_enum` = `PDF · EPUB · HTML · MARKDOWN · **WEB_URL** · CUSTOM`
+- `handbook.book.source_url` 칸 존재
+- `paragraph_chunk` 필수 칸은 `book_id` · `body_text` 둘뿐
+
+→ **웹 문서·논문을 자료로 등록하는 것이 원래 설계에 들어 있다**(PRD FR-7.2 *"Extraction pipeline: PDF → text, web → markdown"*). 즉 "외부 자료 허용"이 아니라 **"자료를 더 수집한다"** 가 정확한 표현이며, 스키마 변경은 필요 없다.
+
+### 9-2. 근거 집계 방식이 틀렸었다 (중요)
+
+개념 **이름만으로** 문단을 세면 실제보다 훨씬 적게 잡힌다. 책이 상위 개념어를 잘 쓰지 않기 때문이다.
+
+| 메뉴 | 개념명만 | **하위 개념명 포함** |
+|---|---:|---:|
+| RAG | 104 | **241** |
+| Prompt Engineering | 32 | **233** |
+| Embeddings | 72 | **85** |
+| Fine-tuning | 74 | **85** |
+| Evaluation | 7 | **76** |
+| **Advanced Prompting** | **0** | **65** |
+| Agents | 10 | **47** |
+| Multi-agent Orchestration | 38 | 38 |
+| Adversarial Evaluation | 19 | 19 |
+| PEFT / LoRA / QLoRA | 4 | 4 |
+| **Multi-hop RAG** | **0** | **0** |
+
+`Advanced Prompting` 은 책에 그 표현이 없고 `ChainOfThought`·`PAL`·`ReAct`·`TreeOfThoughts` 로 서술된다. → 리서처 JSON 의 `bookParagraphsAvailable` 을 **하위 개념명 포함 기준으로 재집계**하고, 검색어 목록을 `bookSearchTerms` 로 함께 제공하도록 수정했다.
+
+### 9-3. 결정 — 현행 유지
+
+- **외부 자료 수집은 지금 하지 않는다.** 메뉴 11개 중 10개가 소장 자료로 충분하다(19~241건).
+- 유일한 예외 `Multi-hop RAG`(0건) 는 **비워둔다.** 이 메뉴는 온톨로지 `HybridRetrieval` 에 매핑돼 있는데 이름부터 다르므로, **매핑 재검토가 자료 수집보다 먼저**다.
+- 비어 있는 섹션은 **그대로 둔다.** 자료 추가 여부는 A·B 52개 작업을 진행하며 나중에 판단한다.
+- C·D 등급으로 내려가면 자료 부족이 다시 나올 수 있으나, 그때 다시 판단한다.

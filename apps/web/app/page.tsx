@@ -36,27 +36,27 @@ const STATIC_MOMENTUM = [
 /* Learning: 사이드바 토픽 id → 온톨로지 개념 노드 (handbook.concept.ontology_node)
    API 가 노드명·slug·별칭 아무거나 받으므로 노드명으로 통일한다.
    근거: apps/docs/ontology-migration/2-implementation-guide.md §5 */
-const CONCEPT_NODE_BY_TOPIC: Record<string, string> = {
+const CONCEPT_NODE_BY_TOPIC: Record<string, { node: string; section: "BASICS" | "ADVANCED" }> = {
   /* BASICS — PRD product-scope.md §1 */
-  "prompting-reasoning": "PromptEngineering",
-  "rag-systems":         "RAG",
-  "fine-tuning":         "Finetuning",
-  "agents-reasoning":    "AgentArchitecture",
-  "embeddings":          "Embedding",
-  "evaluation-systems":  "EvaluationMetric",
+  "prompting-reasoning": { node: "PromptEngineering", section: "BASICS" },
+  "rag-systems":         { node: "RAG", section: "BASICS" },
+  "fine-tuning":         { node: "Finetuning", section: "BASICS" },
+  "agents-reasoning":    { node: "AgentArchitecture", section: "BASICS" },
+  "embeddings":          { node: "Embedding", section: "BASICS" },
+  "evaluation-systems":  { node: "EvaluationMetric", section: "BASICS" },
   /* ADVANCED — PRD product-scope.md §2 */
-  "chain-of-thought":    "AdvancedPrompting",
-  "multi-hop-rag":       "HybridRetrieval",
-  "peft-lora":           "ParameterEfficientFinetuning",
-  "agent-topologies":    "MultiAgentSystem",
-  "custom-embeddings":   "Embedding",
-  "adversarial-eval":    "RedTeaming",
+  "chain-of-thought":    { node: "AdvancedPrompting", section: "ADVANCED" },
+  "multi-hop-rag":       { node: "HybridRetrieval", section: "ADVANCED" },
+  "peft-lora":           { node: "ParameterEfficientFinetuning", section: "ADVANCED" },
+  "agent-topologies":    { node: "MultiAgentSystem", section: "ADVANCED" },
+  "custom-embeddings":   { node: "Embedding", section: "ADVANCED" },
+  "adversarial-eval":    { node: "RedTeaming", section: "ADVANCED" },
 }
 /* 역방향: 개념 slug → 사이드바 토픽 id. 하위 개념을 누르면 그 개념의 "자기 페이지"로 가야 하므로,
    메뉴 토픽인 개념은 해당 토픽 id 로 이동해 사이드바 하이라이트까지 맞춘다.
    메뉴에 없는 개념(Tier 2)은 전용 상태 "concept" 로 연다. */
 const TOPIC_BY_CONCEPT_NODE: Record<string, string> = Object.fromEntries(
-  Object.entries(CONCEPT_NODE_BY_TOPIC).map(([topic, node]) => [node, topic]),
+  Object.entries(CONCEPT_NODE_BY_TOPIC).map(([topic, v]) => [v.node, topic]),
 )
 
 export default function CherryApp() {
@@ -220,7 +220,8 @@ export default function CherryApp() {
       case "custom-embeddings":
       case "adversarial-eval":
         return <ConceptReaderPage
-          slug={CONCEPT_NODE_BY_TOPIC[activeNav]}
+          slug={CONCEPT_NODE_BY_TOPIC[activeNav].node}
+          sectionHint={CONCEPT_NODE_BY_TOPIC[activeNav].section}
           onOpenConcept={openConcept} />
 
       case "highlight":

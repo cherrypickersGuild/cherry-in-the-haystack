@@ -12,6 +12,13 @@ import { fetchLearningConcept, type ConceptPage, type ConceptRelationType } from
 /** 개념 페이지 발행 여부 → 카드 뱃지 */
 type PageStatus = "full" | "outline" | "soon"
 
+/** 섹션 뱃지 색 — `handbook-placeholder.tsx` 의 CARD_PALETTE 원본과 동일하게 유지.
+    BASICS = 초록 · ADVANCED = 체리. 둘을 색으로 구분한다. */
+const SECTION_BADGE = {
+  BASICS:   { bg: "#E3F1E1", fg: "#2F7A3A" },
+  ADVANCED: { bg: "#FDF0F3", fg: "#C94B6E" },
+} as const
+
 /* 관계별 색 — 화면 표기 전용 */
 const RELATION_COLOR: Record<ConceptRelationType, string> = {
   SUBTOPIC: "#7B5EA7",
@@ -33,10 +40,13 @@ const STATUS_BADGE: Record<PageStatus, { label: string; cls: string }> = {
 ───────────────────────────────────────────── */
 export function ConceptReaderPage({
   slug = "rag",
+  sectionHint,
   onBuyOnMarket,
   onOpenConcept,
 }: {
   slug?: string
+  /** 사이드바 토픽에서 열렸을 때의 섹션. 발행 페이지에 section 이 없을 때 쓴다. */
+  sectionHint?: "BASICS" | "ADVANCED"
   onBuyOnMarket?: (conceptId: string) => void
   onOpenConcept?: (slug: string) => void
 }) {
@@ -68,7 +78,9 @@ export function ConceptReaderPage({
     return <div style={{ maxWidth: "700px" }}><p className="text-[13px] text-text-muted">Loading…</p></div>
   }
 
-  const sectionLabel = doc.section === "BASICS" ? "Basics" : "Advanced"
+  /* 섹션: 발행본 > 사이드바 힌트 > 없음(하위 개념을 타고 들어온 경우) */
+  const section = doc.section ?? sectionHint ?? null
+  const badgePalette = section ? SECTION_BADGE[section] : null
 
   return (
     <div className="flex flex-col -m-4 -mx-4 lg:-m-8 lg:-mx-10">
@@ -76,19 +88,16 @@ export function ConceptReaderPage({
       <div className="flex flex-col lg:flex-row lg:flex-1 lg:overflow-hidden">
         {/* Center reading column */}
         <main className="flex-1 overflow-y-auto px-5 py-6 lg:px-12 lg:py-10" style={{ maxWidth: "700px" }}>
-          {/* Breadcrumb */}
-          <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-text-muted mb-3">
-            <span>Learning</span>
-            <span className="text-border">›</span>
-            <span>{sectionLabel}</span>
-            <span className="text-border">›</span>
-            <span className="text-text-primary font-semibold">{doc.title.length > 18 ? doc.menuLabel : doc.title}</span>
-          </div>
-
-          {/* Section badge */}
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-violet-soft text-violet mb-3">
-            {sectionLabel}
-          </span>
+          {/* Section badge — BASICS 초록 / ADVANCED 체리 (원본 디자인).
+              메뉴 소속이 없는 개념(하위 개념 탐색)은 뱃지를 달지 않는다. */}
+          {section && badgePalette && (
+            <span
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold mb-3"
+              style={{ backgroundColor: badgePalette.bg, color: badgePalette.fg }}
+            >
+              {section}
+            </span>
+          )}
 
           {/* Title */}
           <div className="flex items-start justify-between gap-4 mb-4">
