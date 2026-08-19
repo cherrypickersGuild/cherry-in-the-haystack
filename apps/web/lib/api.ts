@@ -1014,3 +1014,70 @@ export async function compareKnowledge(knownTopics: { topic: string; lastUpdated
   if (!res.ok) throw new Error("Failed to compare")
   return res.json()
 }
+
+/* ─────────────────────────────────────────────
+   Learning 개념 페이지 (DB 구동)
+   백엔드: apps/api/src/modules/concept/
+   기획: apps/docs/ontology-migration/2-implementation-guide.md §5
+───────────────────────────────────────────── */
+export type ConceptRelationType =
+  | "SUBTOPIC" | "PREREQUISITE" | "EXTENDS" | "RELATED" | "CONTRADICTS"
+
+export interface ConceptCherry {
+  source: string
+  author: string | null
+  locator: string | null
+  insight: string
+  /** true = 사람이 정리한 문장 · false = 책 원문 그대로 */
+  curated: boolean
+  chunkId: string
+}
+
+export interface ConceptChild {
+  label: string
+  node: string
+  relation: ConceptRelationType
+  why: string | null
+  /** 발행된 개념 페이지가 있나 (링크 가능 여부) */
+  hasPage: boolean
+}
+
+export interface ConceptReference {
+  order: number
+  stage: string
+  title: string
+  url: string | null
+  inLibrary: boolean
+  byline: string | null
+  teaches: string
+  addsOverPrevious: string
+}
+
+export interface ConceptPage {
+  slug: string
+  node: string
+  section: "BASICS" | "ADVANCED" | null
+  title: string
+  menuLabel: string
+  aliases: string[]
+  meta: {
+    updated: string | null
+    verified: boolean
+    source: string
+    contributors: { handle: string; initials: string; role: string | null }[]
+  }
+  overview: { definition: string | null; body: string | null }
+  cherries: ConceptCherry[]
+  childConcepts: ConceptChild[]
+  references: ConceptReference[]
+}
+
+/** Learning 개념 페이지. slug · 온톨로지 노드명 · 별칭 아무거나 받는다.
+ *  ⚠️ 이름 주의: `fetchConcept`(위)는 KaaS 마켓용으로 이미 존재한다. */
+export async function fetchLearningConcept(key: string): Promise<ConceptPage> {
+  const res = await fetch(`${API_URL}/api/learning/concepts/${encodeURIComponent(key)}`, {
+    cache: "no-store",
+  })
+  if (!res.ok) throw new Error(`Failed to fetch concept: ${key} (${res.status})`)
+  return res.json()
+}

@@ -4,6 +4,23 @@
 
 ---
 
+## 0. 전제조건 (이걸 안 하면 아무것도 못 한다)
+
+이 문서의 모든 절차는 **로컬 GraphDB 가 떠 있고 온톨로지가 로드된 상태**를 전제한다.
+
+```bash
+docker compose up -d graphdb            # cherry-graphdb :7200
+D=python_services/packages/idea_to_graph_ontology/data
+curl -X POST -F "config=@$D/config.ttl" http://localhost:7200/rest/repositories
+curl -X POST -H "Content-Type: text/turtle" --data-binary "@$D/llm_ontology_augmented.ttl" \
+     http://localhost:7200/repositories/llm-ontology/statements
+curl http://localhost:7200/repositories/llm-ontology/size    # 1220 이면 정상
+```
+- 접속 확인: `apps/api/.env` 의 `LOCAL_DB_*`(Supabase) · Postgres 17.6 · 포트 5432(세션 모드, **트랜잭션 지원 확인됨**)
+- 스크립트 위치: `scripts/ontology/` (precheck / export / import / verify) · `scripts/learning/`(갭 리포트)
+
+---
+
 ## 1. 스키마 — `handbook.concept_relation` (신규)
 
 ```sql
@@ -98,6 +115,16 @@ node scripts/ontology/precheck.cjs
 | 사이클 검사 (R9) | 중단·보고 |
 - 산출물: **삽입 예정 건수 표 + 충돌 목록**. 이 표를 사용자에게 제시하는 것이 승인 게이트.
 
+### 3-2-B. 컬럼 보완을 **삽입보다 먼저** (순서 고정)
+
+`1-work-guidelines.md` §3-C 의 컬럼 추가(C1~C3)는 **302행을 넣기 전에** 끝낸다.
+
+```
+✅ 컬럼 추가(ALTER) → 302행 INSERT (컬럼 값 포함)
+❌ 302행 INSERT → 컬럼 추가 → 302행 UPDATE 백필   ← 작업 2배 + 백필 실패 위험
+```
+- 특히 `handbook.concept.ontology_node`(C1)는 이관의 **매칭 키**다. 나중에 채우면 그 사이 다른 코드가 NULL 을 보게 된다.
+
 ### 3-3. 삽입 (🔴 쓰기 · 승인 후)
 ```
 node scripts/ontology/import-postgres.cjs --confirm
@@ -117,6 +144,23 @@ node scripts/ontology/verify.cjs
 - 건수 대조: 스냅샷 302/301 ↔ DB 삽입 건수
 - **라운드트립**: DB 에서 다시 읽어 스냅샷과 **완전 일치**하는지(라벨·설명·관계 방향)
 - 샘플 육안: `RAG` 의 하위가 GraphDB 질의 결과와 같은지
+
+### 3-5. ⚠️ 소프트 삭제 후 재실행 — 유령 행 주의 (실측 확인)
+
+롤백(`revoked_at` 설정) 후 다시 이관하면 **같은 개념이 2행**이 된다. 부분 유니크 인덱스가 `WHERE revoked_at IS NULL` 이라 막지 않는다.
+
+> 실측: `__ZZTEST__` 를 삽입 → `revoked_at` 설정 → 재삽입 → **총 2행(살아있는 행 1)**. (테스트는 ROLLBACK 처리, DB 변경 없음)
+
+**규칙 — 모든 조회에 `revoked_at IS NULL` 을 반드시 넣는다.**
+```sql
+-- ✅
+SELECT * FROM handbook.concept
+ WHERE ontology_node = $1 AND revoked_at IS NULL;
+-- ❌ 롤백 이력이 있으면 2행이 나온다
+SELECT * FROM handbook.concept WHERE ontology_node = $1;
+```
+- 관계 조회, 공급자(Provider) 구현, 검증 스크립트 **전부 동일**하게 적용.
+- 재이관 전에 유령 행을 물리 삭제하고 싶다면 별도 승인 후 진행(기본은 남겨둔다 — 이력 보존).
 
 ## 4. 롤백
 

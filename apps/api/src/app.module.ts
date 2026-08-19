@@ -12,6 +12,7 @@ import { KaasModule } from './modules/kaas/kaas.module';
 import { WriterAgentModule } from './modules/writer_agent/writer-agent.module';
 import { BenchModule } from './modules/bench/bench.module';
 import { FrameworksLandscapeModule } from './modules/frameworks_landscape/frameworks-landscape.module';
+import { ConceptModule } from './modules/concept/concept.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { FrameworksLandscapeModule } from './modules/frameworks_landscape/framew
     WriterAgentModule,
     BenchModule,
     FrameworksLandscapeModule,
+    ConceptModule,
   ],
   controllers: [],
   providers: [],

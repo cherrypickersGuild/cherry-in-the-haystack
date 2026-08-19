@@ -15,7 +15,6 @@ import { NDCasesListPage } from "@/components/cherry/nd-cases-articles-page"
 import { NDCasesBestPage } from "@/components/cherry/nd-cases-best-page"
 import { NDResearchPage, NDPapersPage, NDResearchLandscapePage, NDDiscoursePage, NDDiscourseArticlePage } from "@/components/cherry/nd-research-page"
 import { ConceptReaderPage } from "@/components/cherry/concept-reader-page"
-import { HandbookPlaceholder } from "@/components/cherry/handbook-placeholder"
 import { NDSpecPage } from "@/components/cherry/nd-spec-page"
 import { NDOverviewPage } from "@/components/cherry/nd-overview-page"
 import { NDBuildingBlocksPage } from "@/components/cherry/nd-building-blocks-page"
@@ -34,16 +33,30 @@ const STATIC_MOMENTUM = [
   { entityId: "s3", entityName: "Gemini 2.0", categoryName: "Google Family", page: "MODEL_UPDATES", thisWeekCount: 8, prevWeekCount: 3, changePct: 166 },
 ]
 
-/* Learning: UI 토픽 id → 개념 JSON slug (public/learning/index.json 과 일치) */
-const CONCEPT_SLUG_BY_TOPIC: Record<string, string> = {
-  "rag-systems": "rag",
-  "embeddings": "embeddings",
+/* Learning: 사이드바 토픽 id → 온톨로지 개념 노드 (handbook.concept.ontology_node)
+   API 가 노드명·slug·별칭 아무거나 받으므로 노드명으로 통일한다.
+   근거: apps/docs/ontology-migration/2-implementation-guide.md §5 */
+const CONCEPT_NODE_BY_TOPIC: Record<string, string> = {
+  /* BASICS — PRD product-scope.md §1 */
+  "prompting-reasoning": "PromptEngineering",
+  "rag-systems":         "RAG",
+  "fine-tuning":         "Finetuning",
+  "agents-reasoning":    "AgentArchitecture",
+  "embeddings":          "Embedding",
+  "evaluation-systems":  "EvaluationMetric",
+  /* ADVANCED — PRD product-scope.md §2 */
+  "chain-of-thought":    "AdvancedPrompting",
+  "multi-hop-rag":       "HybridRetrieval",
+  "peft-lora":           "ParameterEfficientFinetuning",
+  "agent-topologies":    "MultiAgentSystem",
+  "custom-embeddings":   "Embedding",
+  "adversarial-eval":    "RedTeaming",
 }
 /* 역방향: 개념 slug → 사이드바 토픽 id. 하위 개념을 누르면 그 개념의 "자기 페이지"로 가야 하므로,
    메뉴 토픽인 개념은 해당 토픽 id 로 이동해 사이드바 하이라이트까지 맞춘다.
    메뉴에 없는 개념(Tier 2)은 전용 상태 "concept" 로 연다. */
-const TOPIC_BY_CONCEPT_SLUG: Record<string, string> = Object.fromEntries(
-  Object.entries(CONCEPT_SLUG_BY_TOPIC).map(([topic, slug]) => [slug, topic]),
+const TOPIC_BY_CONCEPT_NODE: Record<string, string> = Object.fromEntries(
+  Object.entries(CONCEPT_NODE_BY_TOPIC).map(([topic, node]) => [node, topic]),
 )
 
 export default function CherryApp() {
@@ -56,7 +69,7 @@ export default function CherryApp() {
 
   /* 개념 페이지 열기 — 메뉴 토픽이면 그 토픽 페이지로, 아니면 전용 개념 페이지로. */
   const openConcept = (slug: string) => {
-    const topic = TOPIC_BY_CONCEPT_SLUG[slug]
+    const topic = TOPIC_BY_CONCEPT_NODE[slug]
     if (topic) {
       setConceptSlug(null)
       setActiveNav(topic)
@@ -192,26 +205,23 @@ export default function CherryApp() {
       case "concept":
         return <ConceptReaderPage slug={conceptSlug ?? "rag"} onOpenConcept={openConcept} />
 
-      // Learning 개념 페이지가 있는 토픽 (public/learning/concepts/<slug>.json)
-      case "rag-systems":
-      case "embeddings":
-        return <ConceptReaderPage
-          slug={CONCEPT_SLUG_BY_TOPIC[activeNav]}
-          onOpenConcept={openConcept} />
-
-      // BASICS — 아직 개념 JSON 이 없는 토픽 (placeholder 유지)
+      /* Learning 토픽 12개 — 전부 DB 구동 개념 페이지.
+         비어 있는 섹션은 빈 채로 보인다(지어내지 않음). */
       case "prompting-reasoning":
+      case "rag-systems":
       case "fine-tuning":
       case "agents-reasoning":
+      case "embeddings":
       case "evaluation-systems":
-      // ADVANCED (6 topics) — PRD product-scope.md §2 에 명시된 토픽
       case "chain-of-thought":
       case "multi-hop-rag":
       case "peft-lora":
       case "agent-topologies":
       case "custom-embeddings":
       case "adversarial-eval":
-        return <HandbookPlaceholder topicId={activeNav} />
+        return <ConceptReaderPage
+          slug={CONCEPT_NODE_BY_TOPIC[activeNav]}
+          onOpenConcept={openConcept} />
 
       case "highlight":
       default:
