@@ -5,8 +5,20 @@
    기획: apps/docs/concept-quality/2-implementation-guide.md */
 const fs = require("fs"), path = require("path");
 const ROOT = path.resolve(__dirname, "../..");
-const { Client } = require(path.join(ROOT, "apps/api/node_modules/pg"));
 const OUT = path.join(ROOT, "apps/docs/concept-quality/researcher-package/concepts-to-fill.json");
+
+/* 덮어쓰기 가드 — 리서처가 손으로 채운 내용이 조용히 사라지지 않게.
+   이 스크립트는 DB 에서 전량을 다시 만든다. 기존 파일의 수기 편집분은 병합되지 않는다. */
+const FORCE = process.argv.includes("--force");
+if (fs.existsSync(OUT) && !FORCE) {
+  console.error(`중단: 산출물이 이미 있습니다 — ${OUT}`);
+  console.error("  이 스크립트는 DB 기준으로 전량 재생성하며, 기존 파일의 수기 편집분을 병합하지 않습니다.");
+  console.error("  덮어쓰려면 --force 를 주세요. 그때 기존 파일을 .bak 으로 먼저 보존합니다.");
+  process.exit(1);
+}
+
+/* DB 드라이버는 가드를 통과한 뒤에 읽는다 — 가드가 먼저 말하도록. */
+const { Client } = require(path.join(ROOT, "apps/api/node_modules/pg"));
 
 /* 사이드바 12개 토픽 (apps/web/app/page.tsx CONCEPT_NODE_BY_TOPIC 과 일치) */
 const MENU = {
@@ -23,51 +35,22 @@ const MENU = {
   RedTeaming: ["ADVANCED", "Adversarial Evaluation"],
 };
 
-/* 개념명 → 책 검색어
-   ⚠️ 주의: 예전 방식(마지막 낱말만 뽑기)은 `MultiAgentSystem` → "system" 이 되어
-   무관한 문단 631개가 걸렸다. 약어(RAG)는 4글자 미만이라 아예 빠졌다.
-   → 전체 구(句)와 단수형만 쓰고, 약어는 낱말 경계로 정확히 찾는다. */
-/* 발행된 Overview 는 마크다운 한 덩어리로 저장돼 있다. 모든 개념이 같은 모양을 갖도록
-   definition / whyItMatters / context 3필드로 되돌린다. */
-function splitOverview(md) {
-  if (!md) return { definition: "", whyItMatters: "", context: "" };
-  const paras = md.split(/\n{2,}/).map((x) => x.trim()).filter(Boolean);
-  const strip = (t) => t.replace(/^\*\*[^*]+:\*\*\s*/, "");
-  return {
-    definition: strip(paras[0] || ""),
-    whyItMatters: strip(paras[1] || ""),
-    context: strip(paras[2] || ""),
-  };
+/* Overview 파싱은 importer 의 직렬화와 짝이 되어야 하므로 공유 모듈을 쓴다(결정 G2).
+   parse ⟷ serialize 가 한 파일에 있어 규약이 어긋날 수 없다. */
+const { parseOverview } = require("./overview-format.cjs");
+
+/* ⚠️ 3필드에 담기지 않는 4번째 이후 문단은 어느 의미 필드에 속하는지 추론하지 않는다
+      (임의 병합 금지). 손실 대상만 모아 두고 끝에서 크게 알린다. */
+const OVERVIEW_OVERFLOW = [];
+function splitOverview(md, node) {
+  const { overview, extraParagraphs } = parseOverview(md);
+  if (extraParagraphs.length) OVERVIEW_OVERFLOW.push({ node, extra: extraParagraphs.length });
+  return overview;
 }
 
-const ACRONYM = (l) => /^[A-Z][A-Za-z]{1,5}$/.test(l) && l.replace(/[^A-Z]/g, "").length >= 2;
-
-/** 이름 하나 → 검색 패턴들 */
-function patternsFor(label) {
-  const raw = String(label).trim();
-  if (ACRONYM(raw)) return [{ text: raw, re: `\\m${raw}\\M` }];   // RAG, PAL, PEFT …
-  const s = raw.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/[\/]/g, " ").toLowerCase().trim();
-  const set = new Set([s]);
-  if (s.endsWith("s")) set.add(s.slice(0, -1));
-  return [...set]
-    .map((t) => t.replace(/[^a-z0-9 ]/g, "").trim())
-    .filter((t) => t.length >= 4)
-    .map((t) => ({ text: raw, re: t.replace(/ /g, "[ -]?") }));
-}
-
-/** 개념명 + 하위 개념명으로 검색어를 만든다.
-    ⚠️ 개념명만 쓰면 실제보다 훨씬 적게 잡힌다 — 책은 상위 개념어를 잘 안 쓰기 때문.
-    실측: "Advanced Prompting" 개념명만 0건 → 하위(ChainOfThought·PAL·ReAct…) 포함 80건. */
-const terms = (label, childLabels = []) => {
-  const out = [], seen = new Set();
-  for (const nm of [label, ...childLabels]) {
-    for (const p of patternsFor(nm)) {
-      if (seen.has(p.re)) continue;
-      seen.add(p.re); out.push(p);
-    }
-  }
-  return out;
-};
+/* 검색어·문단 필터는 evidence exporter 와 반드시 같아야 하므로 공유 모듈을 쓴다.
+   (개수를 세는 쪽과 후보를 뽑는 쪽이 어긋나면 "85개 있다는데 목록은 60개" 가 된다.) */
+const { terms, toRegex, PARAGRAPH_FILTER } = require("./search-terms.cjs");
 
 const env = Object.fromEntries(fs.readFileSync(path.join(ROOT, "apps/api/.env"), "utf8")
   .split("\n").filter((l) => /^[A-Z_]+=/.test(l))
@@ -133,10 +116,10 @@ const env = Object.fromEntries(fs.readFileSync(path.join(ROOT, "apps/api/.env"),
     const t = terms(row.name, kidNames);
     searchTerms[row.node] = [...new Set(t.map((x) => x.text))];
     if (!t.length) { evidence[row.node] = null; continue; }
-    const re = `(${t.map((x) => x.re).join("|")})`;
+    const re = toRegex(t);
     const { rows } = await c.query(
       `SELECT count(*)::int n FROM handbook.paragraph_chunk
-        WHERE body_text ~* $1 AND char_length(body_text) >= 300 AND revoked_at IS NULL`, [re]);
+        WHERE ${PARAGRAPH_FILTER}`, [re]);
     evidence[row.node] = rows[0].n;
   }
   await c.end();
@@ -174,7 +157,9 @@ const env = Object.fromEntries(fs.readFileSync(path.join(ROOT, "apps/api/.env"),
     { name: "", role: "Evidence sourcing" }, // Cherries 를 찾은 사람
   ]);
   const EMPTY_REF = (order, stage) => ({
-    order, stage, title: "", url: "", inLibrary: true, byline: "", teaches: "", addsOverPrevious: "",
+    /* url 은 apps/web/lib/api.ts 의 ConceptReference.url: string | null 계약을 따른다.
+       "없음"은 빈 문자열이 아니라 null 이다. */
+    order, stage, title: "", url: null, inLibrary: true, byline: "", teaches: "", addsOverPrevious: "",
   });
 
   const items = concepts.map((r) => {
@@ -189,7 +174,7 @@ const env = Object.fromEntries(fs.readFileSync(path.join(ROOT, "apps/api/.env"),
     /* 채워야 할 것 — 자동 생성되는 childConcepts 는 넣지 않는다 */
     const toFillList = [];
     if (!r.concept_name) toFillList.push("displayTitle");
-    const ov = splitOverview(r.content_md);
+    const ov = splitOverview(r.content_md, r.node);
     if (!ov.definition) toFillList.push("overview.definition");
     if (!ov.whyItMatters) toFillList.push("overview.whyItMatters");
     if (!ov.context) toFillList.push("overview.context");
@@ -277,10 +262,24 @@ const env = Object.fromEntries(fs.readFileSync(path.join(ROOT, "apps/api/.env"),
     items,
   };
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
+  if (fs.existsSync(OUT)) {
+    const bak = `${OUT}.${new Date().toISOString().replace(/[:.]/g, "-")}.bak`;
+    fs.copyFileSync(OUT, bak);
+    console.log(`   기존 파일 보존 → ${path.basename(bak)}`);
+  }
   fs.writeFileSync(OUT, JSON.stringify(out, null, 2));
   console.log(`✅ ${OUT}`);
   console.log(`   ${(fs.statSync(OUT).size / 1024).toFixed(0)} KB · 항목 ${items.length}`);
   console.log(`   우선순위 A ${out.summary.priorityA} · B ${out.summary.priorityB} · C ${out.summary.priorityC}`);
   console.log(`   채워진 것 — Overview ${out.summary.overviewFilled} · Cherries ${out.summary.cherriesFilled} · References ${out.summary.referencesFilled}`);
   console.log(`   완료된 개념 ${out.summary.done}개 · 남은 필드 총 ${out.summary.totalFieldsToFill}개`);
+
+  if (OVERVIEW_OVERFLOW.length) {
+    console.error("");
+    console.error("⚠️  Overview 문단 손실 — 3필드(definition/whyItMatters/context)에 담기지 않는 개념이 있습니다.");
+    console.error("    4번째 이후 문단은 JSON 에 실리지 않았습니다. 임의로 합치지 않았습니다.");
+    OVERVIEW_OVERFLOW.forEach((x) => console.error(`      · ${x.node} — 3필드 밖 문단 ${x.extra}개`));
+    console.error("    조치: content_md 를 3문단으로 정리하거나, 3필드 스키마 확장을 먼저 결정하세요.");
+    process.exit(1);
+  }
 })().catch((e) => { console.error("실패:", e.message); process.exit(1); });
