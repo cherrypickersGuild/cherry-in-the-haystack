@@ -46,11 +46,17 @@ const CONCEPT_NODE_BY_TOPIC: Record<string, { node: string; section: "BASICS" | 
   "evaluation-systems":  { node: "EvaluationMetric", section: "BASICS" },
   /* ADVANCED — PRD product-scope.md §2 */
   "chain-of-thought":    { node: "AdvancedPrompting", section: "ADVANCED" },
-  "multi-hop-rag":       { node: "HybridRetrieval", section: "ADVANCED" },
+  /* Advanced 6개는 전부 자기 개념을 갖는다. MultiHopRAG · CustomEmbedding ·
+     MultiAgentOrchestration · AdversarialEvaluation 은 2026-08-25 에 신설했다.
+     그 전에는 이름이 비슷한 HybridRetrieval · Embedding 을 가리키고 있었는데,
+     HybridRetrieval 은 "한 번에 잘 찾기"라 multi-hop 과 다른 축이었고,
+     Embedding 은 Basics 의 "Embeddings" 와 같은 개념이라 두 메뉴가 같은 페이지를 열었다.
+     기획: apps/docs/advanced/1-work-guidelines.md §3 */
+  "multi-hop-rag":       { node: "MultiHopRAG", section: "ADVANCED" },
   "peft-lora":           { node: "ParameterEfficientFinetuning", section: "ADVANCED" },
-  "agent-topologies":    { node: "MultiAgentSystem", section: "ADVANCED" },
-  "custom-embeddings":   { node: "Embedding", section: "ADVANCED" },
-  "adversarial-eval":    { node: "RedTeaming", section: "ADVANCED" },
+  "agent-topologies":    { node: "MultiAgentOrchestration", section: "ADVANCED" },
+  "custom-embeddings":   { node: "CustomEmbedding", section: "ADVANCED" },
+  "adversarial-eval":    { node: "AdversarialEvaluation", section: "ADVANCED" },
 }
 /* 역방향: 개념 slug → 사이드바 토픽 id. 하위 개념을 누르면 그 개념의 "자기 페이지"로 가야 하므로,
    메뉴 토픽인 개념은 해당 토픽 id 로 이동해 사이드바 하이라이트까지 맞춘다.

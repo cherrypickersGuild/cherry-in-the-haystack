@@ -1,0 +1,73 @@
+# 2026-08-25 Advanced 작업분만 (delta)
+# 전체는 llm_ontology_v3-2026-08-25.ttl 에 있다. 이 파일만으로는 복원되지 않는다.
+# 용도: 원본과 우리 것을 나중에 구분하기 위함(D10-A).
+
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix llm:  <http://example.org/llm-ontology#> .
+
+# ── 신설 개념 5건 ──
+
+llm:AdapterTuning a owl:Class ;
+    rdfs:label "AdapterTuning"@en ;
+    rdfs:subClassOf llm:ParameterEfficientFinetuning ;
+    llm:origin "cherry-authored" ;
+    llm:description """Adapter tuning inserts a small trainable module into each layer of a frozen pre-trained model. Only the adapters are updated, so a single base model can serve many tasks by swapping adapters instead of keeping a full fine-tuned copy of the model for each one.""" .
+
+llm:ContrastiveFinetuning a owl:Class ;
+    rdfs:label "ContrastiveFinetuning"@en ;
+    rdfs:subClassOf llm:CustomEmbedding ;
+    llm:origin "cherry-authored" ;
+    llm:description """Contrastive fine-tuning trains an embedding model by pulling matching pairs closer together and pushing mismatched pairs apart. It is the standard way to adapt a general embedding model to a specific domain — and recent work reports that the conventional InfoNCE objective can reduce effectiveness in state-of-the-art models, where listwise distillation from a cross-encoder improves retrieval more consistently.""" .
+
+llm:CustomEmbedding a owl:Class ;
+    rdfs:label "CustomEmbedding"@en ;
+    skos:altLabel "Custom Embeddings" ;
+    skos:altLabel "Domain-specific Embeddings" ;
+    skos:altLabel "Embedding Fine-tuning" ;
+    llm:relatedTo llm:Finetuning ;
+    rdfs:subClassOf llm:Embedding ;
+    llm:origin "cherry-authored" ;
+    llm:description """Custom embeddings adapt a general-purpose embedding model to one domain. General models handle everyday language well but miss the distinctions that matter inside law, medicine, or a single company's documents. Contrastive fine-tuning pulls matching pairs together and pushes mismatched ones apart; the quality of that training rests almost entirely on which wrong answers you choose to teach with.""" .
+
+llm:HardNegativeMining a owl:Class ;
+    rdfs:label "HardNegativeMining"@en ;
+    rdfs:subClassOf llm:CustomEmbedding ;
+    llm:origin "cherry-authored" ;
+    llm:description """Hard negative mining chooses the wrong answers used in contrastive training — passages that look close to the query but are not the answer. It drives embedding quality more than any other single choice. It also carries the sharpest trap in the field: on MS-MARCO roughly 70% of the passages most similar to a query turn out to deserve a positive label, so mining naively teaches the model that correct answers are wrong.""" .
+
+llm:MultiHopRAG a owl:Class ;
+    rdfs:label "MultiHopRAG"@en ;
+    skos:altLabel "Iterative Retrieval" ;
+    skos:altLabel "Multi-hop RAG" ;
+    skos:altLabel "Multi-hop Retrieval" ;
+    skos:altLabel "multihop" ;
+    rdfs:subClassOf llm:RAG ;
+    llm:origin "cherry-authored" ;
+    llm:description """Multi-hop RAG answers questions that a single retrieval cannot: the result of one search becomes the input to the next. A router or planner decomposes the question, retrieves evidence for the first hop, uses what it found to form the next query, and repeats. The hard problem is not finding — it is knowing when to stop: retrieve too long and cost explodes, stop too early and the answer is wrong.""" .
+
+# ── 삽입 관계 22건 (신설 개념이 주어인 것 포함) ──
+
+llm:AdapterTuning rdfs:subClassOf llm:ParameterEfficientFinetuning .
+llm:ContrastiveFinetuning rdfs:subClassOf llm:CustomEmbedding .
+llm:Coordinator rdfs:subClassOf llm:MultiAgentSystem .
+llm:CustomEmbedding llm:relatedTo llm:Finetuning .
+llm:CustomEmbedding rdfs:subClassOf llm:Embedding .
+llm:GraphRAG llm:relatedTo llm:MultiHopRAG .
+llm:Guardrails llm:relatedTo llm:RedTeaming .
+llm:HardNegativeMining rdfs:subClassOf llm:CustomEmbedding .
+llm:LoRA rdfs:subClassOf llm:ParameterEfficientFinetuning .
+llm:MultiAgentCollaboration llm:relatedTo llm:MultiAgentSystem .
+llm:MultiHopRAG rdfs:subClassOf llm:RAG .
+llm:PlannerExecutorAgent llm:relatedTo llm:MultiAgentSystem .
+llm:PromptInjection llm:relatedTo llm:RedTeaming .
+llm:QuantizedLoRA llm:relatedTo llm:ParameterEfficientFinetuning .
+llm:QueryExpansion llm:relatedTo llm:MultiHopRAG .
+llm:QueryProcessing llm:relatedTo llm:MultiHopRAG .
+llm:ReAct llm:relatedTo llm:MultiHopRAG .
+llm:RedTeaming llm:relatedTo llm:EvaluationMetric .
+llm:SafetyGuard llm:relatedTo llm:RedTeaming .
+llm:SelfAsk llm:relatedTo llm:MultiHopRAG .
+llm:SemanticRepresentation llm:relatedTo llm:CustomEmbedding .
+llm:WorkflowAutomation llm:relatedTo llm:MultiAgentSystem .

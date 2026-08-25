@@ -9,20 +9,10 @@ const { Client } = require(path.join(ROOT, "apps/api/node_modules/pg"));
 const OUT = process.argv[2] || path.join(ROOT, "apps/docs/concept-quality/현재상태-live.md");
 
 /* 사이드바 12개 토픽 → 온톨로지 노드 (apps/web/app/page.tsx 의 CONCEPT_NODE_BY_TOPIC 과 일치) */
-const TOPICS = [
-  ["BASICS", "Prompt Engineering", "prompting-reasoning", "PromptEngineering"],
-  ["BASICS", "RAG", "rag-systems", "RAG"],
-  ["BASICS", "Fine-tuning", "fine-tuning", "Finetuning"],
-  ["BASICS", "Agents", "agents-reasoning", "AgentArchitecture"],
-  ["BASICS", "Embeddings", "embeddings", "Embedding"],
-  ["BASICS", "Evaluation", "evaluation-systems", "EvaluationMetric"],
-  ["ADVANCED", "Advanced Prompting", "chain-of-thought", "AdvancedPrompting"],
-  ["ADVANCED", "Multi-hop RAG", "multi-hop-rag", "HybridRetrieval"],
-  ["ADVANCED", "PEFT / LoRA / QLoRA", "peft-lora", "ParameterEfficientFinetuning"],
-  ["ADVANCED", "Multi-agent Orchestration", "agent-topologies", "MultiAgentSystem"],
-  ["ADVANCED", "Custom Embeddings", "custom-embeddings", "Embedding"],
-  ["ADVANCED", "Adversarial Evaluation", "adversarial-eval", "RedTeaming"],
-];
+/* UI 토픽 — 하드코딩하지 않는다. 정본은 apps/web/app/page.tsx 다(menu-map.cjs). */
+const { topicRows } = require("./menu-map.cjs");
+const TOPICS = topicRows();
+if (!TOPICS) { console.error("중단: apps/web/app/page.tsx 의 CONCEPT_NODE_BY_TOPIC 을 읽지 못했습니다."); process.exit(1); }
 
 const env = Object.fromEntries(fs.readFileSync(path.join(ROOT, "apps/api/.env"), "utf8")
   .split("\n").filter(l => /^[A-Z_]+=/.test(l))

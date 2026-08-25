@@ -1,0 +1,102 @@
+# 우리가 넣은 개념만 (delta) — 전체는 llm_ontology_v4-2026-08-25.ttl
+# 관계는 RDF 트리플에 출처를 못 붙이므로 아래 목록으로 대신한다(D10-A)
+
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix llm:  <http://example.org/llm-ontology#> .
+
+llm:AdapterTuning a owl:Class ;
+    rdfs:label "Adapter Tuning"@en ;
+    rdfs:subClassOf llm:ParameterEfficientFinetuning ;
+    llm:origin "cherry-authored" ;
+    llm:description """Adapter tuning inserts a small trainable module into each layer of a frozen pre-trained model. Only the adapters are updated, so a single base model can serve many tasks by swapping adapters instead of keeping a full fine-tuned copy of the model for each one.""" .
+
+llm:AdversarialEvaluation a owl:Class ;
+    rdfs:label "Adversarial Evaluation"@en ;
+    skos:altLabel "Adversarial Testing" ;
+    skos:altLabel "Safety Evaluation" ;
+    rdfs:subClassOf llm:EvaluationMetric ;
+    llm:origin "cherry-authored" ;
+    llm:description """Adversarial evaluation measures how a model holds up under inputs designed to break it. It is the measuring half of a pair: red teaming searches adaptively for new failure modes, and adversarial evaluation scores a system against a fixed set of them — attack success rate, severity, coverage, reproducibility. Standardized suites such as HarmBench and JailbreakBench exist so that numbers from different papers mean the same thing. The catch is symmetric to red teaming's: a benchmark can only measure the attacks it already contains.""" .
+
+llm:AttackSuccessRate a owl:Class ;
+    rdfs:label "Attack Success Rate"@en ;
+    rdfs:subClassOf llm:AdversarialEvaluation ;
+    llm:origin "cherry-authored" ;
+    llm:description """Attack success rate is the headline number of adversarial evaluation: the share of attempts that produced the disallowed behaviour, as scored by some judge. It is also the field's most misread number. Recent work argues that ASRs from different papers are frequently not comparable at all — the underlying estimands differ (one-shot versus best-of-N), and the judges used have different true positive rates across the systems being compared.""" .
+
+llm:ContrastiveFinetuning a owl:Class ;
+    rdfs:label "Contrastive Fine-tuning"@en ;
+    rdfs:subClassOf llm:CustomEmbedding ;
+    llm:origin "cherry-authored" ;
+    llm:description """Contrastive fine-tuning trains an embedding model by pulling matching pairs closer together and pushing mismatched pairs apart. It is the standard way to adapt a general embedding model to a specific domain — and recent work reports that the conventional InfoNCE objective can reduce effectiveness in state-of-the-art models, where listwise distillation from a cross-encoder improves retrieval more consistently.""" .
+
+llm:CustomEmbedding a owl:Class ;
+    rdfs:label "Custom Embeddings"@en ;
+    skos:altLabel "Custom Embeddings" ;
+    skos:altLabel "Domain-specific Embeddings" ;
+    skos:altLabel "Embedding Fine-tuning" ;
+    llm:relatedTo llm:Finetuning ;
+    rdfs:subClassOf llm:Embedding ;
+    llm:origin "cherry-authored" ;
+    llm:description """Custom embeddings adapt a general-purpose embedding model to one domain. General models handle everyday language well but miss the distinctions that matter inside law, medicine, or a single company's documents. Contrastive fine-tuning pulls matching pairs together and pushes mismatched ones apart; the quality of that training rests almost entirely on which wrong answers you choose to teach with.""" .
+
+llm:HardNegativeMining a owl:Class ;
+    rdfs:label "Hard Negative Mining"@en ;
+    rdfs:subClassOf llm:CustomEmbedding ;
+    llm:origin "cherry-authored" ;
+    llm:description """Hard negative mining chooses the wrong answers used in contrastive training — passages that look close to the query but are not the answer. It drives embedding quality more than any other single choice. It also carries the sharpest trap in the field: on MS-MARCO roughly 70% of the passages most similar to a query turn out to deserve a positive label, so mining naively teaches the model that correct answers are wrong.""" .
+
+llm:IterativeRetrieval a owl:Class ;
+    rdfs:label "Iterative Retrieval"@en ;
+    skos:altLabel "Iterative Retrieval" ;
+    rdfs:subClassOf llm:MultiHopRAG ;
+    llm:origin "cherry-authored" ;
+    llm:description """Iterative retrieval runs the retriever more than once for a single question, feeding what it found back in to form the next query. It is the mechanism that separates multi-hop RAG from single-shot RAG: the loop, not the index, is what lets an answer be assembled from pieces that no one passage holds together.""" .
+
+llm:MatryoshkaEmbedding a owl:Class ;
+    rdfs:label "Matryoshka Embedding"@en ;
+    rdfs:subClassOf llm:CustomEmbedding ;
+    llm:origin "cherry-authored" ;
+    llm:description """Matryoshka representation learning trains an embedding so that a prefix of the vector is still usable on its own. One model then serves many storage and latency budgets: keep 1024 dimensions where accuracy matters, truncate to 256 where it does not, with no retraining. The original work reports 14x smaller embeddings at comparable ImageNet-1K accuracy.""" .
+
+llm:MultiAgentOrchestration a owl:Class ;
+    rdfs:label "Multi-agent Orchestration"@en ;
+    skos:altLabel "Agent Orchestration" ;
+    skos:altLabel "orchestrator" ;
+    rdfs:subClassOf llm:MultiAgentSystem ;
+    llm:origin "cherry-authored" ;
+    llm:description """Multi-agent orchestration is the control layer that sits above a set of agents and decides which one acts, when, on what state, and with what authority. It covers planning, policy enforcement, state management, and quality operations, and it is where the interesting failures live — loops that never terminate, cost that grows with every hand-off, and state that two agents disagree about. A multi-agent system is the set of agents; orchestration is how that set is run.""" .
+
+llm:MultiHopRAG a owl:Class ;
+    rdfs:label "Multi-hop RAG"@en ;
+    skos:altLabel "Multi-hop RAG" ;
+    skos:altLabel "Multi-hop Retrieval" ;
+    skos:altLabel "multihop" ;
+    rdfs:subClassOf llm:RAG ;
+    llm:origin "cherry-authored" ;
+    llm:description """Multi-hop RAG answers questions that a single retrieval cannot: the result of one search becomes the input to the next. A router or planner decomposes the question, retrieves evidence for the first hop, uses what it found to form the next query, and repeats. The hard problem is not finding — it is knowing when to stop: retrieve too long and cost explodes, stop too early and the answer is wrong.""" .
+
+llm:PrefixTuning a owl:Class ;
+    rdfs:label "Prefix Tuning"@en ;
+    rdfs:subClassOf llm:ParameterEfficientFinetuning ;
+    llm:origin "cherry-authored" ;
+    llm:description """Prefix tuning prepends a small set of trainable vectors to the input or to each layer's hidden states and trains only those. The base model stays frozen, so one copy of the weights can serve many tasks by swapping prefixes. In the PEFT taxonomy it sits in the additive family alongside adapters, as opposed to the reparameterized family where LoRA lives.""" .
+
+llm:QueryDecomposition a owl:Class ;
+    rdfs:label "Query Decomposition"@en ;
+    rdfs:subClassOf llm:MultiHopRAG ;
+    llm:origin "cherry-authored" ;
+    llm:description """Query decomposition breaks a compound question into sub-questions that can each be answered by one retrieval. Plan-then-execute systems decompose up front; interleaved systems such as Self-Ask and IRCoT generate the next sub-question only after seeing the previous answer.""" .
+
+llm:StoppingCriterion a owl:Class ;
+    rdfs:label "Stopping Criterion"@en ;
+    rdfs:subClassOf llm:MultiHopRAG ;
+    llm:origin "cherry-authored" ;
+    llm:description """A stopping criterion decides when an iterative retrieval loop has enough. The published options are a resource budget (hop, token or latency limits), a confidence threshold, an explicit verifier, or a learned value function. This is the axis that has no counterpart in single-shot RAG, and the one where cost and correctness trade against each other most directly.""" .
+
+# ── 우리가 넣은 관계 ──
+llm:IterativeRetrieval rdfs:subClassOf llm:MultiHopRAG .
+llm:QueryDecomposition rdfs:subClassOf llm:MultiHopRAG .
+llm:StoppingCriterion rdfs:subClassOf llm:MultiHopRAG .

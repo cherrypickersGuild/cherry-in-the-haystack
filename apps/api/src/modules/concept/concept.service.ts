@@ -57,7 +57,13 @@ export class ConceptService {
       node: concept.node,
       section: page?.section ?? null,
       title: page?.concept_name ?? concept.label,
-      menuLabel: concept.aliases[0] ?? concept.label,
+      /* D8 — 별칭을 표시 이름으로 쓰지 않는다.
+         이전 구현은 aliases[0] 을 썼는데, provider 가 별칭을 알파벳순으로 주기 때문에
+         검색용 별칭을 하나 등록할 때마다 화면 메뉴 이름이 바뀌었다.
+         (실제로 MultiHopRAG 가 "Iterative Retrieval" 로 뜨는 일이 있었다.)
+         별칭은 조회·검색 전용이고, 표시 이름은 발행본 제목 → 온톨로지 이름 순으로 정한다.
+         기획: apps/docs/advanced/2-implementation-guide.md §3-2 */
+      menuLabel: page?.concept_name ?? concept.label,
       aliases: concept.aliases,
       meta: {
         updated: page?.updated_at ? new Date(page.updated_at).toISOString().slice(0, 10) : null,
