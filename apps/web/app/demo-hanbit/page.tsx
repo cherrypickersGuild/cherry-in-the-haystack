@@ -17,14 +17,14 @@
  */
 
 import { CherryIcon } from "@/components/cherry/sidebar"
-import { FONT_ROUNDED } from "@/components/demo/shared"
-import { DataSourcesDemo } from "@/components/demo/section-sources"
-import { DiscoveryEngineDemo } from "@/components/demo/section-discovery"
-import { LearningObjectivesDemo } from "@/components/demo/section-objectives"
-import { BuildingBlocksDemo } from "@/components/demo/section-blocks"
-import { ContentAnalysisDemo } from "@/components/demo/section-analysis"
-import { PatchNotesDemo } from "@/components/demo/section-patchnotes"
-import { KnowledgeMarketDemo } from "@/components/demo/section-market"
+import { FONT_ROUNDED } from "@/components/demo-hanbit/shared"
+import { DataSourcesDemo } from "@/components/demo-hanbit/section-sources"
+import { DiscoveryEngineDemo } from "@/components/demo-hanbit/section-discovery"
+import { LearningObjectivesDemo } from "@/components/demo-hanbit/section-objectives"
+import { BuildingBlocksDemo } from "@/components/demo-hanbit/section-blocks"
+import { ContentAnalysisDemo } from "@/components/demo-hanbit/section-analysis"
+import { PatchNotesDemo } from "@/components/demo-hanbit/section-patchnotes"
+import { KnowledgeMarketDemo } from "@/components/demo-hanbit/section-market"
 
 const SECTIONS = [
   { id: "sources", label: "데이터 소스" },
@@ -157,7 +157,7 @@ export default function DemoLandingPage() {
 
 /* 섹션 헤더들 — 페이지 파일을 가볍게 유지하려고 여기에 둠 */
 
-import { SectionHeader } from "@/components/demo/shared"
+import { SectionHeader } from "@/components/demo-hanbit/shared"
 
 function Section1Header() {
   return (
