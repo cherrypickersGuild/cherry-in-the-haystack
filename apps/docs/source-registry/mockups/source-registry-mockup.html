@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소스 관리 — 관리자 (목업)</title>
+<style>
+/* 색·간격은 kaas-admin-page.tsx 를 따른다 (투고 목업 2장과 같은 값) */
+:root{
+  --line:#E0E0E0; --line2:#F0F0F0; --ink:#1A1626; --body:#3D3652;
+  --dim:#888; --dim2:#999; --pale:#CCC;
+  --accent:#D4854A; --accent-bg:#FFF8F0; --accent-bg2:#FFF3E8; --accent-ink:#A85D2C;
+  --violet:#7B5EA7; --violet-bg:#F3EFFA;
+  --field:#FBFAF8; --hover:#FAFAFA; --page:#F4F3F1;
+  --green:#2D7A5E; --green-bg:#E8F3EE; --red:#C0503C;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--page);color:var(--body);font-size:13px;line-height:1.5;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;-webkit-font-smoothing:antialiased}
+.note{background:#FFF8E6;border:1px solid #F0D9A0;border-radius:10px;padding:10px 12px;margin:14px 20px 0;font-size:11px;color:#7A5A16}
+.note b{color:#5C4310}
+
+/* 앱 껍데기 — 왼쪽은 기존 사이드바(참고용), 오른쪽이 이번에 만드는 전체 페이지 */
+.app{display:flex;height:calc(100vh - 62px);min-height:640px}
+.nav{width:196px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);padding:14px 8px;font-size:12px;color:#6B727E}
+.nav .brand{font-weight:700;color:var(--ink);font-size:15px;padding:2px 8px 12px}
+.nav .sl{font-size:10px;font-weight:800;letter-spacing:.9px;color:#9E97B3;padding:0 8px;margin:12px 0 5px}
+.nav .it{padding:6px 8px;border-radius:7px}
+.nav .it.on{background:#FDF0F3;color:#C94B6E;font-weight:700}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+
+.phead{background:#fff;border-bottom:1px solid var(--line);padding:14px 20px 0;flex-shrink:0}
+.phead h2{font-size:16px;font-weight:700;color:var(--ink)}
+.phead .sub{font-size:11px;color:var(--dim2);margin-top:2px}
+.ptabs{display:flex;gap:2px;margin-top:12px;overflow-x:auto}
+.ptabs::-webkit-scrollbar{display:none}
+.ptabs button{border:0;background:none;font-family:inherit;cursor:pointer;white-space:nowrap;
+ padding:9px 14px;font-size:13px;font-weight:600;color:var(--dim);border-bottom:2px solid transparent}
+.ptabs button:hover{color:#333}
+.ptabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+
+.body{flex:1;display:flex;gap:16px;padding:16px 20px;min-height:0}
+.tables{width:210px;flex-shrink:0;background:#fff;border:1px solid var(--line);border-radius:12px;
+ display:flex;flex-direction:column;overflow:hidden}
+.tables h3{font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--dim2);padding:12px 14px 8px}
+.tables .list{flex:1;overflow-y:auto;padding:0 6px 8px}
+.tables button{display:flex;width:100%;align-items:center;gap:6px;border:0;background:none;font-family:inherit;
+ cursor:pointer;text-align:left;padding:7px 9px;border-radius:8px;font-size:12.5px;color:var(--body)}
+.tables button:hover{background:var(--hover)}
+.tables button.on{background:var(--accent-bg);color:var(--accent-ink);font-weight:700}
+.tables .n{margin-left:auto;font-size:11px;color:var(--pale)}
+.tables .foot{border-top:1px solid var(--line2);padding:9px 12px;font-size:11px;color:var(--dim2)}
+
+.grid{flex:1;min-width:0;background:#fff;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+.ghead{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line2);flex-shrink:0}
+.ghead h3{font-size:14px;font-weight:700;color:var(--ink)}
+.ghead .c{font-size:11px;color:var(--dim2)}
+.ghead .sp{margin-left:auto;display:flex;gap:6px}
+.btn{border:1px solid var(--line);background:#fff;color:#666;border-radius:8px;padding:5px 11px;
+ font-size:12px;font-weight:600;font-family:inherit;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.p:hover{background:#C2763C;color:#fff}
+/* 돌아가는 버튼 — 크게 보기에서 빠져나오는 길이라 제일 눈에 띄어야 한다 */
+.btn.back{background:var(--ink);border-color:var(--ink);color:#fff;padding:6px 14px;font-size:12.5px}
+.btn.back:hover{background:#000;border-color:#000;color:#fff}
+.btn svg{vertical-align:-2px;margin-right:5px}
+
+.scroll{flex:1;overflow:auto}
+table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
+th,td{border-bottom:1px solid var(--line2);border-right:1px solid var(--line2);padding:0;vertical-align:top}
+th{position:sticky;top:0;z-index:2;background:#FBFAF8;text-align:left;font-size:11px;font-weight:700;color:var(--dim);
+ padding:8px 10px;white-space:nowrap}
+th .k{color:var(--pale);font-weight:600;margin-right:4px;font-size:10px}
+th button{border:0;background:none;cursor:pointer;font-family:inherit;color:var(--pale);font-size:12px;margin-left:6px}
+th button:hover{color:var(--accent)}
+td{font-size:12.5px;color:var(--body)}
+td .cell{padding:7px 10px;min-height:33px;cursor:text}
+td .cell:hover{background:var(--accent-bg)}
+td.rowhead{position:sticky;left:0;background:#fff;z-index:1;border-right:1px solid var(--line)}
+tr:hover td.rowhead{background:var(--hover)}
+.exp{border:0;background:none;cursor:pointer;color:var(--pale);font-size:12px;padding:7px 8px}
+.exp:hover{color:var(--accent)}
+.chip{display:inline-block;background:var(--violet-bg);color:var(--violet);border-radius:4px;
+ padding:1px 6px;font-size:10.5px;font-weight:600;margin:1px 3px 1px 0;white-space:nowrap}
+.chip.g{background:var(--green-bg);color:var(--green)} .chip.o{background:var(--accent-bg2);color:var(--accent-ink)}
+.chip.d{background:#F0F0F0;color:var(--dim)}
+.link{color:var(--accent-ink);text-decoration:none}
+.empty{color:var(--pale)}
+.addrow{padding:8px 12px;font-size:12.5px;color:var(--dim2);cursor:pointer}
+.addrow:hover{background:var(--hover);color:var(--accent-ink)}
+/* 표만 크게 보기 — 체리 메뉴·표 목록을 숨기고 자료만 남긴다 */
+.fullwrap{position:fixed;inset:0;z-index:40;background:var(--page);display:flex;gap:12px;padding:12px}
+.fullwrap .grid{border-radius:10px}
+.esc{font-size:10.5px;color:var(--dim2);margin-left:8px}
+
+/* 다중 선택 — 노션처럼 선택지를 눌러 담는다 */
+.picker{border:1px solid var(--accent);border-radius:8px;background:#fff;padding:8px;min-width:270px;
+ box-shadow:0 6px 20px rgba(0,0,0,.12);position:relative;z-index:5}
+.picker .sel{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:7px;min-height:20px}
+.picker .sel .chip{cursor:pointer}
+.picker .sel .chip:hover{background:#F6DCDC;color:var(--red)}
+.picker .opts{display:flex;flex-wrap:wrap;gap:3px;max-height:132px;overflow-y:auto;
+ border-top:1px solid var(--line2);padding-top:7px}
+.picker .opt{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--dim);
+ border-radius:4px;padding:2px 7px;font-size:10.5px;font-weight:600;font-family:inherit}
+.picker .opt:hover{border-color:var(--accent);color:var(--accent-ink)}
+.picker .opt.on{background:var(--violet-bg);border-color:var(--violet);color:var(--violet)}
+.picker .new{display:flex;gap:5px;margin-top:7px}
+.picker .new input{flex:1;border:1px solid var(--line);border-radius:6px;padding:4px 7px;
+ font-family:inherit;font-size:11.5px;outline:none}
+.picker .new input:focus{border-color:var(--accent)}
+.picker .done{margin-top:7px;width:100%}
+.picker .hint2{font-size:10.5px;color:var(--dim2);margin-top:6px}
+
+input.edit,textarea.edit,select.edit{width:100%;border:1px solid var(--accent);border-radius:5px;padding:5px 7px;
+ font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;background:#fff}
+textarea.edit{min-height:64px;resize:vertical;line-height:1.55}
+
+/* 행 상세 */
+.panel{width:330px;flex-shrink:0;background:#fff;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+.panel .ph{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line2)}
+.panel .ph h3{font-size:13px;font-weight:700;color:var(--ink)}
+.panel .ph button{margin-left:auto;border:0;background:none;cursor:pointer;color:var(--dim);font-size:15px}
+.panel .pb{flex:1;overflow-y:auto;padding:14px}
+.panel .f{margin-bottom:14px}
+.panel .f label{display:block;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--dim2);margin-bottom:4px}
+.panel .v{font-size:12.5px;min-height:20px;cursor:text;border-radius:6px;padding:3px 5px;margin:-3px -5px}
+.panel .v:hover{background:var(--accent-bg)}
+
+/* 칼럼 추가 */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:30}
+.dlg{background:#fff;border-radius:14px;width:420px;padding:20px 22px}
+.dlg h3{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:14px}
+.dlg label{display:block;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--dim2);margin:12px 0 5px}
+.dlg input,.dlg select{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+ font-family:inherit;font-size:13px;color:var(--ink);outline:none}
+.dlg input:focus,.dlg select:focus{border-color:var(--accent)}
+.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.dlg p.warn{background:#FBEAE7;border:1px solid #EFC8C0;border-radius:8px;padding:10px 12px;
+ font-size:12px;color:var(--red);margin-top:6px;line-height:1.6}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn.danger:hover{background:#A8422F;border-color:#A8422F;color:#fff}
+th .del:hover{color:var(--red)}
+.hint{font-size:11px;color:var(--dim2);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="note">
+  <b>목업입니다.</b> 칸을 눌러 고치고, <b>+ 행 추가</b> · <b>+ 칼럼</b> 이 실제로 동작합니다.
+  노션에서 뽑은 <b>진짜 데이터</b>를 넣었습니다. 관리자 화면이 <b>모달이 아니라 전체 페이지</b>라는 점을 보려고 왼쪽 메뉴를 같이 그렸습니다.
+</div>
+
+<div class="app">
+  <!-- 왼쪽: 기존 앱 메뉴 (참고용) -->
+  <div class="nav">
+    <div class="brand">Cherry</div>
+    <div class="sl">NEWLY DISCOVERED</div>
+    <div class="it">Overview</div><div class="it">Research &amp; Models</div><div class="it">Cases</div>
+    <div class="sl">AGENT SHOP</div>
+    <div class="it">Knowledge Market</div>
+    <div class="sl">DIGEST</div>
+    <div class="it">Patch Notes</div>
+    <div class="sl" style="border-top:1px solid #E4E1EE;padding-top:14px;margin-top:16px;color:#C94B6E">CONTRIBUTE</div>
+    <div class="it">Submit Source</div>
+    <div class="sl" style="color:#C94B6E">ADMIN</div>
+    <div class="it on">관리자</div>
+  </div>
+
+  <!-- 오른쪽: 관리자 전체 페이지 -->
+  <div class="main">
+    <div class="phead">
+      <h2>관리자</h2>
+      <div class="sub">모달이 아니라 페이지입니다 — 표를 다루려면 폭이 필요합니다</div>
+      <div class="ptabs" id="tabs"></div>
+    </div>
+    <div class="body" id="body"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   표·칼럼을 데이터로 정의한다 (기획 §4 · D5).
+   칼럼을 늘려도 DB 마이그레이션이 없다 — 여기 정의가 늘 뿐이다.
+   ══════════════════════════════════════════════════════════ */
+const KIND = { text:"글자", url:"주소", long:"여러 줄", select:"선택", multi:"다중 선택", date:"날짜" };
+
+/* 아이콘 — 네 귀로 펼치기 / 네 귀를 모으기. 사이드바 아이콘과 같은 선 굵기(1.9)를 쓴다. */
+const SV = (d) => `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+ stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const ICON = {
+  expand: SV('<path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/>'),
+  shrink: SV('<path d="M4 14h6v6"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/><path d="M3 21l7-7"/>'),
+};
+
+const CATS = ["model-updates","papers","dev-tools","frameworks","insights-opinions","case-studies",
+  "big-tech-trends","regulations-policy-compliance","domain-applications","technical-deep-dives",
+  "ai-education","news-collect","how-people-use-ai","building-blocks-workflow"];
+
+const TABLES = [
+  { key:"substack", label:"서브스택", fields:[
+      {key:"name",  label:"이름",   kind:"text"},
+      {key:"url",   label:"주소",   kind:"url"},
+      {key:"category", label:"분류", kind:"multi", options:CATS},
+      {key:"follow",label:"수집",   kind:"select", options:["","Not Yet","Stopped"]},
+      {key:"why",   label:"왜 보나", kind:"text"},
+      {key:"note",  label:"검토 메모", kind:"long"},
+      {key:"owner", label:"담당",   kind:"select", options:["","HK Jeong","Tae Oh Kim","박주환","Jae hee","서현 신"]},
+    ], rows:[
+      {name:"Dwarkesh Patel",url:"https://www.dwarkesh.com/",category:["insights-opinions"],follow:"Stopped",why:"strictly AI related Interviews",note:"자동 follow는 하지 않는게 맞겠다 1. 유익하지만 AI와 무관한 내용이 많다 2. 내용이 깊으므로 가성비가 안좋다",owner:"HK Jeong",live:false},
+      {name:"Marily Nika",url:"https://marily.substack.com/",category:["building-blocks-workflow","dev-tools","domain-applications","frameworks"],follow:"",why:"AI for PMs and insights on AI tools",note:"보물창고. 아주 높은 순위로 우리에게 필요하다. 모든 카테고리를 우리는 뜯어봐야 한다",owner:"HK Jeong",live:true},
+      {name:"Zvi Mowshowitz",url:"https://thezvi.substack.com/",category:["insights-opinions"],follow:"",why:"His mastery of Lesswrong",note:"이런저런 이야기들 - 받아들",owner:"",live:true},
+      {name:"Azeem Azhar",url:"https://www.exponentialview.co/",category:["insights-opinions"],follow:"",why:"Macro Trend analysis",note:"유료. 거시적인 트렌드를 보는데 유용하다",owner:"HK Jeong",live:false},
+      {name:"Maxime Labonne",url:"https://maximelabonne.substack.com/",category:["model-updates","technical-deep-dives"],follow:"",why:"One of my go-to sources for open-source AI news.",note:"모델 이야기를 주로 다루네",owner:"HK Jeong",live:true},
+      {name:"Damien Benveniste",url:"https://newsletter.theaiedge.io/",category:["ai-education"],follow:"Stopped",why:"Great Newsletter with additional Courses",note:"AI 강의 팔이, 멈췄음",owner:"Tae Oh Kim",live:false},
+      {name:"Sebastian Raschka",url:"https://magazine.sebastianraschka.com/",category:["ai-education"],follow:"Not Yet",why:"To learn about Generative AI in practice",note:"중요",owner:"HK Jeong",live:false},
+      {name:"Luiza Jarovsky",url:"https://www.luizasnewsletter.com/",category:["insights-opinions","regulations-policy-compliance"],follow:"",why:"AI at intersection of Policy & Regulation",note:"AI 발전의 이면, 경고를 많이 해줌 - 듣고 있어야 함",owner:"",live:true},
+      {name:"François Chollet",url:"https://fchollet.substack.com/",category:[],follow:"Stopped",why:"His realistic view of AGI",note:"죽음",owner:"",live:false},
+    ]},
+  { key:"candidates", label:"발굴 후보", fields:[
+      {key:"name",label:"이름",kind:"text"},
+      {key:"url",label:"주소",kind:"url"},
+      {key:"reason",label:"발굴 사유",kind:"text"},
+      {key:"subs",label:"구독자(추정)",kind:"text"},
+      {key:"status",label:"검토 상태",kind:"select",options:["New","검토중","채택","탈락"]},
+      {key:"priority",label:"우선순위",kind:"select",options:["","Low","Medium","High"]},
+      {key:"note",label:"검토 메모",kind:"long"},
+    ], rows:[
+      {name:"AI Futures for Art and Design",url:"https://aifutures.substack.com",reason:"AI Safety",subs:"12",status:"New",priority:"Medium",note:""},
+      {name:"Import AI | Jack Clark",url:"https://importai.substack.com",reason:"AI Education",subs:"",status:"New",priority:"Medium",note:""},
+      {name:"lastweekinai",url:"https://lastweekinai.substack.com",reason:"AI Education",subs:"",status:"New",priority:"Medium",note:""},
+      {name:"🚀 AIxFunda | Kalyan KS",url:"https://aixfunda.substack.com",reason:"Model Updates",subs:"",status:"New",priority:"Medium",note:""},
+      {name:"LLMQuant Newsletter",url:"https://llmquant.substack.com",reason:"Model Updates",subs:"",status:"탈락",priority:"Low",note:"주제는 나쁘지 않은데 글이 generic하다. 중복. 탈락"},
+    ]},
+  { key:"twitter", label:"트위터", n:140, fields:[
+      {key:"name",label:"이름",kind:"text"},{key:"handle",label:"핸들",kind:"text"},
+      {key:"audience",label:"소속/독자",kind:"text"},{key:"why",label:"왜 보나",kind:"text"},
+      {key:"category",label:"분류",kind:"multi",options:CATS}],
+    rows:[{name:"Adam Coates",handle:"@adampaulcoates",audience:"Apple A.I.",why:"ML Engineers",category:[]},
+          {name:"Andrej Karpathy",handle:"@karpathy",audience:"—",why:"기초부터 설명",category:["ai-education"]}]},
+  { key:"linkedin", label:"링크드인", n:62, fields:[
+      {key:"name",label:"이름",kind:"text"},{key:"url",label:"주소",kind:"url"},
+      {key:"category",label:"분류",kind:"multi",options:CATS},{key:"why",label:"왜 보나",kind:"text"}],
+    rows:[{name:"Hamna Aslam Kahn",url:"https://www.linkedin.com/in/hamna-aslam-kahn-81a777134/",category:[],why:""}]},
+  { key:"youtube", label:"유튜브", n:15, fields:[
+      {key:"name",label:"이름",kind:"text"},{key:"url",label:"주소",kind:"url"},{key:"why",label:"왜 보나",kind:"text"}],
+    rows:[{name:"Gan Yin Choong (Adam GoDigital)",url:"https://www.youtube.com/@AdamDigital",why:"Super AI Tools"}]},
+  { key:"etc", label:"기타 크롤", n:35, fields:[
+      {key:"name",label:"이름",kind:"text"},{key:"url",label:"주소",kind:"url"},
+      {key:"why",label:"왜 보나",kind:"text"},{key:"owner",label:"담당",kind:"text"}],
+    rows:[{name:"Casey Newton",url:"https://www.platformer.news/",why:"For journalism on AI",owner:"박주환"}]},
+  { key:"reddit", label:"레딧", n:9, fields:[{key:"name",label:"이름",kind:"text"},{key:"url",label:"주소",kind:"url"}],
+    rows:[{name:"David Ha",url:"https://www.reddit.com/user/hardmaru/"}]},
+  { key:"email", label:"이메일 구독", n:4, fields:[
+      {key:"name",label:"이름",kind:"text"},{key:"url",label:"주소",kind:"url"},{key:"target",label:"독자",kind:"text"}],
+    rows:[{name:"Tobias Zwingmann",url:"https://newsletter.tobiaszwingmann.com/",target:"B2B, founder, CEO"}]},
+  { key:"threads", label:"스레드", n:1, fields:[{key:"name",label:"이름",kind:"text"},{key:"url",label:"주소",kind:"url"}],
+    rows:[{name:"Linxi ‘Jim’ Fan",url:"https://www.threads.net/@dr.jimfan"}]},
+  { key:"medium", label:"미디엄", n:1, fields:[{key:"name",label:"이름",kind:"text"},{key:"url",label:"주소",kind:"url"}],
+    rows:[{name:"Neo4J",url:"https://medium.com/neo4j"}]},
+  { key:"archive", label:"아카이브", n:18, fields:[
+      {key:"name",label:"이름",kind:"text"},{key:"url",label:"주소",kind:"url"},{key:"type",label:"형태",kind:"text"}],
+    rows:[{name:"LLM RAG Langchain 통합",url:"https://open.kakao.com/o/gqs05N6f",type:"카톡방"}]},
+];
+
+const TABS = ["대시보드","지식 큐레이팅","개념 페이지","프롬프트 템플릿","오버뷰 편집","투고 검토","소스 관리"];
+let tab = "소스 관리", cur = TABLES[0], open = null, edit = null, dlg = false;
+/** 표만 크게 보기 — 칼럼이 많아 가로로 넘칠 때 화면을 통째로 쓴다. */
+let full = false;
+/** 삭제 확인 모달 — {title, body, warn, ok, run} */
+let ask = null;
+
+/* ── 그리기 ── */
+function tabs(){
+  document.getElementById('tabs').innerHTML = TABS.map(t =>
+    `<button class="${t===tab?'on':''}" data-t="${t}">${t}</button>`).join('');
+  document.getElementById('tabs').onclick = e => {
+    const b = e.target.closest('button'); if(!b) return; tab = b.dataset.t; render();
+  };
+}
+
+function cellHtml(f, r){
+  const v = r[f.key];
+  if(f.kind === 'multi') return (v && v.length) ? v.map(c=>`<span class="chip">${c}</span>`).join('') : '<span class="empty">—</span>';
+  if(!v) return '<span class="empty">—</span>';
+  if(f.kind === 'url') return `<a class="link" href="${v}" target="_blank" rel="noreferrer">${v.replace(/^https?:\/\/(www\.)?/,'').slice(0,34)}</a>`;
+  if(f.kind === 'select'){
+    const cls = /채택|High/.test(v) ? 'g' : /탈락|Stopped/.test(v) ? 'd' : 'o';
+    return `<span class="chip ${cls}">${v}</span>`;
+  }
+  if(f.kind === 'long') return `<span title="${v.replace(/"/g,'&quot;')}">${v.slice(0,38)}${v.length>38?'…':''}</span>`;
+  return v;
+}
+
+function editor(f, r, ri){
+  const v = r[f.key] ?? (f.kind==='multi' ? [] : '');
+  if(f.kind === 'long') return `<textarea class="edit" data-k="${f.key}" data-i="${ri}">${v}</textarea>`;
+  if(f.kind === 'select') return `<select class="edit" data-k="${f.key}" data-i="${ri}">` +
+      (f.options||[]).map(o=>`<option ${o===v?'selected':''}>${o||'—'}</option>`).join('') + `</select>`;
+  if(f.kind === 'multi'){
+    // 노션처럼 선택지를 눌러 담는다. 없는 값은 아래에서 새로 만든다.
+    const sel = v || [], opts = f.options || [];
+    return `<div class="picker" data-picker="${f.key}" data-i="${ri}">
+      <div class="sel">${sel.length ? sel.map(c=>`<span class="chip" data-off="${c}" title="누르면 뺍니다">${c} ✕</span>`).join('')
+        : '<span class="empty" style="font-size:11px">아직 없습니다 — 아래에서 고르세요</span>'}</div>
+      <div class="opts">${opts.map(o=>`<button class="opt ${sel.includes(o)?'on':''}" data-on="${o}">${o}</button>`).join('')}</div>
+      <div class="new"><input data-newopt placeholder="새 분류를 만들어 담기"><button class="btn" data-addopt>추가</button></div>
+      <button class="btn p done" data-done>완료</button>
+      <p class="hint2">여러 개 고를 수 있습니다. 담긴 것을 누르면 빠집니다.</p>
+    </div>`;
+  }
+  return `<input class="edit" data-k="${f.key}" data-i="${ri}" value="${v}">`;
+}
+
+function grid(){
+  const fs = cur.fields, rs = cur.rows;
+  return `
+  <div class="grid">
+    <div class="ghead">
+      <h3>${cur.label}</h3><span class="c">${rs.length}행 · 칼럼 ${fs.length}개</span>
+      <div class="sp">
+        <button class="btn" id="addCol">+ 칼럼</button>
+        <button class="btn p" id="addRow">+ 행 추가</button>
+        <button class="btn ${full ? 'back' : ''}" id="toggleFull"
+          title="${full ? '원래 화면으로 돌아갑니다 (Esc)' : '메뉴를 감추고 표만 화면 가득 봅니다'}">${
+          full ? ICON.shrink + '원래 크기로' : ICON.expand + '크게 보기'}</button>
+        ${full ? '<span class="esc">Esc</span>' : ''}
+      </div>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr>
+          <th style="width:34px"></th>
+          ${fs.map(f=>`<th>${f.label}<span class="k"> ${KIND[f.kind]}</span>
+             <button data-ren="${f.key}" title="이름 바꾸기">✎</button>
+             <button class="del" data-delcol="${f.key}" title="칼럼 삭제">🗑</button></th>`).join('')}
+          <th style="width:110px">수집</th>
+        </tr></thead>
+        <tbody>
+          ${rs.map((r,i)=>`<tr>
+            <td class="rowhead"><button class="exp" data-exp="${i}" title="행 열기">⤢</button></td>
+            ${fs.map(f=>`<td><div class="cell" data-i="${i}" data-k="${f.key}">
+                ${edit && edit.i===i && edit.k===f.key ? editor(f,r,i) : cellHtml(f,r)}
+              </div></td>`).join('')}
+            <td><div class="cell" data-live="${i}">${r.live
+              ? '<span class="chip g">수집 중</span>' : '<span class="chip d">대기</span>'}</div></td>
+          </tr>`).join('')}
+          <tr><td colspan="${fs.length+2}"><div class="addrow" id="addRow2">+ 행 추가</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function panel(){
+  if(open === null) return '';
+  const r = cur.rows[open];
+  return `<div class="panel">
+    <div class="ph"><h3>${r[cur.fields[0].key] || '(이름 없음)'}</h3><button id="closeP">✕</button></div>
+    <div class="pb">
+      ${cur.fields.map(f=>`<div class="f"><label>${f.label}</label>
+        <div class="v" data-i="${open}" data-k="${f.key}">${cellHtml(f,r)}</div></div>`).join('')}
+      <div class="f"><label>수집</label>
+        <button class="btn ${r.live?'':'p'}" id="toggleLive">${r.live?'수집 멈추기':'수집 대상으로 켜기'}</button>
+        <p class="hint">켜면 <code>content.source</code> 에 행이 생깁니다. 표에 있는 것과 실제로 긁는 것은 다릅니다.</p>
+      </div>
+      <div class="f" style="border-top:1px solid var(--line2);padding-top:14px">
+        <button class="btn danger" id="delRow">이 행 삭제</button>
+        <p class="hint">한 번 물어본 뒤 지웁니다. 되살릴 수 있습니다.</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  tabs();
+  const body = document.getElementById('body');
+  if(tab !== '소스 관리'){
+    body.innerHTML = `<div class="grid"><div class="ghead"><h3>${tab}</h3></div>
+      <div style="padding:40px;text-align:center;color:var(--dim2);font-size:12px">
+        기존 탭입니다. 이번 기획에서는 <b>이름만 한글로</b> 바꿉니다.</div></div>`;
+    return;
+  }
+  const total = TABLES.reduce((n,t)=>n+(t.n || t.rows.length),0);
+
+  // 크게 보기 — 체리 메뉴도 표 목록도 감추고 지금 표만 남긴다.
+  // 행 추가·칼럼 추가·칼럼 수정은 그대로 된다.
+  if(full){
+    body.innerHTML = `<div class="fullwrap">${grid()}${panel()}</div>${dlg ? dialog() : ''}${confirmBox()}`;
+    wire();
+    return;
+  }
+
+  body.innerHTML = `
+    <div class="tables">
+      <h3>표</h3>
+      <div class="list">
+        ${TABLES.map(t=>`<button class="${t.key===cur.key?'on':''}" data-k="${t.key}">
+          ${t.label}<span class="n">${t.n || t.rows.length}</span></button>`).join('')}
+      </div>
+      <div class="foot">노션 11개 표 · 총 ${total}행</div>
+    </div>
+    ${grid()}
+    ${panel()}
+    ${dlg ? dialog() : ''}${confirmBox()}`;
+  wire();
+}
+
+/* 지우기 전에 한 번 물어본다. 무엇이 사라지는지 이름을 적어 준다. */
+function confirmBox(){
+  if(!ask) return '';
+  return `<div class="mask" id="askMask"><div class="dlg">
+    <h3>${ask.title}</h3>
+    <p style="font-size:13px;color:var(--body)">${ask.body}</p>
+    <p class="warn">${ask.warn}</p>
+    <div class="row"><button class="btn" id="askNo">취소</button>
+      <button class="btn danger" id="askYes">${ask.ok}</button></div>
+  </div></div>`;
+}
+
+function dialog(){
+  return `<div class="mask" id="mask"><div class="dlg">
+    <h3>칼럼 추가 — ${cur.label}</h3>
+    <label>이름</label><input id="fLabel" placeholder="예: 구독자 수">
+    <label>종류</label>
+    <select id="fKind">${Object.entries(KIND).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select>
+    <p class="hint">선택 · 다중 선택이면 선택지는 나중에 칸에서 적은 값이 그대로 쌓입니다.</p>
+    <div class="row"><button class="btn" id="cancel">취소</button><button class="btn p" id="ok">추가</button></div>
+  </div></div>`;
+}
+
+/* ── 동작 ── */
+function wire(){
+  document.querySelectorAll('.tables button').forEach(b=>b.onclick=()=>{
+    cur = TABLES.find(t=>t.key===b.dataset.k); open=null; edit=null; render();
+  });
+
+  // 칸을 누르면 그 자리에서 고친다 (노션과 같게)
+  document.querySelectorAll('.cell[data-k]').forEach(c=>c.onclick=()=>{
+    if(edit && edit.i==c.dataset.i && edit.k==c.dataset.k) return;
+    edit = { i:+c.dataset.i, k:c.dataset.k }; render();
+    const el = document.querySelector('.edit'); if(el){ el.focus(); if(el.select) el.select(); }
+  });
+  // 다중 선택 — 고르고 빼고 새로 만들기
+  const pk = document.querySelector('.picker');
+  if(pk){
+    const row = cur.rows[+pk.dataset.i], key = pk.dataset.picker;
+    const f = cur.fields.find(x=>x.key===key);
+    if(!Array.isArray(row[key])) row[key] = row[key] ? [row[key]] : [];
+    const put = v => { if(v && !row[key].includes(v)) row[key].push(v); render(); };
+    pk.querySelectorAll('[data-on]').forEach(b=>b.onclick=e=>{
+      e.stopPropagation();
+      const v=b.dataset.on;
+      row[key] = row[key].includes(v) ? row[key].filter(x=>x!==v) : [...row[key], v];
+      render();
+    });
+    pk.querySelectorAll('[data-off]').forEach(b=>b.onclick=e=>{
+      e.stopPropagation(); row[key]=row[key].filter(x=>x!==b.dataset.off); render();
+    });
+    const ni = pk.querySelector('[data-newopt]');
+    const addNew = () => {
+      const v=(ni.value||'').trim(); if(!v) return;
+      if(!f.options) f.options=[];
+      if(!f.options.includes(v)) f.options.push(v);   // 선택지 자체를 늘린다
+      put(v);
+    };
+    pk.querySelector('[data-addopt]').onclick=e=>{e.stopPropagation(); addNew()};
+    ni.onkeydown=e=>{ if(e.key==='Enter'){e.preventDefault(); addNew()} };
+    pk.querySelector('[data-done]').onclick=e=>{e.stopPropagation(); edit=null; render()};
+    pk.onclick=e=>e.stopPropagation();
+  }
+
+  const ed = document.querySelector('.edit');
+  if(ed){
+    const save = () => {
+      const f = cur.fields.find(x=>x.key===ed.dataset.k);
+      let v = ed.value;
+      if(f.kind==='multi') v = v.split(',').map(s=>s.trim()).filter(Boolean);
+      if(f.kind==='select' && v==='—') v='';
+      cur.rows[+ed.dataset.i][f.key] = v; edit=null; render();
+    };
+    ed.onblur = save;
+    ed.onkeydown = e => { if(e.key==='Enter' && ed.tagName!=='TEXTAREA'){ save(); } if(e.key==='Escape'){ edit=null; render(); } };
+  }
+
+  const add = () => { const r={}; cur.fields.forEach(f=>r[f.key]= f.kind==='multi'?[]:''); r.live=false;
+    cur.rows.push(r); edit={i:cur.rows.length-1,k:cur.fields[0].key}; render();
+    const el=document.querySelector('.edit'); if(el) el.focus(); };
+  const a1=document.getElementById('addRow'), a2=document.getElementById('addRow2');
+  if(a1) a1.onclick=add; if(a2) a2.onclick=add;
+
+  const tf=document.getElementById('toggleFull');
+  if(tf) tf.onclick=()=>{ full=!full; edit=null; render(); };
+
+  const ac=document.getElementById('addCol'); if(ac) ac.onclick=()=>{ dlg=true; render(); };
+  if(dlg){
+    document.getElementById('cancel').onclick=()=>{dlg=false;render()};
+    document.getElementById('mask').onclick=e=>{ if(e.target.id==='mask'){dlg=false;render()} };
+    document.getElementById('ok').onclick=()=>{
+      const label=(document.getElementById('fLabel').value||'새 칼럼').trim();
+      const kind=document.getElementById('fKind').value;
+      cur.fields.push({key:'f'+Date.now(),label,kind,options:[]});
+      cur.rows.forEach(r=>r['f'+0]);
+      dlg=false; render();
+    };
+  }
+
+  // 삭제 — 행·칼럼 모두 한 번 물어본다
+  if(ask){
+    document.getElementById('askNo').onclick=()=>{ ask=null; render(); };
+    document.getElementById('askMask').onclick=e=>{ if(e.target.id==='askMask'){ ask=null; render(); } };
+    document.getElementById('askYes').onclick=()=>{ const run=ask.run; ask=null; run(); render(); };
+  }
+  document.querySelectorAll('[data-delcol]').forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const f=cur.fields.find(x=>x.key===b.dataset.delcol);
+    ask={ title:'칼럼을 지울까요?',
+      body:`<b>${f.label}</b> 칼럼을 지웁니다.`,
+      warn:`이 칼럼에 적어 둔 값이 ${cur.rows.length}행에서 모두 화면에서 사라집니다.`,
+      ok:'칼럼 삭제',
+      run:()=>{ cur.fields=cur.fields.filter(x=>x.key!==f.key); } };
+    render();
+  });
+  const dr=document.getElementById('delRow');
+  if(dr) dr.onclick=()=>{
+    const r=cur.rows[open], nm=r[cur.fields[0].key] || '(이름 없음)';
+    ask={ title:'이 행을 지울까요?', body:`<b>${nm}</b> 을(를) 지웁니다.`,
+      warn:'화면에서 사라지지만 DB 에는 남습니다 — 되살릴 수 있습니다.',
+      ok:'행 삭제',
+      run:()=>{ cur.rows.splice(open,1); open=null; } };
+    render();
+  };
+
+  document.querySelectorAll('[data-ren]').forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const f=cur.fields.find(x=>x.key===b.dataset.ren);
+    const v=prompt('칼럼 이름', f.label); if(v){ f.label=v; render(); }
+  });
+  document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{ open=+b.dataset.exp; edit=null; render(); });
+  const cp=document.getElementById('closeP'); if(cp) cp.onclick=()=>{open=null;render()};
+  const tl=document.getElementById('toggleLive');
+  if(tl) tl.onclick=()=>{ cur.rows[open].live=!cur.rows[open].live; render(); };
+  document.querySelectorAll('[data-live]').forEach(c=>c.onclick=()=>{
+    const r=cur.rows[+c.dataset.live]; r.live=!r.live; render();
+  });
+  document.querySelectorAll('.panel .v').forEach(v=>v.onclick=()=>{
+    edit={i:+v.dataset.i,k:v.dataset.k}; render();
+    const el=document.querySelector('.edit'); if(el) el.focus();
+  });
+}
+
+/* Esc — 편집 중이면 편집만 닫고, 아니면 크게 보기에서 빠져나온다 */
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  if(edit){ edit = null; render(); return; }
+  if(full){ full = false; render(); }
+});
+
+/* 편집 중에 바깥을 누르면 닫는다 */
+document.addEventListener('click', e => {
+  if(edit && !e.target.closest('.picker') && !e.target.closest('.cell') && !e.target.closest('.panel .v')){
+    edit = null; render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
