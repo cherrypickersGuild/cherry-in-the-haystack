@@ -24,6 +24,7 @@ import { KaasArenaPage } from "@/components/cherry/kaas-arena-page"
 import { KaasDashboardPage } from "@/components/cherry/kaas-dashboard-page"
 // KaasAdminPage는 KaasDashboardPage 내부 탭으로 통합됨
 import { KaasConsole, KaasConsoleRef } from "@/components/cherry/kaas-console"
+import { SourceSubmitPage } from "@/components/cherry/source-submit-page"
 
 const MOMENTUM_COLORS = ["#C94B6E", "#7B5EA7", "#2D7A5E", "#D4854A", "#0194E2"]
 
@@ -57,6 +58,15 @@ const CONCEPT_NODE_BY_TOPIC: Record<string, { node: string; section: "BASICS" | 
   "agent-topologies":    { node: "MultiAgentOrchestration", section: "ADVANCED" },
   "custom-embeddings":   { node: "CustomEmbedding", section: "ADVANCED" },
   "adversarial-eval":    { node: "AdversarialEvaluation", section: "ADVANCED" },
+  /* PRD 목록 밖 6개 — 온톨로지 319개 중 216개가 메뉴에서 도달 불가였던 문제를 푼다.
+     PRD 12개가 응용 계층만 다뤄 모델 내부·학습·서빙·안전이 통째로 빠져 있었다.
+     Basics 4 · Advanced 2 로 나눠 넣었다. 근거·계산: research/9-menu-reachability.md */
+  "model-architecture":     { node: "ModelArchitecture", section: "BASICS" },
+  "model-components":       { node: "ModelComponent", section: "BASICS" },
+  "training-paradigms":     { node: "TrainingParadigm", section: "BASICS" },
+  "inference-optimization": { node: "InferenceOptimization", section: "ADVANCED" },
+  "safety-alignment":       { node: "SafetyAndAlignment", section: "ADVANCED" },
+  "application-domains":    { node: "ApplicationDomain", section: "BASICS" },
 }
 /* 역방향: 개념 slug → 사이드바 토픽 id. 하위 개념을 누르면 그 개념의 "자기 페이지"로 가야 하므로,
    메뉴 토픽인 개념은 해당 토픽 id 로 이동해 사이드바 하이라이트까지 맞춘다.
@@ -67,7 +77,7 @@ const TOPIC_BY_CONCEPT_NODE: Record<string, string> = Object.fromEntries(
 
 export default function CherryApp() {
   const [activeNav, setActiveNav] = useState("nd-overview")
-  const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder">("dashboard")
+  const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder" | "submissions">("dashboard")
   const [marketConceptId, setMarketConceptId] = useState<string | null>(null)
   // Learning 개념 페이지: activeNav 와 별개로 "어느 개념인가"를 담는 파라미터 상태
   // (marketConceptId 와 동일한 패턴 — taxonomy/switch 를 늘리지 않고 개념 간 이동)
@@ -131,6 +141,10 @@ export default function CherryApp() {
 
       case "patch-notes":
         return <PatchNotesPage />
+
+      // 유저 자료·소스 투고 (apps/docs/source-submission · D17)
+      case "source-submit":
+        return <SourceSubmitPage />
 
       case "frameworks":
         return <NDFrameworksPage />
@@ -225,6 +239,13 @@ export default function CherryApp() {
       case "agent-topologies":
       case "custom-embeddings":
       case "adversarial-eval":
+      /* PRD 목록 밖 6개 — 위 CONCEPT_NODE_BY_TOPIC 주석 참조 */
+      case "model-architecture":
+      case "model-components":
+      case "training-paradigms":
+      case "inference-optimization":
+      case "safety-alignment":
+      case "application-domains":
         return <ConceptReaderPage
           slug={CONCEPT_NODE_BY_TOPIC[activeNav].node}
           sectionHint={CONCEPT_NODE_BY_TOPIC[activeNav].section}
@@ -427,6 +448,8 @@ export default function CherryApp() {
                 ? "Dashboard › Concept Page"
                 : dashboardTab === "template"
                 ? "Dashboard › Prompt Templates"
+                : dashboardTab === "submissions"
+                ? "Dashboard › Submissions"
                 : "Dashboard"
               : activeNav
           }

@@ -217,3 +217,52 @@ EmbeddingLayer
 - [Matryoshka Representation Learning 원 논문 (arXiv:2205.13147)](https://arxiv.org/abs/2205.13147)
 - [Fine-Tuning Embedding Models with Matryoshka Representation Learning](https://medium.com/@diegoprayudha1/fine-tuning-embedding-models-with-matryoshka-representation-learning-de7d4680b011)
 - [The Best Open-Source Embedding Models in 2026 (BentoML)](https://www.bentoml.com/blog/a-guide-to-open-source-embedding-models)
+
+---
+
+## ⭐ 작성한 콘텐츠 (2026-08-25 · DB 반영 완료)
+
+> 아래는 **DB 에서 다시 읽어온 실제 저장값**이다. 문서와 DB 가 어긋나지 않게 생성해 적었다.
+> 저장 위치 — Overview: `content.concept_page.content_md` · 체리: `handbook.paragraph_concept_link.insight` · References: `content.concept_page.progressive_refs`
+> 발행 상태: `is_published = false` (초안) — V5 원문 대조 검수 전이다.
+
+### Overview (3문단)
+
+```
+Custom embeddings are what you get when you stop using a general-purpose embedding model as-is and adapt it to your domain. General models handle everyday language well and miss the distinctions that decide relevance inside law, medicine, or one company's documents.
+
+Why it matters: retrieval quality is capped by the embedding. No amount of reranking rescues a retriever that never surfaces the right passage, and the gap between a generic and an adapted model is largest exactly where the vocabulary is narrow and the stakes are high.
+
+The shape of the work: pick a starting model deliberately, train it contrastively on pairs from your own data, choose the wrong answers you train against with care, and decide how much vector you actually need to store. Which negatives you pick matters more than almost anything else in the pipeline.
+```
+
+### 체리 3건
+
+**1. The starting model is a decision, not a default**  · primary
+- 출처: *LLM Engineers Handbook* › Chapter 4: RAG Feature Pipeline › How are embeddings created?  (원문 580자)
+- `chunkId` `019e785e-8a2b-78df-a5da-af51d2db7837`
+- insight:
+  > The best embedding model changes over time and with the use case. The book points at MTEB on Hugging Face and names three different ways to read the leaderboard — best overall, best accuracy, smallest memory footprint — and says the choice follows from your requirements, not from the ranking.
+
+**2. Putting different kinds of data in one space**
+- 출처: *LLM Engineers Handbook* › Chapter 4: RAG Feature Pipeline › Applications of embeddings  (원문 344자)
+- `chunkId` `019e785e-8a34-7d60-a8fa-5fef843227f5`
+- insight:
+  > Comparing a sentence to an image requires a model built for it. Specialised models such as CLIP project both types into the same vector space; without that shared space the distance between two embeddings is not a meaningful number, however confidently it computes.
+
+**3. The accurate model you cannot afford to run first**
+- 출처: *LLM Engineers Handbook* › Chapter 4: RAG Feature Pipeline › Post-retrieval  (원문 850자)
+- `chunkId` `019e785e-8a34-7275-8b7a-7b3f1c32b2fb`
+- insight:
+  > A cross-encoder scores a query against a candidate directly and finds relationships a similarity search cannot. It is also too expensive to run over the whole corpus — which is why it lands in post-retrieval: embeddings fetch a shortlist, the cross-encoder reorders it, and only the top N survive.
+
+### References 4단계
+
+| 단계 | 자료 | 링크 | 무엇을 가르치나 |
+|---|---|---|---|
+| START HERE | LLM Engineers Handbook — Ch.4 "RAG Feature Pipeline" | 소장 도서(URL 없음) | How embeddings are produced and used in a real pipeline — model choice, cosine similarity, chunking, pre- and post-retrieval. |
+| NEXT → | NV-Retriever: Improving text embedding models with effective hard-negative mining — NVIDIA, 2024 | [열림](https://arxiv.org/html/2407.15831v1) | Why the negatives you train against decide embedding quality — and the trap that on MS-MARCO about 70% of the passages most similar to a query deserve a positive label (Qu et al., 2020). |
+| THEN → | Recent Advances in Text Embedding: A Review of Top-Performing Methods on MTEB | [열림](https://arxiv.org/html/2406.01607v1) | What the leading models actually do — multi-stage contrastive training, hard-negative mining, instruction tuning, cross-encoder distillation — and the 8 tasks MTEB scores them on. |
+| DEEP DIVE → | Matryoshka Representation Learning — Kusupati et al., 2022 | [열림](https://arxiv.org/abs/2205.13147) | Training one embedding that can be truncated: 14x smaller vectors at comparable ImageNet-1K accuracy, with no retraining. (Reported on vision — do not carry the number straight to text.) |
+
+열리는 링크 **3건** / 4건 — 기준(2건 이상) 충족

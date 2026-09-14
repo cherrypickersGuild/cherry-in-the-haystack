@@ -1046,7 +1046,11 @@ export interface ConceptReference {
   order: number
   stage: string
   title: string
+  /** 외부 자료의 실제 주소. 없으면 null. */
   url: string | null
+  /** 내부 개념 페이지로 가는 링크(ontology_node). 소장 도서를 가리키던 자리를 대신한다.
+   *  챕터 리더 화면이 없어 "책 N장"은 갈 데가 없었다 — 우리 개념 페이지로 보낸다. */
+  internalNode?: string | null
   inLibrary: boolean
   byline: string | null
   teaches: string

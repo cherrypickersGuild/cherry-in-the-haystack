@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>투고 검토 — 관리자 (목업)</title>
+<style>
+/* kaas-admin-page.tsx 의 색·간격·2단 구조를 그대로 따른다 */
+/* kaas-admin-page.tsx 에서 그대로 뽑은 값. 목업 2장이 같이 쓴다. */
+:root{
+  --line:#E0E0E0; --line2:#F0F0F0; --ink:#1A1626; --body:#3D3652;
+  --dim:#888; --dim2:#999; --pale:#CCC;
+  --accent:#D4854A; --accent-bg:#FFF8F0; --accent-bg2:#FFF3E8; --accent-ink:#A85D2C;
+  --violet:#7B5EA7; --violet-bg:#F3EFFA;
+  --field:#FBFAF8; --hover:#FAFAFA; --page:#F4F3F1;
+  --green:#2D7A5E; --red:#C0503C;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--page);color:var(--body);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+ -webkit-font-smoothing:antialiased;line-height:1.5;font-size:13px}
+
+.note{background:#FFF8E6;border:1px solid #F0D9A0;border-radius:10px;
+ padding:10px 12px;margin:14px 20px 0;font-size:11px;color:#7A5A16}
+.note b{color:#5C4310}
+
+.shell{display:flex;gap:20px;padding:16px 20px 20px;align-items:stretch;
+ height:calc(100vh - 60px);min-height:600px}
+@media(max-width:640px){.shell{flex-direction:column;height:auto}}
+.card{display:flex;flex-direction:column;border:1px solid var(--line);
+ border-radius:12px;background:#fff;overflow:hidden}
+.left{width:300px;flex-shrink:0}
+@media(max-width:900px){.left{width:240px}}
+@media(max-width:640px){.left{width:100%;max-height:none}.rows{max-height:34vh}
+ .cline{grid-template-columns:1fr;gap:2px}
+ .cline b{color:var(--ink)}}
+.right{flex:1;min-width:0}
+
+.chead{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px;flex-shrink:0}
+.chead h3{font-size:14px;font-weight:700;color:var(--ink)}
+.chead .c{font-size:11px;color:var(--dim2);font-weight:500}
+
+.tabs{display:flex;border-bottom:1px solid var(--line2);padding:0 12px;overflow-x:auto;flex-shrink:0}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{border:0;background:none;cursor:pointer;font-family:inherit;white-space:nowrap;
+ padding:8px 12px;font-size:13px;font-weight:600;color:var(--dim);
+ border-bottom:2px solid transparent;transition:color .15s}
+.tabs button:hover{color:#333}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs button .n{font-weight:500;color:var(--pale);margin-left:3px}
+
+.chips{display:flex;flex-wrap:wrap;gap:4px;padding:8px 12px 4px;flex-shrink:0}
+.chips button{border:1px solid var(--line);background:#fff;color:#666;border-radius:6px;
+ padding:3px 8px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.chips button:hover{border-color:var(--accent);color:var(--accent)}
+.chips button.on{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:700}
+.chips button .n{opacity:.6;margin-left:3px;font-weight:500}
+.search{padding:8px 12px 4px;flex-shrink:0}
+.search input{width:100%;border:1px solid var(--line);background:var(--field);
+ border-radius:8px;padding:6px 10px;font-size:12px;font-family:inherit;color:var(--ink);outline:none}
+.search input:focus{border-color:var(--ink);background:#fff}
+.search input::placeholder{color:var(--dim)}
+
+.rows{flex:1;overflow-y:auto;padding:4px 8px 8px}
+.row{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;
+ border:1px solid transparent;border-radius:8px;padding:8px 10px;margin-bottom:4px;
+ background:none;font-family:inherit;cursor:pointer;transition:background .15s}
+.row:hover{background:var(--hover)}
+.row.on{border-color:var(--accent);background:var(--accent-bg)}
+.row input[type=checkbox]{margin-top:2px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.row .t{font-size:12px;font-weight:600;color:var(--ink);line-height:1.35;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .m{margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:10px;color:var(--dim2)}
+.row .m .kind{color:var(--violet);font-weight:600}
+.row .body{min-width:0;flex:1}
+
+.st{font-weight:600}
+.st-wait{color:var(--dim2)} .st-hold{color:var(--accent)}
+.st-ok{color:var(--green)} .st-no{color:var(--red)}
+
+.lfoot{border-top:1px solid var(--line2);padding:10px 12px;display:flex;gap:6px;
+ align-items:center;font-size:11px;color:var(--dim2)}
+.lfoot .btn{padding:5px 9px;font-size:11px}
+
+.rhead{flex-shrink:0;border-bottom:1px solid var(--line);padding:16px 20px 0}
+.rhead .top{display:flex;align-items:flex-start;justify-content:space-between;
+ gap:12px;margin-bottom:12px}
+.rhead h3{font-size:14px;font-weight:700;color:var(--ink);line-height:1.35}
+.rhead .sub{font-size:10px;color:var(--dim2);margin-top:3px;word-break:break-all}
+.rhead .sub .v{color:var(--violet)}
+.rtabs{display:flex}
+.rtabs button{border:0;background:none;cursor:pointer;font-family:inherit;white-space:nowrap;
+ padding:11px 20px;font-size:14px;font-weight:600;color:var(--dim);
+ border-bottom:2px solid transparent}
+.rtabs button:first-child{padding-left:0;margin-right:8px}
+.rtabs .tg{display:inline-block;margin-left:7px;font-size:10px;font-weight:700;line-height:17px;
+ padding:0 8px;border-radius:9px;vertical-align:1px;letter-spacing:0}
+.tg-none{background:#F0F0F0;color:#8A8A8A}
+.tg-run {background:var(--accent-bg);color:var(--accent-ink)}
+.tg-done{background:#E3F1E1;color:var(--green)}
+.tg-fail{background:#FBE9E5;color:var(--red)}
+.row .tg{display:inline-block;font-size:9px;font-weight:700;line-height:14px;
+ padding:0 6px;border-radius:7px;margin:0;white-space:nowrap}
+
+.bar{height:5px;border-radius:3px;background:var(--line2);overflow:hidden;margin:10px 0 8px}
+.bar > i{display:block;height:100%;background:var(--accent);transition:width .35s}
+.steps{margin:0 0 0 2px;list-style:none}
+.steps li{font-size:12px;color:var(--dim2);padding:3px 0}
+.steps li.done{color:var(--body)}
+.steps li.now{color:var(--accent-ink);font-weight:600}
+.steps li b{display:inline-block;width:16px;font-weight:700}
+
+.abox{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:var(--hover)}
+.abox.run{border-color:var(--accent);background:var(--accent-bg)}
+.abox.fail{border-color:var(--red);background:#FDF3F1}
+
+/* 적재 미리보기 — 어느 표 어느 칼럼에 무엇이 들어가나 */
+.tbl{border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.tbl > h4{display:flex;align-items:center;gap:8px;margin:0;padding:10px 14px;
+ background:var(--hover);border-bottom:1px solid var(--line);
+ font-size:12px;font-weight:700;color:var(--ink);
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.tbl > h4 .cnt{margin-left:auto;font-family:inherit;font-size:11px;font-weight:700;
+ color:var(--accent-ink);background:var(--accent-bg);border-radius:9px;padding:1px 8px;line-height:16px}
+.tbl .cols{padding:6px 14px 10px}
+.cline{display:grid;grid-template-columns:190px 40px 1fr;gap:4px 10px;padding:5px 0;
+ align-items:start;font-size:12px;border-bottom:1px solid var(--line2)}
+.cline:last-child{border-bottom:0}
+.cline b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:600;
+ color:var(--dim);font-size:11.5px;word-break:break-all}
+.cline > span:last-child{color:var(--ink);word-break:break-word}
+.cline > span.nul{color:var(--dim2)}
+.lv{display:inline-block;font-size:9px;font-weight:800;line-height:15px;text-align:center;
+ border-radius:4px;padding:0 4px;white-space:nowrap}
+.lv-val{background:#E3F1E1;color:var(--green)}
+.lv-def{background:var(--violet-bg);color:var(--violet)}
+.lv-nul{background:#F0F0F0;color:#8A8A8A}
+.lv-gen{background:var(--accent-bg);color:var(--accent-ink)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 14px;font-size:11px;color:var(--dim2)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:0}
+.legend i.lv-val{background:#7FC49A} .legend i.lv-def{background:var(--violet)}
+.legend i.lv-nul{background:#C9C9C9} .legend i.lv-gen{background:var(--accent)}
+.tbl .more.warn2{color:var(--red);background:#FDF3F1;font-weight:600}
+.tbl .more{padding:8px 14px;font-size:11px;color:var(--dim2);background:var(--hover);
+ border-top:1px solid var(--line2)}
+.rtabs button:hover{color:#333}
+.rtabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+.rbody{flex:1;overflow-y:auto;padding:20px 24px}
+.rfoot{flex-shrink:0;border-top:1px solid var(--line);padding:12px 20px;
+ display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rfoot .w{margin-left:auto;font-size:11px;color:var(--dim2)}
+
+label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;
+ letter-spacing:.6px;color:var(--dim2);margin-bottom:6px}
+.f{margin-bottom:18px}
+input[type=text],input[type=url],textarea{width:100%;border:1px solid var(--line);
+ border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;
+ color:var(--ink);background:#fff;outline:none;transition:border-color .15s}
+input:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:#999}
+textarea{resize:vertical;min-height:80px;line-height:1.6}
+.hint{font-size:11px;color:var(--dim2);margin-top:6px}
+
+.btn{border:0;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;
+ white-space:nowrap;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s,color .15s}
+.btn.p{background:#555;color:#fff}   .btn.p:hover{background:#333}
+.btn.p:disabled{opacity:.4;cursor:not-allowed}
+.btn.s{border:1px solid var(--line);background:#fff;color:#666;padding:6px 12px;font-size:12px}
+.btn.s:hover{border-color:var(--accent);color:var(--accent)}
+.btn.ok{background:var(--green);color:#fff}
+.btn.hold{border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent-ink)}
+.btn.no{border:1px solid var(--line);background:#fff;color:var(--red)}
+.btn.no:hover{border-color:var(--red)}
+.btn.a{background:var(--accent);color:#fff}
+
+.warn{border:1px solid var(--accent);background:var(--accent-bg);border-radius:8px;
+ padding:10px 12px;font-size:12px;color:var(--accent-ink);margin-bottom:18px}
+.warn b{font-weight:700}
+.bad{color:var(--red);font-size:12px;margin-top:8px}
+
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:28px 16px;
+ text-align:center;background:var(--hover);cursor:pointer}
+.drop:hover{border-color:var(--accent);background:var(--accent-bg)}
+.drop .big{font-size:13px;font-weight:600;color:var(--ink)}
+.drop .sm{font-size:11px;color:var(--dim2);margin-top:5px}
+.picked{display:flex;align-items:center;gap:10px;border:1px solid var(--accent);
+ background:var(--accent-bg);border-radius:10px;padding:11px 13px}
+.picked .t{font-size:13px;font-weight:600;color:var(--ink)}
+.picked .m{font-size:11px;color:var(--dim2);margin-top:2px}
+.picked .x{margin-left:auto;border:0;background:none;color:var(--dim);
+ font-size:16px;cursor:pointer;font-family:inherit}
+.picked .x:hover{color:var(--red)}
+.kind{font-size:9px;font-weight:800;letter-spacing:.4px;padding:2px 6px;border-radius:4px;
+ background:var(--violet-bg);color:var(--violet);flex-shrink:0}
+.kind.f{background:var(--accent-bg2);color:var(--accent-ink)}
+
+.sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+ color:var(--dim2);margin:22px 0 8px}
+.sec:first-child{margin-top:0}
+.viewer{border:1px solid var(--line);border-radius:10px;background:#fff;
+ height:100%;min-height:420px;display:flex;align-items:center;justify-content:center;
+ color:var(--dim2);font-size:12px}
+.viewer.md{align-items:flex-start;justify-content:flex-start;padding:18px 20px;overflow:auto;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+ color:var(--body);white-space:pre-wrap;line-height:1.75}
+dl.k{display:grid;grid-template-columns:88px 1fr;gap:8px 14px;font-size:13px}
+dl.k dt{color:var(--dim);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding-top:1px}
+dl.k .new{color:var(--accent-ink);font-weight:600}
+dl.k .warn2{color:var(--red)}
+ul.lines{margin:0 0 0 16px} ul.lines li{font-size:13px;margin-bottom:6px}
+ul.lines .loc{color:var(--dim2);font-size:11px}
+pre{background:var(--ink);color:#E8E4F0;border-radius:9px;padding:16px 18px;
+ font-size:11.5px;line-height:1.6;overflow-x:auto;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre .c{color:#8B82A8} pre .s{color:#B8E0C8} pre .k2{color:#E8A0B8}
+.empty{font-size:12px;color:var(--dim2);text-align:center;padding:40px 20px}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="note">
+  <b>목업입니다.</b> 데이터는 가짜지만 <b>탭·목록·체크박스·버튼이 실제로 동작</b>합니다.
+  색·간격·2단 구조는 <code>kaas-admin-page.tsx</code> 에서 그대로 가져왔습니다.
+</div>
+
+<div class="shell">
+
+  <!-- 왼쪽 — 목록 -->
+  <div class="card left">
+    <div class="chead"><h3>투고 검토</h3><span class="c" id="cnt"></span></div>
+    <div class="tabs" id="kindTabs">
+      <button class="on" data-k="FILE">파일<span class="n" id="nFile"></span></button>
+      <button data-k="URL">링크<span class="n" id="nUrl"></span></button>
+    </div>
+    <div class="chips" id="stateChips"></div>
+    <div class="rows" id="rows"></div>
+    <div class="lfoot" id="lfoot"></div>
+  </div>
+
+  <!-- 오른쪽 — 검토 -->
+  <div class="card right" id="right"></div>
+
+</div>
+
+<script>
+const DATA = [
+  { id:1, kind:"PDF", state:"PENDING", name:"llm-engineering-patterns.pdf", title:"LLM Engineering Patterns — RAG 설계 사례집", by:"tomatojams",
+    when:"09-14", meta:"4.2 MB · application/pdf", at:"2026-09-14 09:12",
+    note:"RAG 파이프라인 설계 패턴을 사례 중심으로 정리한 자료입니다.", an:"DONE",
+    a:{ struct:"챕터 12개 · 문단 340개",
+        concepts:"28개 — 이미 있음 21 · <span class='new'>새로 생김 7</span>",
+        neu:"ContextualCompression · QueryRouting · SemanticCache · HybridAlphaTuning …",
+        dup:"기존 문단과 비슷한 것 3건",
+        warn:"4·9장은 목차가 없어 챕터를 못 나눴습니다",
+        sum:["RAG 파이프라인을 수집 → 청킹 → 검색 → 재순위 네 단계로 나눠 설명한다.",
+             "사례가 실제 장애 기록 중심이라 실패 모드 근거로 쓸 만하다.",
+             "임베딩 학습은 다루지 않는다 — Custom Embeddings 쪽 공백은 못 메운다."],
+        cherry:[["청킹 크기를 512로 고정하면 표가 잘려 검색이 무의미해진다","3장 · 문단 41"],
+                ["재순위를 넣기 전에 회수율부터 재라","5장 · 문단 88"],
+                ["하이브리드 검색의 alpha는 질의 종류마다 다르다","5장 · 문단 96"]] } },
+  { id:2, kind:"URL", state:"PENDING", name:"Anthropic Engineering Blog", title:"Anthropic Engineering Blog", by:"jihan",
+    when:"09-13", meta:"https://www.anthropic.com/engineering", at:"2026-09-13 18:40",
+    note:"에이전트를 실제로 운영하며 겪은 내용이 정리돼 올라옵니다." },
+  { id:3, kind:"MD", state:"PENDING", name:"agent-eval-notes.md", title:"에이전트 평가 메모", by:"hangyeol",
+    when:"09-13", meta:"38 KB · text/markdown", at:"2026-09-13 11:05",
+    note:"에이전트 평가 지표를 정리한 메모입니다.", an:"NONE",
+    body:"# Agent Evaluation Notes\n\n## 1. 무엇을 재는가\n\n- 작업 완료율 (task completion)\n- 도구 호출 정확도 (tool call accuracy)\n- 단계 수 (step count) — 같은 답이라도 10단계와 3단계는 다르다\n\n## 2. 흔한 함정\n\n최종 답만 채점하면 운 좋게 맞힌 경우를 걸러내지 못한다.\n중간 단계를 함께 봐야 한다.\n\n## 3. LLM-as-a-judge\n\n판정자도 모델이므로 판정자의 편향이 점수에 섞인다.\n사람 채점과의 일치도를 먼저 재야 한다.\n\n## 4. 무엇을 남길 것인가\n\n점수 하나가 아니라 실패한 사례 목록을 남긴다.\n다음 판을 고칠 때 쓰는 건 점수가 아니라 그 목록이다." },
+  { id:4, kind:"URL", state:"PENDING", name:"Eugene Yan — Writing", title:"Eugene Yan — Writing", by:"tomatojams",
+    when:"09-12", meta:"https://eugeneyan.com", at:"2026-09-12 10:20",
+    note:"추천·검색 시스템 운영 글이 많습니다." },
+  { id:5, kind:"URL", state:"HOLD", name:"Sebastian Raschka — Ahead of AI", title:"Sebastian Raschka — Ahead of AI", by:"anon",
+    when:"09-12", meta:"https://magazine.sebastianraschka.com", at:"2026-09-12 08:02",
+    note:"모델 구조 해설이 좋습니다.",
+    hold:"유료 구독 구간이 섞여 있어 수집 범위를 정하고 다시 봅니다." },
+  { id:6, kind:"URL", state:"APPROVED", name:"Chip Huyen — Blog", title:"Chip Huyen — Blog", by:"tomatojams",
+    when:"09-11", meta:"https://huyenchip.com", at:"2026-09-11 14:30" },
+  { id:7, kind:"PDF", state:"APPROVED", name:"ai-engineering-ch7.pdf", title:"AI Engineering 7장 — 평가 파이프라인", by:"jihan",
+    when:"09-10", meta:"1.8 MB · application/pdf", at:"2026-09-10 09:00", an:"DONE",
+    a:{ struct:"챕터 1개 · 문단 96개", concepts:"11개 — 이미 있음 11 · <span class='new'>새로 생김 0</span>",
+        neu:"없음", dup:"기존 문단과 비슷한 것 0건", warn:"없음",
+        sum:["평가 파이프라인 한 장을 발췌한 것이다.","기존 개념만 다뤄 새 개념은 생기지 않는다.","문단 96개가 근거로 붙는다."],
+        cherry:[["오프라인 점수가 올라도 온라인 지표는 내려갈 수 있다","7장 · 문단 12"]] } },
+  { id:8, kind:"MD", state:"REJECTED", name:"tutorial-draft.md", title:"RAG 입문 튜토리얼 초안", by:"anon",
+    when:"09-08", meta:"12 KB · text/markdown", at:"2026-09-08 21:15",
+    an:"FAILED", anErr:"3장 이후가 스캔 이미지라 글자를 뽑지 못했습니다. 글자가 들어간 PDF 가 필요합니다.",
+    body:"# Draft\n\n(초안 — 기존 자료와 중복)" },
+];
+const LABEL = { PENDING:"대기", HOLD:"유보", APPROVED:"승인", REJECTED:"반려" };
+/* 분석 상태 — 버튼을 눌러야 시작한다(D2 = 버튼).
+   파이프라인이 문단마다 LLM 을 부르므로 즉시 끝나지 않는다. 그래서 '진행 중' 이 따로 있다. */
+/* 상태는 넷뿐이다. 대기열이 없으므로 QUEUED 도 없다 —
+   동시에 하나만 돌고, 이미 돌고 있으면 "이미 분석 중입니다" 로 돌려보낸다(기획 §4-B). */
+const AN = { NONE:["안 함","tg-none"], RUNNING:["진행 중","tg-run"],
+             DONE:["완료","tg-done"], FAILED:["실패","tg-fail"] };
+const STEPS = ["글자 뽑기","챕터 나누기","문단 자르기","개념 뽑기 (LLM)","기존 개념과 대조","요약·경고 정리 (LLM)"];
+let anStep = 0, anTimer = null;
+const STCLS = { PENDING:"st-wait", HOLD:"st-hold", APPROVED:"st-ok", REJECTED:"st-no" };
+
+/* 링크와 파일은 처리 방식이 아예 다르다 — 목록부터 가른다.
+   파일 : 원문을 보고 분석을 돌려 승인한다
+   링크 : 본문이 없으므로 체크해서 조사 목록으로 내보낸다 */
+let kind="FILE", state="ALL", curId=1, rtab="meta", checked=new Set();
+/* 보관 기간은 아직 안 정했다(D5). 대신 며칠 지났는지를 보여준다. */
+const TODAY = new Date("2026-09-14");
+const daysAgo = (at) => Math.round((TODAY - new Date(at.slice(0,10))) / 86400000);
+const ago = (at) => { const n = daysAgo(at); return n <= 0 ? "오늘" : n + "일 지남"; };
+/* 원문을 실제로 불러온 투고만 담는다.
+   PDF 는 수 MB 라 열자마자 내려받으면 화면이 그만큼 늦게 뜬다.
+   [원문 보기] 를 누른 뒤에만 받는다. */
+const opened = new Set();
+const isFile = d => d.kind !== 'URL';
+const inKind = d => (kind === 'URL') === (d.kind === 'URL');
+const STATES = ["ALL","PENDING","HOLD","APPROVED","REJECTED"];
+const SLABEL = { ALL:"전체", PENDING:"대기", HOLD:"유보", APPROVED:"승인", REJECTED:"반려" };
+
+const cur = () => DATA.find(d => d.id === curId) || null;
+
+function drawRows(){
+  document.getElementById('nFile').textContent = DATA.filter(d => !d.kind.includes('URL')).length;
+  document.getElementById('nUrl').textContent  = DATA.filter(d =>  d.kind === 'URL').length;
+
+  /* 상태 칩 — 지금 고른 종류 안에서만 센다 */
+  const pool = DATA.filter(inKind);
+  document.getElementById('stateChips').innerHTML = STATES
+    .filter(st => st === 'ALL' || pool.some(d => d.state === st))
+    .map(st => {
+      const n = st === 'ALL' ? pool.length : pool.filter(d => d.state === st).length;
+      return `<button class="${state===st?'on':''}" data-st="${st}">${SLABEL[st]}<span class="n">${n}</span></button>`;
+    }).join('');
+
+  const items = pool.filter(d => state === 'ALL' || d.state === state);
+  document.getElementById('cnt').textContent = items.length + '건';
+
+  document.getElementById('rows').innerHTML = items.length ? items.map(d => `
+    <div class="row ${d.id===curId?'on':''}" data-id="${d.id}">
+      ${kind === 'URL' ? `<input type="checkbox" data-check="${d.id}" ${checked.has(d.id)?'checked':''}>` : ''}
+      <div class="body">
+        <div class="t">${d.title}</div>
+        <div class="m">${kind==='URL' ? '' : `<span class="kind f">${d.kind}</span>`}
+          <span>${d.by}</span><span>${ago(d.at)}</span>
+          <span class="st ${STCLS[d.state]}">${LABEL[d.state]}</span>
+          ${kind==='URL' ? '' : `<span class="tg ${AN[d.an][1]}">분석 ${AN[d.an][0]}</span>`}</div>
+      </div>
+    </div>`).join('') : '<div class="empty">없습니다.</div>';
+
+  /* 아래 버튼 줄 — 링크 목록에서만 쓴다 */
+  document.getElementById('lfoot').innerHTML = kind === 'URL'
+    ? `<span id="selCount">선택 ${checked.size}건</span>
+       <button class="btn s" id="btnExport" style="margin-left:auto" ${checked.size?'':'disabled'}>JSON 내보내기</button>
+       <button class="btn s" disabled style="opacity:.4" title="다음 범위">가져오기</button>`
+    : `<span>파일은 하나씩 열어 분석 결과를 보고 판단합니다</span>`;
+  const ex = document.getElementById('btnExport');
+  if(ex){ ex.style.opacity = checked.size ? 1 : .45;
+    ex.onclick = () => { rtab = 'export'; drawRight() }; }
+}
+
+/* ── 오른쪽 탭 본문 ── */
+function paneDoc(d){
+  if(d.kind === 'URL') return `
+    <div class="sec">링크</div>
+    <div style="border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:var(--hover)">
+      <a href="${d.meta}" target="_blank" rel="noreferrer"
+         style="font-size:13px;color:var(--accent-ink);word-break:break-all">${d.meta} ↗</a>
+      <div class="hint" style="margin-top:8px">남의 서버에 있는 자료라 이 자리에서 본문을 띄우지 않습니다.</div>
+    </div>
+    <div class="sec">투고자가 쓴 말</div>
+    <p style="font-size:13px">${d.note || '—'}</p>
+`;
+
+  /* 아직 안 받았으면 파일 정보만 보여주고 기다린다 */
+  if(!opened.has(d.id)) return `
+    <div class="sec">첨부된 파일</div>
+    <div class="picked" style="margin-bottom:14px">
+      <span class="kind f">${d.kind}</span>
+      <div><div class="t">${d.name}</div><div class="m">${d.meta}</div></div>
+    </div>
+    <button class="btn a" id="btnOpen">원문 보기</button>
+    <p class="hint" style="margin-top:10px">
+      ${d.kind === 'PDF'
+        ? '누르면 그때 파일을 받아 띄웁니다. 4.2 MB 라 몇 초 걸립니다.'
+        : '누르면 그때 파일을 받아 글자 그대로 띄웁니다.'}<br>
+      열자마자 받지 않는 이유 — 목록을 넘겨보기만 할 때도 매번 파일을 통째로 내려받게 됩니다.
+    </p>
+    <div style="margin-top:12px"><button class="btn s">받지 않고 내려받기</button></div>`;
+
+  if(d.kind === 'MD') return `
+    <div style="display:flex;flex-direction:column;height:100%">
+      <div class="sec">원문 — ${d.name}</div>
+      <div class="viewer md" style="flex:1">${(d.body||'').replace(/</g,'&lt;')}</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
+        <button class="btn s">내려받기</button>
+        <span class="hint" style="margin:0">꾸미지 않고 글자 그대로 보여줍니다</span>
+      </div>
+    </div>`;
+
+  return `
+    <div style="display:flex;flex-direction:column;height:100%">
+      <div class="sec">원문 — ${d.name}</div>
+      <div class="viewer" style="flex:1">PDF 뷰어 — 340쪽</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
+        <button class="btn s">내려받기</button>
+        <span class="hint" style="margin:0">격리된 틀에서 띄웁니다 — 문서 안 스크립트는 실행되지 않습니다</span>
+      </div>
+    </div>`;
+}
+
+/* 적재 미리보기 — 승인 전에 어느 표 어느 칼럼에 무엇이 들어가는지 본다 (기획 §4-E).
+   칼럼 이름·NOT NULL·기본값 여부는 라이브 DB 에서 읽은 실제 값이다.
+   표시 구분   값   분석이 뽑아낸 값이 들어간다
+              기본  DB 기본값이 들어간다 — 우리가 넣지 않는다
+              빈칸  NULL 로 남는다
+              생성  적재할 때 만들어진다 (uuid·시각) */
+const LOAD = [
+  { t:"handbook.book", n:1, note:"책 한 권 = 투고 하나",
+    c:[
+      ["id","생성","uuid"],
+      ["title","값", d => d.title],
+      ["author","빈칸","분석에서 저자를 못 찾았습니다"],
+      ["section_kind","기본","CORE — enum(CORE·APPENDIX·TUTORIAL·REFERENCE·GLOSSARY)"],
+      ["source_type","값", d => d.kind === 'MD' ? 'MARKDOWN' : 'PDF'],
+      ["source_path","값","2026/09/8f3a…c21.pdf"],
+      ["source_url","빈칸","파일 투고라 주소가 없습니다"],
+      ["processing_status","기본","PENDING"],
+      ["total_paragraphs","값","340"],
+      ["paragraphs_processed","기본","0"],
+      ["llm_tokens_used","기본","0 — 적재하며 쌓입니다"],
+      ["llm_cost_cents","기본","0"],
+      ["meta_json","값", d => `{ "submissionId": "…", "submittedBy": "${d.by}" }`],
+      ["created_at","기본","now()"],
+      ["updated_at","기본","now()"],
+      ["revoked_at","빈칸","살아 있는 행"],
+    ] },
+  { t:"handbook.chapter", n:12, note:"첫 행만 펼칩니다 — 나머지 11행도 같은 모양",
+    c:[
+      ["id","생성","uuid"],
+      ["book_id","값","위 book 행을 가리킵니다"],
+      ["chapter_number","값","1"],
+      ["title","값","Chapter 1. Why Retrieval Fails"],
+      ["start_page","값","7"],
+      ["end_page","값","24"],
+      ["level","기본","1"],
+      ["parent_chapter_id","빈칸","최상위 챕터"],
+      ["detection_method","값","toc — 목차에서 찾았습니다"],
+      ["created_at","기본","now()"],
+      ["updated_at","기본","now()"],
+      ["revoked_at","빈칸","살아 있는 행"],
+    ] },
+  { t:"handbook.section", n:38, note:"첫 행만 펼칩니다",
+    c:[
+      ["id","생성","uuid"],
+      ["book_id","값","위 book 행을 가리킵니다"],
+      ["chapter_id","값","위 chapter 행을 가리킵니다"],
+      ["section_number","값","1"],
+      ["title","값","1.1 The Chunking Trap"],
+      ["level","기본","1"],
+      ["parent_section_id","빈칸",""],
+      ["detection_method","기본","llm"],
+      ["created_at","기본","now()"],
+      ["updated_at","기본","now()"],
+      ["revoked_at","빈칸","살아 있는 행"],
+    ] },
+  { t:"handbook.paragraph_chunk", n:340, warn:"340개가 맞는지 보세요 — 자르기가 잘못되면 수천 개가 됩니다",
+    note:"첫 행만 펼칩니다",
+    c:[
+      ["id","생성","uuid"],
+      ["book_id","값","위 book 행"],
+      ["chapter_id","값","위 chapter 행"],
+      ["section_id","값","위 section 행"],
+      ["page_number","값","11"],
+      ["paragraph_index","값","1"],
+      ["chapter_paragraph_index","값","1"],
+      ["body_text","값","“청킹 크기를 512로 고정하면 표가 잘려 검색이 무의미해진다…”"],
+      ["paragraph_hash","값","중복 검사에 씁니다"],
+      ["simhash64","값","비슷한 문단 찾기에 씁니다"],
+      ["importance_score","값","0.82"],
+      ["sampling_weight","빈칸","쓰지 않습니다"],
+      ["judge_originality","빈칸","별도 평가 단계에서 채웁니다"],
+      ["judge_depth","빈칸","〃"],
+      ["judge_technical_accuracy","빈칸","〃"],
+      ["extract_type","값","PRINCIPLE — enum(DEFINITION·EXAMPLE·CASE_STUDY·METRIC·PROCEDURE·PRINCIPLE·COMPARISON·WARNING·OTHER)"],
+      ["cluster_id","빈칸","묶기를 돌리지 않았습니다"],
+      ["is_representative","기본","false"],
+      ["llm_tokens_used","값","적재하며 쌓입니다"],
+      ["llm_cost_cents","값","〃"],
+      ["llm_provider","값","vertex-ai / gemini-2.5-flash"],
+      ["llm_processed_at","값","적재 시각"],
+      ["created_at","기본","now()"],
+      ["updated_at","기본","now()"],
+      ["revoked_at","빈칸","살아 있는 행"],
+      ["core_idea_text","값","청킹 크기를 내용 구조와 무관하게 고정하면 안 된다"],
+    ] },
+  { t:"handbook.concept", n:7, warn:"새로 생기는 것만 7행입니다. 이미 있는 21개는 그대로 씁니다",
+    note:"오탈자로 생긴 개념은 없는지 보세요",
+    c:[
+      ["id","생성","uuid"],
+      ["canonical_name","값","ContextualCompression"],
+      ["description","값","검색한 문단을 질의에 맞게 줄여 넣는 기법"],
+      ["topic_id","빈칸","분류는 나중에 붙입니다"],
+      ["subtopic_id","빈칸","〃"],
+      ["is_active","기본","true"],
+      ["meta_json","값",'{ "origin": "submission", "submissionId": "…" }'],
+      ["created_at","기본","now()"],
+      ["updated_at","기본","now()"],
+      ["revoked_at","빈칸","살아 있는 행"],
+      ["ontology_node","빈칸","후보 상태로 들어갑니다 — 승인이 온톨로지를 건드리지 않습니다"],
+    ] },
+  { t:"handbook.paragraph_concept_link", n:412,
+    note:"문단 하나에 개념이 여럿 붙어 340행보다 많습니다",
+    c:[
+      ["id","생성","uuid"],
+      ["paragraph_chunk_id","값","위 문단을 가리킵니다"],
+      ["concept_id","값","Chunking"],
+      ["is_primary","값","true — 이 문단의 대표 개념 (DB 기본값은 false)"],
+      ["extraction_confidence","값","0.91"],
+      ["created_at","기본","now()"],
+      ["updated_at","기본","now()"],
+      ["revoked_at","빈칸","살아 있는 행"],
+      ["insight","빈칸","체리 문장은 사람이 씁니다"],
+    ] },
+];
+
+function paneLoad(d){
+  if(d.kind === 'URL')
+    return `<div class="empty">링크는 이 표들에 들어가지 않습니다.<br>조사자가 채워 온 JSON 으로 <code>content.source</code> 에 등록합니다.</div>`;
+  if(d.an !== 'DONE')
+    return `<div class="empty">분석이 끝나야 무엇이 들어갈지 알 수 있습니다.<br>
+      [투고 정보] 에서 분석을 먼저 돌리세요.</div>`;
+
+  const KIND = { "값":"lv-val", "기본":"lv-def", "빈칸":"lv-nul", "생성":"lv-gen" };
+  const val = (v) => typeof v === 'function' ? v(d) : v;
+
+  return `
+    <div class="hint" style="margin:0 0 10px">
+      적재는 <b>두 단계</b>입니다. 칼럼은 <b>라이브 DB 에서 읽은 실제 칼럼 전부</b>이고, 순서도 DB 순서 그대로입니다.
+    </div>
+    <div class="abox" style="margin-bottom:14px">
+      <div style="font-size:12px;line-height:1.9;font-family:ui-monospace,Menlo,monospace">
+        ① 파이프라인 &nbsp;→&nbsp; <b>public.*</b> &nbsp;(정수 키)<br>
+        ② 옮기기 &nbsp;→&nbsp; <b>handbook.*</b> &nbsp;(uuid) &nbsp;← 화면에 나오는 곳
+      </div>
+      <p class="hint" style="margin-top:8px">
+        <b>②는 자동으로 되지 않습니다.</b> 옮기기를 따로 실행해야 화면에 나옵니다.</p>
+    </div>
+
+    <div class="sec" style="margin-top:0">① 파이프라인이 만드는 것 — public.*</div>
+    <div class="tbl"><div class="cols">
+      <div class="cline"><b>public.books</b><span class="lv lv-val">1행</span><span>title · author · source_path · processing_status · total_paragraphs</span></div>
+      <div class="cline"><b>public.chapters</b><span class="lv lv-val">12행</span><span>book_id · chapter_number · title · start_page · end_page</span></div>
+      <div class="cline"><b>public.sections</b><span class="lv lv-val">38행</span><span>book_id · chapter_id · section_number · title</span></div>
+      <div class="cline"><b>public.paragraph_chunks</b><span class="lv lv-val">340행</span><span>book_id · chapter_id · section_id · body_text · page_number</span></div>
+      <div class="cline"><b>public.key_ideas</b><span class="lv lv-val">412행</span><span>chunk_id · book_id · core_idea_text</span></div>
+    </div></div>
+
+    <div class="sec">② 옮기면 되는 것 — handbook.*</div>
+    <div class="legend">
+      <span><i class="lv-val"></i>값 — 분석이 뽑은 것</span>
+      <span><i class="lv-def"></i>기본 — DB 기본값</span>
+      <span><i class="lv-nul"></i>빈칸 — NULL 로 남음</span>
+      <span><i class="lv-gen"></i>생성 — 적재할 때 만듦</span>
+    </div>
+
+    ${LOAD.map(T => `
+      <div class="tbl">
+        <h4>${T.t}<span class="cnt">${T.n}행</span></h4>
+        <div class="cols">
+          ${T.c.map(([k, kind, v]) => `
+            <div class="cline">
+              <b>${k}</b>
+              <span class="lv ${KIND[kind]}">${kind}</span>
+              <span class="${kind === '빈칸' ? 'nul' : ''}">${val(v) || '—'}</span>
+            </div>`).join('')}
+        </div>
+        ${T.warn ? `<div class="more warn2"><b>${T.warn}</b></div>` : ''}
+        ${T.note ? `<div class="more">${T.note}</div>` : ''}
+      </div>`).join('')}
+
+    <div class="hint" style="margin-top:14px">
+      여기서 이상한 값을 잡지 못하면 적재 뒤에는 되돌리기 어렵습니다.
+    </div>`;
+}
+
+/* 링크 전용 — 체크한 것들을 조사 목록으로 뽑는다 */
+function paneExport(){
+  const sel = DATA.filter(x => checked.has(x.id));
+  if(!sel.length) return `<div class="empty">왼쪽 목록에서 조사할 링크를 체크하세요.</div>`;
+  return `
+    <div class="sec">조사 목록 — ${sel.length}건</div>
+    <div class="hint" style="margin:0 0 10px">조사자가 에이전트로 빈 칸을 채운 뒤 돌려줍니다. <b>돌려받은 파일로 등록하는 것은 다음에 붙입니다.</b></div>
+<pre>{
+  <span class="k2">"count"</span>: <span class="s">${sel.length}</span>,
+  <span class="k2">"items"</span>: [
+${sel.map(x => `    {
+      <span class="c">// 읽기 전용</span>
+      <span class="k2">"url"</span>: <span class="s">"${x.meta}"</span>,
+      <span class="k2">"submittedBy"</span>: <span class="s">"${x.by}"</span>,
+      <span class="k2">"submitterNote"</span>: <span class="s">"${x.note||''}"</span>,
+
+      <span class="c">// 반드시 채워야 하는 것 3개 — DB 가 NOT NULL 이고 기본값이 없다</span>
+      <span class="k2">"type"</span>: null,        <span class="c">// RSS · WEBSITE · YOUTUBE · …</span>
+      <span class="k2">"name"</span>: null,
+      <span class="k2">"urlHandle"</span>: null,   <span class="c">// 실제로 수집할 주소. RSS 면 RSS 주소</span>
+
+      <span class="c">// 비워도 되는 것</span>
+      <span class="k2">"frequency"</span>: null,   <span class="c">// 비우면 DAILY (DB 기본값)</span>
+      <span class="k2">"description"</span>: null,
+      <span class="k2">"homepageUrl"</span>: null,
+      <span class="k2">"language"</span>: null,
+      <span class="k2">"verdict"</span>: null      <span class="c">// ADD · SKIP</span>
+    }`).join(',\n')}
+  ]
+}</pre>`;
+}
+
+function paneAnalysis(d){
+  if(d.kind === 'URL') return `<div class="empty">링크는 본문을 받아오지 않으므로 분석하지 않습니다.<br>조사자가 조사한 뒤 등록합니다.</div>`;
+
+  if(d.an === 'NONE') return `
+    <div class="abox">
+      <p style="font-size:13px;font-weight:600;color:var(--ink)">아직 분석하지 않았습니다.</p>
+      <p class="hint" style="margin-top:6px">[투고 정보] 탭의 <b>[분석하기]</b> 를 눌러 시작합니다.</p>
+    </div>`;
+
+  if(d.an === 'RUNNING') return `
+    <div class="abox run">
+      <p style="font-size:13px;font-weight:700;color:var(--accent-ink)">분석 중 — ${anStep+1} / ${STEPS.length} 단계</p>
+      <div class="bar"><i style="width:${Math.round((anStep)/STEPS.length*100)}%"></i></div>
+      <ul class="steps">${STEPS.map((t,i) => `
+        <li class="${i<anStep?'done':i===anStep?'now':''}"><b>${i<anStep?'✓':i===anStep?'▸':'·'}</b>${t}</li>`).join('')}</ul>
+      <p class="hint" style="margin-top:10px">
+        4단계에서 문단 묶음마다 LLM 을 부르기 때문에 시간이 걸립니다.<br>이 화면을 떠나도 계속 돌아갑니다 — 다른 투고를 보고 있어도 됩니다.</p>
+    </div>`;
+
+  if(d.an === 'FAILED') return `
+    <div class="abox fail">
+      <p style="font-size:13px;font-weight:700;color:var(--red)">분석 실패</p>
+      <p style="font-size:13px;margin-top:6px">${d.anErr || '알 수 없는 이유로 멈췄습니다.'}</p>
+    </div>
+    <div style="margin-top:14px"><button class="btn a" id="btnAnalyze">다시 시도</button></div>`;
+
+  const a = d.a;
+  return `
+    <div class="sec">문서가 어떻게 들어가는가</div>
+    <dl class="k">
+      <dt>구조</dt><dd>${a.struct}</dd>
+      <dt>개념</dt><dd>${a.concepts}</dd>
+      <dt>새 개념</dt><dd class="new">${a.neu}</dd>
+      <dt>중복</dt><dd>${a.dup}</dd>
+      <dt>경고</dt><dd class="warn2">${a.warn}</dd>
+    </dl>
+    <div class="sec">요약</div>
+    <ul class="lines">${a.sum.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <div class="sec">근거 후보 (체리)</div>
+    <ul class="lines">${a.cherry.map(c=>`<li>“${c[0]}” <span class="loc">${c[1]}</span></li>`).join('')}</ul>
+    <div class="hint" style="margin-top:18px">
+      이 결과는 <b>보여주기만</b> 합니다 — 승인해도 어느 표에도 행이 생기지 않습니다.<br>
+      판단용 미리보기라, 실제 적재는 파이프라인이 다시 돌려 숫자가 조금 달라질 수 있습니다.</div>`;
+}
+
+function paneMeta(d){
+  return `
+    ${d.kind !== 'URL' ? `
+      <div class="sec">첨부된 파일</div>
+      <div class="picked" style="margin-bottom:4px">
+        <span class="kind f">${d.kind}</span>
+        <div><div class="t">${d.name}</div><div class="m">${d.meta}</div></div>
+        <button class="btn s" id="btnOpen2" style="margin-left:auto">원문 보기</button>
+      </div>
+      <p class="hint">원문은 누를 때 받습니다 — 목록만 넘겨볼 때 파일을 내려받지 않습니다</p>
+
+      <div class="sec">업로드 검사</div>
+      <dl class="k">
+        <dt>형식</dt><dd>진짜 ${d.kind} 맞음 — 파일 선두를 확인했습니다</dd>
+        <dt>크기</dt><dd>${d.meta.split(' · ')[0]} · 한도 안</dd>
+        <dt>해시</dt><dd style="font-family:ui-monospace,Menlo,monospace;font-size:11px">
+          9f2c…a71b · 같은 파일 없음</dd>
+        <dt>악성코드</dt><dd class="warn2">검사하지 않았습니다 — 추가 대응할 예정입니다</dd>
+      </dl>
+    ` : `
+      <div class="sec">주소</div>
+      <a href="${d.meta}" target="_blank" rel="noreferrer"
+         style="font-size:13px;color:var(--accent-ink);word-break:break-all">${d.meta} ↗</a>
+    `}
+
+    <div class="sec">유저가 올린 제목</div>
+    <p style="font-size:14px;font-weight:600;color:var(--ink)">${d.title}</p>
+
+    <div class="sec">유저가 쓴 설명</div>
+    <p style="font-size:13px">${d.note || '—'}</p>
+
+    <div class="sec">투고</div>
+    <dl class="k">
+      <dt>투고자</dt><dd>${d.by}</dd>
+      <dt>올린 때</dt><dd>${d.at} <span style="color:var(--dim2)">· ${ago(d.at)}</span></dd>
+      <dt>상태</dt><dd class="st ${STCLS[d.state]}">${LABEL[d.state]}</dd>
+    </dl>
+
+    ${d.kind === 'URL' ? '' : `
+      <div class="sec">분석</div>
+      ${d.an === 'NONE' ? `
+        <div class="abox">
+          <p style="font-size:13px">아직 돌리지 않았습니다.</p>
+          <p class="hint" style="margin-top:6px">
+            문단을 자른 뒤 묶음마다 LLM 을 불러 개념을 뽑습니다. 이 문서는 문단이 많아 몇 분 걸립니다 —
+            <b>볼 가치가 있다고 판단했을 때 누릅니다.</b> 누르면 호출한 만큼 비용이 나갑니다.</p>
+          <div style="margin-top:12px"><button class="btn a" id="btnAnalyze">분석하기</button></div>
+        </div>`
+      : d.an === 'RUNNING' ? `
+        <div class="abox run">
+          <p style="font-size:13px;font-weight:700;color:var(--accent-ink)">
+            분석 중 — ${STEPS[anStep]} (${anStep+1}/${STEPS.length})</p>
+          <div class="bar"><i style="width:${Math.round(anStep/STEPS.length*100)}%"></i></div>
+          <p class="hint">끝나면 [분석 정보] 탭에서 봅니다. 이 화면을 떠나도 계속 돌아갑니다.</p>
+        </div>`
+      : d.an === 'FAILED' ? `
+        <div class="abox fail">
+          <p style="font-size:13px;font-weight:700;color:var(--red)">분석 실패</p>
+          <p style="font-size:13px;margin-top:6px">${d.anErr || ''}</p>
+          <div style="margin-top:12px"><button class="btn a" id="btnAnalyze">다시 시도</button></div>
+        </div>`
+      : `
+        <div class="abox">
+          <p style="font-size:13px">분석이 끝났습니다 — <b>[분석 정보]</b> 탭에서 봅니다.</p>
+          <p class="hint" style="margin-top:6px">${d.a.struct} · ${d.a.dup}</p>
+        </div>`}
+    `}
+
+`;
+}
+
+function drawRight(){
+  const d = cur();
+  const box = document.getElementById('right');
+  if(!d || !inKind(d) || (state !== 'ALL' && d.state !== state)){
+    box.innerHTML = '<div class="empty">왼쪽 목록에서 하나를 고르세요.</div>'; return;
+  }
+  const [anTxt, anCls] = AN[d.an] || AN.NONE;
+  const tabs = d.kind === 'URL'
+    ? [["meta","투고 정보"], ["doc","링크"], ["export",`조사 목록 내보내기${checked.size?` (${checked.size})`:''}`]]
+    : [["meta","투고 정보"], ["doc","원문"],
+       ["analysis",`분석 정보<span class="tg ${anCls}">${anTxt}</span>`],
+       ["load","적재 미리보기"]];
+  if(!tabs.some(t => t[0] === rtab)) rtab = 'meta';
+  const pane = rtab==='doc' ? paneDoc(d)
+             : rtab==='export' ? paneExport()
+             : rtab==='load' ? paneLoad(d)
+             : rtab==='analysis' ? paneAnalysis(d) : paneMeta(d);
+  /* 승인은 분석을 한 번 돌려본 뒤에만 — DONE 이든 FAILED 든(D9).
+     스캔 PDF 는 글자를 못 뽑아 실패하지만, 그것과 자료 가치는 별개다.
+     막는 것은 아직 안 돌린 것(NONE)과 도는 중(RUNNING)뿐이다. */
+  const needAn = d.kind !== 'URL' && (d.an === 'NONE' || d.an === 'RUNNING');
+  /* 되돌릴 수 있다 — 승인·반려한 뒤에도 다시 바꾼다(기획 §4-D).
+     잘못 누른 것을 고칠 길이 없으면 관리자는 누르기를 망설인다. */
+  /* 링크 승인은 "content.source 에 등록하기로 했다"는 표시일 뿐이다.
+     실제 등록은 다음 범위 — 파일 승인이 적재 표시인 것과 같은 구조(기획 §4-D). */
+  const done = d.state === 'APPROVED' || d.state === 'REJECTED';
+  const foot = d.kind === 'URL'
+      ? `<button class="btn ok">승인</button>
+         <button class="btn hold">유보</button>
+         <button class="btn no">반려</button>
+         <span class="w">${done ? `지금 ${LABEL[d.state]} · 다시 눌러 바꿀 수 있습니다`
+           : '승인은 "등록하기로 했다"는 표시입니다 — 등록은 다음에 붙입니다'}</span>`
+      : `<button class="btn ok" ${needAn?'disabled style="opacity:.4;cursor:not-allowed"':''}>승인</button>
+         <button class="btn hold">유보</button>
+         <button class="btn no">반려</button>
+         <span class="w">${needAn
+           ? '분석을 한 번 돌려본 뒤에 승인할 수 있습니다 — [투고 정보] 에서 먼저 돌리세요'
+           : done ? `지금 ${LABEL[d.state]} · 다시 눌러 바꿀 수 있습니다`
+           : '[적재 미리보기] 로 무엇이 들어가는지 확인하세요 — 승인해도 어느 표에도 행이 생기지 않습니다'}</span>`;
+  box.innerHTML = `
+    <div class="rhead">
+      <div class="top">
+        <div>
+          <h3>${d.title}</h3>
+          <div class="sub"><span class="v">${d.kind}</span> · ${d.kind==='URL'?d.meta:d.name} · ${d.by} · ${d.at}
+            <span style="color:var(--dim2)"> · ${ago(d.at)}</span></div>
+        </div>
+      </div>
+      <div class="rtabs">${tabs.map(([k,l]) =>
+        `<button class="${rtab===k?'on':''}" data-r="${k}">${l}</button>`).join('')}</div>
+    </div>
+    <div class="rbody">${pane}</div>
+    <div class="rfoot">${foot}</div>`;
+
+  box.querySelector('.rtabs').onclick = e => {
+    const b = e.target.closest('button'); if(!b) return;
+    rtab = b.dataset.r; drawRight();
+  };
+  const an = document.getElementById('btnAnalyze');
+  if(an) an.onclick = () => runAnalysis(curId);
+  const open1 = document.getElementById('btnOpen');
+  if(open1) open1.onclick = () => { opened.add(curId); drawRight(); };
+  const open2 = document.getElementById('btnOpen2');
+  if(open2) open2.onclick = () => { opened.add(curId); rtab = 'doc'; drawRight(); };
+}
+
+/* 버튼을 누르면 서버가 일을 맡아두고 화면은 바로 돌아온다(백그라운드 작업).
+   목업이라 단계를 시간으로 흉내 낸다 — 실제로는 파이프라인이 단계마다 진행을 알려준다. */
+function runAnalysis(id){
+  const d = DATA.find(x => x.id === id); if(!d) return;
+  clearInterval(anTimer);
+  d.an = 'RUNNING'; anStep = 0; render();
+  anTimer = setInterval(() => {
+    anStep++;
+    if(anStep >= STEPS.length){
+      clearInterval(anTimer);
+      d.an = 'DONE';
+      d.a = d.a || DATA[0].a;     // 목업이라 같은 결과를 쓴다
+      anStep = 0;
+    }
+    render();
+  }, 800);
+}
+
+function render(){ drawRows(); drawRight(); }
+
+function firstOf(){
+  const f = DATA.filter(inKind).find(d => state === 'ALL' || d.state === state);
+  curId = f ? f.id : 0;
+}
+document.getElementById('kindTabs').onclick = e => {
+  const b = e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#kindTabs button').forEach(t => t.classList.remove('on'));
+  b.classList.add('on');
+  kind = b.dataset.k; state = 'ALL'; rtab = 'meta'; firstOf(); render();
+};
+document.getElementById('stateChips').onclick = e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state = b.dataset.st; rtab = 'meta'; firstOf(); render();
+};
+document.getElementById('rows').onclick = e => {
+  const cb = e.target.closest('input[data-check]');
+  if(cb){ const id = +cb.dataset.check;
+    checked.has(id) ? checked.delete(id) : checked.add(id); render(); return; }
+  const r = e.target.closest('.row'); if(!r) return;
+  curId = +r.dataset.id; rtab = 'meta'; render();
+};
+firstOf();
+render();
+</script>
+</body>
+</html>

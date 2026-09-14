@@ -274,13 +274,34 @@ export function ConceptReaderPage({
                     >
                       {ref.stage}
                     </span>
-                    <p className="text-[13px] font-bold text-text-primary mt-0.5">{ref.title}</p>
+                    {/* 세 갈래 — 외부 URL / 내부 개념 페이지 / 링크 없음.
+                        url 을 DB 에 담아놓고 화면이 안 쓰던 문제와, 소장 도서가 갈 데 없던 문제를 함께 고친다. */}
+                    {ref.url ? (
+                      <a
+                        href={ref.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[13px] font-bold text-text-primary mt-0.5 block hover:text-cherry underline decoration-dotted underline-offset-2"
+                      >
+                        {ref.title} ↗
+                      </a>
+                    ) : ref.internalNode && onOpenConcept ? (
+                      <button
+                        type="button"
+                        onClick={() => onOpenConcept(ref.internalNode!)}
+                        className="text-[13px] font-bold text-text-primary mt-0.5 block text-left hover:text-cherry underline decoration-dotted underline-offset-2"
+                      >
+                        {ref.title} →
+                      </button>
+                    ) : (
+                      <p className="text-[13px] font-bold text-text-primary mt-0.5">{ref.title}</p>
+                    )}
                     <p className="text-[12px] text-text-muted leading-[1.5] mt-1">
                       <strong className="text-text-secondary">What you&apos;ll learn:</strong> {ref.teaches}
                     </p>
                     <p className="text-[11px] italic text-violet mt-1">Adds: {ref.addsOverPrevious}</p>
                     <p className="text-[10px] text-text-muted mt-0.5">
-                      {ref.inLibrary ? "📚 In our library" : "🔗 External"}
+                      {ref.url ? "🔗 External" : ref.internalNode ? "📖 On this site" : "📚 In our library"}
                       {ref.byline ? ` — ${ref.byline}` : ""}
                     </p>
                   </div>

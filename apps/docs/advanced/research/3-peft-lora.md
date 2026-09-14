@@ -199,3 +199,64 @@ TrainingParadigm
 - [Parameter Efficient Fine Tuning — Adapters, LoRA, QLoRA 해설](https://medium.com/aimonks/parameter-efficient-fine-tuning-075954d1db51)
 - [LLM Fine-Tuning on a Budget (RunPod)](https://www.runpod.io/articles/guides/llm-fine-tuning-on-a-budget-top-faqs-on-adapters-lora-and-other-parameter-efficient-methods)
 - [KnowLA: Enhancing Parameter-efficient Finetuning (arXiv:2403.14950)](https://arxiv.org/pdf/2403.14950)
+
+---
+
+## ⭐ 작성한 콘텐츠 (2026-08-25 · DB 반영 완료)
+
+> 아래는 **DB 에서 다시 읽어온 실제 저장값**이다. 문서와 DB 가 어긋나지 않게 생성해 적었다.
+> 저장 위치 — Overview: `content.concept_page.content_md` · 체리: `handbook.paragraph_concept_link.insight` · References: `content.concept_page.progressive_refs`
+> 발행 상태: `is_published = false` (초안) — V5 원문 대조 검수 전이다.
+
+### Overview (3문단)
+
+```
+Parameter-efficient fine-tuning adapts a large model by training a small set of new or selected parameters while the original weights stay frozen. One base model can then serve many tasks, because what you ship per task is a few megabytes rather than a new copy of the model.
+
+Why it matters: the memory arithmetic of full fine-tuning rules it out on ordinary hardware. PEFT is what puts adaptation back within reach of a single GPU, and it is why swapping behaviour per customer or per task is an operational decision rather than a capital one.
+
+The shape of the work: add small trainable modules (adapters, soft prompts), select a subset of existing parameters, or re-express the update in low rank (LoRA) — optionally on top of a quantised base (QLoRA). Then decide what you gave up relative to full fine-tuning, and whether fine-tuning was the right tool at all.
+```
+
+### 체리 5건
+
+**1. The number that rules out full fine-tuning**  · primary
+- 출처: *AI Engineering* › Chapter 7. Finetuning › Parameter-Efficient Finetuning  (원문 734자)
+- `chunkId` `019e785e-8a27-7e49-b9c8-6e40ce5a1bf3`
+- insight:
+  > A 7B model in FP16 needs 14 GB just to hold the weights. Full fine-tuning with Adam adds gradients and optimizer states — 7B × 3 × 2 bytes = 42 GB — for 56 GB before activations are counted. Consumer GPUs carry 12–24 GB. That gap, not elegance, is why parameter-efficient methods exist.
+
+**2. Freezing most layers is not enough**
+- 출처: *AI Engineering* › Chapter 7. Finetuning › Parameter-Efficient Finetuning  (원문 583자)
+- `chunkId` `019e785e-8a3a-7748-8cec-0a94fbb69784`
+- insight:
+  > Partial fine-tuning cuts memory but is parameter-inefficient: Houlsby et al. (2019) found that BERT-large needed roughly 25% of its parameters updated to approach full fine-tuning on GLUE. Training fewer layers is not the same as training fewer parameters well — which is the gap the LoRA family targets.
+
+**3. Going below 16 bits**
+- 출처: *AI Engineering* › Chapter 7. Finetuning › Quantization  (원문 1175자)
+- `chunkId` `019e785e-8a24-74f7-bf69-ad0c462efc7a`
+- insight:
+  > Serving moved from FP32 to 16-bit and lower: LLM.int8() at 8 bits and QLoRA at 4 bits (Dettmers et al., 2022, 2023), Apple shipping a 2-bit/4-bit mixture averaging 3.5 bits per weight in 2024, NVIDIA's Blackwell adding 4-bit float inference. Below 8 bits the representation itself gets awkward — minifloats like FP8/FP4, or integer formats such as INT8/INT4.
+
+**4. Combining models instead of retraining one**
+- 출처: *AI Engineering* › Chapter 7. Finetuning › Model Merging and Multi-Task Finetuning  (원문 544자)
+- `chunkId` `019e785e-8a32-78ad-99cf-b9707377eef1`
+- insight:
+  > Model merging aims for a single model worth more than its parts: if one model answers the first 60% of questions and another the last 60%, the merge might answer 80%. It is an alternative to multi-task fine-tuning that costs no training run at all.
+
+**5. A use case people forget**
+- 출처: *AI Engineering* › Chapter 7. Finetuning › Reasons Not to Finetune  (원문 630자)
+- `chunkId` `019e785e-8a3d-7351-9e26-131e456cc930`
+- insight:
+  > Fine-tuning is also a bias-mitigation tool. If a base model keeps giving CEOs male names, fine-tuning on a dataset with many female CEOs pushes back. Garimella et al. (2022) reduced gender bias in BERT-like models by fine-tuning on text authored by women, and racial bias by fine-tuning on African authors — adaptation aimed at the model's defaults rather than at a task.
+
+### References 4단계
+
+| 단계 | 자료 | 링크 | 무엇을 가르치나 |
+|---|---|---|---|
+| START HERE | AI Engineering — Ch.7 "Finetuning" — Chip Huyen | 소장 도서(URL 없음) | When to fine-tune and when not to, the memory arithmetic behind the decision, and where PEFT and quantization fit. |
+| NEXT → | LLM Engineers Handbook — Ch.5 "Supervised Fine-Tuning" | 소장 도서(URL 없음) | Fine-tuning as a pipeline — data filtering, deduplication, decontamination, batch size, packing, optimizers. |
+| THEN → | LoRA: Low-Rank Adaptation of Large Language Models — Hu et al., 2021 | [열림](https://arxiv.org/abs/2106.09685) | The method itself: freeze the weights, learn two low-rank matrices. Reports 10,000x fewer trainable parameters and 3x less GPU memory on GPT-3 175B. |
+| DEEP DIVE → | Parameter-Efficient Fine-Tuning for Large Models: A Comprehensive Survey | [열림](https://arxiv.org/html/2403.14608v6) | The full landscape in four families — additive, selective, reparameterized, hybrid — with roughly sixty named methods placed in it. |
+
+열리는 링크 **2건** / 4건 — 기준(2건 이상) 충족

@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>자료 투고 — 유저 (목업)</title>
+<style>
+/* kaas-admin-page.tsx 의 색·간격·2단 구조를 그대로 따른다 */
+/* kaas-admin-page.tsx 에서 그대로 뽑은 값. 목업 2장이 같이 쓴다. */
+:root{
+  --line:#E0E0E0; --line2:#F0F0F0; --ink:#1A1626; --body:#3D3652;
+  --dim:#888; --dim2:#999; --pale:#CCC;
+  --accent:#D4854A; --accent-bg:#FFF8F0; --accent-bg2:#FFF3E8; --accent-ink:#A85D2C;
+  --violet:#7B5EA7; --violet-bg:#F3EFFA;
+  --field:#FBFAF8; --hover:#FAFAFA; --page:#F4F3F1;
+  --green:#2D7A5E; --red:#C0503C;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--page);color:var(--body);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+ -webkit-font-smoothing:antialiased;line-height:1.5;font-size:13px}
+
+.note{background:#FFF8E6;border:1px solid #F0D9A0;border-radius:10px;
+ padding:10px 12px;margin:14px 20px 0;font-size:11px;color:#7A5A16}
+.note b{color:#5C4310}
+
+.shell{display:flex;gap:20px;padding:16px 20px 20px;align-items:stretch;
+ height:calc(100vh - 60px);min-height:600px}
+@media(max-width:640px){.shell{flex-direction:column;height:auto}}
+.card{display:flex;flex-direction:column;border:1px solid var(--line);
+ border-radius:12px;background:#fff;overflow:hidden}
+.left{width:300px;flex-shrink:0}
+@media(max-width:900px){.left{width:240px}}
+@media(max-width:640px){.left{width:100%;max-height:none}.rows{max-height:34vh}}
+.right{flex:1;min-width:0}
+
+.chead{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px;flex-shrink:0}
+.chead h3{font-size:14px;font-weight:700;color:var(--ink)}
+.chead .c{font-size:11px;color:var(--dim2);font-weight:500}
+
+.tabs{display:flex;border-bottom:1px solid var(--line2);padding:0 12px;overflow-x:auto;flex-shrink:0}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{border:0;background:none;cursor:pointer;font-family:inherit;white-space:nowrap;
+ padding:8px 12px;font-size:13px;font-weight:600;color:var(--dim);
+ border-bottom:2px solid transparent;transition:color .15s}
+.tabs button:hover{color:#333}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs button .n{font-weight:500;color:var(--pale);margin-left:3px}
+
+.search{padding:8px 12px 4px;flex-shrink:0}
+.search input{width:100%;border:1px solid var(--line);background:var(--field);
+ border-radius:8px;padding:6px 10px;font-size:12px;font-family:inherit;color:var(--ink);outline:none}
+.search input:focus{border-color:var(--ink);background:#fff}
+.search input::placeholder{color:var(--dim)}
+
+.rows{flex:1;overflow-y:auto;padding:4px 8px 8px}
+.row{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;
+ border:1px solid transparent;border-radius:8px;padding:8px 10px;margin-bottom:4px;
+ background:none;font-family:inherit;cursor:pointer;transition:background .15s}
+.row:hover{background:var(--hover)}
+.row.plain{cursor:default}
+.row.plain:hover{background:none}
+.row.on{border-color:var(--accent);background:var(--accent-bg)}
+.row input[type=checkbox]{margin-top:2px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.row .t{font-size:12px;font-weight:600;color:var(--ink);line-height:1.35;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .m{margin-top:2px;display:flex;gap:7px;flex-wrap:wrap;font-size:10px;color:var(--dim2)}
+.row .m .kind{color:var(--violet);font-weight:600}
+.row .body{min-width:0;flex:1}
+
+.st{font-weight:600}
+.st-wait{color:var(--dim2)} .st-hold{color:var(--accent)}
+.st-ok{color:var(--green)} .st-no{color:var(--red)}
+
+.lfoot{border-top:1px solid var(--line2);padding:10px 12px;display:flex;gap:6px;
+ align-items:center;font-size:11px;color:var(--dim2)}
+.lfoot .btn{padding:5px 9px;font-size:11px}
+
+.rhead{flex-shrink:0;border-bottom:1px solid var(--line);padding:16px 20px 0}
+.rhead .top{display:flex;align-items:flex-start;justify-content:space-between;
+ gap:12px;margin-bottom:12px}
+.rhead h3{font-size:14px;font-weight:700;color:var(--ink);line-height:1.35}
+.rhead .sub{font-size:10px;color:var(--dim2);margin-top:3px;word-break:break-all}
+.rhead .sub .v{color:var(--violet)}
+.rtabs{display:flex}
+.rtabs button{border:0;background:none;cursor:pointer;font-family:inherit;white-space:nowrap;
+ padding:11px 20px;font-size:14px;font-weight:600;color:var(--dim);
+ border-bottom:2px solid transparent}
+.rtabs button:first-child{padding-left:0;margin-right:8px}
+.rtabs button:hover{color:#333}
+.rtabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+.rbody{flex:1;overflow-y:auto;padding:20px 24px}
+.rfoot{flex-shrink:0;border-top:1px solid var(--line);padding:12px 20px;
+ display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rfoot .w{margin-left:auto;font-size:11px;color:var(--dim2)}
+
+label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;
+ letter-spacing:.6px;color:var(--dim2);margin-bottom:6px}
+.f{margin-bottom:18px}
+input[type=text],input[type=url],textarea{width:100%;border:1px solid var(--line);
+ border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;
+ color:var(--ink);background:#fff;outline:none;transition:border-color .15s}
+input:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:#999}
+textarea{resize:vertical;min-height:80px;line-height:1.6}
+.hint{font-size:11px;color:var(--dim2);margin-top:6px}
+
+.btn{border:0;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;
+ white-space:nowrap;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s,color .15s}
+.btn.p{background:#555;color:#fff}   .btn.p:hover{background:#333}
+.btn.p:disabled{opacity:.4;cursor:not-allowed}
+.btn.s{border:1px solid var(--line);background:#fff;color:#666;padding:6px 12px;font-size:12px}
+.btn.s:hover{border-color:var(--accent);color:var(--accent)}
+.btn.ok{background:var(--green);color:#fff}
+.btn.hold{border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent-ink)}
+.btn.no{border:1px solid var(--line);background:#fff;color:var(--red)}
+.btn.no:hover{border-color:var(--red)}
+.btn.a{background:var(--accent);color:#fff}
+
+.warn{border:1px solid var(--accent);background:var(--accent-bg);border-radius:8px;
+ padding:10px 12px;font-size:12px;color:var(--accent-ink);margin-bottom:18px}
+.warn b{font-weight:700}
+.bad{color:var(--red);font-size:12px;margin-top:8px}
+
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:28px 16px;
+ text-align:center;background:var(--hover);cursor:pointer}
+.drop:hover{border-color:var(--accent);background:var(--accent-bg)}
+.drop .big{font-size:13px;font-weight:600;color:var(--ink)}
+.drop .sm{font-size:11px;color:var(--dim2);margin-top:5px}
+.picked{display:flex;align-items:center;gap:10px;border:1px solid var(--accent);
+ background:var(--accent-bg);border-radius:10px;padding:11px 13px}
+.picked .t{font-size:13px;font-weight:600;color:var(--ink)}
+.picked .m{font-size:11px;color:var(--dim2);margin-top:2px}
+.picked .x{margin-left:auto;border:0;background:none;color:var(--dim);
+ font-size:16px;cursor:pointer;font-family:inherit}
+.picked .x:hover{color:var(--red)}
+.kind{font-size:9px;font-weight:800;letter-spacing:.4px;padding:2px 6px;border-radius:4px;
+ background:var(--violet-bg);color:var(--violet);flex-shrink:0}
+.kind.f{background:var(--accent-bg2);color:var(--accent-ink)}
+
+.sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+ color:var(--dim2);margin:22px 0 8px}
+.sec:first-child{margin-top:0}
+.viewer{border:1px solid var(--line);border-radius:10px;background:#fff;
+ height:100%;min-height:420px;display:flex;align-items:center;justify-content:center;
+ color:var(--dim2);font-size:12px}
+.viewer.md{align-items:flex-start;justify-content:flex-start;padding:18px 20px;overflow:auto;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+ color:var(--body);white-space:pre-wrap;line-height:1.75}
+dl.k{display:grid;grid-template-columns:88px 1fr;gap:8px 14px;font-size:13px}
+dl.k dt{color:var(--dim);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding-top:1px}
+dl.k .new{color:var(--accent-ink);font-weight:600}
+dl.k .warn2{color:var(--red)}
+ul.lines{margin:0 0 0 16px} ul.lines li{font-size:13px;margin-bottom:6px}
+ul.lines .loc{color:var(--dim2);font-size:11px}
+pre{background:var(--ink);color:#E8E4F0;border-radius:9px;padding:16px 18px;
+ font-size:11.5px;line-height:1.6;overflow-x:auto;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre .c{color:#8B82A8} pre .s{color:#B8E0C8} pre .k2{color:#E8A0B8}
+.empty{font-size:12px;color:var(--dim2);text-align:center;padding:40px 20px}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="note">
+  <b>목업입니다.</b> 탭·목록·버튼이 <b>실제로 동작</b>합니다.
+  왼쪽은 <b>내 투고만</b> 보입니다. 남이 올린 것은 보이지 않고, 중복은 서버가 대조해 알려줍니다.
+</div>
+
+<div class="shell">
+
+  <!-- 왼쪽 — 이미 투고된 자료 -->
+  <div class="card left">
+    <div class="chead"><h3>내 투고</h3><span class="c" id="cnt"></span></div>
+    <p style="font-size:11px;color:var(--dim2);padding:0 16px 8px">내가 이미 올린 자료인지 확인하는 곳입니다</p>
+    <div class="tabs" id="scopeTabs">
+      <button class="on" data-s="all">전체</button>
+      <button data-s="APPROVED">승인</button>
+    </div>
+    <div class="rows" id="rows"></div>
+    <div class="lfoot"><span id="hintFoot"></span></div>
+  </div>
+
+  <!-- 오른쪽 — 투고 -->
+  <div class="card right" id="right"></div>
+
+</div>
+
+<script>
+const ME = "tomatojams";
+const LABEL = { PENDING:"대기", HOLD:"유보", APPROVED:"승인", REJECTED:"반려" };
+const STCLS = { PENDING:"st-wait", HOLD:"st-hold", APPROVED:"st-ok", REJECTED:"st-no" };
+
+const LIST = [
+  { id:1, kind:"PDF", state:"PENDING",  name:"llm-engineering-patterns.pdf", by:"tomatojams",
+    when:"09-14", meta:"4.2 MB · application/pdf", at:"2026-09-14 09:12",
+    note:"RAG 파이프라인 설계 패턴을 사례 중심으로 정리한 자료입니다." },
+  { id:2, kind:"URL", state:"PENDING",  name:"Anthropic Engineering Blog", by:"jihan",
+    when:"09-13", meta:"https://www.anthropic.com/engineering", at:"2026-09-13 18:40",
+    note:"에이전트를 실제로 운영하며 겪은 내용이 올라옵니다." },
+  { id:3, kind:"MD",  state:"HOLD",     name:"agent-eval-notes.md", by:"tomatojams",
+    when:"09-13", meta:"38 KB · text/markdown", at:"2026-09-13 11:05",
+    note:"에이전트 평가 지표를 정리한 메모입니다." },
+  { id:4, kind:"URL", state:"APPROVED", name:"Chip Huyen — Blog", by:"tomatojams",
+    when:"09-11", meta:"https://huyenchip.com", at:"2026-09-11 14:30",
+    note:"운영 관점의 글이 꾸준히 올라옵니다." },
+  { id:5, kind:"URL", state:"APPROVED", name:"Eugene Yan — Writing", by:"jihan",
+    when:"09-12", meta:"https://eugeneyan.com", at:"2026-09-12 10:20",
+    note:"추천·검색 시스템 운영 글." },
+  { id:6, kind:"MD",  state:"REJECTED", name:"tutorial-draft.md", by:"tomatojams",
+    when:"09-08", meta:"12 KB · text/markdown", at:"2026-09-08 21:15",
+    note:"튜토리얼 초안입니다." },
+  { id:7, kind:"PDF", state:"APPROVED", name:"ai-engineering-ch7.pdf", by:"jihan",
+    when:"09-10", meta:"1.8 MB · application/pdf", at:"2026-09-10 09:00",
+    note:"평가 파이프라인 발췌." },
+];
+
+let scope="all", ktab="file";
+/* 파일 중복은 업로드가 끝나야 안다 — 브라우저가 보낸 해시는 믿을 수 없으므로
+   서버가 받은 내용으로 SHA-256 을 뜬다(기획 §6-A ⑥ · §10-A).
+   링크는 글자 한 줄이라 입력하는 동안 대조한다. */
+/* 며칠 지났는지만 보여준다 — 날짜가 아니라 경과일이다(기획 §10-A · D5). */
+const TODAY = new Date("2026-09-14");
+const ago = (at) => { const n = Math.round((TODAY - new Date(at.slice(0,10))) / 86400000);
+                      return n <= 0 ? "오늘" : n + "일 지남"; };
+let tried = false;
+let picked=null, urlVal="", titleVal="", noteVal="";
+
+const FILES = {
+  pdf:{ kind:"PDF", name:"llm-engineering-patterns.pdf", size:"4.2 MB",
+        title:"LLM Engineering Patterns", note:"RAG 파이프라인 설계 패턴을 사례 중심으로 정리한 자료입니다." },
+  md: { kind:"MD",  name:"rerank-notes.md", size:"22 KB",
+        title:"Rerank Notes", note:"재순위 모델을 붙이며 정리한 메모입니다." },
+  bad:{ bad:true, name:"report.docx" },
+};
+
+/* 내 투고만 보인다. 남이 올린 것은 이 화면에 절대 나오지 않는다. */
+const MINE = LIST.filter(d => d.by === ME);
+const visible = () => MINE.filter(d => scope === 'all' || d.state === scope);
+
+/* 중복 판정 — 서버가 전체 투고와 대조한다.
+   남이 올린 것과 겹치면 "이미 있다"는 사실만 돌려주고 누가 올렸는지는 알려주지 않는다.
+   내가 올린 것과 겹칠 때만 내 자료이므로 상세를 보여준다. */
+function dup(){
+  if(ktab === 'file' && !tried) return null;      // 아직 안 올렸다 — 알 수 없다
+  const key = (ktab === 'url' ? urlVal : (picked && !picked.bad ? picked.name : '')).trim().toLowerCase();
+  if(!key) return null;
+  const hit = LIST.find(d => d.meta.toLowerCase() === key || d.name.toLowerCase() === key);
+  if(!hit) return null;
+  return hit.by === ME ? { mine:true, d:hit } : { mine:false };
+}
+
+function drawRows(){
+  const items = visible();
+  document.getElementById('cnt').textContent = items.length + '건';
+  /* 확인용 목록이다 — 누를 것도 상세도 없다.
+     내가 올린 게 어떤 파일이고 어떤 주소인지, 지금 어떻게 됐는지만 보이면 된다. */
+  document.getElementById('rows').innerHTML = items.length ? items.map(d => `
+    <div class="row plain">
+      <div class="body">
+        <div class="t">${d.kind === 'URL' ? d.meta : d.name}</div>
+        <div class="m"><span class="kind${d.kind==='URL'?'':' f'}">${d.kind}</span>
+          <span>${ago(d.at)}</span>
+          <span class="st ${STCLS[d.state]}">${LABEL[d.state]}</span></div>
+      </div>
+    </div>`).join('') : '<div class="empty">없습니다.</div>';
+  document.getElementById('hintFoot').textContent =
+    `내가 올린 것 ${MINE.length}건 — 남의 투고는 보이지 않습니다`;
+}
+
+function paneForm(){
+  const d = dup();
+  return `
+    <div class="rhead">
+      <div class="top"><div><h3>자료 투고</h3></div></div>
+      <div class="rtabs" id="kindTabs">
+        <button class="${ktab==='file'?'on':''}" data-k="file">파일</button>
+        <button class="${ktab==='url'?'on':''}" data-k="url">링크</button>
+      </div>
+    </div>
+    <div class="rbody">
+      ${d ? (d.mine
+        ? `<div class="warn"><b>내가 이미 올린 자료입니다.</b><br>
+             ${d.d.name} — ${ago(d.d.at)} · 지금 <b>${LABEL[d.d.state]}</b> 입니다.
+             ${ktab === 'file' ? '<br>내용이 같은 파일이라 저장하지 않았습니다.' : ''}</div>`
+        : `<div class="warn"><b>이미 등록됐거나 검토 중인 자료입니다.</b><br>
+             같은 자료가 이미 들어와 있어 또 올리지 않아도 됩니다.
+             ${ktab === 'file' ? '<br>내용이 같은 파일이라 저장하지 않았습니다.' : ''}</div>`) : ''}
+
+      ${ktab === 'url' ? `
+        <div class="f">
+          <label>주소</label>
+          <input type="url" id="i-url" placeholder="https://" value="${urlVal}">
+          <div class="hint">블로그·뉴스레터처럼 글이 계속 올라오는 곳이면 좋습니다</div>
+        </div>` : `
+        <div class="f">
+          <label>파일</label>
+          ${picked && !picked.bad ? `
+            <div class="picked">
+              <span class="kind f">${picked.kind}</span>
+              <div><div class="t">${picked.name}</div><div class="m">${picked.size}</div></div>
+              <button class="x" data-pick="">✕</button>
+            </div>` : `
+            <div class="drop" data-pick="pdf">
+              <div class="big">파일을 끌어다 놓거나 눌러서 고르세요</div>
+              <div class="sm">PDF · MD · 20 MB까지</div>
+            </div>
+            ${picked && picked.bad ? `<div class="bad">${picked.name} — PDF 와 MD 만 받습니다</div>` : ''}
+            <div class="hint" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              눌러보기 —
+              <button class="btn s" data-pick="pdf">PDF</button>
+              <button class="btn s" data-pick="md">MD</button>
+              <button class="btn s" data-pick="bad">지원 안 되는 파일</button>
+            </div>`}
+        </div>`}
+
+      <div class="f">
+        <label>제목</label>
+        <input type="text" id="i-title" placeholder="자료 이름" value="${titleVal}">
+      </div>
+      <div class="f">
+        <label>왜 볼 만한가</label>
+        <textarea id="i-note" placeholder="한두 줄이면 충분합니다">${noteVal}</textarea>
+      </div>
+    </div>
+    <div class="rfoot">
+      <button class="btn p" id="btnUp" ${d?'disabled':''}>업로드</button>
+      <span class="w">${d ? '이미 올라온 자료라 등록하지 않았습니다'
+        : ktab === 'file'
+          ? '올린 뒤 같은 파일이 있는지 서버가 확인합니다'
+          : '관리자가 확인한 뒤 승인 · 유보 · 반려 중 하나로 알려드립니다'}</span>
+    </div>`;
+}
+
+function drawRight(){
+  const box = document.getElementById('right');
+  box.innerHTML = paneForm();
+
+  const kt = document.getElementById('kindTabs');
+  if(kt) kt.onclick = e => {
+    const b = e.target.closest('button'); if(!b) return;
+    ktab = b.dataset.k; picked = null; tried = false; render();
+  };
+  box.querySelectorAll('[data-pick]').forEach(el => el.onclick = () => {
+    const k = el.dataset.pick;
+    tried = false;
+    if(!k){ picked = null; titleVal = ''; noteVal = ''; }
+    else { picked = FILES[k];
+      if(!picked.bad){ titleVal = picked.title; noteVal = picked.note } }
+    render();
+  });
+  const up = document.getElementById('btnUp');
+  if(up) up.onclick = () => { tried = true; render(); };
+  const iu = document.getElementById('i-url');
+  if(iu) iu.oninput = () => { urlVal = iu.value; render(); iu2focus(iu.value) };
+  const it = document.getElementById('i-title'); if(it) it.oninput = () => titleVal = it.value;
+  const iN = document.getElementById('i-note');  if(iN) iN.oninput  = () => noteVal  = iN.value;
+}
+/* 다시 그린 뒤 주소 칸에 커서를 돌려놓는다 */
+function iu2focus(v){
+  const el = document.getElementById('i-url'); if(!el) return;
+  el.focus(); el.setSelectionRange(v.length, v.length);
+}
+
+function render(){ drawRows(); drawRight(); }
+
+document.getElementById('scopeTabs').onclick = e => {
+  const b = e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#scopeTabs button').forEach(t => t.classList.remove('on'));
+  b.classList.add('on'); scope = b.dataset.s; render();
+};
+render();
+</script>
+</body>
+</html>

@@ -195,3 +195,64 @@ AugmentationTechnique
 - [TreeHop: Generate and Filter Next Query Embeddings (arXiv:2504.20114)](https://arxiv.org/pdf/2504.20114)
 - [TASR: Training-Free Adaptive Stopping for Iterative Retrieval (arXiv:2606.13814)](https://arxiv.org/pdf/2606.13814)
 - [EfficientRAG 해설](https://medium.com/@techsachin/efficientrag-an-efficient-retriever-for-multi-hop-question-answering-524490e02030)
+
+---
+
+## ⭐ 작성한 콘텐츠 (2026-08-25 · DB 반영 완료)
+
+> 아래는 **DB 에서 다시 읽어온 실제 저장값**이다. 문서와 DB 가 어긋나지 않게 생성해 적었다.
+> 저장 위치 — Overview: `content.concept_page.content_md` · 체리: `handbook.paragraph_concept_link.insight` · References: `content.concept_page.progressive_refs`
+> 발행 상태: `is_published = false` (초안) — V5 원문 대조 검수 전이다.
+
+### Overview (3문단)
+
+```
+Multi-hop RAG handles questions a single retrieval cannot answer. The result of one search becomes the input to the next: find the author, then find their institution, then find who leads it. The retrieval loop and the reasoning loop are interleaved rather than run once.
+
+Why it matters: baseline RAG chunks documents, embeds them, and returns the chunks nearest the question. That works for direct lookup and fails whenever the answer has to be assembled from pieces scattered across documents, or summarised across a whole corpus.
+
+The shape of the work: rewrite or expand the question, pull structured constraints out of it, decide where to look next, and — the part everyone underestimates — decide when to stop. Retrieve too long and cost explodes; stop too early and the answer is confidently wrong.
+```
+
+### 체리 5건
+
+**1. Where single-shot retrieval breaks**  · primary
+- 출처: *Building Applications with AI Agents* › Chapter 6. Knowledge and Memory › Using Knowledge Graphs  (원문 881자)
+- `chunkId` `019e785e-8a26-703f-8cc0-55fb01a24776`
+- insight:
+  > Baseline RAG fails on three shapes of question: answers that require connecting information scattered across documents, queries that ask for themes across a dataset, and corpora that are large, messy or narrative rather than a list of facts. "What has Geoffrey Hinton done?" has no single chunk that answers it. Building a graph of entities and relationships is what makes multihop reasoning possible.
+
+**2. Does a bigger context window end all this?**
+- 출처: *Building Applications with AI Agents* › Chapter 6. Knowledge and Memory › Promise and Peril of Dynamic Knowledge Graphs  (원문 1040자)
+- `chunkId` `019e785e-8a21-716a-a301-bab066fc5a65`
+- insight:
+  > Feeding millions of tokens in one shot removes the retrieval machinery and adds compute, latency and cost — and no guarantee the model finds the one relevant line in that window. The book's position is hedged on purpose: larger contexts may make elaborate search obsolete, but for now hybrid systems win on fact-seeking queries, freshness and precision ranking.
+
+**3. Asking the same question several ways**
+- 출처: *LLM Engineers Handbook* › Chapter 9: RAG Inference Pipeline › Query expansion  (원문 1321자)
+- `chunkId` `019e785e-8a3d-7f93-9c21-59d9138835a6`
+- insight:
+  > Query expansion generates N rewrites of the user's question and retrieves for each. The stated purpose is to work around a limitation of the retriever itself — distance-based similarity search sees one phrasing, and one phrasing may sit far from the passage that holds the answer.
+
+**4. Pulling structure out of a sentence**
+- 출처: *LLM Engineers Handbook* › Chapter 9: RAG Inference Pipeline › Self-querying  (원문 980자)
+- `chunkId` `019e785e-8a3e-7ea2-8f7d-42c3198b7586`
+- insight:
+  > Self-querying extracts the filterable parts of a question — a user name, an id — before search runs, so they become metadata filters rather than words in an embedding. It is the recognition that part of a question is a constraint, not a topic.
+
+**5. Semantically close, contextually wrong**
+- 출처: *LLM Engineers Handbook* › Chapter 9: RAG Inference Pipeline › Advanced RAG retrieval optimization: filtered vector search  (원문 550자)
+- `chunkId` `019e785e-8a3f-7d84-89d3-5c044b73e031`
+- insight:
+  > Plain vector search retrieves documents that share language patterns but miss the intent. Search for "Java" and you get the programming language or the Indonesian island, because embeddings capture general semantic meaning and nothing about which one you meant. Filtering exists because similarity alone underdetermines relevance.
+
+### References 4단계
+
+| 단계 | 자료 | 링크 | 무엇을 가르치나 |
+|---|---|---|---|
+| START HERE | AI Engineering — Ch.6 "RAG and Agents" — Chip Huyen | 소장 도서(URL 없음) | The retrieval-first mental model, and why chunking and reranking decide output quality more than model choice does. |
+| NEXT → | LLM Engineers Handbook — Ch.9 "RAG Inference Pipeline" | 소장 도서(URL 없음) | Query expansion, self-querying and filtered vector search as running code — the pieces a multi-hop loop is built from. |
+| THEN → | Retrieval–Reasoning Processes for Multi-hop QA: A Four-Axis Design Framework | [열림](https://arxiv.org/html/2601.00536v1) | Four axes that separate every published multi-hop system: execution plan, index structure, next-step control, and stopping criterion. |
+| DEEP DIVE → | Agentic Retrieval-Augmented Generation: A Survey | [열림](https://arxiv.org/html/2501.09136v4) | What changes when the agent, not the pipeline, decides how many times to retrieve. |
+
+열리는 링크 **2건** / 4건 — 기준(2건 이상) 충족

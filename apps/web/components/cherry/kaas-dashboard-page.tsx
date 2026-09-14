@@ -11,6 +11,7 @@ import { KnowledgeCurationPanel, ConceptPagePublishPanel } from "./kaas-admin-pa
 import { OverviewBuilderPanel } from "./overview-builder-panel"
 import { TemplateEditorBody } from "@/app/template/edit/page"
 import { KaasWorkshopPanel } from "./kaas-workshop-panel"
+import { SourceReviewPanel } from "./source-review-panel"
 import dash from "./dashboard.module.css"
 
 /* ═══════════════════════════════════════════════
@@ -1532,11 +1533,11 @@ function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefr
 /* ═══════════════════════════════════════════════
    Main — 2 panel layout
 ═══════════════════════════════════════════════ */
-export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: boolean; onTabChange?: (tab: "dashboard" | "curation" | "concept-page" | "template" | "overview-builder") => void }) {
+export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: boolean; onTabChange?: (tab: "dashboard" | "curation" | "concept-page" | "template" | "overview-builder" | "submissions") => void }) {
   const [agents, setAgents] = useState<Agent[]>([])
   const [selectedAgentId, setSelectedAgentId] = useState("")
   const [showRegister, setShowRegister] = useState(false)
-  const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder">("dashboard")
+  const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder" | "submissions">("dashboard")
   // Workshop 은 별도 팝업 — 특정 에이전트 카드에서 🔧 Workshop 버튼 눌러 열기
   const [workshopOpenId, setWorkshopOpenId] = useState<string | null>(null)
 
@@ -1650,6 +1651,8 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
       { key: "concept-page" as const, label: "Concept Page" },
       { key: "template" as const, label: "Prompt Templates" },
       { key: "overview-builder" as const, label: "Overview Builder" },
+      // 유저 투고 검토 (apps/docs/source-submission · D6)
+      { key: "submissions" as const, label: "Submissions" },
     ] : []),
   ]
 
@@ -1745,6 +1748,11 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
         {activeTab === "overview-builder" && (
           <div className={dash.subTab}>
             <OverviewBuilderPanel />
+          </div>
+        )}
+        {activeTab === "submissions" && (
+          <div className={dash.subTab}>
+            <SourceReviewPanel />
           </div>
         )}
       </div>

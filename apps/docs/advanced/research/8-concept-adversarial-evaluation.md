@@ -223,3 +223,70 @@ C1~C4 는 책만으로 가능하다. C5·C6 이 외부다.
 - ✅ [A red teaming roadmap towards system-level safety (arXiv:2506.05376)](https://arxiv.org/abs/2506.05376) — **원문 확인**
 - ✅ [HarmBench (arXiv:2402.04249)](https://arxiv.org/html/2402.04249v2) — 1차 조사분, 원문 확인
 - 🔴 [AI Red Teaming Through the Lens of Measurement Theory (OpenReview)](https://openreview.net/pdf?id=KEggQCeDUA) — **접근 차단 · 인용하지 않음**
+
+---
+
+## ⭐ 작성한 콘텐츠 (2026-08-25 · DB 반영 완료)
+
+> 아래는 **DB 에서 다시 읽어온 실제 저장값**이다. 문서와 DB 가 어긋나지 않게 생성해 적었다.
+> 저장 위치 — Overview: `content.concept_page.content_md` · 체리: `handbook.paragraph_concept_link.insight` · References: `content.concept_page.progressive_refs`
+> 발행 상태: `is_published = false` (초안) — V5 원문 대조 검수 전이다.
+
+### Overview (3문단)
+
+```
+Adversarial evaluation measures how a system holds up under inputs built to break it. It is the measuring half of a pair: red teaming searches adaptively for new failure modes, and adversarial evaluation scores a system against a fixed set of them.
+
+Why it matters: ordinary evaluation reports performance on inputs that behave. What takes a deployed system down is the input that does not — the jailbreak, the injection, the malformed query nobody anticipated. Those are a different measurement problem with a different failure mode.
+
+The shape of the work: generate adversarial cases, run them as a repeatable suite, score with a judge, and then ask the uncomfortable question about the score itself — whether it means what you think, and whether it can be compared to anyone else's.
+```
+
+### 체리 6건
+
+**1. Generating the inputs nobody planned for**  · primary
+- 출처: *Building Applications with AI Agents* › Chapter 12. Protecting Agentic Systems › Red Teaming  (원문 946자)
+- `chunkId` `019e785e-8a3c-7630-96ee-04ff1edd4bb4`
+- insight:
+  > Red teaming increasingly uses language models to build synthetic datasets that deliberately do not match what developers expect — anomalous patterns, noisy inputs, biased distributions, out-of-domain examples. Malformed queries that imitate real user error stress the system beyond individual prompts, and the whole thing can be automated and re-run.
+
+**2. Where automation stops**
+- 출처: *Building Applications with AI Agents* › Chapter 12. Protecting Agentic Systems › Red Teaming  (원문 712자)
+- `chunkId` `019e785e-8a34-7280-94b9-0c84533cb700`
+- insight:
+  > Automated tools generate adversarial prompts and test thousands of variations at scale, which is the only way to get coverage. The book is direct about the limit: human creativity remains irreplaceable for the nuanced vulnerabilities the tools miss. The two are complements, not stages.
+
+**3. Where evaluation belongs in the lifecycle**
+- 출처: *Building Applications with AI Agents* › Chapter 9. Validation and Measurement › Measurement Is the Keystone  (원문 918자)
+- `chunkId` `019e785e-8a32-7cbb-ba5f-1afc2abc24d3`
+- insight:
+  > Evaluation moved from a phase at the end to a trigger on every merge and every model update. Keeping one consistent source of truth for metrics over time is what makes regressions visible early — and automated evaluation still does not tell the whole story, so effective teams sample outputs for human review alongside it.
+
+**4. What an evaluation case has to contain**
+- 출처: *Building Applications with AI Agents* › Chapter 9. Validation and Measurement › Creating and Scaling Evaluation Sets  (원문 1250자)
+- `chunkId` `019e785e-8a3c-7386-a41d-723501c7d2f8`
+- insight:
+  > A usable evaluation case pins down both the input state and the expected outcome — the order, the conversation so far, and the exact tool call plus the phrases the reply must contain. Without the expected side written out, validation cannot be automated and the suite degrades into a demo.
+
+**5. Measuring the cost of the failure, not just its rate**
+- 출처: *Building Applications with AI Agents* › Chapter 9. Validation and Measurement › Handling Unexpected Inputs  (원문 787자)
+- `chunkId` `019e785e-8a28-76d1-ae5c-2e57e85aa72c`
+- insight:
+  > Hallucination work has moved toward hybrid human-AI loops with experts correcting output before it propagates, and toward cost-aware evaluation — frameworks that quantify a "hallucination cost" by weighing accuracy gains against the compute spent to get them. Reducing the error rate is not automatically worth what it costs.
+
+**6. Why LLM evaluation is not ML evaluation**
+- 출처: *LLM Engineers Handbook* › Chapter 7: Evaluating LLMs › Comparing ML and LLM evaluation  (원문 1202자)
+- `chunkId` `019e785e-8a3e-7335-9e53-7f87c5be32c2`
+- insight:
+  > Three differences, stated plainly: a single numerical metric rarely fits, because one model does many tasks; feature engineering largely disappears, since the model takes raw text; and interpretability is gone — you cannot read off why the answer came out that way, only ask the model to explain itself.
+
+### References 4단계
+
+| 단계 | 자료 | 링크 | 무엇을 가르치나 |
+|---|---|---|---|
+| START HERE | Building Applications with AI Agents — Ch.12 "Protecting Agentic Systems" — Michael Albada | 소장 도서(URL 없음) | The threat vectors, the defensive techniques, and red teaming as a repeatable cycle rather than a one-off exercise. |
+| NEXT → | LLM Engineers Handbook — Ch.7 "Evaluating LLMs" | 소장 도서(URL 없음) | How LLM evaluation differs from ML evaluation, and how general, domain-specific and task-specific evaluations divide the work. |
+| THEN → | HarmBench: A Standardized Evaluation Framework for Automated Red Teaming — Mazeika et al., 2024 | [열림](https://arxiv.org/html/2402.04249v2) | 18 red teaming methods against 33 LLMs over 510 harmful behaviours — and the finding that within model families robustness shows no correlation with model size. |
+| DEEP DIVE → | Comparison requires valid measurement: Rethinking attack success rate comparisons in AI red teaming — Chouldechova, Cooper et al. | [열림](https://arxiv.org/html/2601.18076v1) | Why most published ASR comparisons do not support their conclusions — incompatible estimands, and judges whose true positive rates differ across the systems being compared. |
+
+열리는 링크 **2건** / 4건 — 기준(2건 이상) 충족

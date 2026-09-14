@@ -1,11 +1,11 @@
 {
- "exportedFrom": "llm_ontology_v5-2026-08-25.ttl (정본 TTL)",
+ "exportedFrom": "llm_ontology_v6-2026-08-25.ttl (정본 TTL)",
  "infer": false,
  "counts": {
-  "concepts": 318,
-  "relations": 340,
-  "aliases": 27,
-  "withDescription": 318
+  "concepts": 319,
+  "relations": 343,
+  "aliases": 28,
+  "withDescription": 319
  },
  "concepts": [
   {
@@ -816,6 +816,14 @@
    "description": "Iterative retrieval runs the retriever more than once for a single question, feeding what it found back in to form the next query. It is the mechanism that separates multi-hop RAG from single-shot RAG: the loop, not the index, is what lets an answer be assembled from pieces that no one passage holds together.",
    "aliases": [
     "Iterative Retrieval"
+   ]
+  },
+  {
+   "node": "Jailbreak",
+   "label": "Jailbreak",
+   "description": "A jailbreak is a prompt that talks a model out of its own safety rules — typically by assigning it a persona that is defined as having no rules, then insisting the persona is maintained. The DAN family (\"do anything now\") is the archetype. Jailbreaks are what red teaming produces and what adversarial benchmarks score, which is why the same prompt shows up as an attack in one paper and as a test case in the next.",
+   "aliases": [
+    "jailbreaking"
    ]
   },
   {
@@ -2350,6 +2358,11 @@
   },
   {
    "from": "DenseRetrieval",
+   "to": "HybridRetrieval",
+   "type": "SUBTOPIC"
+  },
+  {
+   "from": "DenseRetrieval",
    "to": "RAG",
    "type": "SUBTOPIC"
   },
@@ -2666,6 +2679,11 @@
   {
    "from": "IterativeRetrieval",
    "to": "MultiHopRAG",
+   "type": "SUBTOPIC"
+  },
+  {
+   "from": "Jailbreak",
+   "to": "RedTeaming",
    "type": "SUBTOPIC"
   },
   {
@@ -3115,12 +3133,12 @@
   },
   {
    "from": "PromptInjection",
-   "to": "RedTeaming",
-   "type": "RELATED"
+   "to": "PromptingTechnique",
+   "type": "SUBTOPIC"
   },
   {
    "from": "PromptInjection",
-   "to": "PromptingTechnique",
+   "to": "RedTeaming",
    "type": "SUBTOPIC"
   },
   {
@@ -3411,6 +3429,11 @@
   {
    "from": "SparseAttention",
    "to": "AttentionMechanism",
+   "type": "SUBTOPIC"
+  },
+  {
+   "from": "SparseRetrieval",
+   "to": "HybridRetrieval",
    "type": "SUBTOPIC"
   },
   {

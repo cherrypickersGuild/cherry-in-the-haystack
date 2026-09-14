@@ -59,6 +59,7 @@ const IC: Record<string, React.ReactNode> = {
   archive: <Ic d={<><rect x="3" y="4" width="18" height="4" rx="1" /><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4" /></>} />,
   compare: <Ic d={<><circle cx="6" cy="6" r="2.5" /><circle cx="18" cy="18" r="2.5" /><path d="M6 8.5V15a3 3 0 0 0 3 3h6M18 15.5V9a3 3 0 0 0-3-3H9" /></>} />,
   track: <Ic d={<path d="M3 12h4l3 8 4-16 3 8h4" />} />,
+  upload: <Ic d={<><path d="M12 16V4" /><path d="m7 9 5-5 5 5" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></>} />,
 }
 
 const Chevron = () => (
@@ -126,6 +127,8 @@ type SectionDef = {
   id: string
   label: string
   hot?: boolean
+  /** 정보를 읽는 메뉴가 아니라 사용자가 무언가를 하는 메뉴. 선을 긋고 떼어 놓는다. */
+  action?: boolean
   items: NavItem[]
 }
 
@@ -145,6 +148,11 @@ const ND_UTILITY_IC: Record<string, string> = {
   "compare-kb": "compare",
   "change-tracking": "track",
 }
+
+/* 재기획 중이라 메뉴에서 숨긴다(2026-09-14).
+   페이지·API·DB·온톨로지는 그대로 두었으므로, 다시 열 때는 해당 값을 true 로 바꾸면 된다. */
+const SHOW_LEARNING = false
+const SHOW_UTILITY = false
 
 const SECTIONS: SectionDef[] = [
   {
@@ -181,6 +189,13 @@ const SECTIONS: SectionDef[] = [
           { id: "agents-reasoning",    label: "Agents" },
           { id: "embeddings",          label: "Embeddings" },
           { id: "evaluation-systems",  label: "Evaluation" },
+          /* 아래 4개는 PRD 목록 밖이다. 온톨로지 319개 중 216개가 메뉴에서 도달 불가였고,
+             PRD 12개가 응용 계층만 다뤄 모델 내부·학습·과제 계층이 통째로 빠져 있었다.
+             근거·계산: apps/docs/advanced/research/9-menu-reachability.md */
+          { id: "model-architecture",  label: "Model Architecture" },
+          { id: "model-components",    label: "Model Components" },
+          { id: "training-paradigms",  label: "Training Paradigms" },
+          { id: "application-domains", label: "Application Domains" },
         ],
       },
       {
@@ -195,6 +210,9 @@ const SECTIONS: SectionDef[] = [
           { id: "agent-topologies",  label: "Multi-agent Orchestration" },
           { id: "custom-embeddings", label: "Custom Embeddings" },
           { id: "adversarial-eval",  label: "Adversarial Evaluation" },
+          /* PRD 목록 밖 — 위 Basics 주석과 같은 이유. 운영·안전 계층. */
+          { id: "inference-optimization", label: "Inference Optimization" },
+          { id: "safety-alignment",       label: "Safety & Alignment" },
         ],
       },
     ],
@@ -222,6 +240,16 @@ const SECTIONS: SectionDef[] = [
     label: "DIGEST",
     items: [
       { id: "patch-notes", ic: "file", label: "Patch Notes" },
+    ],
+  },
+  {
+    /* 유저가 자료·링크를 올리는 곳 (apps/docs/source-submission · D17).
+       위 메뉴들은 "읽는 곳" 이고 여기는 "보내는 곳" 이라, 맨 아래에 선을 긋고 떼어 놓는다. */
+    id: "contribute",
+    label: "CONTRIBUTE",
+    action: true,
+    items: [
+      { id: "source-submit", ic: "upload", label: "Submit Source" },
     ],
   },
 ]
@@ -423,8 +451,17 @@ export function Sidebar({
 
       {/* Nav — 목업 nav */}
       <nav className="flex-1 overflow-y-auto" style={{ padding: "14px 8px 28px" }}>
-        {SECTIONS.map((section, si) => (
-          <div key={section.id} style={{ marginTop: si === 0 ? 2 : 14 }}>
+        {SECTIONS.filter((s) =>
+          (s.id !== "learning" || SHOW_LEARNING) && (s.id !== "utility" || SHOW_UTILITY),
+        ).map((section, si) => (
+          <div
+            key={section.id}
+            style={
+              section.action
+                ? { marginTop: 22, paddingTop: 16, borderTop: `1px solid ${C.line}` }
+                : { marginTop: si === 0 ? 2 : 14 }
+            }
+          >
             {/* 목업 .slabel */}
             <div
               className="flex items-center"
@@ -433,7 +470,7 @@ export function Sidebar({
                 fontWeight: 800,
                 letterSpacing: "0.9px",
                 textTransform: "uppercase",
-                color: C.label,
+                color: section.action ? C.cherry : C.label,
                 padding: "0 8px",
                 marginBottom: 5,
                 gap: 6,

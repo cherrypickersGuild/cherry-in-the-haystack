@@ -197,3 +197,76 @@ C1~C5 는 책만으로 가능하다. C6 만 외부다.
 - ✅ [A Survey of Agent Interoperability Protocols: MCP, ACP, A2A, ANP (arXiv:2505.02279)](https://arxiv.org/html/2505.02279v1) — **원문 확인**
 - ✅ [Multi-Agent Collaboration Mechanisms: A Survey of LLMs (arXiv:2501.06322)](https://arxiv.org/abs/2501.06322) — 1차 조사분, 원문 확인
 - ✅ [A Taxonomy of Hierarchical Multi-Agent Systems (arXiv:2508.12683)](https://arxiv.org/abs/2508.12683) — 1차 조사분, 원문 확인
+
+---
+
+## ⭐ 작성한 콘텐츠 (2026-08-25 · DB 반영 완료)
+
+> 아래는 **DB 에서 다시 읽어온 실제 저장값**이다. 문서와 DB 가 어긋나지 않게 생성해 적었다.
+> 저장 위치 — Overview: `content.concept_page.content_md` · 체리: `handbook.paragraph_concept_link.insight` · References: `content.concept_page.progressive_refs`
+> 발행 상태: `is_published = false` (초안) — V5 원문 대조 검수 전이다.
+
+### Overview (3문단)
+
+```
+Multi-agent orchestration is the control layer above a set of agents. It decides which agent acts, when, on what shared state, and with what authority — planning, policy, state and quality operations. The agents are the workforce; orchestration is the management.
+
+Why it matters: one agent holding every tool makes worse choices as its toolset grows. Splitting the work into specialists narrows each prompt and each tool list, which reduces selection errors — but every agent you add brings communication overhead, coordination complexity and new ways to fail.
+
+The shape of the work: pick a coordination model (a manager, a peer group, or a hierarchy), decide how agents talk (shared state, messages, or handoffs), and put the whole thing on something that survives a crash. The failure modes are specific to this layer: loops that never terminate, cost that grows with every hand-off, and state two agents disagree about.
+```
+
+### 체리 7건
+
+**1. Why splitting helps at all**  · primary
+- 출처: *Building Applications with AI Agents* › Chapter 8. From One Agent to Many › Multiagent Scenarios  (원문 1868자)
+- `chunkId` `019e785e-8a3a-7fff-b84b-b61ffe32bf64`
+- insight:
+  > The worked example decomposes sixteen tools into three specialists — inventory, transportation, supplier compliance — with a supervisor routing to them. The stated benefit is not parallelism but specialisation: narrowing each agent's toolset and prompt reduces selection errors and improves reliability.
+
+**2. The cost of every agent you add**
+- 출처: *Building Applications with AI Agents* › Chapter 8. From One Agent to Many › Principles for Adding Agents  (원문 1148자)
+- `chunkId` `019e785e-8a28-7541-976c-56a626fe5231`
+- insight:
+  > Parsimony is the principle of adding only the minimum number of agents that does the job. Each addition brings communication overhead, coordination complexity and resource demand. The test the book proposes is concrete: before adding an agent, ask whether an existing agent could take the responsibility, or whether an existing capability could be extended.
+
+**3. A manager decides**
+- 출처: *Building Applications with AI Agents* › Chapter 8. From One Agent to Many › Manager Coordination  (원문 1041자)
+- `chunkId` `019e785e-8a25-79f9-a955-4fc3c3e37ffd`
+- insight:
+  > Manager coordination designates one or more agents to direct the rest. Decisions are made on the group's behalf, which skips the negotiation a peer system needs, keeps task assignment unambiguous, and simplifies communication — subordinates talk to their manager rather than to everyone.
+
+**4. Or nobody decides**
+- 출처: *Building Applications with AI Agents* › Chapter 8. From One Agent to Many › Democratic Coordination  (원문 796자)
+- `chunkId` `019e785e-8a41-7e9d-8e35-5f46d9946659`
+- insight:
+  > Democratic coordination gives every agent equal say and no leader. Its strength is the absence of a single point of failure: the system keeps working when individual agents fail. The cost is the negotiation that manager coordination avoids — the same trade-off, seen from the other side.
+
+**5. Or both, in layers**
+- 출처: *Building Applications with AI Agents* › Chapter 8. From One Agent to Many › Actor-Critic Approaches  (원문 1000자)
+- `chunkId` `019e785e-8a3a-7f8b-b43a-b7b10d42b474`
+- insight:
+  > Hierarchical coordination stacks the two: higher-level agents direct lower ones while leaving them some autonomy. Coordination work spreads across levels instead of concentrating in one manager, which is what lets the agent count grow; layering also adds redundancy, since a task can be handled at more than one level.
+
+**6. Making it survive a crash**
+- 출처: *Building Applications with AI Agents* › Chapter 8. From One Agent to Many › Managing State and Persistence  (원문 798자)
+- `chunkId` `019e785e-8a22-7e35-afae-5958f0a48ba5`
+- insight:
+  > Workflow engines sit above the agents and separate coordination logic from communication mechanics. What they buy you is idempotency, recoverability and durable state — properties that stop mattering in a demo and start mattering the first time an agent stalls or an API goes down mid-run.
+
+**7. Letting the system design itself**
+- 출처: *Building Applications with AI Agents* › Chapter 8. From One Agent to Many › Automated Design of Agent Systems  (원문 1026자)
+- `chunkId` `019e785e-8a32-759d-ba2b-6b5c2033ad74`
+- insight:
+  > ADAS (Hu, Lu and Clune, 2024) proposes that a Meta Agent Search algorithm create, evaluate and refine agentic systems instead of engineers hand-building each component. The argument by analogy is that hand-designed solutions in machine learning have repeatedly been replaced by learned ones.
+
+### References 4단계
+
+| 단계 | 자료 | 링크 | 무엇을 가르치나 |
+|---|---|---|---|
+| START HERE | Building Applications with AI Agents — Ch.8 "From One Agent to Many" — Michael Albada | 소장 도서(URL 없음) | Coordination models side by side — manager, democratic, hierarchical, swarm — with the trade-off each one makes. |
+| NEXT → | Building Applications with AI Agents — Ch.5 "Orchestration" — Michael Albada | 소장 도서(URL 없음) | Graphs and context engineering as the mechanics underneath a coordination model. |
+| THEN → | A Survey of Agent Interoperability Protocols: MCP, ACP, A2A, ANP | [열림](https://arxiv.org/html/2505.02279v1) | The four protocols agents use to find and call each other, and a staged order for adopting them. |
+| DEEP DIVE → | The Orchestration of Multi-Agent Systems: Architectures, Protocols, and Enterprise Adoption | [열림](https://arxiv.org/abs/2601.13671) | Orchestration treated as its own layer — planning, policy enforcement, state management, quality operations — rather than as a property of the agents. |
+
+열리는 링크 **2건** / 4건 — 기준(2건 이상) 충족

@@ -58,3 +58,6 @@ apps/docs/concept-quality/researcher-package/evidence-candidates/
 
 # 리서처 JSON 재생성 시 자동 백업 (커밋 금지)
 apps/docs/concept-quality/researcher-package/*.bak
+
+# 유저 투고 파일 (로컬)
+apps/api/.uploads/

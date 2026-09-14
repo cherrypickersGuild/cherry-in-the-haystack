@@ -167,3 +167,64 @@ PromptingTechnique
 - [Towards Better Chain-of-Thought Prompting Strategies: A Survey (arXiv:2310.04959)](https://arxiv.org/pdf/2310.04959)
 - [Advancing Reasoning in Large Language Models (arXiv:2502.03671)](https://arxiv.org/pdf/2502.03671)
 - [Self-Consistency Improves Chain of Thought Reasoning in Language Models](https://www.researchgate.net/publication/359390115_Self-Consistency_Improves_Chain_of_Thought_Reasoning_in_Language_Models)
+
+---
+
+## ⭐ 작성한 콘텐츠 (2026-08-25 · DB 반영 완료)
+
+> 아래는 **DB 에서 다시 읽어온 실제 저장값**이다. 문서와 DB 가 어긋나지 않게 생성해 적었다.
+> 저장 위치 — Overview: `content.concept_page.content_md` · 체리: `handbook.paragraph_concept_link.insight` · References: `content.concept_page.progressive_refs`
+> 발행 상태: `is_published = false` (초안) — V5 원문 대조 검수 전이다.
+
+### Overview (3문단)
+
+```
+Advanced prompting is what you do once a clear instruction is no longer enough. Instead of only telling the model *what* you want, you shape *how* it gets there — what examples it sees, what role it holds, how much of the reasoning it writes down, and how many times it is allowed to try. None of it touches the weights.
+
+Why it matters: this is the cheapest adaptation available. A prompt change takes effect immediately, costs nothing to train, and is scoped to the session you are in. When a model fails on a task, prompting is the first lever to pull, and often the only one you need.
+
+The shape of the work: put examples in the context, split the system instruction from the user turn, let the model write out intermediate steps, generate several attempts and reconcile them, and have the model criticise its own output. The Prompt Report groups the published techniques into five families — in-context learning, thought generation, decomposition, ensembling, and self-criticism.
+```
+
+### 체리 5건
+
+**1. Learning without training**  · primary
+- 출처: *AI Engineering* › Chapter 5. Prompt Engineering › In-Context Learning: Zero-Shot and Few-Shot  (원문 832자)
+- `chunkId` `019e785e-8a41-705d-b51d-cbee2127dc95`
+- insight:
+  > In-context learning was named in the GPT-3 paper (Brown et al., 2020). Its claim is narrow and strange: a model trained only for next-token prediction learned translation, reading comprehension and SAT questions from examples placed in the prompt, with no weight update. Everything called advanced prompting rests on that observation.
+
+**2. How much fiddling a model needs is a property of the model**
+- 출처: *AI Engineering* › Chapter 5. Prompt Engineering › In-Context Learning: Zero-Shot and Few-Shot  (원문 988자)
+- `chunkId` `019e785e-8a3a-74fd-bff3-38abb57fa1dc`
+- insight:
+  > Write "5" instead of "five", add a newline, change capitalisation — a fragile model answers differently. You can measure this by randomly perturbing prompts and watching the output move. Robustness tracks overall capability, so stronger models need less prompt engineering. Prompting effort is partly a symptom of model choice.
+
+**3. Separating the standing instruction from the turn**
+- 출처: *AI Engineering* › Chapter 5. Prompt Engineering › System Prompt and User Prompt  (원문 832자)
+- `chunkId` `019e785e-8a3a-7d28-9b9f-38e17aaf7dce`
+- insight:
+  > The system prompt holds what stays true across the whole conversation — the role, the standard of care, the output style. The user prompt holds what changes: this question, this document. Splitting them is what makes a roleplaying instruction survive a long session instead of being restated and slowly drifting.
+
+**4. Letting a model write the prompt**
+- 출처: *AI Engineering* › Chapter 5. Prompt Engineering › Evaluate Prompt Engineering Tools  (원문 945자)
+- `chunkId` `019e785e-8a21-7b33-ba36-cc2fc889964f`
+- insight:
+  > Prompt optimisation is now automated. DeepMind's Promptbreeder (2023) treats prompts as a population: an AI generates mutations of a starting prompt, guided by mutator prompts, then mutates the most promising ones again. Stanford's TextGrad (2024) takes a different route to the same end. Hand-tuning is no longer the only option.
+
+**5. The change that takes effect immediately**
+- 출처: *Building Applications with AI Agents* › Chapter 11. Improvement Loops › In-Context Learning  (원문 1087자)
+- `chunkId` `019e785e-8a20-76d5-9bd5-03b005e5e981`
+- insight:
+  > When an agent keeps failing on one kind of error, adding a worked example to the prompt fixes it instantly and only for that session — no retraining, no deployment. The same channel absorbs user corrections mid-conversation. That immediacy is the whole argument for prompting over fine-tuning as a first response.
+
+### References 4단계
+
+| 단계 | 자료 | 링크 | 무엇을 가르치나 |
+|---|---|---|---|
+| START HERE | AI Engineering — Ch.5 "Prompt Engineering" — Chip Huyen | 소장 도서(URL 없음) | What a prompt is made of — in-context learning, system versus user prompt, context efficiency — and how much of it you actually need. |
+| NEXT → | The Prompt Report: A Systematic Survey of Prompting Techniques — Schulhoff et al., 2024 | [열림](https://arxiv.org/abs/2406.06608) | A taxonomy of 58 text prompting techniques in five families, built from 1,565 papers — the map of what has actually been tried. |
+| THEN → | Building Applications with AI Agents — Ch.11 "Improvement Loops" — Michael Albada | 소장 도서(URL 없음) | Prompting as an operational loop: refining prompts from observed failures, and where in-context learning sits next to retraining. |
+| DEEP DIVE → | Towards Better Chain-of-Thought Prompting Strategies: A Survey | [열림](https://arxiv.org/pdf/2310.04959) | Where chain-of-thought helps, where it does not, and which design choices in a CoT prompt actually move the result. |
+
+열리는 링크 **2건** / 4건 — 기준(2건 이상) 충족

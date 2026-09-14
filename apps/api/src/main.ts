@@ -69,6 +69,18 @@ async function bootstrap() {
       message: { code: 'RATE_LIMITED_AUTH', message: 'Too many auth attempts.' },
     }),
   );
+  // Duplicate-check on submissions: without a cap, someone can sweep URLs to
+  // learn what other people submitted. 20/min is plenty for typing one address.
+  app.use(
+    ['/api/sources/submissions/check'],
+    rateLimit({
+      windowMs: 60_000,
+      limit: 20,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { code: 'RATE_LIMITED_CHECK', message: 'Too many lookups. Try again in a minute.' },
+    }),
+  );
   app.use(
     ['/api/v1/kaas/shop/agents/skills/buy', '/api/v1/kaas/shop/buy-and-install', '/api/v1/kaas/credits/deposit'],
     rateLimit({
