@@ -137,8 +137,8 @@ export async function adminGet(id: string): Promise<AdminSubmission> {
   return body(await fetchWithAuth(`${ADMIN}/${id}`))
 }
 
-/** 원문은 눌렀을 때만 받는다 (기획 §4-A). 토큰이 필요하므로 fetch 로 받아 blob URL 로 연다. */
-export async function adminFetchFile(id: string, mode: "view" | "download"): Promise<Blob> {
+/** 원문은 화면에 안 띄운다 — 내려받기만 한다 (기획 §4-A). */
+export async function adminFetchFile(id: string, mode: "download" = "download"): Promise<Blob> {
   const res = await fetchWithAuth(`${ADMIN}/${id}/${mode}`)
   if (!res.ok) throw new SubmissionError("원문을 불러오지 못했습니다.", res.status)
   return res.blob()

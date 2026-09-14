@@ -40,6 +40,7 @@ export function SourceSubmitPage() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState<string | null>(null)
+  const [over, setOver] = useState(false)
   const pick = useRef<HTMLInputElement>(null)
 
   const reload = useCallback(async () => {
@@ -264,11 +265,29 @@ export function SourceSubmitPage() {
                   </button>
                 </div>
               ) : (
+                /* 끌어다 놓아도 되고 눌러서 골라도 된다. */
                 <div
                   onClick={() => pick.current?.click()}
-                  className="cursor-pointer rounded-[10px] border-[1.5px] border-dashed border-[#E0E0E0] bg-[#FAFAFA] px-4 py-7 text-center hover:border-[#D4854A] hover:bg-[#FFF8F0]"
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    setOver(true)
+                  }}
+                  onDragLeave={() => setOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    setOver(false)
+                    choose(e.dataTransfer.files?.[0] ?? null)
+                  }}
+                  className={cn(
+                    "cursor-pointer rounded-[10px] border-[1.5px] border-dashed px-4 py-7 text-center transition-colors",
+                    over
+                      ? "border-[#D4854A] bg-[#FFF3E8]"
+                      : "border-[#E0E0E0] bg-[#FAFAFA] hover:border-[#D4854A] hover:bg-[#FFF8F0]",
+                  )}
                 >
-                  <div className="text-[13px] font-semibold text-[#1A1626]">파일을 눌러서 고르세요</div>
+                  <div className="text-[13px] font-semibold text-[#1A1626]">
+                    {over ? "여기에 놓으세요" : "파일을 끌어다 놓거나 눌러서 고르세요"}
+                  </div>
                   <div className="mt-1.5 text-[11px] text-[#999]">PDF · MD · {MAX_MB} MB까지</div>
                 </div>
               )}

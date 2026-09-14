@@ -6,7 +6,7 @@
  * 기획 §10-B · D6(기존 대시보드 탭)
  *
  * 파일과 링크는 하는 일이 달라 목록부터 가른다(기획 §3).
- * 목록·상세는 파일 본문을 받지 않는다 — [원문 보기] 를 눌렀을 때만 받는다(기획 §4-A).
+ * 목록·상세는 파일 본문을 받지 않는다 — [내려받기] 를 눌렀을 때만 받는다. 화면에 띄우지 않는다(D20).
  */
 
 import { useCallback, useEffect, useState } from "react"
@@ -51,7 +51,6 @@ export function SourceReviewPanel() {
   const [cur, setCur] = useState<AdminSubmission | null>(null)
   const [rtab, setRtab] = useState<RTab>("meta")
   const [checked, setChecked] = useState<Set<string>>(new Set())
-  const [doc, setDoc] = useState<{ url?: string; text?: string } | null>(null)
   const [exported, setExported] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -76,7 +75,6 @@ export function SourceReviewPanel() {
 
   /* 상세는 고를 때 부른다. 파일 본문은 여기 없다. */
   useEffect(() => {
-    setDoc(null)
     setRtab("meta")
     if (!curId) {
       setCur(null)
@@ -144,20 +142,15 @@ export function SourceReviewPanel() {
     }
   }
 
-  async function openDoc(mode: "view" | "download") {
+  /** 원문은 화면에 띄우지 않는다 — 내려받아서 본다(기획 §4-A). */
+  async function download() {
     if (!cur) return
-    const blob = await adminFetchFile(cur.id, mode)
-    if (mode === "download") {
-      const a = document.createElement("a")
-      a.href = URL.createObjectURL(blob)
-      a.download = cur.file_name ?? "submission"
-      a.click()
-      URL.revokeObjectURL(a.href)
-      return
-    }
-    // MD 는 렌더링하지 않는다. 글자 그대로 보여준다(기획 §6-C).
-    if ((cur.file_mime ?? "").startsWith("text/")) setDoc({ text: await blob.text() })
-    else setDoc({ url: URL.createObjectURL(blob) })
+    const blob = await adminFetchFile(cur.id, "download")
+    const a = document.createElement("a")
+    a.href = URL.createObjectURL(blob)
+    a.download = cur.file_name ?? "submission"
+    a.click()
+    URL.revokeObjectURL(a.href)
   }
 
   async function decide(v: "approve" | "hold" | "reject") {
@@ -343,17 +336,14 @@ export function SourceReviewPanel() {
                           </div>
                         </div>
                         <button
-                          onClick={() => {
-                            setRtab("doc")
-                            void openDoc("view")
-                          }}
+                          onClick={() => void download()}
                           className="ml-auto cursor-pointer rounded-lg border border-[#E0E0E0] px-3 py-1.5 text-[12px] font-semibold text-[#666] hover:border-[#D4854A] hover:text-[#D4854A]"
                         >
-                          원문 보기
+                          내려받기
                         </button>
                       </div>
                       <p className="mt-1.5 text-[11px] text-[#999]">
-                        원문은 누를 때 받습니다 — 목록만 넘겨볼 때 파일을 내려받지 않습니다
+                        원문은 화면에 띄우지 않습니다 — 필요하면 내려받아서 보세요
                       </p>
                       <Sec>업로드 검사</Sec>
                       <dl className="grid grid-cols-[88px_1fr] gap-x-3.5 gap-y-2">
@@ -392,40 +382,27 @@ export function SourceReviewPanel() {
                     </a>
                     <p className="mt-2 text-[11px] text-[#999]">남의 서버에 있는 자료라 이 자리에서 본문을 띄우지 않습니다.</p>
                   </div>
-                ) : !doc ? (
-                  <>
-                    <button
-                      onClick={() => void openDoc("view")}
-                      className="cursor-pointer rounded-lg bg-[#D4854A] px-4 py-2 text-[13px] font-semibold text-white"
-                    >
-                      원문 보기
-                    </button>
-                    <p className="mt-2.5 text-[11px] text-[#999]">
-                      누르면 그때 파일을 받아 띄웁니다. 열자마자 받지 않는 이유 — 목록을 넘겨보기만 할 때도 매번 파일을
-                      통째로 내려받게 됩니다.
-                    </p>
-                  </>
                 ) : (
-                  <div className="flex h-full flex-col">
-                    {doc.text !== undefined ? (
-                      <pre className="min-h-[420px] flex-1 overflow-auto whitespace-pre-wrap rounded-[10px] border border-[#E0E0E0] p-5 font-mono text-[12px] leading-[1.75] text-[#3D3652]">
-                        {doc.text}
-                      </pre>
-                    ) : (
-                      <iframe src={doc.url} sandbox="" className="min-h-[420px] flex-1 rounded-[10px] border border-[#E0E0E0]" />
-                    )}
-                    <div className="mt-2.5 flex items-center gap-2">
+                  <>
+                    <Sec>원문</Sec>
+                    <div className="rounded-[10px] border border-[#E0E0E0] bg-[#FAFAFA] px-4 py-4">
+                      <div className="text-[13px] font-semibold text-[#1A1626]">{cur.file_name}</div>
+                      <div className="mt-0.5 text-[11px] text-[#999]">
+                        {((cur.file_size ?? 0) / 1024 / 1024).toFixed(2)} MB · {cur.file_mime}
+                      </div>
                       <button
-                        onClick={() => void openDoc("download")}
-                        className="cursor-pointer rounded-lg border border-[#E0E0E0] px-3 py-1.5 text-[12px] font-semibold text-[#666]"
+                        onClick={() => void download()}
+                        className="mt-3 cursor-pointer rounded-lg bg-[#D4854A] px-4 py-2 text-[13px] font-semibold text-white"
                       >
                         내려받기
                       </button>
-                      <span className="text-[11px] text-[#999]">
-                        {doc.text !== undefined ? "꾸미지 않고 글자 그대로 보여줍니다" : "격리된 틀에서 띄웁니다"}
-                      </span>
+                      <p className="mt-2.5 text-[11px] text-[#999]">
+                        원문은 화면에 띄우지 않습니다 — 내려받아서 보세요.
+                        <br />
+                        목록을 넘겨보기만 할 때 큰 파일을 매번 받아오지 않기 위해서입니다.
+                      </p>
                     </div>
-                  </div>
+                  </>
                 ))}
 
               {rtab === "analysis" && (

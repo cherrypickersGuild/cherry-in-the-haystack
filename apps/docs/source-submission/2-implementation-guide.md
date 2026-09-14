@@ -148,8 +148,8 @@ apps/web/components/cherry/source-review-panel.tsx  관리자 ← 목업 그대�
 
 | | |
 |---|---|
-| **목록·상세는 파일을 안 준다** | 파일 본문도, 파일 주소도 응답에 없다. `/view`·`/download` 를 눌렀을 때만 받는다(기획 §4-A) |
-| **내려줄 때 헤더** | 기획 §6-B 의 헤더를 붙인다. MD 는 **렌더링하지 않고 글자 그대로**(기획 §6-C) |
+| **목록·상세는 파일을 안 준다** | 파일 본문도, 파일 주소도 응답에 없다. `/download` 를 눌렀을 때만 받는다(기획 §4-A) |
+| **내려줄 때 헤더** | 기획 §6-B 의 헤더 + `Content-Disposition: attachment`. **화면에 띄우는 기능은 없다**(D20) |
 
 관리자 API 는 `admin-submission.controller.ts` 에 모으고 **전부** `@Roles(Role.ADMIN)` 을 건다.
 

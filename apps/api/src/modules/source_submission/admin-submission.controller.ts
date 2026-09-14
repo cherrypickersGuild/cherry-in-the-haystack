@@ -54,20 +54,17 @@ export class AdminSubmissionController {
     return this.service.adminGet(id);
   }
 
-  @ApiOperation({ summary: '[ADMIN] 원문 보기' })
-  @Get(':id/view')
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
-  async view(@Param('id') id: string, @Res() res: Response) {
-    await this.send(id, res, false);
-  }
-
   @ApiOperation({ summary: '[ADMIN] 내려받기' })
   @Get(':id/download')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   async download(@Param('id') id: string, @Res() res: Response) {
-    await this.send(id, res, true);
+    const f = await this.service.adminFile(id);
+    const kind = f.mime.startsWith('application/pdf') ? 'pdf' : 'md';
+    res.set(this.gate.safeHeaders(kind));
+    // 파일 이름은 유저가 지은 것이다. 헤더에 그대로 넣지 않고 인코딩해 붙인다.
+    res.set('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(f.fileName)}`);
+    f.stream.pipe(res);
   }
 
   @ApiOperation({ summary: '[ADMIN] 분석 시작' })
@@ -127,21 +124,6 @@ export class AdminSubmissionController {
   }
 
   /* ── 내부 ── */
-
-  /**
-   * 파일을 내려준다. 폴더를 웹 서버가 직접 서빙하지 않고 API 가 읽어 보낸다.
-   * 붙이는 헤더의 이유는 기획 §6-B.
-   */
-  private async send(id: string, res: Response, asAttachment: boolean) {
-    const f = await this.service.adminFile(id);
-    const kind = f.mime.startsWith('application/pdf') ? 'pdf' : 'md';
-    res.set(this.gate.safeHeaders(kind));
-    if (asAttachment) {
-      // 파일 이름은 유저가 지은 것이다. 헤더에 그대로 넣지 않고 인코딩해서 붙인다.
-      res.set('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(f.fileName)}`);
-    }
-    f.stream.pipe(res);
-  }
 
   private adminId(req: RequestWithJwtUser): string {
     const id = String(req.user?.id ?? '').trim();

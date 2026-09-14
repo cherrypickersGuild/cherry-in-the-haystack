@@ -131,9 +131,11 @@ SubmissionStorage          save(stream, ext) · read(key) · remove(key)
 | 언제 | 파일 본문 |
 |---|---|
 | 목록 · 상세 | 안 준다 |
-| [원문 보기] · [내려받기] | 이때만 |
+| [내려받기] | 이때만 |
 
 그래서 첫 탭은 **투고 정보**다 — 어떤 파일이 붙었는지, 유저가 어떤 제목과 설명으로 올렸는지.
+
+**원문은 화면에 띄우지 않는다(D20).** 큰 파일을 매번 받아 띄우면 부담이 크다. 필요하면 내려받아서 본다.
 
 유저가 붙인 **제목과 파일 이름은 다른 값**이다. 제목을 앞에 쓰고 파일 이름은 첨부 정보로 함께 보여준다.
 
@@ -377,12 +379,10 @@ status = APPROVED · reviewed_by_user_id · reviewed_at 기록
 
 마지막에서 두 번째가 원래는 **별도 도메인**으로 풀 문제다. 도메인을 나눌 형편이 아니라 헤더로 대신한다 — 브라우저 구현에 기대는 방어라는 점은 알고 간다.
 
-### 6-C. 화면에 띄울 때
+### 6-C. 화면에 띄우지 않는다
 
-| | |
-|---|---|
-| PDF | `<iframe sandbox>` 안에서 |
-| MD | **렌더링하지 않는다.** 글자 그대로 — `<script>`·`onerror`·`javascript:` 가 살아나지 않게 |
+**원문은 내려받아서 본다(D20).** 화면 안에서 열지 않으므로 `<iframe>` 격리도, 마크다운 렌더링 방어도 필요 없다 —
+띄우지 않는 것이 가장 확실한 방어다. 내려받는 응답에는 §6-B 의 헤더가 그대로 붙는다.
 
 ### 6-D. 분석 LLM — 프롬프트 인젝션
 
@@ -486,7 +486,6 @@ SUBMISSION_ANALYSIS_ENABLED=true    # 데모 시간대에 false 로 끈다
 | GET | `/api/sources/submissions/mine` | 로그인 — 내 투고만 |
 | GET | `/api/admin/submissions` | ADMIN — 목록 |
 | GET | `/api/admin/submissions/:id` | ADMIN — 상세 (파일 본문 안 줌) |
-| GET | `/api/admin/submissions/:id/view` | ADMIN — 원문 |
 | GET | `/api/admin/submissions/:id/download` | ADMIN — 내려받기 |
 | POST | `/api/admin/submissions/:id/analyze` | ADMIN — 분석 시작 |
 | GET | `/api/admin/submissions/:id/analysis` | ADMIN — 분석 상태 |
@@ -556,6 +555,7 @@ SUBMISSION_ANALYSIS_ENABLED=true    # 데모 시간대에 false 로 끈다
 | D14 | 판단 되돌리기 | **된다.** 승인·반려 뒤에도 상태를 바꾼다. 이력은 남기지 않고 마지막 판단으로 덮는다 |
 | D15 | 분석 결과 보관 | **투고 행의 `analysis` 칸에만.** 콘텐츠 표에는 어떤 경우에도 안 들어간다 |
 | D16 | 목록 검색 | **없다.** 유저·관리자 양쪽 다 |
+| D20 | 원문을 화면에 띄우기 | **안 한다.** 내려받기만. 큰 파일을 매번 받아 띄우면 부담이 크고, 띄우지 않으니 iframe·렌더링 방어도 필요 없다 |
 | D17 | 유저 화면 위치 | **메뉴에 `Submit Source` 를 새로 만든다** (`CONTRIBUTE` 섹션) |
 | D18 | LLM 이 실패하면 | **재시도 없이 `FAILED`.** 사유를 화면에 적는다 |
 | D19 | 기동할 때 멈춘 분석 정리 | **30분 넘은 것만.** 로컬 재시작이 프로덕션 분석을 끄지 않게 |
@@ -568,7 +568,7 @@ SUBMISSION_ANALYSIS_ENABLED=true    # 데모 시간대에 false 로 끈다
 ```
 스키마    칼럼 7개 + 제약 + 인덱스 (+ enum 값 1개, 따로 실행)
 저장      서버 폴더 저장 서비스 1개 (submission-storage.service.ts)
-API       모듈 1개 (엔드포인트 15)
+API       모듈 1개 (엔드포인트 14)
 화면      유저 1장 · 관리자 1장 (기존 대시보드 탭)
 분석      unpdf + 기존 bench 클라이언트 · 상태 4단계
 보안      §6 — 외부 입력이라 미루지 않은 것들

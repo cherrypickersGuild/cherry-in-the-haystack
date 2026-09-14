@@ -181,7 +181,7 @@ export class SourceSubmissionService implements OnModuleInit {
     return row;
   }
 
-  /** 원문. [원문 보기]·[내려받기] 를 눌렀을 때만 부른다. */
+  /** 원문. [내려받기] 를 눌렀을 때만 부른다 — 화면에 띄우는 기능은 없다(D20). */
   async adminFile(id: string) {
     const row = await this.knex(TABLE)
       .select('file_key', 'file_name', 'file_mime', 'kind')
