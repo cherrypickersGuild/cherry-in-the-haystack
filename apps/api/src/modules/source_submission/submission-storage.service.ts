@@ -4,6 +4,7 @@ import {
   Logger,
   OnModuleInit,
   PayloadTooLargeException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { createHash, randomUUID } from 'crypto';
 import { createReadStream, createWriteStream } from 'fs';
@@ -42,7 +43,10 @@ export class LocalDiskStorage implements SubmissionStorage, OnModuleInit {
    * 절대경로로 바꿔 둔다. 로컬 설정이 `./.uploads` 같은 상대경로라서,
    * 그대로 두면 아래 toPath 의 가드가 저장을 전부 막는다.
    */
-  private readonly root = process.env.UPLOAD_DIR ? resolve(process.env.UPLOAD_DIR) : '';
+  private readonly root = resolve(process.env.UPLOAD_DIR ?? './.uploads');
+
+  /** 폴더를 쓸 수 있는지. 못 쓰면 **파일 투고만** 잠그고 나머지는 그대로 돈다. */
+  private ready = false;
 
   /**
    * 기동 점검.
@@ -54,23 +58,33 @@ export class LocalDiskStorage implements SubmissionStorage, OnModuleInit {
    * 기획: apps/docs/source-submission/1-work-guidelines.md §2
    */
   async onModuleInit(): Promise<void> {
-    if (!this.root) {
-      throw new Error(
-        '[submission-storage] UPLOAD_DIR 이 없다. ' +
-          '로컬은 ./.uploads, 서버는 /data/uploads 를 잡는다.',
-      );
-    }
-
     try {
       await mkdir(this.root, { recursive: true });
       const probe = join(this.root, `.write-probe-${randomUUID()}`);
       await writeFile(probe, 'ok');
       await rm(probe);
-      this.logger.log(`업로드 폴더 확인: ${this.root}`);
+      this.ready = true;
+      if (!process.env.UPLOAD_DIR) {
+        this.logger.warn(
+          `UPLOAD_DIR 이 없어 ${this.root} 를 씁니다. 컨테이너 안이면 배포할 때마다 파일이 사라집니다 — ` +
+            '서버에 볼륨을 붙이고 UPLOAD_DIR 을 잡으세요.',
+        );
+      } else {
+        this.logger.log(`업로드 폴더 확인: ${this.root}`);
+      }
     } catch (e) {
-      throw new Error(
-        `[submission-storage] UPLOAD_DIR(${this.root}) 에 쓸 수 없다: ${(e as Error).message}`,
+      this.ready = false;
+      this.logger.error(
+        `업로드 폴더(${this.root}) 를 쓸 수 없습니다: ${(e as Error).message} — ` +
+          '파일 투고만 잠급니다. 링크 투고와 나머지 기능은 그대로 돕니다.',
       );
+    }
+  }
+
+  /** 파일을 다루기 전에 부른다. 폴더가 죽어 있으면 여기서만 막는다. */
+  private assertReady(): void {
+    if (!this.ready) {
+      throw new ServiceUnavailableException('지금은 파일을 올릴 수 없습니다. 링크 투고는 그대로 됩니다.');
     }
   }
 
@@ -79,6 +93,7 @@ export class LocalDiskStorage implements SubmissionStorage, OnModuleInit {
    * 크기와 해시를 쓰는 동안 같이 센다 — 파일을 두 번 읽지 않는다.
    */
   async save(stream: Readable, ext: string, maxBytes: number): Promise<StoredFile> {
+    this.assertReady();
     const key = this.makeKey(ext);
     const full = this.toPath(key);
     await mkdir(dirname(full), { recursive: true });
@@ -113,6 +128,7 @@ export class LocalDiskStorage implements SubmissionStorage, OnModuleInit {
   }
 
   async read(key: string): Promise<Readable> {
+    this.assertReady();
     const full = this.toPath(key);
     await stat(full);
     return createReadStream(full);
