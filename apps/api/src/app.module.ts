@@ -13,6 +13,7 @@ import { WriterAgentModule } from './modules/writer_agent/writer-agent.module';
 import { BenchModule } from './modules/bench/bench.module';
 import { FrameworksLandscapeModule } from './modules/frameworks_landscape/frameworks-landscape.module';
 import { SourceSubmissionModule } from './modules/source_submission/source-submission.module';
+import { SourceRegistryModule } from './modules/source_registry/source-registry.module';
 import { ConceptModule } from './modules/concept/concept.module';
 
 @Module({
@@ -32,6 +33,7 @@ import { ConceptModule } from './modules/concept/concept.module';
     FrameworksLandscapeModule,
     ConceptModule,
     SourceSubmissionModule,
+    SourceRegistryModule,
   ],
   controllers: [],
   providers: [],

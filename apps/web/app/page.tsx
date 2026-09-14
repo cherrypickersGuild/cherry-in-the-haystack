@@ -77,7 +77,7 @@ const TOPIC_BY_CONCEPT_NODE: Record<string, string> = Object.fromEntries(
 
 export default function CherryApp() {
   const [activeNav, setActiveNav] = useState("nd-overview")
-  const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder" | "submissions">("dashboard")
+  const [dashboardTab, setDashboardTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder" | "submissions" | "registry">("dashboard")
   const [marketConceptId, setMarketConceptId] = useState<string | null>(null)
   // Learning 개념 페이지: activeNav 와 별개로 "어느 개념인가"를 담는 파라미터 상태
   // (marketConceptId 와 동일한 패턴 — taxonomy/switch 를 늘리지 않고 개념 간 이동)
@@ -98,7 +98,6 @@ export default function CherryApp() {
   const [topArticles, setTopArticles] = useState<LandingTopArticle[]>([])
   const router = useRouter()
   const consoleRef = useRef<KaasConsoleRef>(null)
-  const [showDashboard, setShowDashboard] = useState(false)
 
   // Subscribe to auth change events for re-render; read the token fresh below.
   useAuthTick()
@@ -145,6 +144,11 @@ export default function CherryApp() {
       // 유저 자료·소스 투고 (apps/docs/source-submission · D17)
       case "source-submit":
         return <SourceSubmitPage />
+
+      /* 관리자 — 모달이 아니라 페이지다 (apps/docs/source-registry · D1).
+         표를 다루려면 폭이 필요해서 본문을 통째로 쓴다. */
+      case "admin":
+        return <KaasDashboardPage isAdmin={isAdmin} onTabChange={setDashboardTab} />
 
       case "frameworks":
         return <NDFrameworksPage />
@@ -359,7 +363,7 @@ export default function CherryApp() {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Desktop sidebar — hidden on mobile */}
-      <Sidebar active={activeNav} onSelect={setActiveNav} className="hidden lg:flex" />
+      <Sidebar active={activeNav} onSelect={setActiveNav} isAdmin={isAdmin} className="hidden lg:flex" />
 
       {/* Content column: mobile header + main */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
@@ -373,7 +377,7 @@ export default function CherryApp() {
           <div className="ml-auto flex items-center gap-2">
             {token && (
               <button
-                onClick={() => setShowDashboard(true)}
+                onClick={() => setActiveNav("admin")}
                 className="px-3 py-1.5 rounded-lg text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#C94B6E" }}
               >
@@ -397,7 +401,7 @@ export default function CherryApp() {
         >
           {token && (
             <button
-              onClick={() => setShowDashboard(true)}
+              onClick={() => setActiveNav("admin")}
               className="text-[12px] font-semibold text-white transition-opacity hover:opacity-90 cursor-pointer"
               style={{
                 backgroundColor: "#C94B6E",
@@ -423,12 +427,17 @@ export default function CherryApp() {
         {/* Main scrollable content — constrain inner page to 1200px,
             left-aligned (no mx-auto) so content sits flush with the sidebar. */}
         <main
-          className="flex-1 overflow-y-auto px-4 py-4 lg:px-10 lg:py-8"
+          className={
+            activeNav === "admin"
+              // 관리자 — 표를 다루는 화면이라 폭을 제한하지 않고 여백도 화면이 직접 준다
+              ? "flex-1 overflow-hidden"
+              : "flex-1 overflow-y-auto px-4 py-4 lg:px-10 lg:py-8"
+          }
           style={{ backgroundColor: "#FBFAF8" }}
           id="main-content"
         >
           {/* 가로 표준은 1000px. Landscape 페이지(Frameworks/Prompting/Cases Best/Research/Discourse 혼합)만 1160px. */}
-          <div className={`w-full ${["frameworks", "prompting", "domain-applications", "product-discovery", "model-updates", "benchmarks-datasets", "papers", "regulations-policy-compliance", "community", "big-tech-trends", "market-investment", "technical-deep-dives", "insights-opinions"].includes(activeNav) ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
+          <div className={activeNav === "admin" ? "h-full w-full" : `w-full ${["frameworks", "prompting", "domain-applications", "product-discovery", "model-updates", "benchmarks-datasets", "papers", "regulations-policy-compliance", "community", "big-tech-trends", "market-investment", "technical-deep-dives", "insights-opinions"].includes(activeNav) ? "max-w-[1160px]" : "max-w-[1000px]"}`}>
             {renderContent()}
           </div>
         </main>
@@ -441,7 +450,7 @@ export default function CherryApp() {
         <KaasConsole
           ref={consoleRef}
           currentPage={
-            showDashboard
+            activeNav === "admin"
               ? dashboardTab === "curation"
                 ? "Dashboard › Knowledge Curation"
                 : dashboardTab === "concept-page"
@@ -454,25 +463,6 @@ export default function CherryApp() {
               : activeNav
           }
         />
-      )}
-
-      {/* Dashboard modal (통합: Dashboard + 지식 큐레이팅 + 프롬프트 템플릿) */}
-      {showDashboard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowDashboard(false)}>
-          <div className="absolute inset-0 bg-black/40" />
-          <div
-            className="relative bg-white rounded-2xl shadow-xl w-full max-w-[1200px] h-[95vh] lg:h-[90vh] animate-in zoom-in-95 duration-150 overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setShowDashboard(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-md hover:bg-gray-200 cursor-pointer z-10"
-            >
-              <span className="text-text-muted text-[16px]">✕</span>
-            </button>
-            <KaasDashboardPage isAdmin={isAdmin} onTabChange={setDashboardTab} />
-          </div>
-        </div>
       )}
     </div>
   )

@@ -13,7 +13,7 @@
 .header {
   flex-shrink: 0;
   border-bottom: 1px solid #E4E1EE;
-  background: #FFFFFF;
+  background: #FBFAF8;
   padding: 16px 16px 0 16px;
 }
 @media (min-width: 1024px) {
@@ -98,10 +98,16 @@
   }
 }
 
-/* 탭 콘텐츠 wrapper: flex-1 overflow-hidden */
+/* 탭 콘텐츠 wrapper — 바탕은 페이지 색, 안쪽 카드만 하얗다 (다른 화면과 같은 방식) */
 .tabContent {
   flex: 1;
   overflow: hidden;
+  padding: 16px;
+}
+@media (min-width: 1024px) {
+  .tabContent {
+    padding: 20px 24px;
+  }
 }
 
 /* Dashboard 탭 안 — 좌우 2단 컨테이너:
@@ -167,7 +173,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #FAFAFA;
+  background: transparent;
 }
 @media (min-width: 1024px) {
   .subTab {

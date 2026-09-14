@@ -12,6 +12,7 @@ import { OverviewBuilderPanel } from "./overview-builder-panel"
 import { TemplateEditorBody } from "@/app/template/edit/page"
 import { KaasWorkshopPanel } from "./kaas-workshop-panel"
 import { SourceReviewPanel } from "./source-review-panel"
+import { SourceRegistryPanel } from "./source-registry-panel"
 import dash from "./dashboard.module.css"
 
 /* ═══════════════════════════════════════════════
@@ -1533,11 +1534,11 @@ function WalletPanel({ agent, onRefresh, karma, karmaLoading, karmaError, onRefr
 /* ═══════════════════════════════════════════════
    Main — 2 panel layout
 ═══════════════════════════════════════════════ */
-export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: boolean; onTabChange?: (tab: "dashboard" | "curation" | "concept-page" | "template" | "overview-builder" | "submissions") => void }) {
+export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: boolean; onTabChange?: (tab: "dashboard" | "curation" | "concept-page" | "template" | "overview-builder" | "submissions" | "registry") => void }) {
   const [agents, setAgents] = useState<Agent[]>([])
   const [selectedAgentId, setSelectedAgentId] = useState("")
   const [showRegister, setShowRegister] = useState(false)
-  const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder" | "submissions">("dashboard")
+  const [activeTab, setActiveTab] = useState<"dashboard" | "curation" | "concept-page" | "template" | "overview-builder" | "submissions" | "registry">("dashboard")
   // Workshop 은 별도 팝업 — 특정 에이전트 카드에서 🔧 Workshop 버튼 눌러 열기
   const [workshopOpenId, setWorkshopOpenId] = useState<string | null>(null)
 
@@ -1644,15 +1645,19 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
   const selectedAgent = agents.find((a) => a.id === selectedAgentId) ?? agents[0] ?? null
   const showRegisterAuto = agents.length === 0 && !showRegister
 
+  /* 탭 이름은 한글이다 (apps/docs/source-registry · D2).
+     **키는 영문 그대로 둔다** — 키를 바꾸면 app/page.tsx 의 타입까지 줄줄이 바뀐다. */
   const tabs = [
-    { key: "dashboard" as const, label: "Dashboard" },
-    { key: "curation" as const, label: "Knowledge Curation" },
+    { key: "dashboard" as const, label: "대시보드" },
+    { key: "curation" as const, label: "지식 큐레이팅" },
     ...(isAdmin ? [
-      { key: "concept-page" as const, label: "Concept Page" },
-      { key: "template" as const, label: "Prompt Templates" },
-      { key: "overview-builder" as const, label: "Overview Builder" },
+      { key: "concept-page" as const, label: "개념 페이지" },
+      { key: "template" as const, label: "프롬프트 템플릿" },
+      { key: "overview-builder" as const, label: "오버뷰 편집" },
       // 유저 투고 검토 (apps/docs/source-submission · D6)
-      { key: "submissions" as const, label: "Submissions" },
+      { key: "submissions" as const, label: "투고 검토" },
+      // 노션에서 옮겨 온 소스 표 (apps/docs/source-registry)
+      { key: "registry" as const, label: "소스 관리" },
     ] : []),
   ]
 
@@ -1753,6 +1758,11 @@ export function KaasDashboardPage({ isAdmin = false, onTabChange }: { isAdmin?: 
         {activeTab === "submissions" && (
           <div className={dash.subTab}>
             <SourceReviewPanel />
+          </div>
+        )}
+        {activeTab === "registry" && (
+          <div className={dash.subTab}>
+            <SourceRegistryPanel />
           </div>
         )}
       </div>

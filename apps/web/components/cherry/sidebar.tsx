@@ -243,6 +243,15 @@ const SECTIONS: SectionDef[] = [
     ],
   },
   {
+    /* 관리자 전용 (apps/docs/source-registry · D1 — 모달이 아니라 페이지다) */
+    id: "admin",
+    label: "ADMIN",
+    action: true,
+    items: [
+      { id: "admin", ic: "overview", label: "관리자" },
+    ],
+  },
+  {
     /* 유저가 자료·링크를 올리는 곳 (apps/docs/source-submission · D17).
        위 메뉴들은 "읽는 곳" 이고 여기는 "보내는 곳" 이라, 맨 아래에 선을 긋고 떼어 놓는다. */
     id: "contribute",
@@ -378,11 +387,14 @@ export function Sidebar({
   onSelect,
   className,
   hideLogo = false,
+  isAdmin = false,
 }: {
   active: string
   onSelect: (id: string) => void
   className?: string
   hideLogo?: boolean
+  /** 관리자에게만 `관리자` 메뉴를 보인다. */
+  isAdmin?: boolean
 }) {
   // 멀티오픈: 여러 그룹을 동시에 펼쳐둘 수 있다. 자동으로 닫지 않으므로 메뉴가 튀지 않는다.
   // 펼친 상태는 그룹별로 localStorage에 저장·복원.
@@ -452,7 +464,8 @@ export function Sidebar({
       {/* Nav — 목업 nav */}
       <nav className="flex-1 overflow-y-auto" style={{ padding: "14px 8px 28px" }}>
         {SECTIONS.filter((s) =>
-          (s.id !== "learning" || SHOW_LEARNING) && (s.id !== "utility" || SHOW_UTILITY),
+          (s.id !== "learning" || SHOW_LEARNING) && (s.id !== "utility" || SHOW_UTILITY) &&
+          (s.id !== "admin" || isAdmin),
         ).map((section, si) => (
           <div
             key={section.id}
