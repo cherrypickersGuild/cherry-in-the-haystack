@@ -14,7 +14,7 @@
 
 | 파일 | 날짜 | 크기 | 내용 | 판정 |
 |---|---|---|---|---|
-| ddl-v1.2.sql | 0530 | **143K** | 현행 DDL | |
+| ddl-v1.2.sql | 0530 | **143K** | 현행 DDL | **keep** — 9/29 HK: 전부 살리기. 지한님 정보 얻은 후 reconcile |
 | data-architecture.md | 0415 | **64K** | 데이터 아키텍처 종합 | |
 | handbook-ddl-redesign-proposal.md | 0530 | 41K | 스키마 전면 재설계 **제안** | |
 | handbook-ddl-v2.sql | 0530 | 26K | handbook v2 DDL | |
