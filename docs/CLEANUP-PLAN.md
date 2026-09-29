@@ -8,7 +8,7 @@
 
 - ✅ Notion 237페이지 백업 완료 → `cherry-docs/archive/notion-backup-20260929/` (커밋 `a7a7a66`)
 - ✅ 1차 archive 9건: HANDOVER.md · epics.md · ux-design-directions.html · ux-backup · ddl-v1.1(.bak) · crawler-migration(root) · bmm-workflow-status.yaml · codebase-restructure-memo — 전부 구버전/중복/완료 흔적 (커밋 `93760fc`)
-- ⬜ 아래 57개 파일 검증 대기 (HK)
+- ✅ **9/29 HK 판정: 아래 57개 전부 keep (살리기).** 개별 reconcile은 지한님 status check에서 정보 얻은 후 진행 — 그때까지 문서 이동·수정 없음
 
 ## A. architecture/ (25개)
 
