@@ -1,0 +1,71 @@
+# sources.yaml — Browser-agent source registry
+#
+# Add new sources here to onboard them into the browser-agent crawler pipeline.
+# Each entry is processed on the next daily cycle:
+#   1. /crawler/analyze  — browser-use analyzes the page (once, cached)
+#   2. /crawler/generate — generates a crawl4ai Python crawler + opens a PR
+#   3. After PR merge:  scheduler runs /crawler/execute daily
+#
+# ─── Required fields ────────────────────────────────────────────────────────────
+#
+#   url (string):          Full URL of the target page to crawl
+#   source_name (string):  Human-readable name (used in PR titles and logs)
+#   source_type (string):  Must exactly match a value in content.source_type_enum.
+#                          Valid values: RSS, TWITTER, REDDIT, LINKEDIN, YOUTUBE,
+#                          BLOG, COMPANY_BLOG, NEWSLETTER, GITHUB_TRENDING,
+#                          PRODUCT_HUNT, THREADS, CUSTOM
+#
+# ─── Optional fields ────────────────────────────────────────────────────────────
+#
+#   browser_use_only (boolean, default: false):
+#     When true, skips crawl4ai generation entirely.
+#     Automatically set to true for LINKEDIN sources.
+#     browser-use runs on every scheduled cycle for these sources.
+#
+#   min_body_length (integer, default: package-level setting):
+#     Minimum article body character count for validation.
+#     Override when a source produces short-form content.
+#
+#   recency_window_days (integer, default: package-level setting):
+#     Articles older than this many days are rejected at validation.
+#
+#   consecutive_failures_threshold (integer, default: 3):
+#     Number of consecutive crawl4ai failures before auto-regeneration is triggered.
+#
+# ─── Removal ────────────────────────────────────────────────────────────────────
+#
+#   Removing an entry stops all scheduling for that source.
+#   Existing database records (crawler_analysis, crawler_registry, article_raw) are retained.
+#
+# ────────────────────────────────────────────────────────────────────────────────
+
+sources:
+  # Standard blog — full crawl4ai generation path
+  - url: "https://example.com/blog"
+    source_name: "Example Blog"
+    source_type: "BLOG"
+
+  # LinkedIn — browser_use_only defaults to true automatically
+  - url: "https://www.linkedin.com/company/example/posts/"
+    source_name: "Example LinkedIn"
+    source_type: "LINKEDIN"
+    # browser_use_only: true  ← set automatically; include explicitly only to override
+
+  # GitHub Trending — high-volume, low body length expected
+  - url: "https://github.com/trending"
+    source_name: "GitHub Trending"
+    source_type: "GITHUB_TRENDING"
+    min_body_length: 30
+    recency_window_days: 1
+    consecutive_failures_threshold: 5
+
+  # Newsletter web page — browser_use_only if JS-heavy; otherwise leave default
+  - url: "https://example.substack.com"
+    source_name: "Example Newsletter"
+    source_type: "NEWSLETTER"
+
+  # Product Hunt — standard path; fails quickly so lower threshold
+  - url: "https://www.producthunt.com"
+    source_name: "Product Hunt"
+    source_type: "PRODUCT_HUNT"
+    consecutive_failures_threshold: 2

@@ -27,6 +27,10 @@ from agent_communication_api import AgentAPIClient
 from dotenv import load_dotenv
 from pathlib import Path
 
+from agent_communication_api import AgentAPIClient
+from dotenv import load_dotenv
+from pathlib import Path
+
 import feedparser
 import requests
 

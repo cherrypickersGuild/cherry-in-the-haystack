@@ -1,0 +1,69 @@
+{
+  "ok": true,
+  "source_id": "019d8178-27f2-779f-9bab-3dc5fbd1d3eb",
+  "url": "https://crewai.com/case-studies",
+  "source_name": "CrewAI Case Studies",
+  "steps": {
+    "analyze": {
+      "ok": true,
+      "cached": true,
+      "analysis_id": "06a439a1-a12d-7cb1-8000-2ed524fb4dca"
+    },
+    "generate": {
+      "ok": true,
+      "registry_id": "06a439c4-1841-7509-8000-d156c85f4b4d"
+    },
+    "execute": {
+      "ok": true,
+      "item_count": 4
+    }
+  },
+  "analysis_json": {
+    "notes": "Next.js/React app. All case study cards are <a class='group block'> anchor elements. Featured card (PwC) uses 'lg:col-span-2' and places the full title in an <h2>. Regular cards (IBM, AWS, Gelato, etc.) contain: a <p class='eyebrow'> label ('Case study'), an <h2> with the company name, and a <p class='text-lg text-neutral mt-3 mb-6'> holding the full case study title string. No publication date or author fields are present in the listing cards. The page is a single-page Next.js app; all cards appear to be server-rendered or hydrated on load with no click-based pagination or infinite scroll.",
+    "js_code": null,
+    "wait_for": "css:a.group.block",
+    "magic_mode": false,
+    "dynamic_load": true,
+    "url_selector": "a.group.block",
+    "body_selector": "p.text-lg",
+    "date_selector": "",
+    "title_selector": "p.text-lg",
+    "author_selector": "",
+    "pagination_type": "none",
+    "content_selector": "a.group.block"
+  },
+  "items": [
+    {
+      "title": "IBM automates federal eligibility with Agents",
+      "body": "IBM automates federal eligibility with Agents",
+      "published_at": "",
+      "author": "",
+      "url": "",
+      "canonical_url": ""
+    },
+    {
+      "title": "AWS powers bedrock Agents with CrewAI",
+      "body": "AWS powers bedrock Agents with CrewAI",
+      "published_at": "",
+      "author": "",
+      "url": "",
+      "canonical_url": ""
+    },
+    {
+      "title": "Gelato accelerates fulfillment via agentic integration",
+      "body": "Gelato accelerates fulfillment via agentic integration",
+      "published_at": "",
+      "author": "",
+      "url": "",
+      "canonical_url": ""
+    },
+    {
+      "title": "Brickell Digital scales Lead-Gen using Agents",
+      "body": "Brickell Digital scales Lead-Gen using Agents",
+      "published_at": "",
+      "author": "",
+      "url": "",
+      "canonical_url": ""
+    }
+  ]
+}
