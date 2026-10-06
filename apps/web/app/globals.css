@@ -1,3 +1,4 @@
+/* flash figures: see end of file */
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -58,6 +59,13 @@
   --violet:            #7B5EA7;
   --violet-soft:       #F3EFFA;
   --violet-border:     #C7B8E8;
+
+  /* Green·Orange — 개념 페이지 Flash 네 컷에서 쓴다.
+     값은 BASICS 뱃지(#E3F1E1 / #2F7A3A)와 같은 계열. 목업 정본과 일치시킨다.
+     정본: apps/docs/learning-visual/mockups/*.html */
+  --green:             #2F7A3A;
+  --green-soft:        #E3F1E1;
+  --orange:            #D4854A;
 
   /* Text scale */
   --text-primary:      #1A1626;
@@ -234,3 +242,21 @@
   animation: cherry-shake 0.7s cubic-bezier(.36,.07,.19,.97) both !important;
   transition: none !important;
 }
+
+/* ── 개념 페이지 02 — Flash 네 컷 (concept-flash.ts 의 인라인 SVG용)
+   정본: apps/docs/learning-visual/mockups/*.html · 규약 1-work-guidelines.md §3 ── */
+.concept-figure svg { display: block; width: 100%; height: auto; margin-block: auto; }
+.sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
+.sv-card{fill:var(--card);stroke:var(--border);stroke-width:1.6}
+.sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
+.sv-ink{fill:var(--text-primary)}
+.sv-dim{fill:var(--text-muted)}
+.sv-ch{stroke:var(--cherry);fill:none;stroke-width:1.5;stroke-linecap:round}
+.sv-ch-t{fill:var(--cherry)}
+.sv-ch-b{fill:var(--cherry-soft);stroke:var(--cherry-border);stroke-width:1.4}
+.sv-vi-b{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.4}
+.sv-vi-f{fill:var(--violet)}
+.sv-vi-t{fill:var(--violet)}
+.sv-gr-b{fill:var(--green-soft);stroke:var(--green);stroke-width:1.5}
+.sv-gr-t{fill:var(--green)}
+.sv-gr-l{stroke:var(--green);fill:none;stroke-width:1.5;stroke-linecap:round}

@@ -191,11 +191,14 @@ const SECTIONS: SectionDef[] = [
           { id: "evaluation-systems",  label: "Evaluation" },
           /* 아래 4개는 PRD 목록 밖이다. 온톨로지 319개 중 216개가 메뉴에서 도달 불가였고,
              PRD 12개가 응용 계층만 다뤄 모델 내부·학습·과제 계층이 통째로 빠져 있었다.
-             근거·계산: apps/docs/advanced/research/9-menu-reachability.md */
-          { id: "model-architecture",  label: "Model Architecture" },
-          { id: "model-components",    label: "Model Components" },
-          { id: "training-paradigms",  label: "Training Paradigms" },
-          { id: "application-domains", label: "Application Domains" },
+             근거·계산: apps/docs/advanced/research/9-menu-reachability.md
+             2026-10-06 — 개념 페이지(네 컷·체리)를 PRD 6개만 먼저 완성해 메뉴에서 가린다.
+             페이지가 준비되면 주석을 푼다. page.tsx 의 CONCEPT_NODE_BY_TOPIC 은 그대로 둔다
+             (하위 개념을 타고 들어가면 열리고, 주석만 풀면 메뉴에 다시 뜬다). */
+          // { id: "model-architecture",  label: "Model Architecture" },
+          // { id: "model-components",    label: "Model Components" },
+          // { id: "training-paradigms",  label: "Training Paradigms" },
+          // { id: "application-domains", label: "Application Domains" },
         ],
       },
       {
@@ -210,9 +213,11 @@ const SECTIONS: SectionDef[] = [
           { id: "agent-topologies",  label: "Multi-agent Orchestration" },
           { id: "custom-embeddings", label: "Custom Embeddings" },
           { id: "adversarial-eval",  label: "Adversarial Evaluation" },
-          /* PRD 목록 밖 — 위 Basics 주석과 같은 이유. 운영·안전 계층. */
-          { id: "inference-optimization", label: "Inference Optimization" },
-          { id: "safety-alignment",       label: "Safety & Alignment" },
+          /* PRD 목록 밖 — 위 Basics 주석과 같은 이유. 운영·안전 계층.
+             2026-10-06 — Basics 와 같은 기준으로 메뉴에서 가린다(개념 페이지 미완성).
+             페이지가 준비되면 주석을 푼다. page.tsx 의 노드 매핑은 그대로 둔다. */
+          // { id: "inference-optimization", label: "Inference Optimization" },
+          // { id: "safety-alignment",       label: "Safety & Alignment" },
         ],
       },
     ],

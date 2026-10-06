@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { ShoppingCart } from "lucide-react"
 import { fetchLearningConcept, type ConceptPage, type ConceptRelationType } from "@/lib/api"
+import { CONCEPT_FLASH } from "@/lib/concept-flash"
 
 /* 데이터 정본 = DB (API: GET /api/learning/concepts/:key)
    기획: apps/docs/ontology-migration/2-implementation-guide.md §5
@@ -52,6 +53,8 @@ export function ConceptReaderPage({
 }) {
   const [doc, setDoc] = useState<ConceptPage | null>(null)
   const [error, setError] = useState<string | null>(null)
+  /* 승인본(목업)이 한/영 두 벌이다. Flash 가 있는 개념만 토글을 띄운다. */
+  const [lang, setLang] = useState<"ko" | "en">("ko")
 
   useEffect(() => {
     let alive = true
@@ -80,6 +83,9 @@ export function ConceptReaderPage({
 
   /* 섹션: 발행본 > 사이드바 힌트 > 없음(하위 개념을 타고 들어온 경우) */
   const section = doc.section ?? sectionHint ?? null
+  /* 승인된 네 컷·개요·체리·레퍼런스 (BASICS 6개). 없으면 기존처럼 API 값만 쓴다. */
+  const flash = CONCEPT_FLASH[doc.node] ?? null
+  const x = (ko: string, en: string) => (lang === "ko" ? ko : en)
   const badgePalette = section ? SECTION_BADGE[section] : null
 
   return (
@@ -102,8 +108,27 @@ export function ConceptReaderPage({
           {/* Title */}
           <div className="flex items-start justify-between gap-4 mb-4">
             <h1 className="text-[20px] lg:text-[28px] font-extrabold text-text-primary tracking-[-0.5px] leading-[1.2]">
-              {doc.title}
+              {flash?.title ?? doc.title}
             </h1>
+            <div className="flex-shrink-0 flex items-center gap-2">
+            {flash && (
+              <div className="flex border border-border rounded-lg overflow-hidden bg-card" role="group" aria-label="Language">
+                {(["ko", "en"] as const).map((l) => (
+                  <button
+                    key={l}
+                    type="button"
+                    aria-pressed={lang === l}
+                    onClick={() => setLang(l)}
+                    className={cn(
+                      "px-3 py-1.5 text-[12px] font-semibold cursor-pointer",
+                      lang === l ? "bg-text-primary text-card" : "text-text-muted",
+                    )}
+                  >
+                    {l === "ko" ? "한국어" : "English"}
+                  </button>
+                ))}
+              </div>
+            )}
             {onBuyOnMarket && (
               <button
                 onClick={() => onBuyOnMarket(doc.slug)}
@@ -114,13 +139,14 @@ export function ConceptReaderPage({
                 Buy on Market
               </button>
             )}
+            </div>
           </div>
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-2 text-[12px] text-text-muted mb-8">
             <span>Updated {doc.meta.updated ?? "—"}</span>
             <span className="text-border">·</span>
-            <span>{doc.cherries.length} cherries</span>
+            <span>{(flash ? flash.cherries.length : doc.cherries.length)} cherries</span>
             <span className="text-border">·</span>
             {doc.meta.verified ? (
               <span>Knowledge Team verified</span>
@@ -141,23 +167,56 @@ export function ConceptReaderPage({
             </div>
 
             <div className="space-y-4 text-[14px] text-text-body leading-[1.75]">
-              {(doc.overview.body ?? doc.overview.definition ?? "")
+              {flash ? (
+                <p
+                  className="text-[16px] leading-[1.75]"
+                  dangerouslySetInnerHTML={{ __html: flash.overview[lang] }}
+                />
+              ) : null}
+              {!flash && (doc.overview.body ?? doc.overview.definition ?? "")
                 .split(/\n{2,}/)
                 .filter(Boolean)
                 .map((para, i) => (
                   <p key={i}>{para.replace(/\*\*/g, "")}</p>
                 ))}
-              {!doc.overview.body && !doc.overview.definition && (
+              {!flash && !doc.overview.body && !doc.overview.definition && (
                 <p className="text-text-muted">No overview published yet.</p>
               )}
             </div>
           </section>
 
-          {/* Section 02 — Cherries */}
+          {/* Section 02 — Flash (승인본 네 컷). 데이터: lib/concept-flash.ts */}
+          {flash && (
+            <section className="mb-10">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[10px] font-bold uppercase tracking-[0.8px] text-text-muted whitespace-nowrap">
+                  02 — Flash
+                </span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {flash.figures.map((fig) => (
+                  <figure
+                    key={fig.tag}
+                    className="concept-figure m-0 bg-card border border-border rounded-[8px] p-3 flex flex-col"
+                  >
+                    <div className="text-[10px] font-bold tracking-[0.8px] text-cherry">{fig.tag}</div>
+                    <h3 className="mt-0.5 mb-2 text-[13px] font-semibold text-text-primary">{fig[lang].h}</h3>
+                    <div dangerouslySetInnerHTML={{ __html: fig.art(x) }} />
+                    <figcaption className="mt-2.5 text-[11px] leading-[1.6] text-text-muted text-center">
+                      {fig[lang].c}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Section 03 — Cherries */}
           <section className="mb-10">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-[10px] font-bold uppercase tracking-[0.8px] text-text-muted whitespace-nowrap">
-                02 — Cherries
+                {flash ? "03" : "02"} — Cherries
               </span>
               <div className="flex-1 h-px bg-border" />
             </div>
@@ -165,11 +224,43 @@ export function ConceptReaderPage({
               Key insights from ingested sources — each covers a distinct, non-overlapping aspect
             </p>
 
-            {doc.cherries.length === 0 && (
+            {flash ? (
+              <div className="space-y-2.5">
+                {flash.cherries.map((c, i) => (
+                  <div
+                    key={i}
+                    className="bg-card border border-border rounded-[8px] p-4"
+                    style={{ borderLeftWidth: "3px", borderLeftColor: "#C94B6E" }}
+                  >
+                    <p className="text-[12px] font-bold text-text-primary mb-2 flex flex-wrap items-baseline gap-1.5">
+                      <span>🍒</span>
+                      {c.who}
+                      <span className="font-normal text-text-muted">— {c.role[lang]}</span>
+                    </p>
+                    <q className="block text-[15px] leading-[1.65] text-text-primary [quotes:none]">
+                      “{c.q[lang]}”
+                    </q>
+                    <p className="mt-2 text-[10px] text-text-muted">
+                      {c.cite} ·{" "}
+                      <a
+                        href={c.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-cherry hover:underline"
+                      >
+                        {x("원문", "source")} ↗
+                      </a>
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {!flash && doc.cherries.length === 0 && (
               <p className="text-[12px] text-text-muted">No evidence linked yet.</p>
             )}
             <div className="space-y-2.5">
-              {doc.cherries.map((cherry, i) => (
+              {!flash && doc.cherries.map((cherry, i) => (
                 <div
                   key={i}
                   className="bg-card border border-border rounded-[8px] p-4"
@@ -194,7 +285,7 @@ export function ConceptReaderPage({
           <section className="mb-10">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-[10px] font-bold uppercase tracking-[0.8px] text-text-muted whitespace-nowrap">
-                03 — Child Concepts
+                {flash ? "04" : "03"} — Child Concepts
               </span>
               <div className="flex-1 h-px bg-border" />
             </div>
@@ -247,7 +338,7 @@ export function ConceptReaderPage({
           <section className="mb-10">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-[10px] font-bold uppercase tracking-[0.8px] text-text-muted whitespace-nowrap">
-                04 — Progressive References
+                {flash ? "05 — References" : "04 — Progressive References"}
               </span>
               <div className="flex-1 h-px bg-border" />
             </div>
@@ -255,11 +346,46 @@ export function ConceptReaderPage({
               MECE learning path — each reference adds what the previous didn&apos;t cover
             </p>
 
-            {doc.references.length === 0 && (
+            {flash ? (
+              <div className="space-y-4">
+                {flash.refs.map((r, i) => {
+                  const first = i === 0
+                  const color = first ? "#C94B6E" : "#E4E1EE"
+                  return (
+                    <div key={i} className="pl-4 relative" style={{ borderLeft: `2px solid ${color}` }}>
+                      <div
+                        className="absolute left-[-5px] top-0 w-2 h-2 rounded-full"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span
+                        className="text-[9px] font-bold uppercase tracking-wide"
+                        style={{ color: first ? "#C94B6E" : "#9E97B3" }}
+                      >
+                        {r.stage[lang]}
+                      </span>
+                      <a
+                        href={r.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[13px] font-bold text-text-primary mt-0.5 block hover:text-cherry underline decoration-dotted underline-offset-2"
+                      >
+                        {r.t} ↗
+                      </a>
+                      <p className="mt-1 text-[11.5px] text-text-muted">{r.d[lang]}</p>
+                      <div className="mt-[3px] text-[10px] text-text-muted">
+                        🔗 External — {new URL(r.url).hostname.replace(/^www\./, "")}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : null}
+
+            {!flash && doc.references.length === 0 && (
               <p className="text-[12px] text-text-muted">No reading path published yet.</p>
             )}
             <div className="space-y-4">
-              {doc.references.map((ref, i) => {
+              {!flash && doc.references.map((ref, i) => {
                 const first = i === 0
                 const borderColor = first ? "#C94B6E" : "#E4E1EE"
                 return (
