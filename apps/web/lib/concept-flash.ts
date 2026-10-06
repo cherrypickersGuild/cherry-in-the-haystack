@@ -325,10 +325,10 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     q:{ko:"모델은 얼려 두고 부드러운 프롬프트만 학습한다.",
        en:"a simple yet effective mechanism for learning “soft prompts” to condition frozen language models to perform specific downstream tasks"},
     cite:"Lester, Al-Rfou & Constant, “The Power of Scale for Parameter-Efficient Prompt Tuning”, Abstract (arXiv:2104.08691)", url:"https://arxiv.org/abs/2104.08691" },
-  { who:"Hu et al.", role:{ko:"LoRA · 2021",en:"LoRA · 2021"},
-    q:{ko:"학습해야 할 값이 1만분의 1로 줄어든다.",
-       en:"LoRA can reduce the number of trainable parameters by 10,000 times"},
-    cite:"Hu et al., “LoRA: Low-Rank Adaptation of Large Language Models”, Abstract (arXiv:2106.09685)", url:"https://arxiv.org/abs/2106.09685" },
+  { who:"Howard & Ruder", role:{ko:"ULMFiT · 2018",en:"ULMFiT · 2018"},
+    q:{ko:"예시 100개만으로, 100배 많은 자료로 바닥부터 배운 것과 맞먹는다.",
+       en:"with only 100 labeled examples, it matches the performance of training from scratch on 100x more data"},
+    cite:"Howard & Ruder, “Universal Language Model Fine-tuning for Text Classification”, Abstract (arXiv:1801.06146)", url:"https://arxiv.org/abs/1801.06146" },
   { who:"Rafailov et al.", role:{ko:"DPO · 2023",en:"DPO · 2023"},
     q:{ko:"당신의 언어 모형은 사실 보상 모형이다.",en:"Your Language Model is Secretly a Reward Model"},
     cite:"Rafailov et al., “Direct Preference Optimization: Your Language Model is Secretly a Reward Model” (arXiv:2305.18290)", url:"https://arxiv.org/abs/2305.18290" },
@@ -894,6 +894,107 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
   { stage:{ko:"멈춤",en:"When to stop"}, t:"Active Retrieval Augmented Generation",
     d:{ko:"언제 더 찾을지를 모델이 스스로 정하게 하는 쪽의 이야기.",en:"Letting the model decide when to retrieve again."},
     url:"https://arxiv.org/abs/2305.06983" },
+],
+  },
+  ParameterEfficientFinetuning: {
+    title: "PEFT / LoRA / QLoRA",
+    overview: { ko:"PEFT는 사전학습 모델의 가중치는 그대로 얼려 두고, 작게 덧붙인 부분만 학습해 과제에 맞추는 방법들의 묶음이다.<br>과제마다 모델 한 벌을 통째로 두지 않아도 되므로, 학습 비용과 보관 공간이 함께 줄어든다.", en:"PEFT is the family of methods that freeze a pre-trained model's weights and train only a small added part to fit a task.<br>No task needs its own full copy of the model, so both training cost and storage come down." },
+    figures: [
+  { tag:"IDEA 1",
+    ko:{h:"어댑터 — 층마다 작은 모듈을 끼운다", c:"GLUE에서 과제마다 파라미터를 3.6%만 더하고도 전체 미세조정과의 차이가 0.4% 안쪽이었다."},
+    en:{h:"Adapters — insert a small module into each layer", c:"On GLUE it came within 0.4% of full fine-tuning while adding only 3.6% parameters per task."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="22" y="28" width="150" height="76" rx="10"/>
+      <text class="sv-dim" x="97" y="48" text-anchor="middle" font-size="9.5">${x("얼린 모델","frozen model")}</text>
+      <path class="sv-line" opacity=".5" d="M38 62h118M38 86h118"/>
+      <rect class="sv-vi-b" x="62" y="54" width="70" height="16" rx="8"/>
+      <rect class="sv-vi-b" x="62" y="78" width="70" height="16" rx="8"/>
+      <text class="sv-vi-t" x="97" y="66" text-anchor="middle" font-size="8.5">${x("어댑터","adapter")}</text>
+      <text class="sv-vi-t" x="97" y="90" text-anchor="middle" font-size="8.5">${x("어댑터","adapter")}</text>
+      <path class="sv-line" d="M182 66h20"/><path class="sv-line" d="M196 61l7 5-7 5"/>
+      <text class="sv-gr-t" x="268" y="62" text-anchor="middle" font-size="16" font-weight="700">+3.6%</text>
+      <text class="sv-dim" x="268" y="80" text-anchor="middle" font-size="9.5">${x("과제마다 더하는 양","added per task")}</text>`) },
+
+  { tag:"IDEA 2",
+    ko:{h:"프리픽스 튜닝 — 앞에 벡터 몇 개를 붙인다", c:"파라미터의 0.1%만 학습해도 전체 데이터에서 맞먹었고, 자료가 적을 때는 전체 미세조정을 앞섰다."},
+    en:{h:"Prefix tuning — prepend a few trainable vectors", c:"Learning only 0.1% of the parameters matched full fine-tuning, and beat it in low-data settings."},
+    art:(x)=>F(`
+      <rect class="sv-vi-b" x="14" y="52" width="16" height="28" rx="4"/>
+      <rect class="sv-vi-b" x="34" y="52" width="16" height="28" rx="4"/>
+      <rect class="sv-vi-b" x="54" y="52" width="16" height="28" rx="4"/>
+      <text class="sv-vi-t" x="42" y="126" text-anchor="middle" font-size="9.5">${x("학습하는 벡터","trainable prefix")}</text>
+      <rect class="sv-box" x="80" y="38" width="124" height="56" rx="9"/>
+      <text class="sv-dim" x="142" y="62" text-anchor="middle" font-size="10">${x("얼린 모델","frozen model")}</text>
+      <text class="sv-dim" x="142" y="78" text-anchor="middle" font-size="9">${x("그대로 둔다","untouched")}</text>
+      <path class="sv-line" d="M212 66h20"/><path class="sv-line" d="M226 61l7 5-7 5"/>
+      <text class="sv-gr-t" x="284" y="62" text-anchor="middle" font-size="16" font-weight="700">0.1%</text>
+      <text class="sv-dim" x="284" y="80" text-anchor="middle" font-size="9.5">${x("학습하는 양","what is trained")}</text>`) },
+
+  { tag:"IDEA 3",
+    ko:{h:"LoRA — 가중치 옆에 저랭크 행렬을 더한다", c:"학습해야 할 값이 1만분의 1로 줄고, 그래픽 메모리는 3분의 1이 된다."},
+    en:{h:"LoRA — add a low-rank matrix beside the weights", c:"10,000× fewer trainable parameters and a third of the GPU memory."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="22" y="34" width="86" height="64" rx="9"/>
+      <text class="sv-dim" x="65" y="60" text-anchor="middle" font-size="9.5">${x("원래 가중치","original W")}</text>
+      <text class="sv-dim" x="65" y="76" text-anchor="middle" font-size="9">${x("얼려 둔다","frozen")}</text>
+      <text class="sv-ink" x="122" y="71" text-anchor="middle" font-size="14">+</text>
+      <rect class="sv-vi-b" x="136" y="44" width="30" height="44" rx="5"/>
+      <rect class="sv-vi-b" x="172" y="58" width="44" height="16" rx="5"/>
+      <text class="sv-vi-t" x="176" y="126" text-anchor="middle" font-size="9.5">${x("저랭크 두 장","two low-rank matrices")}</text>
+      <path class="sv-line" d="M226 66h20"/><path class="sv-line" d="M240 61l7 5-7 5"/>
+      <text class="sv-gr-t" x="290" y="62" text-anchor="middle" font-size="15" font-weight="700">1 / 10,000</text>
+      <text class="sv-dim" x="290" y="80" text-anchor="middle" font-size="9.5">${x("학습하는 값의 수","trainable parameters")}</text>`) },
+
+  { tag:"IDEA 4",
+    ko:{h:"QLoRA — 4비트로 눌러 담고 그 위에 LoRA", c:"650억 모델을 48GB 그래픽카드 한 장에서, 16비트 미세조정과 같은 성능으로 학습했다."},
+    en:{h:"QLoRA — quantize to 4-bit, then put LoRA on top", c:"A 65B model fine-tuned on a single 48GB GPU, matching full 16-bit fine-tuning performance."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="34" width="76" height="64" rx="9"/>
+      <text class="sv-dim" x="52" y="60" text-anchor="middle" font-size="10">16-bit</text>
+      <text class="sv-dim" x="52" y="78" text-anchor="middle" font-size="9">${x("650억","65B")}</text>
+      <path class="sv-line" d="M96 66h18"/><path class="sv-line" d="M108 61l6 5-6 5"/>
+      <rect class="sv-vi-b" x="122" y="44" width="62" height="44" rx="8"/>
+      <text class="sv-vi-t" x="153" y="62" text-anchor="middle" font-size="11" font-weight="600">4-bit</text>
+      <text class="sv-vi-t" x="153" y="78" text-anchor="middle" font-size="8.5">${x("+ LoRA","+ LoRA")}</text>
+      <path class="sv-gr-l" d="M190 66h18"/><path class="sv-gr-l" d="M202 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="216" y="40" width="110" height="52" rx="9"/>
+      <text class="sv-gr-t" x="271" y="64" text-anchor="middle" font-size="15" font-weight="700">48GB ×1</text>
+      <text class="sv-dim" x="271" y="81" text-anchor="middle" font-size="9.5">${x("그래픽카드 한 장","a single GPU")}</text>`) },
+],
+    cherries: [
+  { who:"Hu et al.", role:{ko:"LoRA · 2021",en:"LoRA · 2021"},
+    q:{ko:"학습해야 할 값이 1만분의 1로 줄어든다.",en:"LoRA can reduce the number of trainable parameters by 10,000 times"},
+    cite:"Hu et al., “LoRA: Low-Rank Adaptation of Large Language Models”, Abstract (arXiv:2106.09685)", url:"https://arxiv.org/abs/2106.09685" },
+  { who:"Houlsby et al.", role:{ko:"어댑터 · 2019",en:"Adapters · 2019"},
+    q:{ko:"과제가 많아지면 미세조정은 파라미터가 아깝다 — 과제마다 모델 한 벌이 통째로 필요해진다.",
+       en:"in the presence of many downstream tasks, fine-tuning is parameter inefficient: an entire new model is required for every task"},
+    cite:"Houlsby et al., “Parameter-Efficient Transfer Learning for NLP”, Abstract (arXiv:1902.00751)", url:"https://arxiv.org/abs/1902.00751" },
+  { who:"Li & Liang", role:{ko:"프리픽스 튜닝 · 2021",en:"Prefix-Tuning · 2021"},
+    q:{ko:"뒤에 오는 토큰들이 이 접두사를 마치 가상의 토큰처럼 바라보게 한다.",
+       en:"allowing subsequent tokens to attend to this prefix as if it were “virtual tokens”"},
+    cite:"Li & Liang, “Prefix-Tuning: Optimizing Continuous Prompts for Generation”, Abstract (arXiv:2101.00190)", url:"https://arxiv.org/abs/2101.00190" },
+  { who:"Dettmers et al.", role:{ko:"QLoRA · 2023",en:"QLoRA · 2023"},
+    q:{ko:"650억 파라미터 모델을 48GB 그래픽카드 한 장에서 미세조정한다. 16비트로 할 때의 성능을 그대로 지킨 채로.",
+       en:"reduces memory usage enough to finetune a 65B parameter model on a single 48GB GPU while preserving full 16-bit finetuning task performance"},
+    cite:"Dettmers et al., “QLoRA: Efficient Finetuning of Quantized LLMs”, Abstract (arXiv:2305.14314)", url:"https://arxiv.org/abs/2305.14314" },
+  { who:"Houlsby et al.", role:{ko:"어댑터 · 2019",en:"Adapters · 2019"},
+    q:{ko:"반면 미세조정은 과제마다 파라미터의 100%를 학습시킨다.",
+       en:"By contrast, fine-tuning trains 100% of the parameters per task."},
+    cite:"Houlsby et al., “Parameter-Efficient Transfer Learning for NLP”, Abstract (arXiv:1902.00751)", url:"https://arxiv.org/abs/1902.00751" },
+],
+    refs: [
+  { stage:{ko:"원전",en:"Origin"}, t:"Parameter-Efficient Transfer Learning for NLP",
+    d:{ko:"어댑터를 처음 제안한 논문. 3.6%와 0.4%라는 숫자가 여기 있다.",en:"The adapter paper — where 3.6% and 0.4% come from."},
+    url:"https://arxiv.org/abs/1902.00751" },
+  { stage:{ko:"접두사",en:"Prefix"}, t:"Prefix-Tuning: Optimizing Continuous Prompts for Generation",
+    d:{ko:"앞에 붙인 벡터만 학습한다. 0.1%로 맞먹는다.",en:"Train only the prepended vectors — 0.1% is enough."},
+    url:"https://arxiv.org/abs/2101.00190" },
+  { stage:{ko:"저랭크",en:"Low-rank"}, t:"LoRA: Low-Rank Adaptation of Large Language Models",
+    d:{ko:"지금 가장 널리 쓰이는 방식. 추론 때 지연이 늘지 않는다.",en:"The one most used today — and it adds no inference latency."},
+    url:"https://arxiv.org/abs/2106.09685" },
+  { stage:{ko:"양자화",en:"Quantized"}, t:"QLoRA: Efficient Finetuning of Quantized LLMs",
+    d:{ko:"4비트로 눌러 담아 큰 모델을 한 장으로 끌어내린다.",en:"4-bit quantization brings a large model down to one card."},
+    url:"https://arxiv.org/abs/2305.14314" },
 ],
   },
 }
