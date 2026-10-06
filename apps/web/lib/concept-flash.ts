@@ -997,4 +997,109 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     url:"https://arxiv.org/abs/2305.14314" },
 ],
   },
+  MultiAgentOrchestration: {
+    title: "Multi-agent Orchestration",
+    overview: { ko:"멀티에이전트 오케스트레이션은 에이전트들 위에서 누가 언제 무엇을 어떤 권한으로 하는지 정하는 제어 계층이다.<br>에이전트를 몇 개 두느냐가 아니라 이 계층을 어떻게 짜느냐가 결과와 비용을 가른다.", en:"Multi-agent orchestration is the control layer that decides which agent acts, when, on what, and with what authority.<br>What decides the outcome and the cost is not how many agents there are, but how that layer is built." },
+    figures: [
+  { tag:"PROBLEM",
+    ko:{h:"그냥 이어 붙이면 틀린 말이 다음으로 번진다", c:"LLM을 순진하게 엮으면 환각이 연쇄로 번져 앞뒤가 맞지 않는 결과가 나온다."},
+    en:{h:"Chain them naively and one wrong step spreads", c:"Naively chaining LLMs produces cascading hallucinations and logic inconsistencies."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="52" width="60" height="28" rx="6"/>
+      <text class="sv-dim" x="44" y="70" text-anchor="middle" font-size="9.5">${x("에이전트 1","agent 1")}</text>
+      <path class="sv-line" d="M78 66h14"/><path class="sv-line" d="M86 61l6 5-6 5"/>
+      <rect class="sv-box" x="100" y="52" width="60" height="28" rx="6"/>
+      <text class="sv-dim" x="130" y="70" text-anchor="middle" font-size="9.5">${x("에이전트 2","agent 2")}</text>
+      <path class="sv-line" d="M164 66h14"/><path class="sv-line" d="M172 61l6 5-6 5"/>
+      <rect class="sv-ch-b" x="186" y="52" width="60" height="28" rx="6"/>
+      <text class="sv-ch-t" x="216" y="70" text-anchor="middle" font-size="9.5">${x("에이전트 3","agent 3")}</text>
+      <path class="sv-line" d="M250 66h14"/><path class="sv-line" d="M258 61l6 5-6 5"/>
+      <rect class="sv-ch-b" x="272" y="52" width="54" height="28" rx="6"/>
+      <text class="sv-ch-t" x="299" y="70" text-anchor="middle" font-size="9.5">${x("결과","result")}</text>
+      <text class="sv-ch-t" x="170" y="126" text-anchor="middle" font-size="10">${x("한 번 어긋나면 뒤로 번진다","one slip propagates downstream")}</text>`) },
+
+  { tag:"IDEA",
+    ko:{h:"역할을 나누고 일하는 절차를 넣는다", c:"사람의 표준 작업 절차를 프롬프트 순서로 심어, 각 역할이 중간 결과를 검증하게 한다."},
+    en:{h:"Give them roles, and give the work a procedure", c:"Standardized operating procedures are encoded into prompt sequences so each role verifies the intermediate result."},
+    art:(x)=>F(`
+      <rect class="sv-vi-b" x="14" y="30" width="92" height="22" rx="5"/>
+      <text class="sv-vi-t" x="60" y="45" text-anchor="middle" font-size="9">${x("기획","product")}</text>
+      <rect class="sv-vi-b" x="14" y="56" width="92" height="22" rx="5"/>
+      <text class="sv-vi-t" x="60" y="71" text-anchor="middle" font-size="9">${x("설계","architect")}</text>
+      <rect class="sv-vi-b" x="14" y="82" width="92" height="22" rx="5"/>
+      <text class="sv-vi-t" x="60" y="97" text-anchor="middle" font-size="9">${x("구현","engineer")}</text>
+      <path class="sv-line" d="M112 66h16"/><path class="sv-line" d="M122 61l6 5-6 5"/>
+      <rect class="sv-box" x="136" y="38" width="94" height="56" rx="9"/>
+      <text class="sv-ink" x="183" y="60" text-anchor="middle" font-size="10.5">${x("표준 절차","standard procedure")}</text>
+      <text class="sv-dim" x="183" y="76" text-anchor="middle" font-size="9">${x("단계마다 검증","checked at each step")}</text>
+      <path class="sv-line" d="M238 66h16"/><path class="sv-line" d="M248 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="262" y="44" width="64" height="44" rx="8"/>
+      <text class="sv-gr-t" x="294" y="70" text-anchor="middle" font-size="10">${x("넘겨준다","hand off")}</text>`) },
+
+  { tag:"SOLUTION",
+    ko:{h:"계획·실행·조정을 따로 세운다", c:"계획을 짜는 쪽, 도구를 불러 실행하는 쪽, 순서와 상태를 맞추는 쪽이 각각 맡는다."},
+    en:{h:"Separate the planning, the doing and the coordinating", c:"One part plans, one calls the tools and handles retries, one keeps order and state consistent."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="40" width="80" height="52" rx="9"/>
+      <text class="sv-ink" x="54" y="62" text-anchor="middle" font-size="10.5">${x("계획","planner")}</text>
+      <text class="sv-dim" x="54" y="78" text-anchor="middle" font-size="8.5">${x("순서를 짠다","sets the order")}</text>
+      <path class="sv-line" d="M98 66h14"/><path class="sv-line" d="M106 61l6 5-6 5"/>
+      <rect class="sv-box" x="120" y="40" width="80" height="52" rx="9"/>
+      <text class="sv-ink" x="160" y="62" text-anchor="middle" font-size="10.5">${x("실행","executor")}</text>
+      <text class="sv-dim" x="160" y="78" text-anchor="middle" font-size="8.5">${x("도구를 부른다","calls the tools")}</text>
+      <path class="sv-line" d="M204 66h14"/><path class="sv-line" d="M212 61l6 5-6 5"/>
+      <rect class="sv-vi-b" x="226" y="40" width="96" height="52" rx="9"/>
+      <text class="sv-vi-t" x="274" y="62" text-anchor="middle" font-size="10.5">${x("조정","coordinator")}</text>
+      <text class="sv-vi-t" x="274" y="78" text-anchor="middle" font-size="8.5">${x("상태를 맞춘다","keeps state in step")}</text>
+      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="9.5">${x("제어 계층","the control layer")}</text>`) },
+
+  { tag:"BENEFIT",
+    ko:{h:"혼자 할 때보다 멀리 간다 — 대신 토큰을 쓴다", c:"연구 과제에서 여럿이 나눠 맡은 쪽이 혼자 한 쪽보다 90.2% 나았다. 토큰은 대화의 약 15배를 썼다."},
+    en:{h:"It goes further than one agent — and spends for it", c:"On research tasks a lead-and-subagents setup beat a single agent by 90.2%, using about 15× the tokens of a chat."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="36" width="120" height="26" rx="6"/>
+      <text class="sv-dim" x="30" y="53" font-size="10">${x("혼자","single agent")}</text>
+      <rect class="sv-gr-b" x="14" y="74" width="120" height="26" rx="6"/>
+      <text class="sv-gr-t" x="30" y="91" font-size="10">${x("나눠 맡기","lead + subagents")}</text>
+      <path class="sv-gr-l" d="M146 66h24"/><path class="sv-gr-l" d="M164 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="182" y="40" width="144" height="52" rx="9"/>
+      <text class="sv-gr-t" x="254" y="68" text-anchor="middle" font-size="17" font-weight="700">+90.2%</text>
+      <text class="sv-dim" x="254" y="126" text-anchor="middle" font-size="9.5">${x("연구 과제 성적","on research tasks")}</text>`) },
+],
+    cherries: [
+  { who:"Melanie Mitchell", role:{ko:"『Artificial Intelligence』 · 2019 (요지)",en:"“Artificial Intelligence” · 2019 (paraphrase)"},
+    q:{ko:"사람의 지능은 혼자 완결되지 않는다 — 사회적·문화적 맥락 속에서만 작동한다.",
+       en:"Human intelligence is not complete on its own — it works only inside a social and cultural context."},
+    cite:"Melanie Mitchell, 『Artificial Intelligence: A Guide for Thinking Humans』(2019) 의 논지를 간추린 문장 — 원문 직접 인용이 아니다", url:"https://us.macmillan.com/books/9780374715236/artificialintelligence/" },
+  { who:"Hong et al.", role:{ko:"MetaGPT · 2023",en:"MetaGPT · 2023"},
+    q:{ko:"더 복잡한 과제는 LLM을 순진하게 엮는 데서 오는 연쇄 환각 때문에 앞뒤가 어긋난다.",
+       en:"Solutions to more complex tasks, however, are complicated through logic inconsistencies due to cascading hallucinations caused by naively chaining LLMs."},
+    cite:"Hong et al., “MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework”, Abstract (arXiv:2308.00352)", url:"https://arxiv.org/abs/2308.00352" },
+  { who:"Hong et al.", role:{ko:"MetaGPT · 2023",en:"MetaGPT · 2023"},
+    q:{ko:"조립 라인처럼 역할을 나눠 맡긴다.",en:"MetaGPT utilizes an assembly line paradigm to assign diverse roles to various agents"},
+    cite:"Hong et al., “MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework”, Abstract (arXiv:2308.00352)", url:"https://arxiv.org/abs/2308.00352" },
+  { who:"Hong et al.", role:{ko:"MetaGPT · 2023",en:"MetaGPT · 2023"},
+    q:{ko:"사람의 일하는 방식을 표준 절차로 심어, 각자 자기 몫의 중간 결과를 검증하게 한다.",
+       en:"MetaGPT encodes Standardized Operating Procedures (SOPs) into prompt sequences for more streamlined workflows, thus allowing agents with human-like domain expertise to verify intermediate results and reduce errors."},
+    cite:"Hong et al., “MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework”, Abstract (arXiv:2308.00352)", url:"https://arxiv.org/abs/2308.00352" },
+  { who:"Wu et al.", role:{ko:"AutoGen · 2023",en:"AutoGen · 2023"},
+    q:{ko:"에이전트들이 서로 대화하며 일을 끝낸다.",
+       en:"multiple agents that can converse with each other to accomplish tasks"},
+    cite:"Wu et al., “AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation”, Abstract (arXiv:2308.08155)", url:"https://arxiv.org/abs/2308.08155" },
+],
+    refs: [
+  { stage:{ko:"문제",en:"The failure"}, t:"MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework",
+    d:{ko:"연쇄 환각이 왜 생기는지, 표준 절차로 어떻게 막는지.",en:"Why cascading hallucinations happen, and how SOPs stop them."},
+    url:"https://arxiv.org/abs/2308.00352" },
+  { stage:{ko:"틀",en:"The framework"}, t:"AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation",
+    d:{ko:"대화하는 에이전트로 응용을 짜는 방식. 대화 패턴을 코드로 적는다.",en:"Build applications out of conversable agents; program the conversation."},
+    url:"https://arxiv.org/abs/2308.08155" },
+  { stage:{ko:"실전",en:"In practice"}, t:"How we built our multi-agent research system",
+    d:{ko:"90.2%와 토큰 15배가 여기서 나온다. 무엇이 깨졌는지도 함께 적혀 있다.",en:"Where 90.2% and the 15× token figure come from — along with what broke."},
+    url:"https://www.anthropic.com/engineering/multi-agent-research-system" },
+  { stage:{ko:"반론",en:"The counterargument"}, t:"Don't Build Multi-Agents",
+    d:{ko:"나누지 말라는 쪽의 주장. 맥락이 갈라지면 결정이 어긋난다.",en:"The case against splitting: once context splits, decisions diverge."},
+    url:"https://cognition.ai/blog/dont-build-multi-agents" },
+],
+  },
 }

@@ -1,0 +1,467 @@
+<title>Multi-agent Orchestration</title>
+<style>
+/* 기존 개념 페이지(concept-reader-page.tsx)의 색·간격·구조를 그대로 쓴다.
+   새로 만든 것은 ①한/영 토글 ②그림 구획뿐이다. */
+:root{
+  --page:#FBFAF8; --card:#FFFFFF; --border:#E4E1EE; --secondary:#F4F3F1;
+  --text-primary:#1A1626; --text-secondary:#3D3652; --text-muted:#9E97B3;
+  --cherry:#C94B6E; --cherry-soft:#FDF0F3; --cherry-border:#F0C3CF;
+  --violet:#7B5EA7; --violet-soft:#F3EFFA; --violet-border:#D9CEEC;
+  --green:#2F7A3A; --green-soft:#E3F1E1; --orange:#D4854A;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --page:#15131C; --card:#1D1A28; --border:#2F2B3E; --secondary:#242031;
+    --text-primary:#F1EFF6; --text-secondary:#C7C1D5; --text-muted:#8A82A0;
+    --cherry:#E9819C; --cherry-soft:#2B1A21; --cherry-border:#5A3442;
+    --violet:#AB92D4; --violet-soft:#241D33; --violet-border:#463A62;
+    --green:#5FBE95; --green-soft:#16261F; --orange:#E0A171;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#15131C; --card:#1D1A28; --border:#2F2B3E; --secondary:#242031;
+  --text-primary:#F1EFF6; --text-secondary:#C7C1D5; --text-muted:#8A82A0;
+  --cherry:#E9819C; --cherry-soft:#2B1A21; --cherry-border:#5A3442;
+  --violet:#AB92D4; --violet-soft:#241D33; --violet-border:#463A62;
+  --green:#5FBE95; --green-soft:#16261F; --orange:#E0A171;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text-secondary);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+  font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.shell{display:flex;gap:0;max-width:1160px;margin:0 auto;align-items:flex-start}
+@media(max-width:900px){.shell{flex-direction:column}}
+main{flex:1;min-width:0;padding-block:28px 72px;padding-left:20px;padding-right:20px}
+aside{width:280px;flex-shrink:0;border-left:1px solid var(--border);
+  padding-block:24px 40px;padding-left:16px;padding-right:16px}
+@media(max-width:900px){aside{width:100%;border-left:0;border-top:1px solid var(--border)}}
+
+/* 머리 — 원본의 뱃지·제목·메타줄 */
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;
+  font-size:10px;font-weight:700;background:var(--green-soft);color:var(--green);margin-bottom:12px}
+h1{margin:0 0 16px;font-size:28px;font-weight:800;color:var(--text-primary);
+  letter-spacing:-.5px;line-height:1.2}
+@media(max-width:600px){h1{font-size:20px}}
+.titlerow{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.langs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  background:var(--card);flex-shrink:0}
+.langs button{border:0;background:transparent;font-family:inherit;cursor:pointer;
+  padding:6px 13px;font-size:12px;font-weight:600;color:var(--text-muted)}
+.langs button[aria-pressed="true"]{background:var(--text-primary);color:var(--card)}
+.langs button:focus-visible{outline:2px solid var(--cherry);outline-offset:-2px}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;
+  color:var(--text-muted);margin-bottom:32px}
+.meta .dot{color:var(--border)}
+.meta .draft{color:var(--orange);font-weight:600}
+
+/* 구획 머리 — 원본 그대로 */
+section{margin-bottom:40px}
+.sechead{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sechead span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text-muted);white-space:nowrap}
+.sechead .rule{flex:1;height:1px;background:var(--border)}
+
+/* 01 개요 — 두 줄 */
+.overview{font-size:16px;line-height:1.75;color:var(--text-secondary);margin:0}
+
+/* 02 그림 */
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:700px){.figs{grid-template-columns:1fr}}
+figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
+  display:flex;flex-direction:column}
+.figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
+figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure svg{display:block;width:100%;height:auto;margin-block:auto}
+figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+.sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
+.sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
+.sv-ink{fill:var(--text-primary)} .sv-dim{fill:var(--text-muted)}
+.sv-ch{stroke:var(--cherry);fill:none;stroke-width:1.5;stroke-linecap:round} .sv-ch-t{fill:var(--cherry)}
+.sv-ch-b{fill:var(--cherry-soft);stroke:var(--cherry-border);stroke-width:1.4}
+.sv-vi-b{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.4}
+.sv-vi-f{fill:var(--violet)} .sv-vi-t{fill:var(--violet)}
+.sv-gr-b{fill:var(--green-soft);stroke:var(--green);stroke-width:1.5}
+.sv-gr-t{fill:var(--green)} .sv-gr-l{stroke:var(--green);fill:none;stroke-width:1.5;stroke-linecap:round}
+
+/* 03 체리 — 원본 카드(왼쪽 3px 체리색) */
+.cherry{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--cherry);
+  border-radius:8px;padding:16px;margin-bottom:10px}
+.cherry .who{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:12px;
+  font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.cherry .who .role{font-weight:400;color:var(--text-muted)}
+.cherry q{display:block;quotes:none;font-size:15px;line-height:1.65;color:var(--text-primary)}
+.cherry .cite{margin:8px 0 0;font-size:10px;color:var(--text-muted)}
+.cherry .cite a{color:var(--cherry);text-decoration:none}
+.cherry .cite a:hover{text-decoration:underline}
+
+/* 04 하위 개념 — 원본 2열 카드 + 관계색 + FULL/OUTLINE 뱃지 */
+.kids{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:600px){.kids{grid-template-columns:1fr}}
+.kid{position:relative;background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:12px 56px 12px 12px;text-align:left;font-family:inherit;cursor:pointer}
+.kid.has{border-color:var(--violet-border)} .kid.outline{border-style:dashed}
+.kid:hover{border-color:var(--cherry)}
+.kid .st{position:absolute;top:8px;right:8px;padding:1px 6px;border-radius:4px;border:1px solid;
+  font-size:8px;font-weight:800;letter-spacing:.5px}
+.kid .st.full{background:var(--violet-soft);color:var(--violet);border-color:var(--violet-border)}
+.kid .st.out{background:var(--secondary);color:var(--text-muted);border-color:var(--border)}
+.kid .rel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.kid .nm{margin:2px 0 0;font-size:13px;font-weight:600;color:var(--text-primary)}
+.kid .why{margin:2px 0 0;font-size:11px;color:var(--text-muted)}
+
+/* 05 레퍼런스 — 원본 타임라인 */
+.ref{position:relative;padding-left:16px;border-left:2px solid var(--border);margin-bottom:16px}
+.ref:first-child{border-left-color:var(--cherry)}
+.ref .pin{position:absolute;left:-5px;top:2px;width:8px;height:8px;border-radius:50%;background:var(--border)}
+.ref:first-child .pin{background:var(--cherry)}
+.ref .stage{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+.ref:first-child .stage{color:var(--cherry)}
+.ref a.t{display:block;margin-top:2px;font-size:13px;font-weight:700;color:var(--text-primary);
+  text-decoration:none;text-underline-offset:2px}
+.ref a.t:hover{color:var(--cherry);text-decoration:underline dotted}
+.ref p{margin:4px 0 0;font-size:11.5px;color:var(--text-muted)}
+.ref .kind{margin-top:3px;font-size:10px;color:var(--text-muted)}
+
+/* 오른쪽 — Learning Roadmap 카드 (원본) */
+.rmcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.rmcard .h{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text-muted);margin:0 0 12px}
+.rmcard svg{display:block;width:100%;height:auto}
+.legend{margin-top:8px;display:grid;gap:4px;font-size:9px;color:var(--text-muted)}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend i{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.rm-self{fill:var(--card);stroke:var(--cherry);stroke-width:2}
+.rm-deep{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.5}
+.rm-pre{fill:var(--secondary);stroke:var(--border);stroke-width:1.5}
+.rm-arrow{stroke:var(--border);stroke-width:1.5;fill:none}
+.rm-head{fill:var(--border)} .rm-band{fill:var(--text-muted)} .rm-t{fill:var(--text-primary)} .rm-vt{fill:var(--violet)}
+</style>
+
+<div class="shell">
+  <main>
+    <span class="badge" id="badge">ADVANCED</span>
+    <div class="titlerow">
+      <h1 id="title">Multi-agent Orchestration</h1>
+      <div class="langs" role="group" aria-label="Language">
+        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
+        <button id="lang-en" type="button" aria-pressed="false">English</button>
+      </div>
+    </div>
+    <div class="meta" id="meta"></div>
+
+    <section>
+      <div class="sechead"><span>01 — Overview</span><div class="rule"></div></div>
+      <p class="overview" id="overview"></p>
+    </section>
+
+    <section>
+      <div class="sechead"><span>02 — Flash</span><div class="rule"></div></div>
+      <div class="figs" id="figs"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>03 — Cherries</span><div class="rule"></div></div>
+      <div id="cherries"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>04 — Child Concepts</span><div class="rule"></div></div>
+      <div class="kids" id="kids"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>05 — References</span><div class="rule"></div></div>
+      <div id="refs"></div>
+    </section>
+  </main>
+
+  <aside>
+    <div class="rmcard">
+      <p class="h">Learning Roadmap</p>
+      <div id="roadmap"></div>
+      <div class="legend">
+        <div><i style="border:2px solid var(--cherry);background:var(--card)"></i><span>Cherry = You are here</span></div>
+        <div><i style="border:2px solid var(--violet-border);background:var(--violet-soft)"></i><span>Violet = Go deeper</span></div>
+        <div><i style="border:1px dashed var(--violet-border);background:var(--violet-soft)"></i><span>Dashed = Outline only</span></div>
+        <div><i style="border:1px solid var(--border);background:var(--secondary)"></i><span>Gray = Prerequisite</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+const F = (i) => `<svg viewBox="0 0 340 142" role="img" xmlns="http://www.w3.org/2000/svg">${i}</svg>`;
+
+/* 넉 장 공통 격자 — 사물 띠 28~104(중심 66), 이름표 126, 화살표 66. x(한국어, English) */
+const FIGURES = [
+  { tag:"PROBLEM",
+    ko:{h:"그냥 이어 붙이면 틀린 말이 다음으로 번진다", c:"LLM을 순진하게 엮으면 환각이 연쇄로 번져 앞뒤가 맞지 않는 결과가 나온다."},
+    en:{h:"Chain them naively and one wrong step spreads", c:"Naively chaining LLMs produces cascading hallucinations and logic inconsistencies."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="52" width="60" height="28" rx="6"/>
+      <text class="sv-dim" x="44" y="70" text-anchor="middle" font-size="9.5">${x("에이전트 1","agent 1")}</text>
+      <path class="sv-line" d="M78 66h14"/><path class="sv-line" d="M86 61l6 5-6 5"/>
+      <rect class="sv-box" x="100" y="52" width="60" height="28" rx="6"/>
+      <text class="sv-dim" x="130" y="70" text-anchor="middle" font-size="9.5">${x("에이전트 2","agent 2")}</text>
+      <path class="sv-line" d="M164 66h14"/><path class="sv-line" d="M172 61l6 5-6 5"/>
+      <rect class="sv-ch-b" x="186" y="52" width="60" height="28" rx="6"/>
+      <text class="sv-ch-t" x="216" y="70" text-anchor="middle" font-size="9.5">${x("에이전트 3","agent 3")}</text>
+      <path class="sv-line" d="M250 66h14"/><path class="sv-line" d="M258 61l6 5-6 5"/>
+      <rect class="sv-ch-b" x="272" y="52" width="54" height="28" rx="6"/>
+      <text class="sv-ch-t" x="299" y="70" text-anchor="middle" font-size="9.5">${x("결과","result")}</text>
+      <text class="sv-ch-t" x="170" y="126" text-anchor="middle" font-size="10">${x("한 번 어긋나면 뒤로 번진다","one slip propagates downstream")}</text>`) },
+
+  { tag:"IDEA",
+    ko:{h:"역할을 나누고 일하는 절차를 넣는다", c:"사람의 표준 작업 절차를 프롬프트 순서로 심어, 각 역할이 중간 결과를 검증하게 한다."},
+    en:{h:"Give them roles, and give the work a procedure", c:"Standardized operating procedures are encoded into prompt sequences so each role verifies the intermediate result."},
+    art:(x)=>F(`
+      <rect class="sv-vi-b" x="14" y="30" width="92" height="22" rx="5"/>
+      <text class="sv-vi-t" x="60" y="45" text-anchor="middle" font-size="9">${x("기획","product")}</text>
+      <rect class="sv-vi-b" x="14" y="56" width="92" height="22" rx="5"/>
+      <text class="sv-vi-t" x="60" y="71" text-anchor="middle" font-size="9">${x("설계","architect")}</text>
+      <rect class="sv-vi-b" x="14" y="82" width="92" height="22" rx="5"/>
+      <text class="sv-vi-t" x="60" y="97" text-anchor="middle" font-size="9">${x("구현","engineer")}</text>
+      <path class="sv-line" d="M112 66h16"/><path class="sv-line" d="M122 61l6 5-6 5"/>
+      <rect class="sv-box" x="136" y="38" width="94" height="56" rx="9"/>
+      <text class="sv-ink" x="183" y="60" text-anchor="middle" font-size="10.5">${x("표준 절차","standard procedure")}</text>
+      <text class="sv-dim" x="183" y="76" text-anchor="middle" font-size="9">${x("단계마다 검증","checked at each step")}</text>
+      <path class="sv-line" d="M238 66h16"/><path class="sv-line" d="M248 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="262" y="44" width="64" height="44" rx="8"/>
+      <text class="sv-gr-t" x="294" y="70" text-anchor="middle" font-size="10">${x("넘겨준다","hand off")}</text>`) },
+
+  { tag:"SOLUTION",
+    ko:{h:"계획·실행·조정을 따로 세운다", c:"계획을 짜는 쪽, 도구를 불러 실행하는 쪽, 순서와 상태를 맞추는 쪽이 각각 맡는다."},
+    en:{h:"Separate the planning, the doing and the coordinating", c:"One part plans, one calls the tools and handles retries, one keeps order and state consistent."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="40" width="80" height="52" rx="9"/>
+      <text class="sv-ink" x="54" y="62" text-anchor="middle" font-size="10.5">${x("계획","planner")}</text>
+      <text class="sv-dim" x="54" y="78" text-anchor="middle" font-size="8.5">${x("순서를 짠다","sets the order")}</text>
+      <path class="sv-line" d="M98 66h14"/><path class="sv-line" d="M106 61l6 5-6 5"/>
+      <rect class="sv-box" x="120" y="40" width="80" height="52" rx="9"/>
+      <text class="sv-ink" x="160" y="62" text-anchor="middle" font-size="10.5">${x("실행","executor")}</text>
+      <text class="sv-dim" x="160" y="78" text-anchor="middle" font-size="8.5">${x("도구를 부른다","calls the tools")}</text>
+      <path class="sv-line" d="M204 66h14"/><path class="sv-line" d="M212 61l6 5-6 5"/>
+      <rect class="sv-vi-b" x="226" y="40" width="96" height="52" rx="9"/>
+      <text class="sv-vi-t" x="274" y="62" text-anchor="middle" font-size="10.5">${x("조정","coordinator")}</text>
+      <text class="sv-vi-t" x="274" y="78" text-anchor="middle" font-size="8.5">${x("상태를 맞춘다","keeps state in step")}</text>
+      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="9.5">${x("제어 계층","the control layer")}</text>`) },
+
+  { tag:"BENEFIT",
+    ko:{h:"혼자 할 때보다 멀리 간다 — 대신 토큰을 쓴다", c:"연구 과제에서 여럿이 나눠 맡은 쪽이 혼자 한 쪽보다 90.2% 나았다. 토큰은 대화의 약 15배를 썼다."},
+    en:{h:"It goes further than one agent — and spends for it", c:"On research tasks a lead-and-subagents setup beat a single agent by 90.2%, using about 15× the tokens of a chat."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="36" width="120" height="26" rx="6"/>
+      <text class="sv-dim" x="30" y="53" font-size="10">${x("혼자","single agent")}</text>
+      <rect class="sv-gr-b" x="14" y="74" width="120" height="26" rx="6"/>
+      <text class="sv-gr-t" x="30" y="91" font-size="10">${x("나눠 맡기","lead + subagents")}</text>
+      <path class="sv-gr-l" d="M146 66h24"/><path class="sv-gr-l" d="M164 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="182" y="40" width="144" height="52" rx="9"/>
+      <text class="sv-gr-t" x="254" y="68" text-anchor="middle" font-size="17" font-weight="700">+90.2%</text>
+      <text class="sv-dim" x="254" y="126" text-anchor="middle" font-size="9.5">${x("연구 과제 성적","on research tasks")}</text>`) },
+];
+
+const CHERRIES = [
+  { who:"Melanie Mitchell", role:{ko:"『Artificial Intelligence』 · 2019 (요지)",en:"“Artificial Intelligence” · 2019 (paraphrase)"},
+    q:{ko:"사람의 지능은 혼자 완결되지 않는다 — 사회적·문화적 맥락 속에서만 작동한다.",
+       en:"Human intelligence is not complete on its own — it works only inside a social and cultural context."},
+    cite:"Melanie Mitchell, 『Artificial Intelligence: A Guide for Thinking Humans』(2019) 의 논지를 간추린 문장 — 원문 직접 인용이 아니다", url:"https://us.macmillan.com/books/9780374715236/artificialintelligence/" },
+  { who:"Hong et al.", role:{ko:"MetaGPT · 2023",en:"MetaGPT · 2023"},
+    q:{ko:"더 복잡한 과제는 LLM을 순진하게 엮는 데서 오는 연쇄 환각 때문에 앞뒤가 어긋난다.",
+       en:"Solutions to more complex tasks, however, are complicated through logic inconsistencies due to cascading hallucinations caused by naively chaining LLMs."},
+    cite:"Hong et al., “MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework”, Abstract (arXiv:2308.00352)", url:"https://arxiv.org/abs/2308.00352" },
+  { who:"Hong et al.", role:{ko:"MetaGPT · 2023",en:"MetaGPT · 2023"},
+    q:{ko:"조립 라인처럼 역할을 나눠 맡긴다.",en:"MetaGPT utilizes an assembly line paradigm to assign diverse roles to various agents"},
+    cite:"Hong et al., “MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework”, Abstract (arXiv:2308.00352)", url:"https://arxiv.org/abs/2308.00352" },
+  { who:"Hong et al.", role:{ko:"MetaGPT · 2023",en:"MetaGPT · 2023"},
+    q:{ko:"사람의 일하는 방식을 표준 절차로 심어, 각자 자기 몫의 중간 결과를 검증하게 한다.",
+       en:"MetaGPT encodes Standardized Operating Procedures (SOPs) into prompt sequences for more streamlined workflows, thus allowing agents with human-like domain expertise to verify intermediate results and reduce errors."},
+    cite:"Hong et al., “MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework”, Abstract (arXiv:2308.00352)", url:"https://arxiv.org/abs/2308.00352" },
+  { who:"Wu et al.", role:{ko:"AutoGen · 2023",en:"AutoGen · 2023"},
+    q:{ko:"에이전트들이 서로 대화하며 일을 끝낸다.",
+       en:"multiple agents that can converse with each other to accomplish tasks"},
+    cite:"Wu et al., “AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation”, Abstract (arXiv:2308.08155)", url:"https://arxiv.org/abs/2308.08155" },
+];
+
+const KIDS = [
+  { rel:"SUBTOPIC", node:"Planner", label:"Planner", has:false,
+    why:{ko:"목표와 제약에서 행동 순서와 작업 흐름을 설계한다",en:"Designs the sequence of actions from goal and constraints"} },
+  { rel:"SUBTOPIC", node:"Executor", label:"Executor", has:false,
+    why:{ko:"계획을 실제 작업으로 바꿔 도구를 부르고 오류를 다룬다",en:"Turns the plan into work — tools, retries, fallbacks"} },
+  { rel:"SUBTOPIC", node:"Coordinator", label:"Coordinator", has:false,
+    why:{ko:"작업 배분·통신·자원·상태 일관성을 관리한다",en:"Routes work and messages, keeps state consistent"} },
+  { rel:"RELATED", node:"MultiAgentCollaboration", label:"MultiAgentCollaboration", has:false,
+    why:{ko:"여러 에이전트가 일을 나누고 정보를 주고받는 방식",en:"How agents split work and exchange information"} },
+  { rel:"RELATED", node:"WorkflowAutomation", label:"WorkflowAutomation", has:false,
+    why:{ko:"업무 흐름을 작업 단위로 쪼개 자동 실행한다",en:"Decompose a business process and run it automatically"} },
+  { rel:"PREREQUISITE", node:"MultiAgentSystem", label:"MultiAgentSystem", has:true,
+    why:{ko:"굴릴 에이전트들의 집합이 먼저 있어야 한다",en:"There must be a set of agents to run"} },
+];
+
+const REL_COLOR = { SUBTOPIC:"var(--violet)", PREREQUISITE:"var(--text-muted)", RELATED:"var(--orange)" };
+
+const REFS = [
+  { stage:{ko:"문제",en:"The failure"}, t:"MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework",
+    d:{ko:"연쇄 환각이 왜 생기는지, 표준 절차로 어떻게 막는지.",en:"Why cascading hallucinations happen, and how SOPs stop them."},
+    url:"https://arxiv.org/abs/2308.00352" },
+  { stage:{ko:"틀",en:"The framework"}, t:"AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation",
+    d:{ko:"대화하는 에이전트로 응용을 짜는 방식. 대화 패턴을 코드로 적는다.",en:"Build applications out of conversable agents; program the conversation."},
+    url:"https://arxiv.org/abs/2308.08155" },
+  { stage:{ko:"실전",en:"In practice"}, t:"How we built our multi-agent research system",
+    d:{ko:"90.2%와 토큰 15배가 여기서 나온다. 무엇이 깨졌는지도 함께 적혀 있다.",en:"Where 90.2% and the 15× token figure come from — along with what broke."},
+    url:"https://www.anthropic.com/engineering/multi-agent-research-system" },
+  { stage:{ko:"반론",en:"The counterargument"}, t:"Don't Build Multi-Agents",
+    d:{ko:"나누지 말라는 쪽의 주장. 맥락이 갈라지면 결정이 어긋난다.",en:"The case against splitting: once context splits, decisions diverge."},
+    url:"https://cognition.ai/blog/dont-build-multi-agents" },
+];
+
+const T = {
+  ko:{ meta:["Updated 2026-10-06","5 cherries","Draft — pending review","via 외부 자료"],
+       overview:"멀티에이전트 오케스트레이션은 에이전트들 위에서 누가 언제 무엇을 어떤 권한으로 하는지 정하는 제어 계층이다.<br>에이전트를 몇 개 두느냐가 아니라 이 계층을 어떻게 짜느냐가 결과와 비용을 가른다." },
+  en:{ meta:["Updated 2026-10-06","5 cherries","Draft — pending review","via external sources"],
+       overview:"Multi-agent orchestration is the control layer that decides which agent acts, when, on what, and with what authority.<br>What decides the outcome and the cost is not how many agents there are, but how that layer is built." },
+};
+
+const SELF_NODE = "MultiAgentOrchestration";
+
+/* Learning Roadmap — concept-reader-page.tsx 의 ConceptRoadmap 을 그대로 옮긴다.
+   띠·관계 매핑·배치·폰트 축소·화살표 모두 기존 화면과 같다. 색만 테마 토큰을 쓴다. */
+const ROADMAP_BANDS = [
+  { title:"Prerequisites", rel:["PREREQUISITE"],            pos:"above" },
+  { title:"Go deeper",     rel:["SUBTOPIC","EXTENDS"],      pos:"below" },
+  { title:"Related",       rel:["RELATED","CONTRADICTS"],   pos:"below" },
+];
+const RM = { W:200, PAD:4, GAP:6, FS:11, CHAR_W:0.56, PAD_X:9, LINE_H:14, CHIP_PAD_Y:9,
+  ROW_GAP:7, BAND_LABEL_H:22, BAND_FS:10, BAND_GAP:18,
+  SELF_MIN_W:96, SELF_FS:15, SELF_MIN_FS:10, SELF_PAD_X:12, SELF_PAD_Y:12,
+  CHIP_MIN_FS:8, ARROW:22 };
+
+function breakPoints(s){ const idx=[];
+  for(let i=1;i<s.length;i++){ if(s[i]===" ")idx.push(i);
+    else if(/[a-z0-9]/.test(s[i-1])&&/[A-Z]/.test(s[i]))idx.push(i); } return idx; }
+function wrapLabelAt(label, maxTextW, fs){
+  const w=(t)=>t.length*fs*RM.CHAR_W;
+  if(w(label)<=maxTextW) return [label];
+  const bps=breakPoints(label); const lines=[]; let start=0;
+  while(start<label.length){
+    const rest=label.slice(start);
+    if(w(rest)<=maxTextW){ lines.push(rest.trim()); break; }
+    const cand=bps.filter(b=>b>start&&w(label.slice(start,b))<=maxTextW);
+    if(!cand.length){ const n=Math.max(1,Math.floor(maxTextW/(fs*RM.CHAR_W)));
+      lines.push(label.slice(start,start+n).trim()); start+=n; }
+    else { const b=cand[cand.length-1]; lines.push(label.slice(start,b).trim()); start=b; }
+  }
+  return lines.filter(Boolean);
+}
+function fitText(label, maxTextW, maxFS, minFS){
+  const w=(t,fs)=>t.length*fs*RM.CHAR_W;
+  if(w(label,maxFS)<=maxTextW) return {lines:[label],fs:maxFS};
+  const needed=maxTextW/(label.length*RM.CHAR_W);
+  if(needed>=minFS) return {lines:[label],fs:Math.floor(needed*10)/10};
+  return {lines:wrapLabelAt(label,maxTextW,minFS),fs:minFS};
+}
+function roadmap(){
+  const inner=RM.W-RM.PAD*2;
+  const makeChip=(c)=>{ const maxTextW=inner-RM.PAD_X*2;
+    const {lines,fs}=fitText(c.label,maxTextW,RM.FS,RM.CHIP_MIN_FS);
+    const widest=Math.max(...lines.map(l=>l.length*fs*RM.CHAR_W));
+    return { node:c.node, label:c.label, hasPage:c.has, lines, fs,
+      w:Math.min(inner,widest+RM.PAD_X*2), h:lines.length*(fs+3)+RM.CHIP_PAD_Y*2 }; };
+  const flow=(chips)=>{ const rows=[]; let cur=[],used=0;
+    for(const ch of chips){ const need=ch.w+(cur.length?RM.GAP:0);
+      if(cur.length&&used+need>inner){ rows.push(cur); cur=[ch]; used=ch.w; }
+      else { cur.push(ch); used+=need; } }
+    if(cur.length) rows.push(cur); return rows; };
+  const bands=ROADMAP_BANDS.map(b=>{
+    const chips=KIDS.filter(c=>b.rel.includes(c.rel)).map(makeChip);
+    const rows=flow(chips);
+    const h=chips.length ? RM.BAND_LABEL_H
+      + rows.reduce((s,r)=>s+Math.max(...r.map(c=>c.h)),0)
+      + Math.max(0,rows.length-1)*RM.ROW_GAP : 0;
+    return {...b, rows, h, count:chips.length};
+  }).filter(b=>b.count>0);
+
+  const above=bands.filter(b=>b.pos==="above"), below=bands.filter(b=>b.pos==="below");
+  const sum=(l)=>l.reduce((s,b)=>s+b.h,0)+Math.max(0,l.length-1)*RM.BAND_GAP;
+  const selfFit=fitText(SELF_NODE, inner-RM.SELF_PAD_X*2, RM.SELF_FS, RM.SELF_MIN_FS);
+  const selfTextW=Math.max(...selfFit.lines.map(l=>l.length*selfFit.fs*RM.CHAR_W));
+  const selfW=Math.min(inner,Math.max(RM.SELF_MIN_W,selfTextW+RM.SELF_PAD_X*2));
+  const selfH=selfFit.lines.length*(selfFit.fs+4)+RM.SELF_PAD_Y*2;
+  const selfBlock=selfH+20;
+  const H=RM.PAD*2+(above.length?sum(above)+RM.ARROW:0)+selfBlock+(below.length?sum(below)+RM.ARROW:0);
+
+  const parts=[];
+  const drawBand=(b,top)=>{ let y=top+RM.BAND_LABEL_H;
+    parts.push(`<text class="rm-band" x="${RM.W/2}" y="${top+11}" text-anchor="middle" font-size="${RM.BAND_FS}" font-weight="700" letter-spacing=".5">${b.title.toUpperCase()}</text>`);
+    b.rows.forEach((row,ri)=>{
+      const rowH=Math.max(...row.map(c=>c.h));
+      const rowW=row.reduce((s,c)=>s+c.w,0)+(row.length-1)*RM.GAP;
+      let x=(RM.W-rowW)/2;
+      for(const c of row){ const cx=x; x+=c.w+RM.GAP;
+        const cls=b.pos==="above"?"rm-pre":"rm-deep";
+        parts.push(`<rect class="${cls}" x="${cx}" y="${y}" width="${c.w}" height="${c.h}" rx="7"${c.hasPage?"":' stroke-dasharray="3"'}/>`);
+        c.lines.forEach((ln,li)=>parts.push(
+          `<text class="${b.pos==="above"?"rm-band":"rm-vt"}" x="${cx+c.w/2}" y="${y+RM.CHIP_PAD_Y+(c.fs+3)*li+c.fs}" text-anchor="middle" font-size="${c.fs}">${ln}</text>`));
+      }
+      y+=rowH+(ri<b.rows.length-1?RM.ROW_GAP:0);
+    });
+  };
+  const arrow=(y,dashed)=>{
+    parts.push(`<line class="rm-arrow" x1="${RM.W/2}" y1="${y}" x2="${RM.W/2}" y2="${y+RM.ARROW-7}" stroke-width="2"${dashed?' stroke-dasharray="4"':''}/>`);
+    parts.push(`<polygon class="rm-head" points="${RM.W/2-5},${y+RM.ARROW-8} ${RM.W/2+5},${y+RM.ARROW-8} ${RM.W/2},${y+RM.ARROW}"/>`);
+  };
+
+  let y=RM.PAD;
+  above.forEach((b,i)=>{ drawBand(b,y); y+=b.h+(i<above.length-1?RM.BAND_GAP:0); });
+  if(above.length){ arrow(y,false); y+=RM.ARROW; }
+  parts.push(`<rect class="rm-self" x="${(RM.W-selfW)/2}" y="${y}" width="${selfW}" height="${selfH}" rx="8"/>`);
+  selfFit.lines.forEach((ln,i)=>parts.push(
+    `<text class="rm-t" x="${RM.W/2}" y="${y+RM.SELF_PAD_Y+(selfFit.fs+4)*i+selfFit.fs}" text-anchor="middle" font-size="${selfFit.fs}" font-weight="700">${ln}</text>`));
+  parts.push(`<text class="rm-band" x="${RM.W/2}" y="${y+selfH+14}" text-anchor="middle" font-size="10">(you are here)</text>`);
+  y+=selfBlock;
+  if(below.length){ arrow(y,true); y+=RM.ARROW; }
+  below.forEach((b,i)=>{ drawBand(b,y); y+=b.h+(i<below.length-1?RM.BAND_GAP:0); });
+  return `<svg viewBox="0 0 ${RM.W} ${Math.ceil(H)}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
+}
+
+let lang = "ko";
+function render(){
+  const t = T[lang];
+  document.getElementById("meta").innerHTML = t.meta
+    .map((m,i)=>`<span class="${i===2?"draft":""}">${m}</span>`).join('<span class="dot">·</span>');
+  document.getElementById("overview").innerHTML = t.overview;
+
+  const x = (k,e) => lang==="ko" ? k : e;
+  document.getElementById("figs").innerHTML = FIGURES.map(f=>`
+    <figure><div class="figtag">${f.tag}</div><h3>${f[lang].h}</h3>${f.art(x)}
+      <figcaption>${f[lang].c}</figcaption></figure>`).join("");
+
+  document.getElementById("cherries").innerHTML = CHERRIES.map(c=>`
+    <div class="cherry">
+      <div class="who">🍒 ${c.who} <span class="role">— ${c.role[lang]}</span></div>
+      <q>“${c.q[lang]}”</q>
+      <p class="cite">${c.cite} · <a href="${c.url}" target="_blank" rel="noopener noreferrer">${lang==="ko"?"원문":"source"} ↗</a></p>
+    </div>`).join("");
+
+  document.getElementById("kids").innerHTML = KIDS.map(k=>`
+    <button class="kid ${k.has?"has":"outline"}" type="button">
+      <span class="st ${k.has?"full":"out"}">${k.has?"FULL":"OUTLINE"}</span>
+      <span class="rel" style="color:${REL_COLOR[k.rel]}">${k.rel}</span>
+      <p class="nm">${k.label}</p><p class="why">${k.why[lang]}</p>
+    </button>`).join("");
+
+  document.getElementById("refs").innerHTML = REFS.map(r=>`
+    <div class="ref"><div class="pin"></div>
+      <div class="stage">${r.stage[lang]}</div>
+      <a class="t" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.t} ↗</a>
+      <p>${r.d[lang]}</p>
+      <div class="kind">🔗 External — ${new URL(r.url).hostname.replace(/^www\./,"")}</div>
+    </div>`).join("");
+
+  document.getElementById("roadmap").innerHTML = roadmap();
+  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
+  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
+}
+document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
+document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
+render();
+</script>
