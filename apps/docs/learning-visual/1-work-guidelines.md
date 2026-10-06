@@ -20,7 +20,9 @@
   〈왜〉 Advanced Prompting의 하위 개념 8개를 추정으로 썼는데, 온톨로지의 실제 자식은 11개였고
   그중 4개만 맞았다. Reflexion·SelfAsk·PlanAndSolve·PAL·ProgramOfThoughts·PromptChaining이
   빠지고, 없는 개념(Least-to-Most·Prompt Optimization)이 들어가 있었다.
-- 모르면 **DB를 읽는다**(§6-1에 쿼리가 있다). 그래도 모르면 **묻는다.**
+- **화면 구조도 정본이 있다.** 로드맵·구획·관계 종류는 `concept-reader-page.tsx` 와
+  `lib/api.ts` 가 정본이다. 목업은 그것을 옮긴 것이고, 새로 설계하는 자리가 아니다 (§6-1-1).
+- 모르면 **코드와 DB를 먼저 읽는다**(§6-1 쿼리 · §6-1-1 표). 그래도 모르면 **묻는다.**
 
 ---
 
@@ -375,6 +377,28 @@ SELECT r.relation_type::text rel, o.ontology_node, o.canonical_name, o.descripti
   카드 격자는 2열이므로 개수는 제약이 아니다.
 - 온톨로지에 없는 개념은 **넣지 않는다.** 넣어야 할 것 같으면 온톨로지에 추가하는 것이
   먼저이고, 그 추가는 사용자 지시 없이 하지 않는다 (DB는 프로덕션과 공유한다).
+
+### 6-1-1. 오른쪽 Learning Roadmap — 기존 화면의 알고리즘을 그대로 쓴다
+
+로드맵은 **새로 설계하지 않는다.** `apps/web/components/cherry/concept-reader-page.tsx` 의
+`ConceptRoadmap` 을 그대로 옮긴다. 별도 데이터 없이 **하위 개념 하나로** 그린다.
+
+| 항목 | 값 (기존 화면) |
+|---|---|
+| 띠 | `Prerequisites`(위) · `Go deeper`(아래) · `Related`(아래). **빈 띠는 생략** |
+| 관계 매핑 | `PREREQUISITE` → Prerequisites · `SUBTOPIC`·`EXTENDS` → Go deeper · `RELATED`·`CONTRADICTS` → Related |
+| 관계 종류 | **이 다섯뿐이다** — `SUBTOPIC` `PREREQUISITE` `EXTENDS` `RELATED` `CONTRADICTS` (`lib/api.ts` `ConceptRelationType`) |
+| 중앙 상자 | **온톨로지 노드명**(`doc.node`, 예 `AdvancedPrompting`). 표시 이름이 아니다. 아래에 `(you are here)` |
+| 칩 | 이름 길이에 맞춰 폭이 늘고, 폭이 남으면 **옆에 나란히**, 모자라면 다음 줄. 줄은 가운데 정렬 |
+| 글자 | 폭에 맞춰 ①그대로 → ②폰트 축소 → ③줄바꿈(공백·camelCase 경계). **자르지 않는다** |
+| 페이지 없음 | 칩 테두리를 파선 |
+| 화살표 | 위→중앙 실선, 중앙→아래 **점선** |
+| 폭 | `W=200` |
+| 범례 | 4줄 고정 — Cherry/Violet/Dashed/Gray |
+
+- **없는 관계를 만들지 않는다.** 상위 개념(부모)은 기존 화면의 로드맵에 **올라가지 않는다**
+  — API 의 `childConcepts` 는 아래 방향 간선만 담기 때문이다.
+  〈왜〉 `PARENT` 라는 관계와 `ABOVE` 띠를 지어내 넣었다가 전부 걷어냈다. 그런 관계 종류는 없다.
 
 ### 6-2. 레퍼런스
 
