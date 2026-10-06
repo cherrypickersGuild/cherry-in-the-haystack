@@ -194,26 +194,26 @@ const F = (i) => `<svg viewBox="0 0 340 142" role="img" xmlns="http://www.w3.org
 
 /* 넉 장 공통 격자 — 사물 띠 28~104(중심 66), 이름표 126, 화살표 66. x(한국어, English) */
 const FIGURES = [
-  { tag:"PROBLEM",
-    ko:{h:"생각을 한 줄로만 펼친다", c:"토큰을 왼쪽에서 오른쪽으로 정해 나가는 과정에 갇혀 있어, 앞선 선택이 중요한 문제에서 약하다."},
-    en:{h:"The thinking runs in a single line", c:"Confined to token-level, left-to-right decision-making, it falls short where the initial decisions are pivotal."},
+  { tag:"IDEA 1",
+    ko:{h:"생각의 사슬 — 답 대신 푸는 과정을 쓰게 한다", c:"예시 여덟 개로 GSM8K 최고 성적을 냈다. 지시문 한 문장만 붙여도 10.4%에서 40.7%가 됐다."},
+    en:{h:"Chain of Thought — make it write the steps, not the answer", c:"Eight exemplars took GSM8K to state of the art; one added sentence moved it from 10.4% to 40.7%."},
     art:(x)=>F(`
-      <rect class="sv-box" x="24" y="52" width="58" height="28" rx="6"/>
-      <text class="sv-dim" x="53" y="70" text-anchor="middle" font-size="9.5">${x("생각 1","step 1")}</text>
-      <path class="sv-line" d="M86 66h12"/><path class="sv-line" d="M94 61l6 5-6 5"/>
+      <rect class="sv-box" x="14" y="52" width="58" height="28" rx="6"/>
+      <text class="sv-dim" x="43" y="70" text-anchor="middle" font-size="9.5">${x("생각 1","step 1")}</text>
+      <path class="sv-line" d="M76 66h12"/><path class="sv-line" d="M84 61l6 5-6 5"/>
       <rect class="sv-box" x="102" y="52" width="58" height="28" rx="6"/>
       <text class="sv-dim" x="131" y="70" text-anchor="middle" font-size="9.5">${x("생각 2","step 2")}</text>
       <path class="sv-line" d="M164 66h12"/><path class="sv-line" d="M172 61l6 5-6 5"/>
-      <rect class="sv-box" x="180" y="52" width="58" height="28" rx="6"/>
-      <text class="sv-dim" x="209" y="70" text-anchor="middle" font-size="9.5">${x("생각 3","step 3")}</text>
-      <path class="sv-line" d="M242 66h12"/><path class="sv-line" d="M250 61l6 5-6 5"/>
-      <rect class="sv-ch-b" x="258" y="52" width="58" height="28" rx="6"/>
-      <text class="sv-ch-t" x="287" y="70" text-anchor="middle" font-size="9.5">${x("답","answer")}</text>
-      <text class="sv-ch-t" x="170" y="126" text-anchor="middle" font-size="10">${x("앞의 선택이 뒤를 모두 가른다","the first choice decides the rest")}</text>`) },
+      <rect class="sv-box" x="190" y="52" width="58" height="28" rx="6"/>
+      <text class="sv-dim" x="219" y="70" text-anchor="middle" font-size="9.5">${x("생각 3","step 3")}</text>
+      <path class="sv-line" d="M252 66h12"/><path class="sv-line" d="M260 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="278" y="52" width="48" height="28" rx="6"/>
+      <text class="sv-gr-t" x="302" y="70" text-anchor="middle" font-size="9.5">${x("답","answer")}</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="10.5" font-weight="700">${x("\u201C단계별로 생각해 봅시다\u201D","\u201CLet\u2019s think step by step\u201D")}</text>`) },
 
-  { tag:"IDEA",
-    ko:{h:"여러 길로 풀어 보고 많이 나온 답을 고른다", c:"복잡한 문제는 보통 여러 갈래로 풀어도 같은 정답에 이른다. GSM8K가 17.9%포인트 올랐다."},
-    en:{h:"Solve it along several paths and take the answer that recurs", c:"A complex problem usually admits several ways of thinking that lead to its one correct answer. GSM8K rose 17.9 points."},
+  { tag:"IDEA 2",
+    ko:{h:"자기일관성 — 여러 길로 풀고 많이 나온 답을 고른다", c:"복잡한 문제는 여러 갈래로 풀어도 같은 정답에 이른다. GSM8K가 17.9%포인트 올랐다."},
+    en:{h:"Self-Consistency — solve it several ways, take what recurs", c:"A complex problem admits several ways of thinking that reach its one correct answer. GSM8K rose 17.9 points."},
     art:(x)=>F(`
       <rect class="sv-box" x="10" y="52" width="54" height="28" rx="6"/>
       <text class="sv-dim" x="37" y="70" text-anchor="middle" font-size="9.5">${x("질문","question")}</text>
@@ -229,9 +229,9 @@ const FIGURES = [
       <text class="sv-gr-t" x="286" y="71" text-anchor="middle" font-size="10.5">${x("가장 많이 나온 답","the answer that recurs")}</text>
       <text class="sv-gr-t" x="124" y="126" text-anchor="middle" font-size="11" font-weight="700">GSM8K +17.9%</text>`) },
 
-  { tag:"SOLUTION",
-    ko:{h:"사슬 대신 나무로 펼치고, 막히면 되돌아간다", c:"여러 갈래를 스스로 평가해 앞을 내다보거나 되돌아간다. 24 게임 성공률이 4%에서 74%로 올랐다."},
-    en:{h:"Spread a tree instead of a chain, and back up at a dead end", c:"It self-evaluates the branches, looks ahead and backtracks. On Game of 24 the success rate went from 4% to 74%."},
+  { tag:"IDEA 3",
+    ko:{h:"생각의 나무 — 펼쳐 보고 막히면 되돌아간다", c:"여러 갈래를 스스로 평가해 앞을 내다본다. 24 게임 성공률이 4%에서 74%로 올랐다."},
+    en:{h:"Tree of Thoughts — branch out, back up at a dead end", c:"It self-evaluates the branches and looks ahead. On Game of 24 the success rate went from 4% to 74%."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="52" width="48" height="28" rx="6"/>
       <text class="sv-dim" x="38" y="70" text-anchor="middle" font-size="9.5">${x("생각","thought")}</text>
@@ -250,9 +250,9 @@ const FIGURES = [
       <text class="sv-dim" x="276" y="52" text-anchor="middle" font-size="9">${x("되돌아간다","backtrack")}</text>
       <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("24 게임 성공률 74%","Game of 24: 74%")}</text>`) },
 
-  { tag:"BENEFIT",
-    ko:{h:"생각과 행동을 번갈아, 밖에서 확인하며 간다", c:"생각만 할 때 쌓이던 환각과 오류를 밖의 자료로 끊는다. ALFWorld 성공률이 34%포인트 올랐다."},
-    en:{h:"Alternate thinking and acting, checking against the outside", c:"Outside sources break the hallucination and error propagation that pure reasoning accumulates. ALFWorld success rose 34 points."},
+  { tag:"IDEA 4",
+    ko:{h:"리액트 — 생각과 행동을 번갈아 한다", c:"밖의 자료로 환각과 오류 전파를 끊는다. ALFWorld 성공률이 34%포인트 올랐다."},
+    en:{h:"ReAct — alternate thinking and acting", c:"Outside sources break hallucination and error propagation. ALFWorld success rose 34 points."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="36" width="76" height="26" rx="6"/>
       <text class="sv-dim" x="52" y="53" text-anchor="middle" font-size="10">${x("생각","reason")}</text>
@@ -272,21 +272,21 @@ const FIGURES = [
 
 const CHERRIES = [
   { who:"Shunyu Yao", role:{ko:"ReAct·ToT 저자 · 2025",en:"author of ReAct & ToT · 2025"},
+    q:{ko:"AI의 후반전은 지금부터다. 문제를 푸는 데서 문제를 정의하는 쪽으로 옮겨 간다.",
+       en:"The second half of AI — starting now — will shift focus from solving problems to defining problems."},
+    cite:"Shunyu Yao, “The Second Half” (2025)", url:"https://ysymyth.github.io/The-Second-Half/" },
+  { who:"Shunyu Yao", role:{ko:"ReAct·ToT 저자 · 2025",en:"author of ReAct & ToT · 2025"},
+    q:{ko:"첫 판 선수들은 게임과 시험을 풀었고, 후반전 선수들은 지능으로 쓸 만한 물건을 만들어 조 단위 회사를 세운다.",
+       en:"While players in the first half solve video games and exams, players in the second half get to build billion or trillion dollar companies by building useful products out of intelligence."},
+    cite:"Shunyu Yao, “The Second Half” (2025)", url:"https://ysymyth.github.io/The-Second-Half/" },
+  { who:"Shunyu Yao", role:{ko:"ReAct·ToT 저자 · 2025",en:"author of ReAct & ToT · 2025"},
     q:{ko:"생각은 이상한 종류의 행동이다. 바깥 세상을 직접 바꾸지 않는데, 생각의 공간은 끝이 없고 조합적으로 무한하다.",
        en:"Thinking, or reasoning, is a strange kind of action - it does not directly affect the external world, yet the space of reasoning is open-ended and combinatorially infinite."},
     cite:"Shunyu Yao, “The Second Half” (2025)", url:"https://ysymyth.github.io/The-Second-Half/" },
-  { who:"Wang et al.", role:{ko:"자기일관성 · 2022",en:"Self-Consistency · 2022"},
-    q:{ko:"복잡한 문제는 보통 여러 갈래로 생각해도 하나의 정답에 이른다.",
-       en:"a complex reasoning problem typically admits multiple different ways of thinking leading to its unique correct answer"},
-    cite:"Wang et al., “Self-Consistency Improves Chain of Thought Reasoning in Language Models”, Abstract (arXiv:2203.11171)", url:"https://arxiv.org/abs/2203.11171" },
-  { who:"Yao et al.", role:{ko:"생각의 나무 · 2023",en:"Tree of Thoughts · 2023"},
-    q:{ko:"여러 갈래를 스스로 평가해 다음을 정하고, 필요하면 앞을 내다보거나 되돌아가며 전체를 보고 고른다.",
-       en:"considering multiple different reasoning paths and self-evaluating choices to decide the next course of action, as well as looking ahead or backtracking when necessary to make global choices"},
-    cite:"Yao et al., “Tree of Thoughts: Deliberate Problem Solving with Large Language Models”, Abstract (arXiv:2305.10601)", url:"https://arxiv.org/abs/2305.10601" },
-  { who:"Yang et al.", role:{ko:"모델이 찾아낸 지시문 · 2023",en:"prompt found by the model · 2023"},
-    q:{ko:"심호흡을 하고 이 문제를 단계별로 풀어 보세요.",
-       en:"Take a deep breath and work on this problem step-by-step"},
-    cite:"Yang et al., “Large Language Models as Optimizers”, 최적 지시문 (arXiv:2309.03409) — GSM8K 80.2%", url:"https://arxiv.org/html/2309.03409v3" },
+  { who:"George Pólya", role:{ko:"수학자 · 1945",en:"mathematician · 1945"},
+    q:{ko:"문제를 이해하라 · 계획을 세우라 · 계획을 실행하라 · 돌아보라.",
+       en:"Understanding the problem · Devising a plan · Carrying out the plan · Looking back"},
+    cite:"George Pólya, “How to Solve It”, 네 단계 (Princeton University Press, 1945)", url:"https://www.hlevkin.com/hlevkin/90MathPhysBioBooks/Math/Polya/George_Polya_How%20to%20Solve%20It.pdf" },
   { who:"Noam Brown", role:{ko:"TED AI · 2024 (전언)",en:"TED AI · 2024 (as reported)"},
     q:{ko:"포커 한 판에서 20초만 더 생각하게 하니, 모델을 10만 배 키우고 10만 배 더 오래 학습시킨 것과 같은 효과가 났다.",
        en:"having a bot think for just 20 seconds in a hand of poker got the same boosting performance as scaling up the model by 100,000x and training it for 100,000 times longer"},
@@ -336,9 +336,9 @@ const REFS = [
 
 const T = {
   ko:{ meta:["Updated 2026-10-06","5 cherries","Draft — pending review","via 외부 자료"],
-       overview:"심화 프롬프팅은 답을 묻는 대신 푸는 과정을 설계한다.<br>한 줄로 생각하게 두지 않고, 여러 길로 풀리고 막히면 되돌리고 밖에서 확인하게 만든다." },
+       overview:"심화 프롬프팅은 모델을 다시 학습시키지 않고, 추론·계획·검증·수정을 여러 단계로 나눠 밟게 하는 프롬프트 설계 전체에 대한 개념이다." },
   en:{ meta:["Updated 2026-10-06","5 cherries","Draft — pending review","via external sources"],
-       overview:"Advanced prompting designs the solving process instead of asking for the answer.<br>Not one line of thought: several paths, backtracking at dead ends, and checks against the outside." },
+       overview:"Advanced prompting is the name for all prompt design that, without retraining the model, has it work through reasoning, planning, verification and revision in separate steps." },
 };
 
 const SELF_NODE = "AdvancedPrompting";
