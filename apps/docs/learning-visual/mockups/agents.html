@@ -1,0 +1,418 @@
+<title>Agents</title>
+<style>
+/* 기존 개념 페이지(concept-reader-page.tsx)의 색·간격·구조를 그대로 쓴다.
+   새로 만든 것은 ①한/영 토글 ②그림 구획뿐이다. */
+:root{
+  --page:#FBFAF8; --card:#FFFFFF; --border:#E4E1EE; --secondary:#F4F3F1;
+  --text-primary:#1A1626; --text-secondary:#3D3652; --text-muted:#9E97B3;
+  --cherry:#C94B6E; --cherry-soft:#FDF0F3; --cherry-border:#F0C3CF;
+  --violet:#7B5EA7; --violet-soft:#F3EFFA; --violet-border:#D9CEEC;
+  --green:#2F7A3A; --green-soft:#E3F1E1; --orange:#D4854A;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --page:#15131C; --card:#1D1A28; --border:#2F2B3E; --secondary:#242031;
+    --text-primary:#F1EFF6; --text-secondary:#C7C1D5; --text-muted:#8A82A0;
+    --cherry:#E9819C; --cherry-soft:#2B1A21; --cherry-border:#5A3442;
+    --violet:#AB92D4; --violet-soft:#241D33; --violet-border:#463A62;
+    --green:#5FBE95; --green-soft:#16261F; --orange:#E0A171;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#15131C; --card:#1D1A28; --border:#2F2B3E; --secondary:#242031;
+  --text-primary:#F1EFF6; --text-secondary:#C7C1D5; --text-muted:#8A82A0;
+  --cherry:#E9819C; --cherry-soft:#2B1A21; --cherry-border:#5A3442;
+  --violet:#AB92D4; --violet-soft:#241D33; --violet-border:#463A62;
+  --green:#5FBE95; --green-soft:#16261F; --orange:#E0A171;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text-secondary);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+  font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.shell{display:flex;gap:0;max-width:1160px;margin:0 auto;align-items:flex-start}
+@media(max-width:900px){.shell{flex-direction:column}}
+main{flex:1;min-width:0;padding-block:28px 72px;padding-left:20px;padding-right:20px}
+aside{width:280px;flex-shrink:0;border-left:1px solid var(--border);
+  padding-block:24px 40px;padding-left:16px;padding-right:16px}
+@media(max-width:900px){aside{width:100%;border-left:0;border-top:1px solid var(--border)}}
+
+/* 머리 — 원본의 뱃지·제목·메타줄 */
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;
+  font-size:10px;font-weight:700;background:var(--green-soft);color:var(--green);margin-bottom:12px}
+h1{margin:0 0 16px;font-size:28px;font-weight:800;color:var(--text-primary);
+  letter-spacing:-.5px;line-height:1.2}
+@media(max-width:600px){h1{font-size:20px}}
+.titlerow{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.langs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  background:var(--card);flex-shrink:0}
+.langs button{border:0;background:transparent;font-family:inherit;cursor:pointer;
+  padding:6px 13px;font-size:12px;font-weight:600;color:var(--text-muted)}
+.langs button[aria-pressed="true"]{background:var(--text-primary);color:var(--card)}
+.langs button:focus-visible{outline:2px solid var(--cherry);outline-offset:-2px}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;
+  color:var(--text-muted);margin-bottom:32px}
+.meta .dot{color:var(--border)}
+.meta .draft{color:var(--orange);font-weight:600}
+
+/* 구획 머리 — 원본 그대로 */
+section{margin-bottom:40px}
+.sechead{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sechead span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text-muted);white-space:nowrap}
+.sechead .rule{flex:1;height:1px;background:var(--border)}
+
+/* 01 개요 — 두 줄 */
+.overview{font-size:16px;line-height:1.75;color:var(--text-secondary);margin:0}
+
+/* 02 그림 */
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:700px){.figs{grid-template-columns:1fr}}
+figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
+  display:flex;flex-direction:column}
+.figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
+figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure svg{display:block;width:100%;height:auto;margin-block:auto}
+figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+.sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
+.sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
+.sv-ink{fill:var(--text-primary)} .sv-dim{fill:var(--text-muted)}
+.sv-ch{stroke:var(--cherry);fill:none;stroke-width:1.5;stroke-linecap:round} .sv-ch-t{fill:var(--cherry)}
+.sv-ch-b{fill:var(--cherry-soft);stroke:var(--cherry-border);stroke-width:1.4}
+.sv-vi-b{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.4}
+.sv-vi-f{fill:var(--violet)} .sv-vi-t{fill:var(--violet)}
+.sv-gr-b{fill:var(--green-soft);stroke:var(--green);stroke-width:1.5}
+.sv-gr-t{fill:var(--green)} .sv-gr-l{stroke:var(--green);fill:none;stroke-width:1.5;stroke-linecap:round}
+
+/* 03 체리 — 원본 카드(왼쪽 3px 체리색) */
+.cherry{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--cherry);
+  border-radius:8px;padding:16px;margin-bottom:10px}
+.cherry .who{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:12px;
+  font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.cherry .who .role{font-weight:400;color:var(--text-muted)}
+.cherry q{display:block;quotes:none;font-size:15px;line-height:1.65;color:var(--text-primary)}
+.cherry .cite{margin:8px 0 0;font-size:10px;color:var(--text-muted)}
+.cherry .cite a{color:var(--cherry);text-decoration:none}
+.cherry .cite a:hover{text-decoration:underline}
+
+/* 04 하위 개념 — 원본 2열 카드 + 관계색 + FULL/OUTLINE 뱃지 */
+.kids{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:600px){.kids{grid-template-columns:1fr}}
+.kid{position:relative;background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:12px 56px 12px 12px;text-align:left;font-family:inherit;cursor:pointer}
+.kid.has{border-color:var(--violet-border)} .kid.outline{border-style:dashed}
+.kid:hover{border-color:var(--cherry)}
+.kid .st{position:absolute;top:8px;right:8px;padding:1px 6px;border-radius:4px;border:1px solid;
+  font-size:8px;font-weight:800;letter-spacing:.5px}
+.kid .st.full{background:var(--violet-soft);color:var(--violet);border-color:var(--violet-border)}
+.kid .st.out{background:var(--secondary);color:var(--text-muted);border-color:var(--border)}
+.kid .rel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.kid .nm{margin:2px 0 0;font-size:13px;font-weight:600;color:var(--text-primary)}
+.kid .why{margin:2px 0 0;font-size:11px;color:var(--text-muted)}
+
+/* 05 레퍼런스 — 원본 타임라인 */
+.ref{position:relative;padding-left:16px;border-left:2px solid var(--border);margin-bottom:16px}
+.ref:first-child{border-left-color:var(--cherry)}
+.ref .pin{position:absolute;left:-5px;top:2px;width:8px;height:8px;border-radius:50%;background:var(--border)}
+.ref:first-child .pin{background:var(--cherry)}
+.ref .stage{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+.ref:first-child .stage{color:var(--cherry)}
+.ref a.t{display:block;margin-top:2px;font-size:13px;font-weight:700;color:var(--text-primary);
+  text-decoration:none;text-underline-offset:2px}
+.ref a.t:hover{color:var(--cherry);text-decoration:underline dotted}
+.ref p{margin:4px 0 0;font-size:11.5px;color:var(--text-muted)}
+.ref .kind{margin-top:3px;font-size:10px;color:var(--text-muted)}
+
+/* 오른쪽 — Learning Roadmap 카드 (원본) */
+.rmcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.rmcard .h{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text-muted);margin:0 0 12px}
+.rmcard svg{display:block;width:100%;height:auto}
+.legend{margin-top:8px;display:grid;gap:4px;font-size:9px;color:var(--text-muted)}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend i{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.rm-self{fill:var(--card);stroke:var(--cherry);stroke-width:2}
+.rm-deep{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.5}
+.rm-pre{fill:var(--secondary);stroke:var(--border);stroke-width:1.5}
+.rm-arrow{stroke:var(--border);stroke-width:1.5;fill:none}
+.rm-band{fill:var(--text-muted)} .rm-t{fill:var(--text-primary)} .rm-vt{fill:var(--violet)}
+</style>
+
+<div class="shell">
+  <main>
+    <span class="badge" id="badge">BASICS</span>
+    <div class="titlerow">
+      <h1 id="title">Agents</h1>
+      <div class="langs" role="group" aria-label="Language">
+        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
+        <button id="lang-en" type="button" aria-pressed="false">English</button>
+      </div>
+    </div>
+    <div class="meta" id="meta"></div>
+
+    <section>
+      <div class="sechead"><span>01 — Overview</span><div class="rule"></div></div>
+      <p class="overview" id="overview"></p>
+    </section>
+
+    <section>
+      <div class="sechead"><span>02 — Flash</span><div class="rule"></div></div>
+      <div class="figs" id="figs"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>03 — Cherries</span><div class="rule"></div></div>
+      <div id="cherries"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>04 — Child Concepts</span><div class="rule"></div></div>
+      <div class="kids" id="kids"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>05 — References</span><div class="rule"></div></div>
+      <div id="refs"></div>
+    </section>
+  </main>
+
+  <aside>
+    <div class="rmcard">
+      <p class="h">Learning Roadmap</p>
+      <div id="roadmap"></div>
+      <div class="legend">
+        <div><i style="border:2px solid var(--cherry);background:var(--card)"></i><span>Cherry = You are here</span></div>
+        <div><i style="border:2px solid var(--violet-border);background:var(--violet-soft)"></i><span>Violet = Go deeper</span></div>
+        <div><i style="border:1px dashed var(--violet-border);background:var(--violet-soft)"></i><span>Dashed = Outline only</span></div>
+        <div><i style="border:1px solid var(--border);background:var(--secondary)"></i><span>Gray = Prerequisite</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+const F = (i) => `<svg viewBox="0 0 340 142" role="img" xmlns="http://www.w3.org/2000/svg">${i}</svg>`;
+
+/* 넉 장 공통 격자 — 사물 띠 28~104(중심 66), 이름표 126, 화살표 66. x(한국어, English) */
+const FIGURES = [
+  { tag:"PROBLEM",
+    ko:{h:"묻고 답하면 끝, 중간에 알아볼 방법이 없다", c:"모델 안에 든 것만으로 한 번에 답을 내야 한다."},
+    en:{h:"One question, one answer — nothing in between", c:"It must answer in a single pass, from what it already holds."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="52" width="68" height="30" rx="6"/>
+      <text class="sv-ink" x="48" y="72" text-anchor="middle" font-size="10.5" font-weight="500">${x("질문","question")}</text>
+      <path class="sv-line" d="M90 66h20"/><path class="sv-line" d="M104 61l7 5-7 5"/>
+      <rect class="sv-box" x="120" y="44" width="92" height="46" rx="9"/>
+      <text class="sv-ink" x="166" y="72" text-anchor="middle" font-size="11.5" font-weight="500">MODEL</text>
+      <path class="sv-line" d="M220 66h20"/><path class="sv-line" d="M234 61l7 5-7 5"/>
+      <rect class="sv-box" x="250" y="52" width="60" height="30" rx="6"/>
+      <text class="sv-ink" x="280" y="72" text-anchor="middle" font-size="10.5" font-weight="500">${x("답","answer")}</text>
+      <rect class="sv-ch-b" x="120" y="100" width="92" height="22" rx="11"/>
+      <text class="sv-ch-t" x="166" y="115" text-anchor="middle" font-size="9.5">${x("바깥은 못 본다","can’t look outside")}</text>`) },
+
+  { tag:"IDEA",
+    ko:{h:"생각과 행동을 번갈아 하게 한다", c:"생각이 계획을 세우고 고치면, 행동이 바깥에서 사실을 가져온다."},
+    en:{h:"Let it alternate between thinking and acting", c:"Reasoning tracks the plan; acting reaches outside for facts."},
+    art:(x)=>F(`
+      <rect class="sv-vi-b" x="24" y="30" width="86" height="34" rx="8"/>
+      <text class="sv-vi-t" x="67" y="52" text-anchor="middle" font-size="10.5" font-weight="500">${x("생각","thought")}</text>
+      <path class="sv-line" d="M116 47h40"/><path class="sv-line" d="M150 42l7 5-7 5"/>
+      <rect class="sv-box" x="162" y="30" width="86" height="34" rx="8"/>
+      <text class="sv-ink" x="205" y="52" text-anchor="middle" font-size="10.5" font-weight="500">${x("행동","action")}</text>
+      <path class="sv-line" d="M254 47h26"/><path class="sv-line" d="M274 42l7 5-7 5"/>
+      <rect class="sv-box" x="246" y="78" width="80" height="32" rx="8"/>
+      <text class="sv-dim" x="286" y="98" text-anchor="middle" font-size="10">${x("관찰","observation")}</text>
+      <path class="sv-line" d="M286 64v10"/>
+      <path class="sv-line" d="M240 94H112"/><path class="sv-line" d="M118 89l-7 5 7 5"/>
+      <path class="sv-line" d="M67 70v24h40"/>
+      <text class="sv-dim" x="150" y="126" text-anchor="middle" font-size="9.5">${x("될 때까지 돌린다","round and round until done")}</text>`) },
+
+  { tag:"SOLUTION",
+    ko:{h:"도구를 직접 골라 쓴다", c:"어떤 도구를 언제 부르고 무엇을 넘길지까지 모델이 정한다."},
+    en:{h:"It picks up the tools itself", c:"Which tool to call, when, and with what arguments — the model decides."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="44" width="92" height="52" rx="9"/>
+      <text class="sv-ink" x="60" y="66" text-anchor="middle" font-size="11" font-weight="500">${x("에이전트","agent")}</text>
+      <text class="sv-dim" x="60" y="82" text-anchor="middle" font-size="8.8">${x("다음 수를 고른다","chooses the next move")}</text>
+      <path class="sv-line" d="M114 50h40"/><path class="sv-line" d="M148 45l7 5-7 5"/>
+      <path class="sv-line" d="M114 66h40"/><path class="sv-line" d="M148 61l7 5-7 5"/>
+      <path class="sv-line" d="M114 82h40"/><path class="sv-line" d="M148 77l7 5-7 5"/>
+      <rect class="sv-vi-b" x="164" y="36" width="104" height="28" rx="6"/>
+      <text class="sv-vi-t" x="216" y="54" text-anchor="middle" font-size="9.5">${x("검색","search")}</text>
+      <rect class="sv-vi-b" x="164" y="68" width="104" height="28" rx="6"/>
+      <text class="sv-vi-t" x="216" y="86" text-anchor="middle" font-size="9.5">${x("계산","calculator")}</text>
+      <rect class="sv-vi-b" x="164" y="100" width="104" height="24" rx="6"/>
+      <text class="sv-vi-t" x="216" y="116" text-anchor="middle" font-size="9.5">${x("코드 실행","run code")}</text>
+      <path class="sv-line" d="M276 66h22"/><path class="sv-line" d="M292 61l7 5-7 5"/>
+      <text class="sv-dim" x="312" y="70" text-anchor="middle" font-size="9.5">${x("결과","result")}</text>`) },
+
+  { tag:"BENEFIT",
+    ko:{h:"틀리면 스스로 돌아보고 다시 한다", c:"실패를 말로 적어 두고 다음 차례에 참고했을 때의 HumanEval 성적."},
+    en:{h:"When it fails, it reflects and tries again", c:"HumanEval score when failures are written down and reread on the next try."},
+    art:(x)=>F(`
+      <path class="sv-line" opacity=".5" d="M40 110h286"/>
+      <rect class="sv-box" x="80" y="62" width="56" height="48" rx="3"/>
+      <text class="sv-dim" x="108" y="56" text-anchor="middle" font-size="11">80%</text>
+      <text class="sv-dim" x="108" y="126" text-anchor="middle" font-size="9.5">GPT-4</text>
+      <rect class="sv-gr-b" x="212" y="42" width="56" height="68" rx="3"/>
+      <text class="sv-gr-t" x="240" y="36" text-anchor="middle" font-size="13" font-weight="700">91%</text>
+      <text class="sv-gr-t" x="240" y="126" text-anchor="middle" font-size="9.5">Reflexion</text>
+      <path class="sv-gr-l" d="M150 76h44"/><path class="sv-gr-l" d="M188 71l7 5-7 5"/>`) },
+];
+
+const CHERRIES = [
+  { who:"Bill Gates", role:{ko:"「AI 에이전트는 컴퓨팅의 미래」 · 2023",en:"“AI-powered agents are the future of computing” · 2023"},
+    q:{ko:"에이전트는 소프트웨어 산업을 뒤집을 것이다 — 명령어를 치던 시대에서 아이콘을 누르는 시대로 넘어온 이래 가장 큰 변화다.",
+       en:"They’re also going to upend the software industry, bringing about the biggest revolution in computing since we went from typing commands to tapping on icons."},
+    cite:"Bill Gates, GatesNotes (2023-11-09)", url:"https://www.gatesnotes.com/AI-agents" },
+  { who:"Marc Benioff", role:{ko:"Salesforce CEO · 다보스 2025",en:"CEO, Salesforce · Davos 2025"},
+    q:{ko:"우리는 사람만 데리고 일하는 마지막 세대의 경영자다.",
+       en:"We are the last CEOs who are only going to be managing humans as our workforce"},
+    cite:"Marc Benioff, World Economic Forum (2025-01)", url:"https://www.axios.com/2025/01/22/salesforce-chief-ai-agents-davos" },
+  { who:"Ethan Mollick", role:{ko:"와튼스쿨 · 2024",en:"Wharton · 2024"},
+    q:{ko:"AI를 인턴처럼 대하라는 말을 흔히 듣는다. 하지만 그 비유는 사람들이 AI를 아주 좁게 쓰게 만든다. 대신 이렇게 제안한다 — 대화가 바뀔 때마다 당신이 한 말을 전부 잊어버리는, 무한히 참을성 있는 새 동료로 대하라.",
+       en:"Often, you are told to do this by treating AI like an intern. … Instead, let me propose a new analogy: treat AI like an infinitely patient new coworker who forgets everything you tell them each new conversation."},
+    cite:"Ethan Mollick, “Getting Started with AI: Good Enough” (2024-11)", url:"https://simonwillison.net/2024/Nov/24/ethan-mollick/" },
+  { who:"Jensen Huang", role:{ko:"NVIDIA CEO · CES 2025",en:"CEO, NVIDIA · CES 2025"},
+    q:{ko:"여러 면에서, 앞으로 모든 회사의 IT 부서는 AI 에이전트의 인사팀이 될 것이다.",
+       en:"In a lot of ways, the IT department of every company is going to be the HR department of AI agents in the future"},
+    cite:"Jensen Huang, CES 기조연설 (2025-01-06)", url:"https://www.fortune.com/2025/01/09/nvidia-ceo-jensen-huangt-take-over-hr-ai-agents" },
+  { who:"Lilian Weng", role:{ko:"「LLM 기반 자율 에이전트」 · 2023",en:"“LLM Powered Autonomous Agents” · 2023"},
+    q:{ko:"LLM 이 두뇌 노릇을 하고 거기에 계획·기억·도구가 더해지면, 그것이 에이전트다.",
+       en:"In a LLM-powered autonomous agent system, LLM functions as the agent’s brain, complemented by several key components"},
+    cite:"Lilian Weng (2023-06-23)", url:"https://lilianweng.github.io/posts/2023-06-23-agent/" },
+];
+
+const KIDS = [
+  { rel:"SUBTOPIC", node:"LLMAgent", label:"LLMAgent", has:false,
+    why:{ko:"LLM을 추론 엔진으로 삼아 계획·도구·메모리를 묶는다",en:"An LLM as the reasoning engine, with tools and memory"} },
+  { rel:"SUBTOPIC", node:"MultiAgentSystem", label:"MultiAgentSystem", has:true,
+    why:{ko:"여러 에이전트가 나뉘어 협업하거나 경쟁한다",en:"Several agents collaborating or competing"} },
+  { rel:"SUBTOPIC", node:"PlannerExecutorAgent", label:"PlannerExecutorAgent", has:false,
+    why:{ko:"계획을 세우는 쪽과 실행하는 쪽을 나눈다",en:"One module plans, another executes"} },
+  { rel:"SUBTOPIC", node:"ReflexiveAgent", label:"ReflexiveAgent", has:false,
+    why:{ko:"상태를 쌓지 않고 자극에 바로 반응한다",en:"Reacts to stimuli with no internal state"} },
+  { rel:"SUBTOPIC", node:"ToolAugmentedAgent", label:"ToolAugmentedAgent", has:false,
+    why:{ko:"검색·API·코드 실행을 직접 호출한다",en:"Calls search, APIs and code execution"} },
+  { rel:"PARENT", node:"LLMConcept", label:"LLMConcept", has:false,
+    why:{ko:"LLM 개념 전체가 상위에 있다",en:"The parent family of LLM concepts"} },
+];
+const REL_COLOR = { SUBTOPIC:"var(--violet)", PREREQUISITE:"var(--text-muted)", RELATED:"var(--orange)", PARENT:"var(--text-muted)" };
+
+const REFS = [
+  { stage:{ko:"원전",en:"Origin"}, t:"ReAct: Synergizing Reasoning and Acting in Language Models",
+    d:{ko:"생각과 행동을 번갈아 한다는 골격이 여기서 나왔다.",en:"Where the thought–action loop comes from."},
+    url:"https://arxiv.org/abs/2210.03629" },
+  { stage:{ko:"도구",en:"Tools"}, t:"Toolformer: Language Models Can Teach Themselves to Use Tools",
+    d:{ko:"도구를 언제 어떻게 부를지 모델이 스스로 배운다.",en:"The model learns when and how to call a tool."},
+    url:"https://arxiv.org/abs/2302.04761" },
+  { stage:{ko:"반성",en:"Reflection"}, t:"Reflexion: Language Agents with Verbal Reinforcement Learning",
+    d:{ko:"실패를 말로 적어 두고 다음에 참고한다. 수치가 초록에 있다.",en:"Write the failure down, reread it next time — numbers in the abstract."},
+    url:"https://arxiv.org/abs/2303.11366" },
+  { stage:{ko:"실전",en:"Practice"}, t:"Building effective agents",
+    d:{ko:"언제 에이전트를 쓰고 언제 단순한 흐름으로 끝낼지.",en:"When an agent earns its keep — and when a plain workflow is enough."},
+    url:"https://www.anthropic.com/engineering/building-effective-agents" },
+];
+
+const T = {
+  ko:{ meta:["Updated 2026-10-04","5 cherries","Draft — pending review","via 외부 자료"],
+       overview:"에이전트는 한 번에 답하지 않고, 생각하고 도구를 쓰고 결과를 본 뒤 다시 생각한다.<br>그래서 묻는 사람이 단계를 짜 주지 않아도 여러 수를 거쳐 일을 끝낸다." },
+  en:{ meta:["Updated 2026-10-04","5 cherries","Draft — pending review","via external sources"],
+       overview:"An agent doesn’t answer in one pass — it thinks, uses a tool, looks at the result, and thinks again.<br>You don’t lay out the steps; it takes them." },
+};
+
+/* Learning Roadmap — rag.html 과 같은 규칙 */
+const RM = { W:236, PAD:4, FS:11, CHAR_W:0.56, PAD_X:9, LINE_H:14, CHIP_PAD_Y:9, ROW_GAP:7,
+             BAND_LABEL_H:20, BAND_GAP:16, SELF_FS:15, SELF_PAD_Y:12, ARROW:20 };
+function wrapLabel(label, maxW, fs){
+  const w = (t) => t.length * fs * RM.CHAR_W;
+  if (w(label) <= maxW) return [label];
+  const bps = []; for (let i=1;i<label.length;i++){ if(label[i]===" ")bps.push(i);
+    else if(/[a-z0-9]/.test(label[i-1])&&/[A-Z]/.test(label[i]))bps.push(i); }
+  const out=[]; let s=0;
+  while (s < label.length){
+    const rest = label.slice(s);
+    if (w(rest) <= maxW){ out.push(rest.trim()); break; }
+    const c = bps.filter(b=>b>s && w(label.slice(s,b))<=maxW);
+    if (!c.length){ const n=Math.max(1,Math.floor(maxW/(fs*RM.CHAR_W))); out.push(label.slice(s,s+n).trim()); s+=n; }
+    else { const b=c[c.length-1]; out.push(label.slice(s,b).trim()); s=b; }
+  }
+  return out.filter(Boolean);
+}
+function roadmap(){
+  const inner = RM.W - RM.PAD*2, maxTextW = inner - RM.PAD_X*2;
+  const chip = (k) => { const lines = wrapLabel(k.label, maxTextW, RM.FS);
+    return { ...k, lines, h: lines.length*RM.LINE_H + RM.CHIP_PAD_Y*2 }; };
+  const pre = KIDS.filter(k=>k.rel==="PREREQUISITE"||k.rel==="PARENT").map(chip);
+  const deep = KIDS.filter(k=>k.rel==="SUBTOPIC").map(chip);
+  const rel = KIDS.filter(k=>k.rel==="RELATED").map(chip);
+  const selfH = RM.SELF_FS + RM.SELF_PAD_Y*2;
+  let y = 0; const parts = [];
+  const band = (title, arr, cls) => {
+    if (!arr.length) return;
+    parts.push(`<text class="rm-band" x="${RM.PAD}" y="${y+12}" font-size="10" font-weight="700" letter-spacing=".6">${title}</text>`);
+    y += RM.BAND_LABEL_H;
+    for (const c of arr){
+      parts.push(`<rect class="${cls}" x="${RM.PAD}" y="${y}" width="${inner}" height="${c.h}" rx="6"${c.has?"":' stroke-dasharray="4 3"'}/>`);
+      c.lines.forEach((ln,i)=>parts.push(
+        `<text class="${cls==="rm-pre"?"rm-band":"rm-vt"}" x="${RM.PAD+RM.PAD_X}" y="${y+RM.CHIP_PAD_Y+RM.LINE_H*(i+1)-4}" font-size="${RM.FS}" font-weight="600">${ln}</text>`));
+      y += c.h + RM.ROW_GAP;
+    }
+    y += RM.BAND_GAP - RM.ROW_GAP;
+  };
+  if (pre.length){
+    band("ABOVE", pre, "rm-pre");
+    parts.push(`<path class="rm-arrow" d="M${RM.W/2} ${y-10}v${RM.ARROW-6}"/><path class="rm-arrow" d="M${RM.W/2-4} ${y+RM.ARROW-16}l4 5 4-5"/>`);
+    y += RM.ARROW;
+  }
+  parts.push(`<rect class="rm-self" x="${RM.PAD}" y="${y}" width="${inner}" height="${selfH}" rx="8"/>`);
+  parts.push(`<text class="rm-t" x="${RM.W/2}" y="${y+selfH/2+5}" text-anchor="middle" font-size="${RM.SELF_FS}" font-weight="800">Agents</text>`);
+  y += selfH;
+  parts.push(`<path class="rm-arrow" d="M${RM.W/2} ${y}v${RM.ARROW-8}"/><path class="rm-arrow" d="M${RM.W/2-4} ${y+RM.ARROW-14}l4 5 4-5"/>`);
+  y += RM.ARROW + 2;
+  band("GO DEEPER", deep, "rm-deep");
+  band("RELATED", rel, "rm-deep");
+  return `<svg viewBox="0 0 ${RM.W} ${y}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
+}
+
+let lang = "ko";
+function render(){
+  const t = T[lang];
+  document.getElementById("meta").innerHTML = t.meta
+    .map((m,i)=>`<span class="${i===2?"draft":""}">${m}</span>`).join('<span class="dot">·</span>');
+  document.getElementById("overview").innerHTML = t.overview;
+
+  const x = (k,e) => lang==="ko" ? k : e;
+  document.getElementById("figs").innerHTML = FIGURES.map(f=>`
+    <figure><div class="figtag">${f.tag}</div><h3>${f[lang].h}</h3>${f.art(x)}
+      <figcaption>${f[lang].c}</figcaption></figure>`).join("");
+
+  document.getElementById("cherries").innerHTML = CHERRIES.map(c=>`
+    <div class="cherry">
+      <div class="who">🍒 ${c.who} <span class="role">— ${c.role[lang]}</span></div>
+      <q>“${c.q[lang]}”</q>
+      <p class="cite">${c.cite} · <a href="${c.url}" target="_blank" rel="noopener noreferrer">${lang==="ko"?"원문":"source"} ↗</a></p>
+    </div>`).join("");
+
+  document.getElementById("kids").innerHTML = KIDS.map(k=>`
+    <button class="kid ${k.has?"has":"outline"}" type="button">
+      <span class="st ${k.has?"full":"out"}">${k.has?"FULL":"OUTLINE"}</span>
+      <span class="rel" style="color:${REL_COLOR[k.rel]}">${k.rel}</span>
+      <p class="nm">${k.label}</p><p class="why">${k.why[lang]}</p>
+    </button>`).join("");
+
+  document.getElementById("refs").innerHTML = REFS.map(r=>`
+    <div class="ref"><div class="pin"></div>
+      <div class="stage">${r.stage[lang]}</div>
+      <a class="t" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.t} ↗</a>
+      <p>${r.d[lang]}</p>
+      <div class="kind">🔗 External — ${new URL(r.url).hostname.replace(/^www\./,"")}</div>
+    </div>`).join("");
+
+  document.getElementById("roadmap").innerHTML = roadmap();
+  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
+  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
+}
+document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
+document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
+render();
+</script>

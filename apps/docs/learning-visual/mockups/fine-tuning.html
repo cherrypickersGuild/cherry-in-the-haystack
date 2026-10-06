@@ -1,0 +1,416 @@
+<title>Fine-tuning</title>
+<style>
+/* 기존 개념 페이지(concept-reader-page.tsx)의 색·간격·구조를 그대로 쓴다.
+   새로 만든 것은 ①한/영 토글 ②그림 구획뿐이다. */
+:root{
+  --page:#FBFAF8; --card:#FFFFFF; --border:#E4E1EE; --secondary:#F4F3F1;
+  --text-primary:#1A1626; --text-secondary:#3D3652; --text-muted:#9E97B3;
+  --cherry:#C94B6E; --cherry-soft:#FDF0F3; --cherry-border:#F0C3CF;
+  --violet:#7B5EA7; --violet-soft:#F3EFFA; --violet-border:#D9CEEC;
+  --green:#2F7A3A; --green-soft:#E3F1E1; --orange:#D4854A;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --page:#15131C; --card:#1D1A28; --border:#2F2B3E; --secondary:#242031;
+    --text-primary:#F1EFF6; --text-secondary:#C7C1D5; --text-muted:#8A82A0;
+    --cherry:#E9819C; --cherry-soft:#2B1A21; --cherry-border:#5A3442;
+    --violet:#AB92D4; --violet-soft:#241D33; --violet-border:#463A62;
+    --green:#5FBE95; --green-soft:#16261F; --orange:#E0A171;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#15131C; --card:#1D1A28; --border:#2F2B3E; --secondary:#242031;
+  --text-primary:#F1EFF6; --text-secondary:#C7C1D5; --text-muted:#8A82A0;
+  --cherry:#E9819C; --cherry-soft:#2B1A21; --cherry-border:#5A3442;
+  --violet:#AB92D4; --violet-soft:#241D33; --violet-border:#463A62;
+  --green:#5FBE95; --green-soft:#16261F; --orange:#E0A171;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text-secondary);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+  font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.shell{display:flex;gap:0;max-width:1160px;margin:0 auto;align-items:flex-start}
+@media(max-width:900px){.shell{flex-direction:column}}
+main{flex:1;min-width:0;padding-block:28px 72px;padding-left:20px;padding-right:20px}
+aside{width:280px;flex-shrink:0;border-left:1px solid var(--border);
+  padding-block:24px 40px;padding-left:16px;padding-right:16px}
+@media(max-width:900px){aside{width:100%;border-left:0;border-top:1px solid var(--border)}}
+
+/* 머리 — 원본의 뱃지·제목·메타줄 */
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;
+  font-size:10px;font-weight:700;background:var(--green-soft);color:var(--green);margin-bottom:12px}
+h1{margin:0 0 16px;font-size:28px;font-weight:800;color:var(--text-primary);
+  letter-spacing:-.5px;line-height:1.2}
+@media(max-width:600px){h1{font-size:20px}}
+.titlerow{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.langs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  background:var(--card);flex-shrink:0}
+.langs button{border:0;background:transparent;font-family:inherit;cursor:pointer;
+  padding:6px 13px;font-size:12px;font-weight:600;color:var(--text-muted)}
+.langs button[aria-pressed="true"]{background:var(--text-primary);color:var(--card)}
+.langs button:focus-visible{outline:2px solid var(--cherry);outline-offset:-2px}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;
+  color:var(--text-muted);margin-bottom:32px}
+.meta .dot{color:var(--border)}
+.meta .draft{color:var(--orange);font-weight:600}
+
+/* 구획 머리 — 원본 그대로 */
+section{margin-bottom:40px}
+.sechead{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sechead span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text-muted);white-space:nowrap}
+.sechead .rule{flex:1;height:1px;background:var(--border)}
+
+/* 01 개요 — 두 줄 */
+.overview{font-size:16px;line-height:1.75;color:var(--text-secondary);margin:0}
+
+/* 02 그림 */
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:700px){.figs{grid-template-columns:1fr}}
+figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
+  display:flex;flex-direction:column}
+.figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
+figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure svg{display:block;width:100%;height:auto;margin-block:auto}
+figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+.sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
+.sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
+.sv-ink{fill:var(--text-primary)} .sv-dim{fill:var(--text-muted)}
+.sv-ch{stroke:var(--cherry);fill:none;stroke-width:1.5;stroke-linecap:round} .sv-ch-t{fill:var(--cherry)}
+.sv-ch-b{fill:var(--cherry-soft);stroke:var(--cherry-border);stroke-width:1.4}
+.sv-vi-b{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.4}
+.sv-vi-f{fill:var(--violet)} .sv-vi-t{fill:var(--violet)}
+.sv-gr-b{fill:var(--green-soft);stroke:var(--green);stroke-width:1.5}
+.sv-gr-t{fill:var(--green)} .sv-gr-l{stroke:var(--green);fill:none;stroke-width:1.5;stroke-linecap:round}
+
+/* 03 체리 — 원본 카드(왼쪽 3px 체리색) */
+.cherry{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--cherry);
+  border-radius:8px;padding:16px;margin-bottom:10px}
+.cherry .who{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:12px;
+  font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.cherry .who .role{font-weight:400;color:var(--text-muted)}
+.cherry q{display:block;quotes:none;font-size:15px;line-height:1.65;color:var(--text-primary)}
+.cherry .cite{margin:8px 0 0;font-size:10px;color:var(--text-muted)}
+.cherry .cite a{color:var(--cherry);text-decoration:none}
+.cherry .cite a:hover{text-decoration:underline}
+
+/* 04 하위 개념 — 원본 2열 카드 + 관계색 + FULL/OUTLINE 뱃지 */
+.kids{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:600px){.kids{grid-template-columns:1fr}}
+.kid{position:relative;background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:12px 56px 12px 12px;text-align:left;font-family:inherit;cursor:pointer}
+.kid.has{border-color:var(--violet-border)} .kid.outline{border-style:dashed}
+.kid:hover{border-color:var(--cherry)}
+.kid .st{position:absolute;top:8px;right:8px;padding:1px 6px;border-radius:4px;border:1px solid;
+  font-size:8px;font-weight:800;letter-spacing:.5px}
+.kid .st.full{background:var(--violet-soft);color:var(--violet);border-color:var(--violet-border)}
+.kid .st.out{background:var(--secondary);color:var(--text-muted);border-color:var(--border)}
+.kid .rel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.kid .nm{margin:2px 0 0;font-size:13px;font-weight:600;color:var(--text-primary)}
+.kid .why{margin:2px 0 0;font-size:11px;color:var(--text-muted)}
+
+/* 05 레퍼런스 — 원본 타임라인 */
+.ref{position:relative;padding-left:16px;border-left:2px solid var(--border);margin-bottom:16px}
+.ref:first-child{border-left-color:var(--cherry)}
+.ref .pin{position:absolute;left:-5px;top:2px;width:8px;height:8px;border-radius:50%;background:var(--border)}
+.ref:first-child .pin{background:var(--cherry)}
+.ref .stage{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+.ref:first-child .stage{color:var(--cherry)}
+.ref a.t{display:block;margin-top:2px;font-size:13px;font-weight:700;color:var(--text-primary);
+  text-decoration:none;text-underline-offset:2px}
+.ref a.t:hover{color:var(--cherry);text-decoration:underline dotted}
+.ref p{margin:4px 0 0;font-size:11.5px;color:var(--text-muted)}
+.ref .kind{margin-top:3px;font-size:10px;color:var(--text-muted)}
+
+/* 오른쪽 — Learning Roadmap 카드 (원본) */
+.rmcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.rmcard .h{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text-muted);margin:0 0 12px}
+.rmcard svg{display:block;width:100%;height:auto}
+.legend{margin-top:8px;display:grid;gap:4px;font-size:9px;color:var(--text-muted)}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend i{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.rm-self{fill:var(--card);stroke:var(--cherry);stroke-width:2}
+.rm-deep{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.5}
+.rm-pre{fill:var(--secondary);stroke:var(--border);stroke-width:1.5}
+.rm-arrow{stroke:var(--border);stroke-width:1.5;fill:none}
+.rm-band{fill:var(--text-muted)} .rm-t{fill:var(--text-primary)} .rm-vt{fill:var(--violet)}
+</style>
+
+<div class="shell">
+  <main>
+    <span class="badge" id="badge">BASICS</span>
+    <div class="titlerow">
+      <h1 id="title">Fine-tuning</h1>
+      <div class="langs" role="group" aria-label="Language">
+        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
+        <button id="lang-en" type="button" aria-pressed="false">English</button>
+      </div>
+    </div>
+    <div class="meta" id="meta"></div>
+
+    <section>
+      <div class="sechead"><span>01 — Overview</span><div class="rule"></div></div>
+      <p class="overview" id="overview"></p>
+    </section>
+
+    <section>
+      <div class="sechead"><span>02 — Flash</span><div class="rule"></div></div>
+      <div class="figs" id="figs"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>03 — Cherries</span><div class="rule"></div></div>
+      <div id="cherries"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>04 — Child Concepts</span><div class="rule"></div></div>
+      <div class="kids" id="kids"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>05 — References</span><div class="rule"></div></div>
+      <div id="refs"></div>
+    </section>
+  </main>
+
+  <aside>
+    <div class="rmcard">
+      <p class="h">Learning Roadmap</p>
+      <div id="roadmap"></div>
+      <div class="legend">
+        <div><i style="border:2px solid var(--cherry);background:var(--card)"></i><span>Cherry = You are here</span></div>
+        <div><i style="border:2px solid var(--violet-border);background:var(--violet-soft)"></i><span>Violet = Go deeper</span></div>
+        <div><i style="border:1px dashed var(--violet-border);background:var(--violet-soft)"></i><span>Dashed = Outline only</span></div>
+        <div><i style="border:1px solid var(--border);background:var(--secondary)"></i><span>Gray = Prerequisite</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+const F = (i) => `<svg viewBox="0 0 340 142" role="img" xmlns="http://www.w3.org/2000/svg">${i}</svg>`;
+
+/* 넉 장 공통 격자 — 사물 띠 28~104(중심 66), 이름표 126, 화살표 66. x(한국어, English) */
+const FIGURES = [
+  { tag:"PROBLEM",
+    ko:{h:"과제가 바뀌면 바닥부터 다시 길러야 했다", c:"과제마다 구조를 손보고 처음부터 학습시키던 시절의 이야기다."},
+    en:{h:"A new task meant training from scratch", c:"Each task needed its own architecture changes and its own training run."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="36" width="76" height="60" rx="8"/>
+      <text class="sv-dim" x="52" y="70" text-anchor="middle" font-size="10">${x("과제 A","task A")}</text>
+      <text class="sv-dim" x="52" y="126" text-anchor="middle" font-size="9.5">${x("전용 모델","its own model")}</text>
+      <rect class="sv-box" x="104" y="36" width="76" height="60" rx="8"/>
+      <text class="sv-dim" x="142" y="70" text-anchor="middle" font-size="10">${x("과제 B","task B")}</text>
+      <text class="sv-dim" x="142" y="126" text-anchor="middle" font-size="9.5">${x("전용 모델","its own model")}</text>
+      <rect class="sv-box" x="194" y="36" width="76" height="60" rx="8"/>
+      <text class="sv-dim" x="232" y="70" text-anchor="middle" font-size="10">${x("과제 C","task C")}</text>
+      <text class="sv-dim" x="232" y="126" text-anchor="middle" font-size="9.5">${x("전용 모델","its own model")}</text>
+      <text class="sv-ch-t" x="300" y="70" text-anchor="middle" font-size="12" font-weight="700">···</text>
+      <text class="sv-ch-t" x="300" y="88" text-anchor="middle" font-size="9.5">${x("계속","and on")}</text>`) },
+
+  { tag:"IDEA",
+    ko:{h:"이미 배운 모델을 가져와 조금 더 가르친다", c:"예시 100개만으로도 100배 많은 자료로 처음부터 학습한 것과 맞먹었다."},
+    en:{h:"Take a model that already learned, then teach it a little more", c:"With only 100 labeled examples it matched training from scratch on 100× more data."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="38" width="96" height="56" rx="9"/>
+      <text class="sv-ink" x="62" y="62" text-anchor="middle" font-size="11" font-weight="500">${x("사전학습","pre-trained")}</text>
+      <text class="sv-dim" x="62" y="78" text-anchor="middle" font-size="8.8">${x("이미 배운 모델","already trained")}</text>
+      <path class="sv-line" d="M120 66h20"/><path class="sv-line" d="M134 61l7 5-7 5"/>
+      <rect class="sv-card" x="150" y="48" width="18" height="36" rx="3"/>
+      <rect class="sv-card" x="172" y="48" width="18" height="36" rx="3"/>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("내 예시 100개","100 examples")}</text>
+      <path class="sv-line" d="M200 66h20"/><path class="sv-line" d="M214 61l7 5-7 5"/>
+      <rect class="sv-gr-b" x="230" y="38" width="96" height="56" rx="9"/>
+      <text class="sv-gr-t" x="278" y="62" text-anchor="middle" font-size="11" font-weight="500">${x("내 과제용","tuned for my task")}</text>
+      <text class="sv-dim" x="278" y="78" text-anchor="middle" font-size="8.8">${x("같은 모델, 조금 더","same model, a bit more")}</text>`) },
+
+  { tag:"SOLUTION",
+    ko:{h:"전부 바꾸지 않고 작은 부품만 바꾼다", c:"학습해야 할 값이 1만분의 1로 줄고, 그래픽 메모리는 3분의 1이 된다."},
+    en:{h:"Change a small part instead of the whole thing", c:"10,000× fewer trainable parameters and a third of the GPU memory."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="26" y="28" width="150" height="76" rx="10"/>
+      <text class="sv-dim" x="101" y="50" text-anchor="middle" font-size="9.5">${x("원래 가중치","original weights")}</text>
+      <text class="sv-dim" x="101" y="70" text-anchor="middle" font-size="9">${x("그대로 얼려 둔다","kept frozen")}</text>
+      <rect class="sv-vi-b" x="62" y="78" width="78" height="20" rx="10"/>
+      <text class="sv-vi-t" x="101" y="92" text-anchor="middle" font-size="9.5" font-weight="600">${x("작은 어댑터","small adapter")}</text>
+      <path class="sv-line" d="M186 66h22"/><path class="sv-line" d="M202 61l7 5-7 5"/>
+      <text class="sv-vi-t" x="272" y="62" text-anchor="middle" font-size="15" font-weight="700">1 / 10,000</text>
+      <text class="sv-dim" x="272" y="80" text-anchor="middle" font-size="9.5">${x("학습하는 값의 수","trainable parameters")}</text>`) },
+
+  { tag:"BENEFIT",
+    ko:{h:"100배 작은 모델이 더 나은 답을 낸다", c:"사람 평가에서 13억 모델의 답이 1750억 모델의 답보다 선호됐다."},
+    en:{h:"A 100× smaller model gives the better answer", c:"Human raters preferred the 1.3B model’s answers over those of the 175B model."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="18" y="34" width="120" height="30" rx="6"/>
+      <text class="sv-dim" x="34" y="54" font-size="10">GPT-3</text>
+      <text class="sv-dim" x="126" y="54" text-anchor="end" font-size="11">175B</text>
+      <rect class="sv-gr-b" x="18" y="80" width="120" height="30" rx="6"/>
+      <text class="sv-gr-t" x="34" y="100" font-size="10">InstructGPT</text>
+      <text class="sv-gr-t" x="126" y="100" text-anchor="end" font-size="12" font-weight="700">1.3B</text>
+      <path class="sv-gr-l" d="M150 72h30"/><path class="sv-gr-l" d="M174 67l7 5-7 5"/>
+      <rect class="sv-box" x="192" y="44" width="134" height="52" rx="9"/>
+      <text class="sv-ink" x="259" y="66" text-anchor="middle" font-size="11" font-weight="500">${x("사람이 고른 쪽","what people preferred")}</text>
+      <text class="sv-gr-t" x="259" y="83" text-anchor="middle" font-size="10" font-weight="600">InstructGPT</text>
+      <text class="sv-dim" x="78" y="126" text-anchor="middle" font-size="9.5">${x("같은 질문, 두 답","same prompts, two answers")}</text>`) },
+];
+
+const CHERRIES = [
+  { who:"Ilya Sutskever", role:{ko:"NeurIPS 2024 (전언)",en:"NeurIPS 2024 (as reported)"},
+    q:{ko:"데이터는 AI의 화석연료다. 어쩌다 쌓였고 지금 우리가 그걸 태우고 있지만, 정점은 이미 지났다.",
+       en:"You could even say that data is the fossil fuel of AI. It was created somehow, and now we use it, but we’ve achieved peak data."},
+    cite:"Ilya Sutskever, NeurIPS (2024-12) — 전해진 발언", url:"https://officechai.com/stories/data-is-the-fossil-fuel-of-ai-it-will-get-exhausted-ilya-sutskever/" },
+  { who:"Lester et al.", role:{ko:"프롬프트 튜닝 · 2021",en:"Prompt Tuning · 2021"},
+    q:{ko:"모델은 얼려 두고 부드러운 프롬프트만 학습한다.",
+       en:"a simple yet effective mechanism for learning “soft prompts” to condition frozen language models to perform specific downstream tasks"},
+    cite:"Lester, Al-Rfou & Constant, “The Power of Scale for Parameter-Efficient Prompt Tuning”, Abstract (arXiv:2104.08691)", url:"https://arxiv.org/abs/2104.08691" },
+  { who:"Hu et al.", role:{ko:"LoRA · 2021",en:"LoRA · 2021"},
+    q:{ko:"학습해야 할 값이 1만분의 1로 줄어든다.",
+       en:"LoRA can reduce the number of trainable parameters by 10,000 times"},
+    cite:"Hu et al., “LoRA: Low-Rank Adaptation of Large Language Models”, Abstract (arXiv:2106.09685)", url:"https://arxiv.org/abs/2106.09685" },
+  { who:"Rafailov et al.", role:{ko:"DPO · 2023",en:"DPO · 2023"},
+    q:{ko:"당신의 언어 모형은 사실 보상 모형이다.",en:"Your Language Model is Secretly a Reward Model"},
+    cite:"Rafailov et al., “Direct Preference Optimization: Your Language Model is Secretly a Reward Model” (arXiv:2305.18290)", url:"https://arxiv.org/abs/2305.18290" },
+  { who:"Lester et al.", role:{ko:"프롬프트 튜닝 · 2021",en:"Prompt Tuning · 2021"},
+    q:{ko:"모델이 수십억 파라미터를 넘어서면, 프롬프트만 학습해도 모델 전체를 손보는 것만큼 강력해진다.",
+       en:"as models exceed billions of parameters, our method “closes the gap” and matches the strong performance of model tuning"},
+    cite:"Lester, Al-Rfou & Constant, “The Power of Scale for Parameter-Efficient Prompt Tuning”, Abstract (arXiv:2104.08691)", url:"https://arxiv.org/abs/2104.08691" },
+];
+
+const KIDS = [
+  { rel:"SUBTOPIC", node:"InstructionTuning", label:"InstructionTuning", has:false,
+    why:{ko:"지시-응답 데이터로 지시를 따르게 만든다",en:"Train on instruction–response pairs"} },
+  { rel:"SUBTOPIC", node:"ParameterEfficientFinetuning", label:"Parameter Efficient Finetuning", has:true,
+    why:{ko:"원본은 고정하고 작은 파라미터만 학습한다",en:"Freeze the original, train a small add-on"} },
+  { rel:"SUBTOPIC", node:"SupervisedFinetuning", label:"SupervisedFinetuning", has:false,
+    why:{ko:"라벨 붙은 데이터로 손실을 줄여 간다",en:"Minimize loss on labeled data"} },
+  { rel:"SUBTOPIC", node:"TaskSpecificFinetuning", label:"TaskSpecificFinetuning", has:false,
+    why:{ko:"특정 과제 하나에 맞춰 더 학습시킨다",en:"Adapt it to one downstream task"} },
+  { rel:"SUBTOPIC", node:"TransferLearning", label:"Transfer Learning", has:false,
+    why:{ko:"사전학습이 쌓은 지식을 새 과제에 재활용한다",en:"Reuse what pre-training accumulated"} },
+  { rel:"RELATED", node:"CustomEmbedding", label:"Custom Embeddings", has:true,
+    why:{ko:"임베딩 모델을 한 분야에 맞추는 쪽",en:"Adapting an embedding model to one domain"} },
+  { rel:"PARENT", node:"TrainingParadigm", label:"TrainingParadigm", has:false,
+    why:{ko:"학습 방식 전체가 상위에 있다",en:"The parent family of training paradigms"} },
+];
+const REL_COLOR = { SUBTOPIC:"var(--violet)", PREREQUISITE:"var(--text-muted)", RELATED:"var(--orange)", PARENT:"var(--text-muted)" };
+
+const REFS = [
+  { stage:{ko:"원전",en:"Origin"}, t:"Universal Language Model Fine-tuning for Text Classification",
+    d:{ko:"전이학습을 자연어로 가져온 논문. 100개 예시 이야기가 여기 있다.",en:"The paper that brought transfer learning to NLP. The 100-example result is here."},
+    url:"https://arxiv.org/abs/1801.06146" },
+  { stage:{ko:"정렬",en:"Alignment"}, t:"Training language models to follow instructions with human feedback",
+    d:{ko:"사람 피드백으로 다듬으면 작은 모델이 큰 모델을 이긴다.",en:"Tuned on human feedback, the small model beats the large one."},
+    url:"https://arxiv.org/abs/2203.02155" },
+  { stage:{ko:"효율",en:"Efficiency"}, t:"LoRA: Low-Rank Adaptation of Large Language Models",
+    d:{ko:"전부 바꾸지 않고 작은 부품만 바꾸는 법. 숫자가 초록에 있다.",en:"Changing a small part instead of everything — the numbers are in the abstract."},
+    url:"https://arxiv.org/abs/2106.09685" },
+  { stage:{ko:"실전",en:"Practice"}, t:"QLoRA: Efficient Finetuning of Quantized LLMs",
+    d:{ko:"GPU 한 장으로 큰 모델을 미세조정하는 쪽의 이야기.",en:"Fine-tuning a large model on a single GPU."},
+    url:"https://arxiv.org/abs/2305.14314" },
+];
+
+const T = {
+  ko:{ meta:["Updated 2026-10-03","5 cherries","Draft — pending review","via 외부 자료"],
+       overview:"미세조정은 이미 배운 모델을 가져와 내 자료로 조금 더 가르친다.<br>그래서 바닥부터 기르지 않고도 모델이 내 과제의 말투와 형식을 따른다." },
+  en:{ meta:["Updated 2026-10-03","5 cherries","Draft — pending review","via external sources"],
+       overview:"Fine-tuning takes a model that has already learned and teaches it a little more on your own data.<br>Without training from scratch, it picks up your task’s form and voice." },
+};
+
+/* Learning Roadmap — rag.html 과 같은 규칙 */
+const RM = { W:236, PAD:4, FS:11, CHAR_W:0.56, PAD_X:9, LINE_H:14, CHIP_PAD_Y:9, ROW_GAP:7,
+             BAND_LABEL_H:20, BAND_GAP:16, SELF_FS:15, SELF_PAD_Y:12, ARROW:20 };
+function wrapLabel(label, maxW, fs){
+  const w = (t) => t.length * fs * RM.CHAR_W;
+  if (w(label) <= maxW) return [label];
+  const bps = []; for (let i=1;i<label.length;i++){ if(label[i]===" ")bps.push(i);
+    else if(/[a-z0-9]/.test(label[i-1])&&/[A-Z]/.test(label[i]))bps.push(i); }
+  const out=[]; let s=0;
+  while (s < label.length){
+    const rest = label.slice(s);
+    if (w(rest) <= maxW){ out.push(rest.trim()); break; }
+    const c = bps.filter(b=>b>s && w(label.slice(s,b))<=maxW);
+    if (!c.length){ const n=Math.max(1,Math.floor(maxW/(fs*RM.CHAR_W))); out.push(label.slice(s,s+n).trim()); s+=n; }
+    else { const b=c[c.length-1]; out.push(label.slice(s,b).trim()); s=b; }
+  }
+  return out.filter(Boolean);
+}
+function roadmap(){
+  const inner = RM.W - RM.PAD*2, maxTextW = inner - RM.PAD_X*2;
+  const chip = (k) => { const lines = wrapLabel(k.label, maxTextW, RM.FS);
+    return { ...k, lines, h: lines.length*RM.LINE_H + RM.CHIP_PAD_Y*2 }; };
+  const pre = KIDS.filter(k=>k.rel==="PREREQUISITE"||k.rel==="PARENT").map(chip);
+  const deep = KIDS.filter(k=>k.rel==="SUBTOPIC").map(chip);
+  const rel = KIDS.filter(k=>k.rel==="RELATED").map(chip);
+  const selfH = RM.SELF_FS + RM.SELF_PAD_Y*2;
+  let y = 0; const parts = [];
+  const band = (title, arr, cls) => {
+    if (!arr.length) return;
+    parts.push(`<text class="rm-band" x="${RM.PAD}" y="${y+12}" font-size="10" font-weight="700" letter-spacing=".6">${title}</text>`);
+    y += RM.BAND_LABEL_H;
+    for (const c of arr){
+      parts.push(`<rect class="${cls}" x="${RM.PAD}" y="${y}" width="${inner}" height="${c.h}" rx="6"${c.has?"":' stroke-dasharray="4 3"'}/>`);
+      c.lines.forEach((ln,i)=>parts.push(
+        `<text class="${cls==="rm-pre"?"rm-band":"rm-vt"}" x="${RM.PAD+RM.PAD_X}" y="${y+RM.CHIP_PAD_Y+RM.LINE_H*(i+1)-4}" font-size="${RM.FS}" font-weight="600">${ln}</text>`));
+      y += c.h + RM.ROW_GAP;
+    }
+    y += RM.BAND_GAP - RM.ROW_GAP;
+  };
+  if (pre.length){
+    band("ABOVE", pre, "rm-pre");
+    parts.push(`<path class="rm-arrow" d="M${RM.W/2} ${y-10}v${RM.ARROW-6}"/><path class="rm-arrow" d="M${RM.W/2-4} ${y+RM.ARROW-16}l4 5 4-5"/>`);
+    y += RM.ARROW;
+  }
+  parts.push(`<rect class="rm-self" x="${RM.PAD}" y="${y}" width="${inner}" height="${selfH}" rx="8"/>`);
+  parts.push(`<text class="rm-t" x="${RM.W/2}" y="${y+selfH/2+5}" text-anchor="middle" font-size="${RM.SELF_FS}" font-weight="800">Fine-tuning</text>`);
+  y += selfH;
+  parts.push(`<path class="rm-arrow" d="M${RM.W/2} ${y}v${RM.ARROW-8}"/><path class="rm-arrow" d="M${RM.W/2-4} ${y+RM.ARROW-14}l4 5 4-5"/>`);
+  y += RM.ARROW + 2;
+  band("GO DEEPER", deep, "rm-deep");
+  band("RELATED", rel, "rm-deep");
+  return `<svg viewBox="0 0 ${RM.W} ${y}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
+}
+
+let lang = "ko";
+function render(){
+  const t = T[lang];
+  document.getElementById("meta").innerHTML = t.meta
+    .map((m,i)=>`<span class="${i===2?"draft":""}">${m}</span>`).join('<span class="dot">·</span>');
+  document.getElementById("overview").innerHTML = t.overview;
+
+  const x = (k,e) => lang==="ko" ? k : e;
+  document.getElementById("figs").innerHTML = FIGURES.map(f=>`
+    <figure><div class="figtag">${f.tag}</div><h3>${f[lang].h}</h3>${f.art(x)}
+      <figcaption>${f[lang].c}</figcaption></figure>`).join("");
+
+  document.getElementById("cherries").innerHTML = CHERRIES.map(c=>`
+    <div class="cherry">
+      <div class="who">🍒 ${c.who} <span class="role">— ${c.role[lang]}</span></div>
+      <q>“${c.q[lang]}”</q>
+      <p class="cite">${c.cite} · <a href="${c.url}" target="_blank" rel="noopener noreferrer">${lang==="ko"?"원문":"source"} ↗</a></p>
+    </div>`).join("");
+
+  document.getElementById("kids").innerHTML = KIDS.map(k=>`
+    <button class="kid ${k.has?"has":"outline"}" type="button">
+      <span class="st ${k.has?"full":"out"}">${k.has?"FULL":"OUTLINE"}</span>
+      <span class="rel" style="color:${REL_COLOR[k.rel]}">${k.rel}</span>
+      <p class="nm">${k.label}</p><p class="why">${k.why[lang]}</p>
+    </button>`).join("");
+
+  document.getElementById("refs").innerHTML = REFS.map(r=>`
+    <div class="ref"><div class="pin"></div>
+      <div class="stage">${r.stage[lang]}</div>
+      <a class="t" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.t} ↗</a>
+      <p>${r.d[lang]}</p>
+      <div class="kind">🔗 External — ${new URL(r.url).hostname.replace(/^www\./,"")}</div>
+    </div>`).join("");
+
+  document.getElementById("roadmap").innerHTML = roadmap();
+  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
+  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
+}
+document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
+document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
+render();
+</script>

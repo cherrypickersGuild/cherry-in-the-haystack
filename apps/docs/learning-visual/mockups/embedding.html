@@ -1,0 +1,422 @@
+<title>Embedding</title>
+<style>
+/* 기존 개념 페이지(concept-reader-page.tsx)의 색·간격·구조를 그대로 쓴다.
+   새로 만든 것은 ①한/영 토글 ②그림 구획뿐이다. */
+:root{
+  --page:#FBFAF8; --card:#FFFFFF; --border:#E4E1EE; --secondary:#F4F3F1;
+  --text-primary:#1A1626; --text-secondary:#3D3652; --text-muted:#9E97B3;
+  --cherry:#C94B6E; --cherry-soft:#FDF0F3; --cherry-border:#F0C3CF;
+  --violet:#7B5EA7; --violet-soft:#F3EFFA; --violet-border:#D9CEEC;
+  --green:#2F7A3A; --green-soft:#E3F1E1; --orange:#D4854A;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --page:#15131C; --card:#1D1A28; --border:#2F2B3E; --secondary:#242031;
+    --text-primary:#F1EFF6; --text-secondary:#C7C1D5; --text-muted:#8A82A0;
+    --cherry:#E9819C; --cherry-soft:#2B1A21; --cherry-border:#5A3442;
+    --violet:#AB92D4; --violet-soft:#241D33; --violet-border:#463A62;
+    --green:#5FBE95; --green-soft:#16261F; --orange:#E0A171;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#15131C; --card:#1D1A28; --border:#2F2B3E; --secondary:#242031;
+  --text-primary:#F1EFF6; --text-secondary:#C7C1D5; --text-muted:#8A82A0;
+  --cherry:#E9819C; --cherry-soft:#2B1A21; --cherry-border:#5A3442;
+  --violet:#AB92D4; --violet-soft:#241D33; --violet-border:#463A62;
+  --green:#5FBE95; --green-soft:#16261F; --orange:#E0A171;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text-secondary);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+  font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.shell{display:flex;gap:0;max-width:1160px;margin:0 auto;align-items:flex-start}
+@media(max-width:900px){.shell{flex-direction:column}}
+main{flex:1;min-width:0;padding-block:28px 72px;padding-left:20px;padding-right:20px}
+aside{width:280px;flex-shrink:0;border-left:1px solid var(--border);
+  padding-block:24px 40px;padding-left:16px;padding-right:16px}
+@media(max-width:900px){aside{width:100%;border-left:0;border-top:1px solid var(--border)}}
+
+/* 머리 — 원본의 뱃지·제목·메타줄 */
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;
+  font-size:10px;font-weight:700;background:var(--green-soft);color:var(--green);margin-bottom:12px}
+h1{margin:0 0 16px;font-size:28px;font-weight:800;color:var(--text-primary);
+  letter-spacing:-.5px;line-height:1.2}
+@media(max-width:600px){h1{font-size:20px}}
+.titlerow{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.langs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  background:var(--card);flex-shrink:0}
+.langs button{border:0;background:transparent;font-family:inherit;cursor:pointer;
+  padding:6px 13px;font-size:12px;font-weight:600;color:var(--text-muted)}
+.langs button[aria-pressed="true"]{background:var(--text-primary);color:var(--card)}
+.langs button:focus-visible{outline:2px solid var(--cherry);outline-offset:-2px}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;
+  color:var(--text-muted);margin-bottom:32px}
+.meta .dot{color:var(--border)}
+.meta .draft{color:var(--orange);font-weight:600}
+
+/* 구획 머리 — 원본 그대로 */
+section{margin-bottom:40px}
+.sechead{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sechead span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text-muted);white-space:nowrap}
+.sechead .rule{flex:1;height:1px;background:var(--border)}
+
+/* 01 개요 — 두 줄 */
+.overview{font-size:16px;line-height:1.75;color:var(--text-secondary);margin:0}
+
+/* 02 그림 */
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:700px){.figs{grid-template-columns:1fr}}
+figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
+  display:flex;flex-direction:column}
+.figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
+figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure svg{display:block;width:100%;height:auto;margin-block:auto}
+figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+.sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
+.sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
+.sv-ink{fill:var(--text-primary)} .sv-dim{fill:var(--text-muted)}
+.sv-ch{stroke:var(--cherry);fill:none;stroke-width:1.5;stroke-linecap:round} .sv-ch-t{fill:var(--cherry)}
+.sv-ch-b{fill:var(--cherry-soft);stroke:var(--cherry-border);stroke-width:1.4}
+.sv-vi-b{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.4}
+.sv-vi-f{fill:var(--violet)} .sv-vi-t{fill:var(--violet)}
+.sv-gr-b{fill:var(--green-soft);stroke:var(--green);stroke-width:1.5}
+.sv-gr-t{fill:var(--green)} .sv-gr-l{stroke:var(--green);fill:none;stroke-width:1.5;stroke-linecap:round}
+
+/* 03 체리 — 원본 카드(왼쪽 3px 체리색) */
+.cherry{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--cherry);
+  border-radius:8px;padding:16px;margin-bottom:10px}
+.cherry .who{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:12px;
+  font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.cherry .who .role{font-weight:400;color:var(--text-muted)}
+.cherry q{display:block;quotes:none;font-size:15px;line-height:1.65;color:var(--text-primary)}
+.cherry .cite{margin:8px 0 0;font-size:10px;color:var(--text-muted)}
+.cherry .cite a{color:var(--cherry);text-decoration:none}
+.cherry .cite a:hover{text-decoration:underline}
+
+/* 04 하위 개념 — 원본 2열 카드 + 관계색 + FULL/OUTLINE 뱃지 */
+.kids{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:600px){.kids{grid-template-columns:1fr}}
+.kid{position:relative;background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:12px 56px 12px 12px;text-align:left;font-family:inherit;cursor:pointer}
+.kid.has{border-color:var(--violet-border)} .kid.outline{border-style:dashed}
+.kid:hover{border-color:var(--cherry)}
+.kid .st{position:absolute;top:8px;right:8px;padding:1px 6px;border-radius:4px;border:1px solid;
+  font-size:8px;font-weight:800;letter-spacing:.5px}
+.kid .st.full{background:var(--violet-soft);color:var(--violet);border-color:var(--violet-border)}
+.kid .st.out{background:var(--secondary);color:var(--text-muted);border-color:var(--border)}
+.kid .rel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.kid .nm{margin:2px 0 0;font-size:13px;font-weight:600;color:var(--text-primary)}
+.kid .why{margin:2px 0 0;font-size:11px;color:var(--text-muted)}
+
+/* 05 레퍼런스 — 원본 타임라인 */
+.ref{position:relative;padding-left:16px;border-left:2px solid var(--border);margin-bottom:16px}
+.ref:first-child{border-left-color:var(--cherry)}
+.ref .pin{position:absolute;left:-5px;top:2px;width:8px;height:8px;border-radius:50%;background:var(--border)}
+.ref:first-child .pin{background:var(--cherry)}
+.ref .stage{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+.ref:first-child .stage{color:var(--cherry)}
+.ref a.t{display:block;margin-top:2px;font-size:13px;font-weight:700;color:var(--text-primary);
+  text-decoration:none;text-underline-offset:2px}
+.ref a.t:hover{color:var(--cherry);text-decoration:underline dotted}
+.ref p{margin:4px 0 0;font-size:11.5px;color:var(--text-muted)}
+.ref .kind{margin-top:3px;font-size:10px;color:var(--text-muted)}
+
+/* 오른쪽 — Learning Roadmap 카드 (원본) */
+.rmcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.rmcard .h{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text-muted);margin:0 0 12px}
+.rmcard svg{display:block;width:100%;height:auto}
+.legend{margin-top:8px;display:grid;gap:4px;font-size:9px;color:var(--text-muted)}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend i{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.rm-self{fill:var(--card);stroke:var(--cherry);stroke-width:2}
+.rm-deep{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.5}
+.rm-pre{fill:var(--secondary);stroke:var(--border);stroke-width:1.5}
+.rm-arrow{stroke:var(--border);stroke-width:1.5;fill:none}
+.rm-band{fill:var(--text-muted)} .rm-t{fill:var(--text-primary)} .rm-vt{fill:var(--violet)}
+</style>
+
+<div class="shell">
+  <main>
+    <span class="badge" id="badge">BASICS</span>
+    <div class="titlerow">
+      <h1 id="title">Embedding</h1>
+      <div class="langs" role="group" aria-label="Language">
+        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
+        <button id="lang-en" type="button" aria-pressed="false">English</button>
+      </div>
+    </div>
+    <div class="meta" id="meta"></div>
+
+    <section>
+      <div class="sechead"><span>01 — Overview</span><div class="rule"></div></div>
+      <p class="overview" id="overview"></p>
+    </section>
+
+    <section>
+      <div class="sechead"><span>02 — Flash</span><div class="rule"></div></div>
+      <div class="figs" id="figs"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>03 — Cherries</span><div class="rule"></div></div>
+      <div id="cherries"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>04 — Child Concepts</span><div class="rule"></div></div>
+      <div class="kids" id="kids"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>05 — References</span><div class="rule"></div></div>
+      <div id="refs"></div>
+    </section>
+  </main>
+
+  <aside>
+    <div class="rmcard">
+      <p class="h">Learning Roadmap</p>
+      <div id="roadmap"></div>
+      <div class="legend">
+        <div><i style="border:2px solid var(--cherry);background:var(--card)"></i><span>Cherry = You are here</span></div>
+        <div><i style="border:2px solid var(--violet-border);background:var(--violet-soft)"></i><span>Violet = Go deeper</span></div>
+        <div><i style="border:1px dashed var(--violet-border);background:var(--violet-soft)"></i><span>Dashed = Outline only</span></div>
+        <div><i style="border:1px solid var(--border);background:var(--secondary)"></i><span>Gray = Prerequisite</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+const F = (i) => `<svg viewBox="0 0 340 142" role="img" xmlns="http://www.w3.org/2000/svg">${i}</svg>`;
+
+/* 넉 장 공통 격자 — 사물 띠 28~126, 세로 중심 77, 화살표 한 줄.
+   굵게는 한 장에 하나까지. x(한국어, English) */
+const FIGURES = [
+  { tag:"PROBLEM",
+    ko:{h:"사전의 번호로는 뜻이 닮았는지 알 수 없다", c:"낱말을 어휘 사전의 색인 번호로만 다루던 시절의 한계다."},
+    en:{h:"Index numbers can’t tell you two words are alike", c:"The limit of treating words as indices in a vocabulary."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="28" width="152" height="98" rx="10"/>
+      <text class="sv-dim" x="30" y="52" font-size="10">${x("고양이","cat")}</text>
+      <text class="sv-dim" x="150" y="52" text-anchor="end" font-size="10">#1042</text>
+      <path class="sv-line" opacity=".35" d="M30 62h120"/>
+      <text class="sv-dim" x="30" y="84" font-size="10">${x("고양잇과","feline")}</text>
+      <text class="sv-dim" x="150" y="84" text-anchor="end" font-size="10">#7781</text>
+      <path class="sv-line" opacity=".35" d="M30 94h120"/>
+      <text class="sv-dim" x="30" y="116" font-size="10">${x("자동차","car")}</text>
+      <text class="sv-dim" x="150" y="116" text-anchor="end" font-size="10">#0032</text>
+
+      <path class="sv-line" d="M176 77h22"/><path class="sv-line" d="M192 72l7 5-7 5"/>
+
+      <rect class="sv-ch-b" x="210" y="48" width="116" height="58" rx="10"/>
+      <text class="sv-ch-t" x="268" y="72" text-anchor="middle" font-size="9.5">${x("#1042 와 #7781","#1042 vs #7781")}</text>
+      <text class="sv-ch-t" x="268" y="94" text-anchor="middle" font-size="16" font-weight="700">?</text>`) },
+
+  { tag:"IDEA",
+    ko:{h:"뜻이 비슷하면 가까운 자리에 놓는다", c:"낱말을 좌표로 바꾸면 닮음을 거리로 다룰 수 있다."},
+    en:{h:"Put similar meanings in nearby places", c:"Turn words into coordinates and likeness becomes distance."},
+    art:(x)=>F(`
+      <path class="sv-line" d="M34 120V34"/><path class="sv-line" d="M34 120h286"/>
+      <path class="sv-line" d="M29 40l5-6 5 6"/><path class="sv-line" d="M314 115l6 5-6 5"/>
+      <circle class="sv-vi-f" cx="116" cy="60" r="4.5"/>
+      <text class="sv-vi-t" x="126" y="58" font-size="9.5">${x("고양이","cat")}</text>
+      <circle class="sv-vi-f" cx="138" cy="76" r="4.5"/>
+      <text class="sv-vi-t" x="148" y="80" font-size="9.5">${x("고양잇과","feline")}</text>
+      <circle class="sv-vi-f" cx="104" cy="82" r="4.5"/>
+      <text class="sv-vi-t" x="60" y="86" font-size="9.5" text-anchor="end">${x("강아지","dog")}</text>
+      <circle class="sv-dot" style="fill:var(--text-muted)" cx="268" cy="104" r="4.5"/>
+      <text class="sv-dim" x="258" y="100" text-anchor="end" font-size="9.5">${x("자동차","car")}</text>
+      <path class="sv-vi-b" style="fill:none;stroke-dasharray:4 4" d="M78 46h88v52H78z" opacity=".9"/>`) },
+
+  { tag:"SOLUTION",
+    ko:{h:"두 벡터가 이루는 각으로 의미의 유사함이 측정가능해진다.", c:"원논문은 낱말 하나를 640개의 숫자로 나타냈다."},
+    en:{h:"The angle between two vectors makes similarity of meaning measurable.", c:"The original paper represented each word with 640 numbers."},
+    art:(x)=>F(`
+      <path style="fill:none;stroke:var(--violet);stroke-width:1.8;stroke-linecap:round" d="M48 116L140 39"/>
+      <path style="fill:none;stroke:var(--violet);stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round" d="M131.5 42.1L140 39L135.5 46.8"/>
+      <path class="sv-line" d="M48 116L196 90"/>
+      <path class="sv-line" style="stroke-linejoin:round" d="M187.1 88.4L196 90L188.2 94.5"/>
+      <path style="fill:none;stroke:var(--violet-border);stroke-width:1.4" d="M83.2 86.4A46 46 0 0 1 93.3 108"/>
+      <text class="sv-vi-t" x="99" y="98" font-size="12" font-weight="500">θ</text>
+      <circle class="sv-ink" cx="48" cy="116" r="3"/>
+      <text class="sv-vi-t" x="148" y="38" font-size="9.5">${x("질문","query")}</text>
+      <text class="sv-dim" x="204" y="92" font-size="9.5">${x("문서 조각","a chunk")}</text>
+      <text class="sv-vi-t" x="286" y="46" text-anchor="middle" font-size="13" font-weight="700">${x("640차원","640-dim")}</text>
+      <text class="sv-dim" x="286" y="60" text-anchor="middle" font-size="9.5">${x("벡터 하나의 크기","one vector")}</text>`) },
+
+  { tag:"BENEFIT",
+    ko:{h:"뜻끼리 더하고 뺄 수 있다", c:"king − man + woman 의 결과는 queen 에 가장 가까웠다."},
+    en:{h:"Meanings can be added and subtracted", c:"king − man + woman landed closest to queen."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="10" y="60" width="58" height="34" rx="6"/>
+      <text class="sv-ink" x="39" y="82" text-anchor="middle" font-size="11" font-weight="500">king</text>
+      <text class="sv-dim" x="78" y="82" text-anchor="middle" font-size="14">−</text>
+      <rect class="sv-box" x="88" y="60" width="56" height="34" rx="6"/>
+      <text class="sv-ink" x="116" y="82" text-anchor="middle" font-size="11" font-weight="500">man</text>
+      <text class="sv-dim" x="154" y="82" text-anchor="middle" font-size="14">+</text>
+      <rect class="sv-box" x="164" y="60" width="68" height="34" rx="6"/>
+      <text class="sv-ink" x="198" y="82" text-anchor="middle" font-size="11" font-weight="500">woman</text>
+      <path class="sv-gr-l" d="M240 77h16"/><path class="sv-gr-l" d="M252 72l6 5-6 5"/>
+      <rect class="sv-gr-b" x="262" y="60" width="64" height="34" rx="6"/>
+      <text class="sv-gr-t" x="294" y="82" text-anchor="middle" font-size="12" font-weight="700">queen</text>
+      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="9.5">${x("벡터끼리의 셈","arithmetic on vectors")}</text>`) },
+];
+
+const CHERRIES = [
+  { who:"Pandu Nayak", role:{ko:"Google 검색 부사장 · 2019 (전언)",en:"VP of Search, Google · 2019 (as reported)"},
+    q:{ko:"지난 5년을 통틀어 가장 큰 도약이고, 검색의 역사에서도 손꼽히는 도약이다.",
+       en:"the biggest leap forward in the past five years, and one of the biggest leaps forward in the history of Search"},
+    cite:"Pandu Nayak, Google Search 블로그 (2019-10-25)", url:"https://blog.google/products/search/search-language-understanding-bert/" },
+  { who:"Caliskan, Bryson & Narayanan", role:{ko:"Science · 2017",en:"Science · 2017"},
+    q:{ko:"언어 자체에 우리 역사의 편향이, 되찾아 낼 수 있고 정확한 자국으로 남아 있다.",
+       en:"language itself contains recoverable and accurate imprints of our historic biases"},
+    cite:"Caliskan, Bryson & Narayanan, “Semantics derived automatically from language corpora contain human-like biases” (arXiv:1608.07187)", url:"https://arxiv.org/abs/1608.07187" },
+  { who:"Bolukbasi et al.", role:{ko:"임베딩의 성별 편향 · 2016",en:"Gender bias in embeddings · 2016"},
+    q:{ko:"구글 뉴스 기사로 학습한 낱말 임베딩조차 성별 고정관념을 불편할 만큼 드러낸다.",
+       en:"We show that even word embeddings trained on Google News articles exhibit female/male gender stereotypes to a disturbing extent."},
+    cite:"Bolukbasi, Chang, Zou, Saligrama & Kalai, “Man is to Computer Programmer as Woman is to Homemaker?” (arXiv:1607.06520)", url:"https://arxiv.org/abs/1607.06520" },
+  { who:"Reimers & Gurevych", role:{ko:"Sentence-BERT 논문 · 2019",en:"The Sentence-BERT paper · 2019"},
+    q:{ko:"가장 닮은 한 쌍을 찾는 수고가 65시간에서 약 5초로 줄어든다. 정확도는 그대로 둔 채로.",
+       en:"This reduces the effort for finding the most similar pair from 65 hours with BERT / RoBERTa to about 5 seconds with SBERT, while maintaining the accuracy from BERT."},
+    cite:"Reimers & Gurevych, “Sentence-BERT”, Abstract (arXiv:1908.10084)", url:"https://arxiv.org/abs/1908.10084" },
+  { who:"Peters et al.", role:{ko:"ELMo · 2018",en:"ELMo · 2018"},
+    q:{ko:"같은 단어라도 쓰인 문맥에 따라 벡터가 달라진다.",
+       en:"how these uses vary across linguistic contexts (i.e., to model polysemy)"},
+    cite:"Peters et al., “Deep contextualized word representations”, Abstract (arXiv:1802.05365)", url:"https://arxiv.org/abs/1802.05365" },
+];
+
+const KIDS = [
+  { rel:"SUBTOPIC", node:"CustomEmbedding", label:"Custom Embeddings", has:true,
+    why:{ko:"범용 모델을 한 분야에 맞춰 다시 학습한다",en:"Adapt a general model to one domain"} },
+  { rel:"SUBTOPIC", node:"SemanticRepresentation", label:"Semantic Representation", has:false,
+    why:{ko:"문장을 고정 차원 벡터로 바꿔 의미를 수치화한다",en:"Turn a sentence into a fixed-length vector"} },
+  { rel:"RELATED", node:"Chunking", label:"Chunking", has:false,
+    why:{ko:"긴 문서를 조각으로 나누는 전처리",en:"Splitting long documents into chunks"} },
+  { rel:"RELATED", node:"VectorDatabase", label:"Vector Database", has:false,
+    why:{ko:"벡터를 저장하고 근사 최근접으로 찾는다",en:"Stores vectors, searches by nearest neighbor"} },
+  { rel:"PARENT", node:"EmbeddingLayer", label:"EmbeddingLayer", has:false,
+    why:{ko:"모델 안의 임베딩 층이 상위에 있다",en:"The embedding layer inside the model"} },
+];
+const REL_COLOR = { SUBTOPIC:"var(--violet)", PREREQUISITE:"var(--text-muted)", RELATED:"var(--orange)", PARENT:"var(--text-muted)" };
+
+const REFS = [
+  { stage:{ko:"원전",en:"Origin"}, t:"Efficient Estimation of Word Representations in Vector Space",
+    d:{ko:"word2vec 논문. 서론 한 문단이면 왜 필요했는지 안다.",en:"The word2vec paper. One paragraph of the intro explains why it was needed."},
+    url:"https://arxiv.org/abs/1301.3781" },
+  { stage:{ko:"입문",en:"Primer"}, t:"The Illustrated Word2vec",
+    d:{ko:"그림으로 따라가는 설명. 벡터가 왜 그렇게 생겼는지 보인다.",en:"A picture-led walkthrough of how the vectors come about."},
+    url:"https://jalammar.github.io/illustrated-word2vec/" },
+  { stage:{ko:"해설",en:"Deeper"}, t:"Deep Learning, NLP, and Representations",
+    d:{ko:"표현을 배우는 일이 왜 핵심인지 짚는 글.",en:"Why learning representations is the point."},
+    url:"https://colah.github.io/posts/2014-07-NLP-RNNs-Representations/" },
+  { stage:{ko:"실전",en:"Practice"}, t:"Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks",
+    d:{ko:"문장 단위 임베딩. 초록에 수치가 바로 나온다.",en:"Sentence-level embeddings. The numbers are in the abstract."},
+    url:"https://arxiv.org/abs/1908.10084" },
+];
+
+const T = {
+  ko:{ meta:["Updated 2026-10-03","5 cherries","Draft — pending review","via 외부 자료"],
+       overview:"임베딩은 글을 좌표로 바꾼다 — 뜻이 비슷하면 가까운 자리에 놓인다.<br>그래서 낱말과 문장의 닮음을 거리로 잴 수 있다." },
+  en:{ meta:["Updated 2026-10-03","5 cherries","Draft — pending review","via external sources"],
+       overview:"An embedding turns text into coordinates — similar meanings land in nearby places.<br>Likeness between words and sentences becomes a distance you can measure." },
+};
+
+/* Learning Roadmap — rag.html 과 같은 규칙 */
+const RM = { W:236, PAD:4, FS:11, CHAR_W:0.56, PAD_X:9, LINE_H:14, CHIP_PAD_Y:9, ROW_GAP:7,
+             BAND_LABEL_H:20, BAND_GAP:16, SELF_FS:15, SELF_PAD_Y:12, ARROW:20 };
+function wrapLabel(label, maxW, fs){
+  const w = (t) => t.length * fs * RM.CHAR_W;
+  if (w(label) <= maxW) return [label];
+  const bps = []; for (let i=1;i<label.length;i++){ if(label[i]===" ")bps.push(i);
+    else if(/[a-z0-9]/.test(label[i-1])&&/[A-Z]/.test(label[i]))bps.push(i); }
+  const out=[]; let s=0;
+  while (s < label.length){
+    const rest = label.slice(s);
+    if (w(rest) <= maxW){ out.push(rest.trim()); break; }
+    const c = bps.filter(b=>b>s && w(label.slice(s,b))<=maxW);
+    if (!c.length){ const n=Math.max(1,Math.floor(maxW/(fs*RM.CHAR_W))); out.push(label.slice(s,s+n).trim()); s+=n; }
+    else { const b=c[c.length-1]; out.push(label.slice(s,b).trim()); s=b; }
+  }
+  return out.filter(Boolean);
+}
+function roadmap(){
+  const inner = RM.W - RM.PAD*2, maxTextW = inner - RM.PAD_X*2;
+  const chip = (k) => { const lines = wrapLabel(k.label, maxTextW, RM.FS);
+    return { ...k, lines, h: lines.length*RM.LINE_H + RM.CHIP_PAD_Y*2 }; };
+  const pre = KIDS.filter(k=>k.rel==="PREREQUISITE"||k.rel==="PARENT").map(chip);
+  const deep = KIDS.filter(k=>k.rel==="SUBTOPIC").map(chip);
+  const rel = KIDS.filter(k=>k.rel==="RELATED").map(chip);
+  const selfH = RM.SELF_FS + RM.SELF_PAD_Y*2;
+  let y = 0; const parts = [];
+  const band = (title, arr, cls) => {
+    if (!arr.length) return;
+    parts.push(`<text class="rm-band" x="${RM.PAD}" y="${y+12}" font-size="10" font-weight="700" letter-spacing=".6">${title}</text>`);
+    y += RM.BAND_LABEL_H;
+    for (const c of arr){
+      parts.push(`<rect class="${cls}" x="${RM.PAD}" y="${y}" width="${inner}" height="${c.h}" rx="6"${c.has?"":' stroke-dasharray="4 3"'}/>`);
+      c.lines.forEach((ln,i)=>parts.push(
+        `<text class="${cls==="rm-pre"?"rm-band":"rm-vt"}" x="${RM.PAD+RM.PAD_X}" y="${y+RM.CHIP_PAD_Y+RM.LINE_H*(i+1)-4}" font-size="${RM.FS}" font-weight="600">${ln}</text>`));
+      y += c.h + RM.ROW_GAP;
+    }
+    y += RM.BAND_GAP - RM.ROW_GAP;
+  };
+  if (pre.length){
+    band("ABOVE", pre, "rm-pre");
+    parts.push(`<path class="rm-arrow" d="M${RM.W/2} ${y-10}v${RM.ARROW-6}"/><path class="rm-arrow" d="M${RM.W/2-4} ${y+RM.ARROW-16}l4 5 4-5"/>`);
+    y += RM.ARROW;
+  }
+  parts.push(`<rect class="rm-self" x="${RM.PAD}" y="${y}" width="${inner}" height="${selfH}" rx="8"/>`);
+  parts.push(`<text class="rm-t" x="${RM.W/2}" y="${y+selfH/2+5}" text-anchor="middle" font-size="${RM.SELF_FS}" font-weight="800">Embedding</text>`);
+  y += selfH;
+  parts.push(`<path class="rm-arrow" d="M${RM.W/2} ${y}v${RM.ARROW-8}"/><path class="rm-arrow" d="M${RM.W/2-4} ${y+RM.ARROW-14}l4 5 4-5"/>`);
+  y += RM.ARROW + 2;
+  band("GO DEEPER", deep, "rm-deep");
+  band("RELATED", rel, "rm-deep");
+  return `<svg viewBox="0 0 ${RM.W} ${y}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
+}
+
+let lang = "ko";
+function render(){
+  const t = T[lang];
+  document.getElementById("meta").innerHTML = t.meta
+    .map((m,i)=>`<span class="${i===2?"draft":""}">${m}</span>`).join('<span class="dot">·</span>');
+  document.getElementById("overview").innerHTML = t.overview;
+
+  const x = (k,e) => lang==="ko" ? k : e;
+  document.getElementById("figs").innerHTML = FIGURES.map(f=>`
+    <figure><div class="figtag">${f.tag}</div><h3>${f[lang].h}</h3>${f.art(x)}
+      <figcaption>${f[lang].c}</figcaption></figure>`).join("");
+
+  document.getElementById("cherries").innerHTML = CHERRIES.map(c=>`
+    <div class="cherry">
+      <div class="who">🍒 ${c.who} <span class="role">— ${c.role[lang]}</span></div>
+      <q>“${c.q[lang]}”</q>
+      <p class="cite">${c.cite} · <a href="${c.url}" target="_blank" rel="noopener noreferrer">${lang==="ko"?"원문":"source"} ↗</a></p>
+    </div>`).join("");
+
+  document.getElementById("kids").innerHTML = KIDS.map(k=>`
+    <button class="kid ${k.has?"has":"outline"}" type="button">
+      <span class="st ${k.has?"full":"out"}">${k.has?"FULL":"OUTLINE"}</span>
+      <span class="rel" style="color:${REL_COLOR[k.rel]}">${k.rel}</span>
+      <p class="nm">${k.label}</p><p class="why">${k.why[lang]}</p>
+    </button>`).join("");
+
+  document.getElementById("refs").innerHTML = REFS.map(r=>`
+    <div class="ref"><div class="pin"></div>
+      <div class="stage">${r.stage[lang]}</div>
+      <a class="t" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.t} ↗</a>
+      <p>${r.d[lang]}</p>
+      <div class="kind">🔗 External — ${new URL(r.url).hostname.replace(/^www\./,"")}</div>
+    </div>`).join("");
+
+  document.getElementById("roadmap").innerHTML = roadmap();
+  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
+  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
+}
+document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
+document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
+render();
+</script>

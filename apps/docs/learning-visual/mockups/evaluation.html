@@ -1,0 +1,429 @@
+<title>Evaluation</title>
+<style>
+/* 기존 개념 페이지(concept-reader-page.tsx)의 색·간격·구조를 그대로 쓴다.
+   새로 만든 것은 ①한/영 토글 ②그림 구획뿐이다. */
+:root{
+  --page:#FBFAF8; --card:#FFFFFF; --border:#E4E1EE; --secondary:#F4F3F1;
+  --text-primary:#1A1626; --text-secondary:#3D3652; --text-muted:#9E97B3;
+  --cherry:#C94B6E; --cherry-soft:#FDF0F3; --cherry-border:#F0C3CF;
+  --violet:#7B5EA7; --violet-soft:#F3EFFA; --violet-border:#D9CEEC;
+  --green:#2F7A3A; --green-soft:#E3F1E1; --orange:#D4854A;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --page:#15131C; --card:#1D1A28; --border:#2F2B3E; --secondary:#242031;
+    --text-primary:#F1EFF6; --text-secondary:#C7C1D5; --text-muted:#8A82A0;
+    --cherry:#E9819C; --cherry-soft:#2B1A21; --cherry-border:#5A3442;
+    --violet:#AB92D4; --violet-soft:#241D33; --violet-border:#463A62;
+    --green:#5FBE95; --green-soft:#16261F; --orange:#E0A171;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#15131C; --card:#1D1A28; --border:#2F2B3E; --secondary:#242031;
+  --text-primary:#F1EFF6; --text-secondary:#C7C1D5; --text-muted:#8A82A0;
+  --cherry:#E9819C; --cherry-soft:#2B1A21; --cherry-border:#5A3442;
+  --violet:#AB92D4; --violet-soft:#241D33; --violet-border:#463A62;
+  --green:#5FBE95; --green-soft:#16261F; --orange:#E0A171;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text-secondary);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+  font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.shell{display:flex;gap:0;max-width:1160px;margin:0 auto;align-items:flex-start}
+@media(max-width:900px){.shell{flex-direction:column}}
+main{flex:1;min-width:0;padding-block:28px 72px;padding-left:20px;padding-right:20px}
+aside{width:280px;flex-shrink:0;border-left:1px solid var(--border);
+  padding-block:24px 40px;padding-left:16px;padding-right:16px}
+@media(max-width:900px){aside{width:100%;border-left:0;border-top:1px solid var(--border)}}
+
+/* 머리 — 원본의 뱃지·제목·메타줄 */
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;
+  font-size:10px;font-weight:700;background:var(--green-soft);color:var(--green);margin-bottom:12px}
+h1{margin:0 0 16px;font-size:28px;font-weight:800;color:var(--text-primary);
+  letter-spacing:-.5px;line-height:1.2}
+@media(max-width:600px){h1{font-size:20px}}
+.titlerow{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.langs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  background:var(--card);flex-shrink:0}
+.langs button{border:0;background:transparent;font-family:inherit;cursor:pointer;
+  padding:6px 13px;font-size:12px;font-weight:600;color:var(--text-muted)}
+.langs button[aria-pressed="true"]{background:var(--text-primary);color:var(--card)}
+.langs button:focus-visible{outline:2px solid var(--cherry);outline-offset:-2px}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;
+  color:var(--text-muted);margin-bottom:32px}
+.meta .dot{color:var(--border)}
+.meta .draft{color:var(--orange);font-weight:600}
+
+/* 구획 머리 — 원본 그대로 */
+section{margin-bottom:40px}
+.sechead{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sechead span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text-muted);white-space:nowrap}
+.sechead .rule{flex:1;height:1px;background:var(--border)}
+
+/* 01 개요 — 두 줄 */
+.overview{font-size:16px;line-height:1.75;color:var(--text-secondary);margin:0}
+
+/* 02 그림 */
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:700px){.figs{grid-template-columns:1fr}}
+figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
+  display:flex;flex-direction:column}
+.figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
+figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure svg{display:block;width:100%;height:auto;margin-block:auto}
+figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+.sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
+.sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
+.sv-ink{fill:var(--text-primary)} .sv-dim{fill:var(--text-muted)}
+.sv-ch{stroke:var(--cherry);fill:none;stroke-width:1.5;stroke-linecap:round} .sv-ch-t{fill:var(--cherry)}
+.sv-ch-b{fill:var(--cherry-soft);stroke:var(--cherry-border);stroke-width:1.4}
+.sv-vi-b{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.4}
+.sv-vi-f{fill:var(--violet)} .sv-vi-t{fill:var(--violet)}
+.sv-gr-b{fill:var(--green-soft);stroke:var(--green);stroke-width:1.5}
+.sv-gr-t{fill:var(--green)} .sv-gr-l{stroke:var(--green);fill:none;stroke-width:1.5;stroke-linecap:round}
+
+/* 03 체리 — 원본 카드(왼쪽 3px 체리색) */
+.cherry{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--cherry);
+  border-radius:8px;padding:16px;margin-bottom:10px}
+.cherry .who{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:12px;
+  font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.cherry .who .role{font-weight:400;color:var(--text-muted)}
+.cherry q{display:block;quotes:none;font-size:15px;line-height:1.65;color:var(--text-primary)}
+.cherry .cite{margin:8px 0 0;font-size:10px;color:var(--text-muted)}
+.cherry .cite a{color:var(--cherry);text-decoration:none}
+.cherry .cite a:hover{text-decoration:underline}
+
+/* 04 하위 개념 — 원본 2열 카드 + 관계색 + FULL/OUTLINE 뱃지 */
+.kids{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:600px){.kids{grid-template-columns:1fr}}
+.kid{position:relative;background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:12px 56px 12px 12px;text-align:left;font-family:inherit;cursor:pointer}
+.kid.has{border-color:var(--violet-border)} .kid.outline{border-style:dashed}
+.kid:hover{border-color:var(--cherry)}
+.kid .st{position:absolute;top:8px;right:8px;padding:1px 6px;border-radius:4px;border:1px solid;
+  font-size:8px;font-weight:800;letter-spacing:.5px}
+.kid .st.full{background:var(--violet-soft);color:var(--violet);border-color:var(--violet-border)}
+.kid .st.out{background:var(--secondary);color:var(--text-muted);border-color:var(--border)}
+.kid .rel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.kid .nm{margin:2px 0 0;font-size:13px;font-weight:600;color:var(--text-primary)}
+.kid .why{margin:2px 0 0;font-size:11px;color:var(--text-muted)}
+
+/* 05 레퍼런스 — 원본 타임라인 */
+.ref{position:relative;padding-left:16px;border-left:2px solid var(--border);margin-bottom:16px}
+.ref:first-child{border-left-color:var(--cherry)}
+.ref .pin{position:absolute;left:-5px;top:2px;width:8px;height:8px;border-radius:50%;background:var(--border)}
+.ref:first-child .pin{background:var(--cherry)}
+.ref .stage{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+.ref:first-child .stage{color:var(--cherry)}
+.ref a.t{display:block;margin-top:2px;font-size:13px;font-weight:700;color:var(--text-primary);
+  text-decoration:none;text-underline-offset:2px}
+.ref a.t:hover{color:var(--cherry);text-decoration:underline dotted}
+.ref p{margin:4px 0 0;font-size:11.5px;color:var(--text-muted)}
+.ref .kind{margin-top:3px;font-size:10px;color:var(--text-muted)}
+
+/* 오른쪽 — Learning Roadmap 카드 (원본) */
+.rmcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.rmcard .h{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--text-muted);margin:0 0 12px}
+.rmcard svg{display:block;width:100%;height:auto}
+.legend{margin-top:8px;display:grid;gap:4px;font-size:9px;color:var(--text-muted)}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend i{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.rm-self{fill:var(--card);stroke:var(--cherry);stroke-width:2}
+.rm-deep{fill:var(--violet-soft);stroke:var(--violet-border);stroke-width:1.5}
+.rm-pre{fill:var(--secondary);stroke:var(--border);stroke-width:1.5}
+.rm-arrow{stroke:var(--border);stroke-width:1.5;fill:none}
+.rm-band{fill:var(--text-muted)} .rm-t{fill:var(--text-primary)} .rm-vt{fill:var(--violet)}
+</style>
+
+<div class="shell">
+  <main>
+    <span class="badge" id="badge">BASICS</span>
+    <div class="titlerow">
+      <h1 id="title">Evaluation</h1>
+      <div class="langs" role="group" aria-label="Language">
+        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
+        <button id="lang-en" type="button" aria-pressed="false">English</button>
+      </div>
+    </div>
+    <div class="meta" id="meta"></div>
+
+    <section>
+      <div class="sechead"><span>01 — Overview</span><div class="rule"></div></div>
+      <p class="overview" id="overview"></p>
+    </section>
+
+    <section>
+      <div class="sechead"><span>02 — Flash</span><div class="rule"></div></div>
+      <div class="figs" id="figs"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>03 — Cherries</span><div class="rule"></div></div>
+      <div id="cherries"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>04 — Child Concepts</span><div class="rule"></div></div>
+      <div class="kids" id="kids"></div>
+    </section>
+
+    <section>
+      <div class="sechead"><span>05 — References</span><div class="rule"></div></div>
+      <div id="refs"></div>
+    </section>
+  </main>
+
+  <aside>
+    <div class="rmcard">
+      <p class="h">Learning Roadmap</p>
+      <div id="roadmap"></div>
+      <div class="legend">
+        <div><i style="border:2px solid var(--cherry);background:var(--card)"></i><span>Cherry = You are here</span></div>
+        <div><i style="border:2px solid var(--violet-border);background:var(--violet-soft)"></i><span>Violet = Go deeper</span></div>
+        <div><i style="border:1px dashed var(--violet-border);background:var(--violet-soft)"></i><span>Dashed = Outline only</span></div>
+        <div><i style="border:1px solid var(--border);background:var(--secondary)"></i><span>Gray = Prerequisite</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+const F = (i) => `<svg viewBox="0 0 340 142" role="img" xmlns="http://www.w3.org/2000/svg">${i}</svg>`;
+
+/* 넉 장 공통 격자 — 사물 띠 28~104(중심 66), 이름표 126, 화살표 66. x(한국어, English) */
+const FIGURES = [
+  { tag:"PROBLEM",
+    ko:{h:"정답지와 글자를 맞춰 점수를 냈다", c:"번역에 쓰던 지표를 대화에 가져다 쓰니 사람 판단과 거의 맞지 않았고, 전문 영역에서는 전혀 맞지 않았다."},
+    en:{h:"Scored by matching words against one reference answer", c:"Metrics borrowed from translation correlated very weakly with human judgement, and not at all in the technical domain."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="12" y="36" width="92" height="26" rx="6"/>
+      <text class="sv-dim" x="58" y="53" text-anchor="middle" font-size="10">${x("모델 답","model answer")}</text>
+      <rect class="sv-box" x="12" y="70" width="92" height="26" rx="6"/>
+      <text class="sv-dim" x="58" y="87" text-anchor="middle" font-size="10">${x("정답지 한 장","one reference")}</text>
+      <path class="sv-line" d="M112 66h20"/><path class="sv-line" d="M126 61l7 5-7 5"/>
+      <rect class="sv-box" x="140" y="44" width="86" height="44" rx="8"/>
+      <text class="sv-ink" x="183" y="62" text-anchor="middle" font-size="10.5">${x("겹친 낱말을","count the words")}</text>
+      <text class="sv-dim" x="183" y="78" text-anchor="middle" font-size="9.5">${x("세어 채점","they share")}</text>
+      <path class="sv-line" d="M234 66h20"/><path class="sv-line" d="M248 61l7 5-7 5"/>
+      <rect class="sv-ch-b" x="262" y="44" width="66" height="44" rx="8"/>
+      <text class="sv-ch-t" x="295" y="62" text-anchor="middle" font-size="9.5">${x("사람 판단과","unrelated to")}</text>
+      <text class="sv-ch-t" x="295" y="77" text-anchor="middle" font-size="9.5">${x("거의 무관","human judgement")}</text>`) },
+
+  { tag:"IDEA",
+    ko:{h:"두 답을 나란히 놓고 더 나은 쪽을 고른다", c:"공개 플랫폼에서 모은 표로 순위를 만들었고, 그 표는 전문 평가자의 판단과도 잘 맞았다."},
+    en:{h:"Put two answers side by side and pick the better one", c:"Votes gathered on an open platform became the ranking, and they agreed well with expert raters."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="36" width="86" height="26" rx="6"/>
+      <text class="sv-dim" x="57" y="53" text-anchor="middle" font-size="10">${x("답 A","answer A")}</text>
+      <rect class="sv-box" x="14" y="70" width="86" height="26" rx="6"/>
+      <text class="sv-dim" x="57" y="87" text-anchor="middle" font-size="10">${x("답 B","answer B")}</text>
+      <path class="sv-line" d="M108 66h20"/><path class="sv-line" d="M122 61l7 5-7 5"/>
+      <rect class="sv-vi-b" x="136" y="44" width="76" height="44" rx="8"/>
+      <text class="sv-vi-t" x="174" y="61" text-anchor="middle" font-size="9.5">${x("더 나은 쪽에","one vote for")}</text>
+      <text class="sv-vi-t" x="174" y="78" text-anchor="middle" font-size="11" font-weight="600">${x("한 표","the better")}</text>
+      <text class="sv-gr-t" x="174" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("모은 표 24만","240K votes")}</text>
+      <path class="sv-line" d="M220 66h20"/><path class="sv-line" d="M234 61l7 5-7 5"/>
+      <rect class="sv-box" x="248" y="34" width="78" height="64" rx="8"/>
+      <rect class="sv-ch-b" x="258" y="43" width="58" height="13" rx="3"/>
+      <rect class="sv-box" x="258" y="60" width="58" height="13" rx="3"/>
+      <rect class="sv-box" x="258" y="77" width="58" height="13" rx="3"/>
+      <text class="sv-dim" x="287" y="126" text-anchor="middle" font-size="9.5">${x("순위","ranking")}</text>`) },
+
+  { tag:"SOLUTION",
+    ko:{h:"사람 대신 강한 모델이 심판을 본다", c:"어느 답을 왜 골랐는지까지 쓰게 하면, 비싸서 많이 할 수 없던 사람 평가를 대신할 수 있다."},
+    en:{h:"A strong model sits as the judge instead of people", c:"Made to state which answer it picked and why, it stands in for human rating that was too expensive to scale."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="12" y="36" width="76" height="26" rx="6"/>
+      <text class="sv-dim" x="50" y="53" text-anchor="middle" font-size="10">${x("답 A","answer A")}</text>
+      <rect class="sv-box" x="12" y="70" width="76" height="26" rx="6"/>
+      <text class="sv-dim" x="50" y="87" text-anchor="middle" font-size="10">${x("답 B","answer B")}</text>
+      <path class="sv-line" d="M96 66h20"/><path class="sv-line" d="M110 61l7 5-7 5"/>
+      <rect class="sv-vi-b" x="124" y="38" width="88" height="56" rx="9"/>
+      <text class="sv-vi-t" x="168" y="62" text-anchor="middle" font-size="11" font-weight="600">${x("심판 모델","the judge")}</text>
+      <text class="sv-vi-t" x="168" y="78" text-anchor="middle" font-size="9" font-weight="400">GPT-4</text>
+      <path class="sv-line" d="M220 66h20"/><path class="sv-line" d="M234 61l7 5-7 5"/>
+      <rect class="sv-box" x="248" y="38" width="78" height="56" rx="9"/>
+      <text class="sv-ink" x="287" y="60" text-anchor="middle" font-size="10.5">${x("고른 답","the pick")}</text>
+      <text class="sv-dim" x="287" y="77" text-anchor="middle" font-size="9.5">${x("고른 이유","and the reason")}</text>`) },
+
+  { tag:"BENEFIT",
+    ko:{h:"채점을 사람 수준으로 자동화할 수 있다", c:"심판 모델과 사람의 판단이 80% 넘게 일치했다. 사람끼리 일치하는 정도와 같은 수준이다."},
+    en:{h:"Scoring can be automated at human level", c:"The judge agreed with human preference over 80% of the time — the same level at which humans agree with each other."},
+    art:(x)=>F(`
+      <rect class="sv-gr-b" x="14" y="40" width="130" height="52" rx="9"/>
+      <text class="sv-gr-t" x="79" y="60" text-anchor="middle" font-size="9.5">${x("심판 모델 ↔ 사람","judge ↔ human")}</text>
+      <text class="sv-gr-t" x="79" y="81" text-anchor="middle" font-size="17" font-weight="700">80% +</text>
+      <path class="sv-gr-l" d="M154 66h26"/><path class="sv-gr-l" d="M174 61l7 5-7 5"/>
+      <rect class="sv-box" x="192" y="40" width="134" height="52" rx="9"/>
+      <text class="sv-ink" x="259" y="60" text-anchor="middle" font-size="10.5">${x("사람 ↔ 사람","human ↔ human")}</text>
+      <text class="sv-dim" x="259" y="79" text-anchor="middle" font-size="10">${x("일치하는 정도와 같다","agree at the same rate")}</text>
+      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="9.5">${x("같은 질문, 같은 두 답","same question, same two answers")}</text>`) },
+];
+
+const CHERRIES = [
+  { who:"Alan Turing", role:{ko:"Mind · 1950",en:"Mind · 1950"},
+    q:{ko:"앞으로 50년 뒤(당시 기준 1950년)에는, 5분 정도 질문해 봐서는 사람과 기계를 가려낼 확률이 70%도 되지 않을 만큼 모방 게임을 잘하는 컴퓨터가 나올 것이다.",
+       en:"I believe that in about fifty years’ time it will be possible to programme computers … to make them play the imitation game so well that an average interrogator will not have more than 70 per cent. chance of making the right identification after five minutes of questioning."},
+    cite:"Alan Turing, “Computing Machinery and Intelligence”, Mind LIX(236), §6 (1950)", url:"https://academic.oup.com/mind/article/LIX/236/433/986238" },
+  { who:"Jimenez et al.", role:{ko:"SWE-bench · 2023",en:"SWE-bench · 2023"},
+    q:{ko:"언어 모델은 우리가 그것을 평가할 수 있는 능력을 이미 앞질러 버렸다.",
+       en:"Language models have outpaced our ability to evaluate them effectively"},
+    cite:"Jimenez et al., “SWE-bench: Can Language Models Resolve Real-World GitHub Issues?”, Abstract (arXiv:2310.06770)", url:"https://arxiv.org/abs/2310.06770" },
+  { who:"Andrej Karpathy", role:{ko:"2025-03 (트윗)",en:"2025-03 (tweet)"},
+    q:{ko:"지금은 평가의 위기다. 어떤 수치를 봐야 하는지 나도 잘 모르겠다.",
+       en:"My reaction is that there is an evaluation crisis. I don’t really know what metrics to look at right now."},
+    cite:"Andrej Karpathy, X (2025-03-03)", url:"https://x.com/karpathy/status/1896266683301659068" },
+  { who:"Kapoor & Narayanan", role:{ko:"AI Snake Oil · 2024",en:"AI Snake Oil · 2024"},
+    q:{ko:"비용을 100배 들여 정확도 2%를 더 얻는다면, 그게 정말 더 나은 건가.",
+       en:"If we eke out a 2% accuracy improvement for 100x the cost, is that really better?"},
+    cite:"Sayash Kapoor & Arvind Narayanan, “AI leaderboards are no longer useful. It’s time to switch to Pareto curves.” (2024)", url:"https://www.normaltech.ai/p/ai-leaderboards-are-no-longer-useful" },
+  { who:"Marilyn Strathern", role:{ko:"인류학자 · 1997",en:"anthropologist · 1997"},
+    q:{ko:"어떤 척도가 목표가 되면, 그것은 좋은 척도이기를 그친다.",
+       en:"When a measure becomes a target, it ceases to be a good measure."},
+    cite:"Marilyn Strathern, “‘Improving ratings’: audit in the British University system”, European Review 5(3) (1997)", url:"https://gwern.net/doc/statistics/decision/1997-strathern.pdf" },
+];
+
+const KIDS = [
+  { rel:"SUBTOPIC", node:"AdversarialEvaluation", label:"Adversarial Evaluation", has:true,
+    why:{ko:"깨뜨리려고 만든 입력에 얼마나 버티는지 잰다",en:"How it holds up under inputs built to break it"} },
+  { rel:"SUBTOPIC", node:"AutomaticMetric", label:"AutomaticMetric", has:false,
+    why:{ko:"사람 없이 알고리즘으로 계산하는 지표",en:"Computed algorithmically, with no human"} },
+  { rel:"SUBTOPIC", node:"BenchmarkDataset", label:"BenchmarkDataset", has:false,
+    why:{ko:"정답과 분할이 정해진 표준 평가 데이터",en:"Standard data with ground truth and splits"} },
+  { rel:"SUBTOPIC", node:"Hallucination", label:"Hallucination", has:false,
+    why:{ko:"근거 없는 내용을 사실처럼 말하는 현상",en:"Stating what has no basis as if it were fact"} },
+  { rel:"SUBTOPIC", node:"HumanEvaluation", label:"HumanEvaluation", has:false,
+    why:{ko:"사람이 직접 읽고 품질을 매긴다",en:"People read it and score the quality"} },
+  { rel:"SUBTOPIC", node:"ModelEvaluation", label:"Model Evaluation", has:false,
+    why:{ko:"모델이 실제로 얼마나 정확한지 재는 과정 전체",en:"The whole process of measuring accuracy"} },
+  { rel:"SUBTOPIC", node:"ModelSelection", label:"Model Selection", has:false,
+    why:{ko:"성능과 비용을 함께 보고 어느 모델을 쓸지 정한다",en:"Choosing a model on performance and cost"} },
+  { rel:"SUBTOPIC", node:"ParameterCount", label:"Parameter Count", has:false,
+    why:{ko:"학습 가능한 변수의 총량",en:"The total number of trainable variables"} },
+  { rel:"SUBTOPIC", node:"PerformanceMetric", label:"Performance metric", has:false,
+    why:{ko:"목표를 얼마나 정확·효율적으로 달성했는지의 기준",en:"How accurately and efficiently the goal was met"} },
+  { rel:"PARENT", node:"LLMConcept", label:"LLMConcept", has:false,
+    why:{ko:"LLM 개념 전체가 상위에 있다",en:"The parent family of LLM concepts"} },
+];
+const REL_COLOR = { SUBTOPIC:"var(--violet)", PREREQUISITE:"var(--text-muted)", RELATED:"var(--orange)", PARENT:"var(--text-muted)" };
+
+const REFS = [
+  { stage:{ko:"원전",en:"Origin"}, t:"GLUE: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding",
+    d:{ko:"여러 과제를 하나의 점수로 묶은 자리. 1년 만에 사람 수준을 넘어섰다.",en:"Where many tasks became one score — and were passed within a year."},
+    url:"https://arxiv.org/abs/1804.07461" },
+  { stage:{ko:"폭",en:"Breadth"}, t:"Holistic Evaluation of Language Models",
+    d:{ko:"정확도만이 아니라 일곱 가지를 함께 잰다. 그 전에는 공통 과제가 하나도 없는 모델들도 있었다.",en:"Seven metrics, not just accuracy. Before it, some models shared no scenario at all."},
+    url:"https://arxiv.org/abs/2211.09110" },
+  { stage:{ko:"선호",en:"Preference"}, t:"Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference",
+    d:{ko:"두 답을 나란히 놓고 고르게 해, 표로 순위를 만든다.",en:"Two answers side by side, and the votes make the ranking."},
+    url:"https://arxiv.org/abs/2403.04132" },
+  { stage:{ko:"자동화",en:"Automation"}, t:"Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+    d:{ko:"모델이 심판을 볼 때의 성적과 편향이 여기 정리돼 있다.",en:"How well a model judges — and how it is biased."},
+    url:"https://arxiv.org/abs/2306.05685" },
+];
+
+const T = {
+  ko:{ meta:["Updated 2026-10-04","5 cherries","Draft — pending review","via 외부 자료"],
+       overview:"평가는 모델의 답이 얼마나 좋은지를 같은 기준으로 재는 일이다.<br>정답이 하나가 아닌 답은 사람의 선호로 재고, 이제는 그 판단을 모델이 대신한다." },
+  en:{ meta:["Updated 2026-10-04","5 cherries","Draft — pending review","via external sources"],
+       overview:"Evaluation measures how good a model’s answers are, on one comparable scale.<br>Where there is no single right answer it measures human preference — and a model now stands in for that judgment." },
+};
+
+/* Learning Roadmap — rag.html 과 같은 규칙 */
+const RM = { W:236, PAD:4, FS:11, CHAR_W:0.56, PAD_X:9, LINE_H:14, CHIP_PAD_Y:9, ROW_GAP:7,
+             BAND_LABEL_H:20, BAND_GAP:16, SELF_FS:15, SELF_PAD_Y:12, ARROW:20 };
+function wrapLabel(label, maxW, fs){
+  const w = (t) => t.length * fs * RM.CHAR_W;
+  if (w(label) <= maxW) return [label];
+  const bps = []; for (let i=1;i<label.length;i++){ if(label[i]===" ")bps.push(i);
+    else if(/[a-z0-9]/.test(label[i-1])&&/[A-Z]/.test(label[i]))bps.push(i); }
+  const out=[]; let s=0;
+  while (s < label.length){
+    const rest = label.slice(s);
+    if (w(rest) <= maxW){ out.push(rest.trim()); break; }
+    const c = bps.filter(b=>b>s && w(label.slice(s,b))<=maxW);
+    if (!c.length){ const n=Math.max(1,Math.floor(maxW/(fs*RM.CHAR_W))); out.push(label.slice(s,s+n).trim()); s+=n; }
+    else { const b=c[c.length-1]; out.push(label.slice(s,b).trim()); s=b; }
+  }
+  return out.filter(Boolean);
+}
+function roadmap(){
+  const inner = RM.W - RM.PAD*2, maxTextW = inner - RM.PAD_X*2;
+  const chip = (k) => { const lines = wrapLabel(k.label, maxTextW, RM.FS);
+    return { ...k, lines, h: lines.length*RM.LINE_H + RM.CHIP_PAD_Y*2 }; };
+  const pre = KIDS.filter(k=>k.rel==="PREREQUISITE"||k.rel==="PARENT").map(chip);
+  const deep = KIDS.filter(k=>k.rel==="SUBTOPIC").map(chip);
+  const rel = KIDS.filter(k=>k.rel==="RELATED").map(chip);
+  const selfH = RM.SELF_FS + RM.SELF_PAD_Y*2;
+  let y = 0; const parts = [];
+  const band = (title, arr, cls) => {
+    if (!arr.length) return;
+    parts.push(`<text class="rm-band" x="${RM.PAD}" y="${y+12}" font-size="10" font-weight="700" letter-spacing=".6">${title}</text>`);
+    y += RM.BAND_LABEL_H;
+    for (const c of arr){
+      parts.push(`<rect class="${cls}" x="${RM.PAD}" y="${y}" width="${inner}" height="${c.h}" rx="6"${c.has?"":' stroke-dasharray="4 3"'}/>`);
+      c.lines.forEach((ln,i)=>parts.push(
+        `<text class="${cls==="rm-pre"?"rm-band":"rm-vt"}" x="${RM.PAD+RM.PAD_X}" y="${y+RM.CHIP_PAD_Y+RM.LINE_H*(i+1)-4}" font-size="${RM.FS}" font-weight="600">${ln}</text>`));
+      y += c.h + RM.ROW_GAP;
+    }
+    y += RM.BAND_GAP - RM.ROW_GAP;
+  };
+  if (pre.length){
+    band("ABOVE", pre, "rm-pre");
+    parts.push(`<path class="rm-arrow" d="M${RM.W/2} ${y-10}v${RM.ARROW-6}"/><path class="rm-arrow" d="M${RM.W/2-4} ${y+RM.ARROW-16}l4 5 4-5"/>`);
+    y += RM.ARROW;
+  }
+  parts.push(`<rect class="rm-self" x="${RM.PAD}" y="${y}" width="${inner}" height="${selfH}" rx="8"/>`);
+  parts.push(`<text class="rm-t" x="${RM.W/2}" y="${y+selfH/2+5}" text-anchor="middle" font-size="${RM.SELF_FS}" font-weight="800">Evaluation</text>`);
+  y += selfH;
+  parts.push(`<path class="rm-arrow" d="M${RM.W/2} ${y}v${RM.ARROW-8}"/><path class="rm-arrow" d="M${RM.W/2-4} ${y+RM.ARROW-14}l4 5 4-5"/>`);
+  y += RM.ARROW + 2;
+  band("GO DEEPER", deep, "rm-deep");
+  band("RELATED", rel, "rm-deep");
+  return `<svg viewBox="0 0 ${RM.W} ${y}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
+}
+
+let lang = "ko";
+function render(){
+  const t = T[lang];
+  document.getElementById("meta").innerHTML = t.meta
+    .map((m,i)=>`<span class="${i===2?"draft":""}">${m}</span>`).join('<span class="dot">·</span>');
+  document.getElementById("overview").innerHTML = t.overview;
+
+  const x = (k,e) => lang==="ko" ? k : e;
+  document.getElementById("figs").innerHTML = FIGURES.map(f=>`
+    <figure><div class="figtag">${f.tag}</div><h3>${f[lang].h}</h3>${f.art(x)}
+      <figcaption>${f[lang].c}</figcaption></figure>`).join("");
+
+  document.getElementById("cherries").innerHTML = CHERRIES.map(c=>`
+    <div class="cherry">
+      <div class="who">🍒 ${c.who} <span class="role">— ${c.role[lang]}</span></div>
+      <q>“${c.q[lang]}”</q>
+      <p class="cite">${c.cite} · <a href="${c.url}" target="_blank" rel="noopener noreferrer">${lang==="ko"?"원문":"source"} ↗</a></p>
+    </div>`).join("");
+
+  document.getElementById("kids").innerHTML = KIDS.map(k=>`
+    <button class="kid ${k.has?"has":"outline"}" type="button">
+      <span class="st ${k.has?"full":"out"}">${k.has?"FULL":"OUTLINE"}</span>
+      <span class="rel" style="color:${REL_COLOR[k.rel]}">${k.rel}</span>
+      <p class="nm">${k.label}</p><p class="why">${k.why[lang]}</p>
+    </button>`).join("");
+
+  document.getElementById("refs").innerHTML = REFS.map(r=>`
+    <div class="ref"><div class="pin"></div>
+      <div class="stage">${r.stage[lang]}</div>
+      <a class="t" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.t} ↗</a>
+      <p>${r.d[lang]}</p>
+      <div class="kind">🔗 External — ${new URL(r.url).hostname.replace(/^www\./,"")}</div>
+    </div>`).join("");
+
+  document.getElementById("roadmap").innerHTML = roadmap();
+  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
+  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
+}
+document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
+document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
+render();
+</script>

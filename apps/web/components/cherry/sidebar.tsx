@@ -151,7 +151,7 @@ const ND_UTILITY_IC: Record<string, string> = {
 
 /* 재기획 중이라 메뉴에서 숨긴다(2026-09-14).
    페이지·API·DB·온톨로지는 그대로 두었으므로, 다시 열 때는 해당 값을 true 로 바꾸면 된다. */
-const SHOW_LEARNING = false
+const SHOW_LEARNING = true
 const SHOW_UTILITY = false
 
 const SECTIONS: SectionDef[] = [

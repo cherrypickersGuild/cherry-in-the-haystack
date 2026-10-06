@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAG — 개념 페이지 샘플 (목업)</title>
+<style>
+:root{
+  --line:#E4E1EE; --line2:#F0F0F0; --ink:#1A1626; --body:#3D3652;
+  --dim:#888; --dim2:#9E97B3; --pale:#CCC;
+  --cherry:#C94B6E; --cherry-bg:#FDF0F3;
+  --accent:#D4854A; --accent-bg:#FFF8F0; --accent-ink:#A85D2C;
+  --violet:#7B5EA7; --violet-bg:#F3EFFA;
+  --page:#FBFAF8; --green:#2D7A5E;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--page);color:var(--body);line-height:1.6;font-size:14px;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;-webkit-font-smoothing:antialiased}
+.note{background:#FFF8E6;border:1px solid #F0D9A0;border-radius:10px;padding:10px 12px;margin:16px auto 0;
+ max-width:1000px;font-size:11px;color:#7A5A16}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 24px 80px}
+
+/* 머리 */
+.head{display:flex;align-items:flex-start;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.head h1{font-size:30px;font-weight:800;color:var(--ink);letter-spacing:-0.5px;line-height:1.2}
+.head .ko{font-size:13px;color:var(--dim2);margin-top:4px;font-weight:600}
+.badge{display:inline-block;background:var(--violet-bg);color:var(--violet);border-radius:5px;
+ padding:2px 8px;font-size:10px;font-weight:800;letter-spacing:.5px;margin-bottom:8px}
+.lang{margin-left:auto;display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-shrink:0}
+.lang button{border:0;background:#fff;font-family:inherit;cursor:pointer;padding:7px 14px;
+ font-size:12px;font-weight:700;color:var(--dim)}
+.lang button.on{background:var(--ink);color:#fff}
+
+/* 구획 */
+section{margin-top:38px}
+.sec{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.sec span{font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--dim2);white-space:nowrap}
+.sec .bar{flex:1;height:1px;background:var(--line)}
+
+/* 01 한 줄 */
+.lead{font-size:19px;line-height:1.65;color:var(--ink);font-weight:600;letter-spacing:-0.2px}
+.lead b{color:var(--cherry)}
+
+/* 02 그림 */
+.figs{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:760px){.figs{grid-template-columns:1fr}}
+.fig{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px}
+.fig .n{font-size:10px;font-weight:800;color:var(--cherry);letter-spacing:.5px}
+.fig h4{font-size:14px;font-weight:700;color:var(--ink);margin:3px 0 10px}
+.fig svg{width:100%;height:auto;display:block}
+.fig p{font-size:12px;color:var(--dim);margin-top:10px;line-height:1.6}
+
+/* 03 체리 */
+.cherry{background:#fff;border:1px solid var(--line);border-left:3px solid var(--cherry);
+ border-radius:10px;padding:16px 18px;margin-bottom:12px}
+.cherry .who{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.cherry .who b{font-size:13px;font-weight:800;color:var(--ink)}
+.cherry .who .role{font-size:11px;color:var(--dim2)}
+.cherry q{display:block;font-size:15px;line-height:1.7;color:var(--ink);font-weight:500;
+ quotes:'"' '"';letter-spacing:-0.1px}
+.cherry .why{font-size:12px;color:var(--dim);margin-top:10px;padding-top:9px;border-top:1px dashed var(--line2)}
+.cherry .src{font-size:11px;color:var(--dim2);margin-top:6px}
+.cherry .src a{color:var(--accent-ink);text-decoration:none}
+.cherry .src a:hover{text-decoration:underline}
+
+/* 04 하위 개념 */
+.kids{display:flex;flex-wrap:wrap;gap:8px}
+.kids a{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);
+ border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--body);text-decoration:none}
+.kids a:hover{border-color:var(--cherry);color:var(--cherry)}
+.kids a i{font-style:normal;font-size:9px;font-weight:800;letter-spacing:.4px;color:var(--pale)}
+
+/* 05 레퍼런스 */
+.ref{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line2)}
+.ref:last-child{border-bottom:0}
+.ref .k{flex-shrink:0;width:74px;font-size:9.5px;font-weight:800;letter-spacing:.4px;color:var(--dim2);padding-top:3px}
+.ref a{font-size:13.5px;font-weight:700;color:var(--ink);text-decoration:none}
+.ref a:hover{color:var(--cherry)}
+.ref p{font-size:11.5px;color:var(--dim);margin-top:2px}
+.ref .host{font-size:10.5px;color:var(--pale);margin-top:3px}
+</style>
+</head>
+<body>
+<div class="note">
+  <b>목업입니다.</b> 오른쪽 위 <b>한국어 / English</b> 를 누르면 전부 바뀝니다.
+  체리의 인용문은 <b>실제 출처에서 그대로 가져온 것</b>이고, 링크는 살아 있는 주소입니다.
+</div>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <div class="badge" id="badge">BASICS</div>
+      <h1 id="title">RAG</h1>
+      <div class="ko" id="subtitle">Retrieval-Augmented Generation · 검색 증강 생성</div>
+    </div>
+    <div class="lang">
+      <button id="btn-ko" class="on">한국어</button>
+      <button id="btn-en">English</button>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec"><span id="s1">01 — 한 줄로</span><div class="bar"></div></div>
+    <p class="lead" id="lead"></p>
+  </section>
+
+  <section>
+    <div class="sec"><span id="s2">02 — 그림으로</span><div class="bar"></div></div>
+    <div class="figs" id="figs"></div>
+  </section>
+
+  <section>
+    <div class="sec"><span id="s3">03 — 체리</span><div class="bar"></div></div>
+    <div id="cherries"></div>
+  </section>
+
+  <section>
+    <div class="sec"><span id="s4">04 — 하위 개념</span><div class="bar"></div></div>
+    <div class="kids" id="kids"></div>
+  </section>
+
+  <section>
+    <div class="sec"><span id="s5">05 — 레퍼런스</span><div class="bar"></div></div>
+    <div id="refs"></div>
+  </section>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   개념 한 장의 데이터. 이 모양 그대로 public/learning/concepts/rag.json 이 된다.
+   그림은 SVG 글자라 DB·S3 없이도 그대로 실린다.
+   ══════════════════════════════════════════════════════════════ */
+
+const C = "#C94B6E", V = "#7B5EA7", G = "#2D7A5E", L = "#E4E1EE", D = "#9E97B3";
+const svg = (inner) => `<svg viewBox="0 0 340 150" xmlns="http://www.w3.org/2000/svg"
+  font-family="-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif">${inner}</svg>`;
+
+const FIG = [
+  {
+    n: "01",
+    ko: { t: "모델은 배운 것만 안다", c: "학습이 끝난 순간 지식은 굳는다. 모르는 걸 물으면 그럴듯하게 지어낸다." },
+    en: { t: "A model only knows what it learned", c: "Knowledge freezes the moment training ends. Ask beyond it and the model invents." },
+    art: svg(`
+      <rect x="112" y="28" width="116" height="78" rx="12" fill="#fff" stroke="${L}" stroke-width="2"/>
+      <text x="170" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#1A1626">MODEL</text>
+      <text x="170" y="82" text-anchor="middle" font-size="10" fill="${D}">2024년까지의 기억</text>
+      <path d="M40 67h58" stroke="${D}" stroke-width="2" stroke-linecap="round"/>
+      <path d="M92 62l7 5-7 5" fill="none" stroke="${D}" stroke-width="2" stroke-linecap="round"/>
+      <text x="40" y="55" font-size="10" fill="${D}">질문</text>
+      <path d="M242 67h52" stroke="${C}" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4"/>
+      <path d="M288 62l7 5-7 5" fill="none" stroke="${C}" stroke-width="2" stroke-linecap="round"/>
+      <text x="252" y="55" font-size="10" fill="${C}" font-weight="700">?</text>
+      <text x="245" y="92" font-size="9.5" fill="${C}">모르면 지어낸다</text>`)
+  },
+  {
+    n: "02",
+    ko: { t: "지식을 모델 밖에 둔다", c: "문서를 조각내어 색인해 둔다. 모델은 그대로, 지식만 밖에 쌓인다." },
+    en: { t: "Keep the knowledge outside", c: "Documents are split and indexed. The model stays as-is; knowledge lives outside it." },
+    art: svg(`
+      <rect x="18" y="34" width="52" height="68" rx="6" fill="#fff" stroke="${L}" stroke-width="2"/>
+      <path d="M28 50h32M28 60h32M28 70h22" stroke="${L}" stroke-width="2" stroke-linecap="round"/>
+      <text x="44" y="118" text-anchor="middle" font-size="9.5" fill="${D}">문서</text>
+      <path d="M78 68h26" stroke="${D}" stroke-width="2"/><path d="M98 63l7 5-7 5" fill="none" stroke="${D}" stroke-width="2"/>
+      <g fill="${V}" opacity=".85">
+        <rect x="114" y="38" width="42" height="17" rx="4"/><rect x="114" y="60" width="42" height="17" rx="4"/>
+        <rect x="114" y="82" width="42" height="17" rx="4"/></g>
+      <text x="135" y="118" text-anchor="middle" font-size="9.5" fill="${D}">조각</text>
+      <path d="M166 68h26" stroke="${D}" stroke-width="2"/><path d="M186 63l7 5-7 5" fill="none" stroke="${D}" stroke-width="2"/>
+      <rect x="202" y="34" width="118" height="68" rx="10" fill="${V}" opacity=".08" stroke="${V}" stroke-width="1.6"/>
+      <text x="261" y="62" text-anchor="middle" font-size="11.5" font-weight="700" fill="${V}">색인</text>
+      <text x="261" y="80" text-anchor="middle" font-size="9.5" fill="${D}">뜻으로 찾을 수 있게</text>`)
+  },
+  {
+    n: "03",
+    ko: { t: "물으면 찾아서 같이 넣는다", c: "질문이 오면 관련 조각을 꺼내 질문과 함께 모델에 넣는다. 답에는 출처가 붙는다." },
+    en: { t: "Retrieve first, then answer", c: "On each query, relevant pieces are pulled in alongside it — and the answer carries its sources." },
+    art: svg(`
+      <text x="16" y="42" font-size="10" fill="${D}">질문</text>
+      <rect x="14" y="50" width="70" height="26" rx="6" fill="#fff" stroke="${L}" stroke-width="2"/>
+      <path d="M88 63h24" stroke="${D}" stroke-width="2"/><path d="M106 58l7 5-7 5" fill="none" stroke="${D}" stroke-width="2"/>
+      <rect x="118" y="30" width="72" height="66" rx="10" fill="${V}" opacity=".08" stroke="${V}" stroke-width="1.6"/>
+      <text x="154" y="58" text-anchor="middle" font-size="10.5" font-weight="700" fill="${V}">검색</text>
+      <text x="154" y="74" text-anchor="middle" font-size="9" fill="${D}">관련 조각 k개</text>
+      <path d="M194 63h22" stroke="${D}" stroke-width="2"/><path d="M210 58l7 5-7 5" fill="none" stroke="${D}" stroke-width="2"/>
+      <rect x="222" y="36" width="100" height="54" rx="10" fill="#fff" stroke="${L}" stroke-width="2"/>
+      <text x="272" y="60" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1626">MODEL</text>
+      <text x="272" y="76" text-anchor="middle" font-size="9" fill="${G}">답 + 출처</text>
+      <path d="M154 96v14h118v-10" fill="none" stroke="${G}" stroke-width="1.6" stroke-dasharray="3 3"/>
+      <text x="196" y="124" font-size="9" fill="${G}">어디서 왔는지 남는다</text>`)
+  },
+  {
+    n: "04",
+    ko: { t: "밖에 있으니 고칠 수 있다", c: "문서를 갈아 끼우면 다음 질문부터 바로 반영된다. 모델을 다시 학습시키지 않는다." },
+    en: { t: "Outside means editable", c: "Swap a document and the next answer changes. No retraining required." },
+    art: svg(`
+      <rect x="24" y="30" width="120" height="40" rx="8" fill="#fff" stroke="${L}" stroke-width="2"/>
+      <text x="84" y="55" text-anchor="middle" font-size="10.5" fill="${D}">낡은 문서</text>
+      <rect x="24" y="84" width="120" height="40" rx="8" fill="${G}" opacity=".08" stroke="${G}" stroke-width="1.8"/>
+      <text x="84" y="109" text-anchor="middle" font-size="10.5" font-weight="700" fill="${G}">새 문서</text>
+      <path d="M150 77h30" stroke="${G}" stroke-width="2"/><path d="M174 72l7 5-7 5" fill="none" stroke="${G}" stroke-width="2"/>
+      <rect x="188" y="46" width="132" height="60" rx="10" fill="#fff" stroke="${L}" stroke-width="2"/>
+      <text x="254" y="72" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1626">MODEL</text>
+      <text x="254" y="90" text-anchor="middle" font-size="9" fill="${D}">그대로 · 재학습 없음</text>
+      <text x="188" y="128" font-size="9.5" fill="${G}">지식만 갈아 끼운다</text>`)
+  },
+];
+
+const CHERRY = [
+  {
+    who: "Patrick Lewis", role: { ko: "RAG 원논문 1저자 · Cohere", en: "Lead author of the RAG paper · Cohere" },
+    quote: "had this compelling vision of a trained system that had a retrieval index in the middle of it, so it could learn and generate any text output you wanted.",
+    why: { ko: "RAG 는 기법이기 전에 그림이었다 — 학습된 시스템 한가운데에 검색 색인을 박아 넣는 그림.",
+           en: "Before it was a technique, RAG was a picture: a trained system with a retrieval index sitting in the middle of it." },
+    src: "Rick Merritt, “What Is Retrieval-Augmented Generation, aka RAG?”, NVIDIA Blog (2025-01-31)",
+    url: "https://blogs.nvidia.com/blog/what-is-retrieval-augmented-generation/",
+  },
+  {
+    who: "Douwe Kiela", role: { ko: "RAG 원논문 공저자 · Contextual AI CEO", en: "RAG co-author · CEO, Contextual AI" },
+    quote: "Claiming that large LLM context windows replace RAG is like saying you don't need hard drives because there's enough RAM.",
+    why: { ko: "맥락창이 커져도 검색이 사라지지 않는 이유를 한 문장으로 끝낸다. 크기의 문제가 아니라 층위의 문제다.",
+           en: "One line settles the “long context kills RAG” debate: it was never about size, it's about layers of storage." },
+    src: "Douwe Kiela, “RAG is dead, long live RAG!”, Contextual AI blog (2025-04-09)",
+    url: "https://contextual.ai/blog/is-rag-dead-yet",
+  },
+  {
+    who: "Lewis et al.", role: { ko: "RAG 원논문 (NeurIPS 2020)", en: "The original RAG paper (NeurIPS 2020)" },
+    quote: "knowledge can be directly revised and expanded, and accessed knowledge can be inspected and interpreted.",
+    why: { ko: "성능 이야기가 아니다. 지식을 고칠 수 있고 들여다볼 수 있게 된다는 선언 — RAG 가 지금까지 살아남은 진짜 이유.",
+           en: "Not a performance claim. A declaration that knowledge becomes revisable and inspectable — the reason RAG outlived the hype." },
+    src: "Lewis et al., “Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks”, §1 Introduction (arXiv:2005.11401)",
+    url: "https://arxiv.org/abs/2005.11401",
+  },
+  {
+    who: "Chip Huyen", role: { ko: "『AI Engineering』 저자", en: "Author of “AI Engineering”" },
+    quote: "External data sources that a model can access via retrieval … can be considered the model's long-term memory … information in the long-term memory can be deleted without updating the model.",
+    why: { ko: "검색을 '모델의 장기기억'으로 다시 부른다. 그리고 그 기억은 <b>지울 수 있다</b> — 가중치에 박힌 지식은 못 하는 일.",
+           en: "Reframes retrieval as the model's long-term memory — and this memory can be <b>deleted</b>, which baked-in weights can never do." },
+    src: "Chip Huyen, 『AI Engineering』 Ch.6 “RAG and Agents” (소장 도서)",
+    url: "https://huyenchip.com/2024/07/25/genai-platform.html",
+  },
+];
+
+const KIDS = [
+  { k: "SUBTOPIC", n: "Dense Retrieval" }, { k: "SUBTOPIC", n: "Sparse Retrieval" },
+  { k: "SUBTOPIC", n: "Hybrid Retrieval" }, { k: "SUBTOPIC", n: "Reranking" },
+  { k: "SUBTOPIC", n: "Contextual Retrieval" }, { k: "SUBTOPIC", n: "GraphRAG" },
+  { k: "SUBTOPIC", n: "Multi-hop RAG" }, { k: "SUBTOPIC", n: "Similarity Search" },
+  { k: "선행", n: "Embedding" }, { k: "관련", n: "Chunking" }, { k: "관련", n: "Vector Database" },
+];
+
+const REF = [
+  { stage: { ko: "원전", en: "ORIGIN" }, title: "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+    d: { ko: "RAG 라는 말이 나온 논문. 서론 두 문단만 읽어도 왜 만들었는지 안다.", en: "The paper that coined RAG. Two paragraphs of the intro tell you why it exists." },
+    url: "https://arxiv.org/abs/2005.11401" },
+  { stage: { ko: "입문", en: "PRIMER" }, title: "What Is Retrieval-Augmented Generation, aka RAG?",
+    d: { ko: "만든 사람의 회고까지 담긴 소개 글. 그림과 비유가 쉽다.", en: "An introduction that includes the creator's own retrospective." },
+    url: "https://blogs.nvidia.com/blog/what-is-retrieval-augmented-generation/" },
+  { stage: { ko: "논쟁", en: "DEBATE" }, title: "RAG is dead, long live RAG!",
+    d: { ko: "맥락창이 커지면 RAG 는 끝인가 — 공저자가 직접 답한다.", en: "Does a bigger context window kill RAG? A co-author answers." },
+    url: "https://contextual.ai/blog/is-rag-dead-yet" },
+  { stage: { ko: "실전", en: "PRACTICE" }, title: "Introducing Contextual Retrieval",
+    d: { ko: "조각을 자를 때 맥락을 잃는 문제와 그 해법. 수치가 같이 있다.", en: "The context-loss problem in chunking, and a fix — with numbers." },
+    url: "https://www.anthropic.com/news/contextual-retrieval" },
+];
+
+const T = {
+  ko: { s1: "01 — 한 줄로", s2: "02 — 그림으로", s3: "03 — 체리", s4: "04 — 하위 개념", s5: "05 — 레퍼런스",
+        sub: "Retrieval-Augmented Generation · 검색 증강 생성",
+        lead: "RAG 는 모델을 다시 학습시키는 대신, <b>지식을 모델 밖에 두고 물을 때마다 찾아서 넣는</b> 방식이다.<br>그래서 지식은 고칠 수 있고, 답에는 출처가 남는다." },
+  en: { s1: "01 — IN ONE LINE", s2: "02 — IN PICTURES", s3: "03 — CHERRIES", s4: "04 — CHILD CONCEPTS", s5: "05 — REFERENCES",
+        sub: "Retrieval-Augmented Generation",
+        lead: "Instead of retraining the model, RAG <b>keeps knowledge outside it and fetches what's relevant at question time</b>.<br>So the knowledge stays editable — and every answer can point at where it came from." },
+};
+
+let lang = "ko";
+
+function render() {
+  const t = T[lang];
+  for (const k of ["s1","s2","s3","s4","s5"]) document.getElementById(k).textContent = t[k];
+  document.getElementById("subtitle").textContent = t.sub;
+  document.getElementById("lead").innerHTML = t.lead;
+
+  document.getElementById("figs").innerHTML = FIG.map((f) => `
+    <div class="fig">
+      <div class="n">FIG ${f.n}</div>
+      <h4>${f[lang].t}</h4>
+      ${f.art}
+      <p>${f[lang].c}</p>
+    </div>`).join("");
+
+  document.getElementById("cherries").innerHTML = CHERRY.map((c) => `
+    <div class="cherry">
+      <div class="who"><b>${c.who}</b><span class="role">${c.role[lang]}</span></div>
+      <q>“${c.quote}”</q>
+      <p class="why">${c.why[lang]}</p>
+      <p class="src">${c.src} · <a href="${c.url}" target="_blank" rel="noopener noreferrer">출처 ↗</a></p>
+    </div>`).join("");
+
+  document.getElementById("kids").innerHTML = KIDS.map((k) =>
+    `<a href="#"><i>${k.k}</i>${k.n}</a>`).join("");
+
+  document.getElementById("refs").innerHTML = REF.map((r) => `
+    <div class="ref">
+      <div class="k">${r.stage[lang]}</div>
+      <div>
+        <a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.title} ↗</a>
+        <p>${r.d[lang]}</p>
+        <div class="host">${new URL(r.url).hostname.replace(/^www\./, "")}</div>
+      </div>
+    </div>`).join("");
+
+  document.getElementById("btn-ko").className = lang === "ko" ? "on" : "";
+  document.getElementById("btn-en").className = lang === "en" ? "on" : "";
+  document.documentElement.lang = lang;
+}
+document.getElementById("btn-ko").onclick = () => { lang = "ko"; render(); };
+document.getElementById("btn-en").onclick = () => { lang = "en"; render(); };
+render();
+</script>
+</body>
+</html>
