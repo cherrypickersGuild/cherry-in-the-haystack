@@ -8,8 +8,15 @@
 export type Bi = { ko: string; en: string }
 export type Pick = (ko: string, en: string) => string
 
+/** 넉 장의 틀은 두 가지다 (1-work-guidelines.md §2-2-0)
+    · 이야기형 — 하나의 개념: PROBLEM · IDEA · SOLUTION · BENEFIT
+    · 나열형   — 여러 기법을 묶은 상위 개념: IDEA 1 ~ IDEA 4 */
+export type FigureTag =
+  | "PROBLEM" | "IDEA" | "SOLUTION" | "BENEFIT"
+  | "IDEA 1" | "IDEA 2" | "IDEA 3" | "IDEA 4"
+
 export type ConceptFigure = {
-  tag: "PROBLEM" | "IDEA" | "SOLUTION" | "BENEFIT"
+  tag: FigureTag
   ko: { h: string; c: string }
   en: { h: string; c: string }
   /** 인라인 SVG 문자열. 색은 .sv-* 클래스(globals.css)가 테마 토큰으로 칠한다. */
@@ -666,6 +673,122 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
   { stage:{ko:"자동화",en:"Automation"}, t:"Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
     d:{ko:"모델이 심판을 볼 때의 성적과 편향이 여기 정리돼 있다.",en:"How well a model judges — and how it is biased."},
     url:"https://arxiv.org/abs/2306.05685" },
+],
+  },
+  AdvancedPrompting: {
+    title: "Advanced Prompting",
+    overview: { ko:"심화 프롬프팅은 모델을 다시 학습시키지 않고, 추론·계획·검증·수정을 여러 단계로 나눠 밟게 하는 프롬프트 설계 전체에 대한 개념이다.", en:"Advanced prompting is the name for all prompt design that, without retraining the model, has it work through reasoning, planning, verification and revision in separate steps." },
+    figures: [
+  { tag:"IDEA 1",
+    ko:{h:"생각의 사슬 — 답 대신 푸는 과정을 쓰게 한다", c:"예시 여덟 개로 GSM8K 최고 성적을 냈다. 지시문 한 문장만 붙여도 10.4%에서 40.7%가 됐다."},
+    en:{h:"Chain of Thought — make it write the steps, not the answer", c:"Eight exemplars took GSM8K to state of the art; one added sentence moved it from 10.4% to 40.7%."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="52" width="58" height="28" rx="6"/>
+      <text class="sv-dim" x="43" y="70" text-anchor="middle" font-size="9.5">${x("생각 1","step 1")}</text>
+      <path class="sv-line" d="M76 66h12"/><path class="sv-line" d="M84 61l6 5-6 5"/>
+      <rect class="sv-box" x="102" y="52" width="58" height="28" rx="6"/>
+      <text class="sv-dim" x="131" y="70" text-anchor="middle" font-size="9.5">${x("생각 2","step 2")}</text>
+      <path class="sv-line" d="M164 66h12"/><path class="sv-line" d="M172 61l6 5-6 5"/>
+      <rect class="sv-box" x="190" y="52" width="58" height="28" rx="6"/>
+      <text class="sv-dim" x="219" y="70" text-anchor="middle" font-size="9.5">${x("생각 3","step 3")}</text>
+      <path class="sv-line" d="M252 66h12"/><path class="sv-line" d="M260 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="278" y="52" width="48" height="28" rx="6"/>
+      <text class="sv-gr-t" x="302" y="70" text-anchor="middle" font-size="9.5">${x("답","answer")}</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="10.5" font-weight="700">${x("\u201C단계별로 생각해 봅시다\u201D","\u201CLet\u2019s think step by step\u201D")}</text>`) },
+
+  { tag:"IDEA 2",
+    ko:{h:"자기일관성 — 여러 길로 풀고 많이 나온 답을 고른다", c:"복잡한 문제는 여러 갈래로 풀어도 같은 정답에 이른다. GSM8K가 17.9%포인트 올랐다."},
+    en:{h:"Self-Consistency — solve it several ways, take what recurs", c:"A complex problem admits several ways of thinking that reach its one correct answer. GSM8K rose 17.9 points."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="10" y="52" width="54" height="28" rx="6"/>
+      <text class="sv-dim" x="37" y="70" text-anchor="middle" font-size="9.5">${x("질문","question")}</text>
+      <path class="sv-line" d="M64 66L92 41"/><path class="sv-line" d="M64 66h28"/><path class="sv-line" d="M64 66L92 93"/>
+      <rect class="sv-box" x="92" y="30" width="64" height="22" rx="5"/>
+      <text class="sv-dim" x="124" y="45" text-anchor="middle" font-size="9">${x("길 A","path A")}</text>
+      <rect class="sv-box" x="92" y="56" width="64" height="22" rx="5"/>
+      <text class="sv-dim" x="124" y="71" text-anchor="middle" font-size="9">${x("길 B","path B")}</text>
+      <rect class="sv-box" x="92" y="82" width="64" height="22" rx="5"/>
+      <text class="sv-dim" x="124" y="97" text-anchor="middle" font-size="9">${x("길 C","path C")}</text>
+      <path class="sv-line" d="M156 41L236 66"/><path class="sv-line" d="M156 67h80"/><path class="sv-line" d="M156 93L236 66"/>
+      <rect class="sv-gr-b" x="244" y="48" width="84" height="36" rx="8"/>
+      <text class="sv-gr-t" x="286" y="71" text-anchor="middle" font-size="10.5">${x("가장 많이 나온 답","the answer that recurs")}</text>
+      <text class="sv-gr-t" x="124" y="126" text-anchor="middle" font-size="11" font-weight="700">GSM8K +17.9%</text>`) },
+
+  { tag:"IDEA 3",
+    ko:{h:"생각의 나무 — 펼쳐 보고 막히면 되돌아간다", c:"여러 갈래를 스스로 평가해 앞을 내다본다. 24 게임 성공률이 4%에서 74%로 올랐다."},
+    en:{h:"Tree of Thoughts — branch out, back up at a dead end", c:"It self-evaluates the branches and looks ahead. On Game of 24 the success rate went from 4% to 74%."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="52" width="48" height="28" rx="6"/>
+      <text class="sv-dim" x="38" y="70" text-anchor="middle" font-size="9.5">${x("생각","thought")}</text>
+      <path class="sv-line" d="M62 66L84 41"/><path class="sv-line" d="M62 66L84 93"/>
+      <rect class="sv-box" x="84" y="30" width="56" height="22" rx="5"/>
+      <text class="sv-dim" x="112" y="45" text-anchor="middle" font-size="9">${x("가지 1","branch 1")}</text>
+      <rect class="sv-box" x="84" y="82" width="56" height="22" rx="5"/>
+      <text class="sv-dim" x="112" y="97" text-anchor="middle" font-size="9">${x("가지 2","branch 2")}</text>
+      <path class="sv-line" d="M140 41h18"/><path class="sv-line" d="M140 93h18"/>
+      <rect class="sv-ch-b" x="158" y="30" width="56" height="22" rx="5"/>
+      <text class="sv-ch-t" x="186" y="45" text-anchor="middle" font-size="9">${x("막힘","dead end")}</text>
+      <rect class="sv-gr-b" x="158" y="82" width="56" height="22" rx="5"/>
+      <text class="sv-gr-t" x="186" y="97" text-anchor="middle" font-size="9">${x("계속","keep going")}</text>
+      <path class="sv-line" d="M214 41h20v52h-12" stroke-dasharray="4 3"/>
+      <path class="sv-line" d="M228 88l-6 5 6 5"/>
+      <text class="sv-dim" x="276" y="52" text-anchor="middle" font-size="9">${x("되돌아간다","backtrack")}</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("24 게임 성공률 74%","Game of 24: 74%")}</text>`) },
+
+  { tag:"IDEA 4",
+    ko:{h:"리액트 — 생각과 행동을 번갈아 한다", c:"밖의 자료로 환각과 오류 전파를 끊는다. ALFWorld 성공률이 34%포인트 올랐다."},
+    en:{h:"ReAct — alternate thinking and acting", c:"Outside sources break hallucination and error propagation. ALFWorld success rose 34 points."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="36" width="76" height="26" rx="6"/>
+      <text class="sv-dim" x="52" y="53" text-anchor="middle" font-size="10">${x("생각","reason")}</text>
+      <rect class="sv-box" x="14" y="74" width="76" height="26" rx="6"/>
+      <text class="sv-dim" x="52" y="91" text-anchor="middle" font-size="10">${x("행동","act")}</text>
+      <path class="sv-line" d="M40 62v8"/><path class="sv-line" d="M36 66l4 5 4-5"/>
+      <path class="sv-line" d="M64 74v-8"/><path class="sv-line" d="M60 70l4-5 4 5"/>
+      <path class="sv-line" d="M94 66h14"/><path class="sv-line" d="M102 61l6 5-6 5"/>
+      <rect class="sv-vi-b" x="116" y="44" width="86" height="44" rx="9"/>
+      <text class="sv-vi-t" x="159" y="62" text-anchor="middle" font-size="10.5">${x("밖의 자료","outside source")}</text>
+      <text class="sv-vi-t" x="159" y="78" text-anchor="middle" font-size="9">${x("검색해 확인","look it up")}</text>
+      <path class="sv-gr-l" d="M210 66h16"/><path class="sv-gr-l" d="M220 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="234" y="44" width="92" height="44" rx="9"/>
+      <text class="sv-gr-t" x="280" y="68" text-anchor="middle" font-size="17" font-weight="700">+34%</text>
+      <text class="sv-dim" x="280" y="126" text-anchor="middle" font-size="9.5">${x("ALFWorld 성공률","ALFWorld success")}</text>`) },
+],
+    cherries: [
+  { who:"Shunyu Yao", role:{ko:"ReAct·ToT 저자 · 2025",en:"author of ReAct & ToT · 2025"},
+    q:{ko:"AI의 후반전은 지금부터다. 문제를 푸는 데서 문제를 정의하는 쪽으로 옮겨 간다.",
+       en:"The second half of AI — starting now — will shift focus from solving problems to defining problems."},
+    cite:"Shunyu Yao, “The Second Half” (2025)", url:"https://ysymyth.github.io/The-Second-Half/" },
+  { who:"Shunyu Yao", role:{ko:"ReAct·ToT 저자 · 2025",en:"author of ReAct & ToT · 2025"},
+    q:{ko:"첫 판 선수들은 게임과 시험을 풀었고, 후반전 선수들은 지능으로 쓸 만한 물건을 만들어 조 단위 회사를 세운다.",
+       en:"While players in the first half solve video games and exams, players in the second half get to build billion or trillion dollar companies by building useful products out of intelligence."},
+    cite:"Shunyu Yao, “The Second Half” (2025)", url:"https://ysymyth.github.io/The-Second-Half/" },
+  { who:"Shunyu Yao", role:{ko:"ReAct·ToT 저자 · 2025",en:"author of ReAct & ToT · 2025"},
+    q:{ko:"생각은 이상한 종류의 행동이다. 바깥 세상을 직접 바꾸지 않는데, 생각의 공간은 끝이 없고 조합적으로 무한하다.",
+       en:"Thinking, or reasoning, is a strange kind of action - it does not directly affect the external world, yet the space of reasoning is open-ended and combinatorially infinite."},
+    cite:"Shunyu Yao, “The Second Half” (2025)", url:"https://ysymyth.github.io/The-Second-Half/" },
+  { who:"George Pólya", role:{ko:"수학자 · 1945",en:"mathematician · 1945"},
+    q:{ko:"문제를 이해하라 · 계획을 세우라 · 계획을 실행하라 · 돌아보라.",
+       en:"Understanding the problem · Devising a plan · Carrying out the plan · Looking back"},
+    cite:"George Pólya, “How to Solve It”, 네 단계 (Princeton University Press, 1945)", url:"https://www.hlevkin.com/hlevkin/90MathPhysBioBooks/Math/Polya/George_Polya_How%20to%20Solve%20It.pdf" },
+  { who:"Noam Brown", role:{ko:"TED AI · 2024 (전언)",en:"TED AI · 2024 (as reported)"},
+    q:{ko:"포커 한 판에서 20초만 더 생각하게 하니, 모델을 10만 배 키우고 10만 배 더 오래 학습시킨 것과 같은 효과가 났다.",
+       en:"having a bot think for just 20 seconds in a hand of poker got the same boosting performance as scaling up the model by 100,000x and training it for 100,000 times longer"},
+    cite:"Noam Brown, TED AI Conference (2024-10) — 전해진 발언", url:"https://venturebeat.com/ai/openai-noam-brown-stuns-ted-ai-conference-20-seconds-of-thinking-worth-100000x-more-data" },
+],
+    refs: [
+  { stage:{ko:"원전",en:"Origin"}, t:"Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+    d:{ko:"예시 여덟 개로 GSM8K 최고 성적을 낸 논문. 한 줄 사슬의 출발점이다.",en:"Eight exemplars, state of the art on GSM8K — where the single chain starts."},
+    url:"https://arxiv.org/abs/2201.11903" },
+  { stage:{ko:"여러 길",en:"Many paths"}, t:"Self-Consistency Improves Chain of Thought Reasoning in Language Models",
+    d:{ko:"탐욕적 디코딩을 버리고 여러 갈래를 모아 다수를 고른다.",en:"Drop greedy decoding, sample paths, marginalize."},
+    url:"https://arxiv.org/abs/2203.11171" },
+  { stage:{ko:"되돌아가기",en:"Backtracking"}, t:"Tree of Thoughts: Deliberate Problem Solving with Large Language Models",
+    d:{ko:"사슬을 나무로 일반화했다. 24 게임 4% → 74%.",en:"The chain generalized to a tree. Game of 24: 4% → 74%."},
+    url:"https://arxiv.org/abs/2305.10601" },
+  { stage:{ko:"행동",en:"Acting"}, t:"ReAct: Synergizing Reasoning and Acting in Language Models",
+    d:{ko:"생각과 행동을 엮어 환각과 오류 전파를 끊는다.",en:"Interleaving the two breaks hallucination and error propagation."},
+    url:"https://arxiv.org/abs/2210.03629" },
 ],
   },
 }
