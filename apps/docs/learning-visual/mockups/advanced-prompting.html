@@ -70,9 +70,9 @@ section{margin-bottom:40px}
 figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
   display:flex;flex-direction:column}
 .figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
-figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure h3{margin:2px 0 8px;font-size:14px;font-weight:600;color:var(--text-primary)}
 figure svg{display:block;width:100%;height:auto;margin-block:auto}
-figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+figcaption{margin-top:10px;font-size:12px;line-height:1.6;color:var(--text-muted);text-align:center}
 .sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
 .sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
 .sv-ink{fill:var(--text-primary)} .sv-dim{fill:var(--text-muted)}
@@ -142,10 +142,6 @@ figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted
     <span class="badge" id="badge">ADVANCED</span>
     <div class="titlerow">
       <h1 id="title">Advanced Prompting</h1>
-      <div class="langs" role="group" aria-label="Language">
-        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
-        <button id="lang-en" type="button" aria-pressed="false">English</button>
-      </div>
     </div>
     <div class="meta" id="meta"></div>
 
@@ -199,75 +195,75 @@ const FIGURES = [
     en:{h:"Chain of Thought — make it write the steps, not the answer", c:"Eight exemplars took GSM8K to state of the art; one added sentence moved it from 10.4% to 40.7%."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="52" width="58" height="28" rx="6"/>
-      <text class="sv-dim" x="43" y="70" text-anchor="middle" font-size="9.5">${x("생각 1","step 1")}</text>
+      <text class="sv-dim" x="43" y="70" text-anchor="middle" font-size="10.5">${x("생각 1","step 1")}</text>
       <path class="sv-line" d="M76 66h12"/><path class="sv-line" d="M84 61l6 5-6 5"/>
       <rect class="sv-box" x="102" y="52" width="58" height="28" rx="6"/>
-      <text class="sv-dim" x="131" y="70" text-anchor="middle" font-size="9.5">${x("생각 2","step 2")}</text>
+      <text class="sv-dim" x="131" y="70" text-anchor="middle" font-size="10.5">${x("생각 2","step 2")}</text>
       <path class="sv-line" d="M164 66h12"/><path class="sv-line" d="M172 61l6 5-6 5"/>
       <rect class="sv-box" x="190" y="52" width="58" height="28" rx="6"/>
-      <text class="sv-dim" x="219" y="70" text-anchor="middle" font-size="9.5">${x("생각 3","step 3")}</text>
+      <text class="sv-dim" x="219" y="70" text-anchor="middle" font-size="10.5">${x("생각 3","step 3")}</text>
       <path class="sv-line" d="M252 66h12"/><path class="sv-line" d="M260 61l6 5-6 5"/>
       <rect class="sv-gr-b" x="278" y="52" width="48" height="28" rx="6"/>
-      <text class="sv-gr-t" x="302" y="70" text-anchor="middle" font-size="9.5">${x("답","answer")}</text>
-      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="10.5" font-weight="700">${x("\u201C단계별로 생각해 봅시다\u201D","\u201CLet\u2019s think step by step\u201D")}</text>`) },
+      <text class="sv-gr-t" x="302" y="70" text-anchor="middle" font-size="10.5">${x("답","answer")}</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11.5" font-weight="700">${x("\u201C단계별로 생각해 봅시다\u201D","\u201CLet\u2019s think step by step\u201D")}</text>`) },
 
   { tag:"IDEA 2",
     ko:{h:"자기일관성 — 여러 길로 풀고 많이 나온 답을 고른다", c:"복잡한 문제는 여러 갈래로 풀어도 같은 정답에 이른다. GSM8K가 17.9%포인트 올랐다."},
     en:{h:"Self-Consistency — solve it several ways, take what recurs", c:"A complex problem admits several ways of thinking that reach its one correct answer. GSM8K rose 17.9 points."},
     art:(x)=>F(`
       <rect class="sv-box" x="10" y="52" width="54" height="28" rx="6"/>
-      <text class="sv-dim" x="37" y="70" text-anchor="middle" font-size="9.5">${x("질문","question")}</text>
+      <text class="sv-dim" x="37" y="70" text-anchor="middle" font-size="10.5">${x("질문","question")}</text>
       <path class="sv-line" d="M64 66L92 41"/><path class="sv-line" d="M64 66h28"/><path class="sv-line" d="M64 66L92 93"/>
       <rect class="sv-box" x="92" y="30" width="64" height="22" rx="5"/>
-      <text class="sv-dim" x="124" y="45" text-anchor="middle" font-size="9">${x("길 A","path A")}</text>
+      <text class="sv-dim" x="124" y="45" text-anchor="middle" font-size="10">${x("길 A","path A")}</text>
       <rect class="sv-box" x="92" y="56" width="64" height="22" rx="5"/>
-      <text class="sv-dim" x="124" y="71" text-anchor="middle" font-size="9">${x("길 B","path B")}</text>
+      <text class="sv-dim" x="124" y="71" text-anchor="middle" font-size="10">${x("길 B","path B")}</text>
       <rect class="sv-box" x="92" y="82" width="64" height="22" rx="5"/>
-      <text class="sv-dim" x="124" y="97" text-anchor="middle" font-size="9">${x("길 C","path C")}</text>
+      <text class="sv-dim" x="124" y="97" text-anchor="middle" font-size="10">${x("길 C","path C")}</text>
       <path class="sv-line" d="M156 41L236 66"/><path class="sv-line" d="M156 67h80"/><path class="sv-line" d="M156 93L236 66"/>
       <rect class="sv-gr-b" x="244" y="48" width="84" height="36" rx="8"/>
-      <text class="sv-gr-t" x="286" y="71" text-anchor="middle" font-size="10.5">${x("가장 많이 나온 답","the answer that recurs")}</text>
-      <text class="sv-gr-t" x="124" y="126" text-anchor="middle" font-size="11" font-weight="700">GSM8K +17.9%</text>`) },
+      <text class="sv-gr-t" x="286" y="71" text-anchor="middle" font-size="11.5">${x("가장 많이 나온 답","the answer that recurs")}</text>
+      <text class="sv-gr-t" x="124" y="126" text-anchor="middle" font-size="12" font-weight="700">GSM8K +17.9%</text>`) },
 
   { tag:"IDEA 3",
     ko:{h:"생각의 나무 — 펼쳐 보고 막히면 되돌아간다", c:"여러 갈래를 스스로 평가해 앞을 내다본다. 24 게임 성공률이 4%에서 74%로 올랐다."},
     en:{h:"Tree of Thoughts — branch out, back up at a dead end", c:"It self-evaluates the branches and looks ahead. On Game of 24 the success rate went from 4% to 74%."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="52" width="48" height="28" rx="6"/>
-      <text class="sv-dim" x="38" y="70" text-anchor="middle" font-size="9.5">${x("생각","thought")}</text>
+      <text class="sv-dim" x="38" y="70" text-anchor="middle" font-size="10.5">${x("생각","thought")}</text>
       <path class="sv-line" d="M62 66L84 41"/><path class="sv-line" d="M62 66L84 93"/>
       <rect class="sv-box" x="84" y="30" width="56" height="22" rx="5"/>
-      <text class="sv-dim" x="112" y="45" text-anchor="middle" font-size="9">${x("가지 1","branch 1")}</text>
+      <text class="sv-dim" x="112" y="45" text-anchor="middle" font-size="10">${x("가지 1","branch 1")}</text>
       <rect class="sv-box" x="84" y="82" width="56" height="22" rx="5"/>
-      <text class="sv-dim" x="112" y="97" text-anchor="middle" font-size="9">${x("가지 2","branch 2")}</text>
+      <text class="sv-dim" x="112" y="97" text-anchor="middle" font-size="10">${x("가지 2","branch 2")}</text>
       <path class="sv-line" d="M140 41h18"/><path class="sv-line" d="M140 93h18"/>
       <rect class="sv-ch-b" x="158" y="30" width="56" height="22" rx="5"/>
-      <text class="sv-ch-t" x="186" y="45" text-anchor="middle" font-size="9">${x("막힘","dead end")}</text>
+      <text class="sv-ch-t" x="186" y="45" text-anchor="middle" font-size="10">${x("막힘","dead end")}</text>
       <rect class="sv-gr-b" x="158" y="82" width="56" height="22" rx="5"/>
-      <text class="sv-gr-t" x="186" y="97" text-anchor="middle" font-size="9">${x("계속","keep going")}</text>
+      <text class="sv-gr-t" x="186" y="97" text-anchor="middle" font-size="10">${x("계속","keep going")}</text>
       <path class="sv-line" d="M214 41h20v52h-12" stroke-dasharray="4 3"/>
       <path class="sv-line" d="M228 88l-6 5 6 5"/>
-      <text class="sv-dim" x="276" y="52" text-anchor="middle" font-size="9">${x("되돌아간다","backtrack")}</text>
-      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("24 게임 성공률 74%","Game of 24: 74%")}</text>`) },
+      <text class="sv-dim" x="276" y="52" text-anchor="middle" font-size="10">${x("되돌아간다","backtrack")}</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="12" font-weight="700">${x("24 게임 성공률 74%","Game of 24: 74%")}</text>`) },
 
   { tag:"IDEA 4",
     ko:{h:"리액트 — 생각과 행동을 번갈아 한다", c:"밖의 자료로 환각과 오류 전파를 끊는다. ALFWorld 성공률이 34%포인트 올랐다."},
     en:{h:"ReAct — alternate thinking and acting", c:"Outside sources break hallucination and error propagation. ALFWorld success rose 34 points."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="36" width="76" height="26" rx="6"/>
-      <text class="sv-dim" x="52" y="53" text-anchor="middle" font-size="10">${x("생각","reason")}</text>
+      <text class="sv-dim" x="52" y="53" text-anchor="middle" font-size="11">${x("생각","reason")}</text>
       <rect class="sv-box" x="14" y="74" width="76" height="26" rx="6"/>
-      <text class="sv-dim" x="52" y="91" text-anchor="middle" font-size="10">${x("행동","act")}</text>
+      <text class="sv-dim" x="52" y="91" text-anchor="middle" font-size="11">${x("행동","act")}</text>
       <path class="sv-line" d="M40 62v8"/><path class="sv-line" d="M36 66l4 5 4-5"/>
       <path class="sv-line" d="M64 74v-8"/><path class="sv-line" d="M60 70l4-5 4 5"/>
       <path class="sv-line" d="M94 66h14"/><path class="sv-line" d="M102 61l6 5-6 5"/>
       <rect class="sv-vi-b" x="116" y="44" width="86" height="44" rx="9"/>
-      <text class="sv-vi-t" x="159" y="62" text-anchor="middle" font-size="10.5">${x("밖의 자료","outside source")}</text>
-      <text class="sv-vi-t" x="159" y="78" text-anchor="middle" font-size="9">${x("검색해 확인","look it up")}</text>
+      <text class="sv-vi-t" x="159" y="62" text-anchor="middle" font-size="11.5">${x("밖의 자료","outside source")}</text>
+      <text class="sv-vi-t" x="159" y="78" text-anchor="middle" font-size="10">${x("검색해 확인","look it up")}</text>
       <path class="sv-gr-l" d="M210 66h16"/><path class="sv-gr-l" d="M220 61l6 5-6 5"/>
       <rect class="sv-gr-b" x="234" y="44" width="92" height="44" rx="9"/>
-      <text class="sv-gr-t" x="280" y="68" text-anchor="middle" font-size="17" font-weight="700">+34%</text>
-      <text class="sv-dim" x="280" y="126" text-anchor="middle" font-size="9.5">${x("ALFWorld 성공률","ALFWorld success")}</text>`) },
+      <text class="sv-gr-t" x="280" y="68" text-anchor="middle" font-size="18" font-weight="700">+34%</text>
+      <text class="sv-dim" x="280" y="126" text-anchor="middle" font-size="10.5">${x("ALFWorld 성공률","ALFWorld success")}</text>`) },
 ];
 
 const CHERRIES = [
@@ -443,7 +439,8 @@ function roadmap(){
   return `<svg viewBox="0 0 ${RM.W} ${Math.ceil(H)}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
 }
 
-let lang = "ko";
+/* 화면 언어는 앱 상단 바가 정한다(lib/lang.ts). 목업에서는 주소 뒤 ?lang=en 으로 본다. */
+let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "ko";
 function render(){
   const t = T[lang];
   document.getElementById("meta").innerHTML = t.meta
@@ -478,10 +475,6 @@ function render(){
     </div>`).join("");
 
   document.getElementById("roadmap").innerHTML = roadmap();
-  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
-  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
 }
-document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
-document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
 render();
 </script>

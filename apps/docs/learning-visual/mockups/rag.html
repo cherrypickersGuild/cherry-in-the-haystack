@@ -70,9 +70,9 @@ section{margin-bottom:40px}
 figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
   display:flex;flex-direction:column}
 .figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
-figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure h3{margin:2px 0 8px;font-size:14px;font-weight:600;color:var(--text-primary)}
 figure svg{display:block;width:100%;height:auto;margin-block:auto}
-figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+figcaption{margin-top:10px;font-size:12px;line-height:1.6;color:var(--text-muted);text-align:center}
 .sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
 .sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
 .sv-ink{fill:var(--text-primary)} .sv-dim{fill:var(--text-muted)}
@@ -142,10 +142,6 @@ figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted
     <span class="badge" id="badge">BASICS</span>
     <div class="titlerow">
       <h1 id="title">RAG</h1>
-      <div class="langs" role="group" aria-label="Language">
-        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
-        <button id="lang-en" type="button" aria-pressed="false">English</button>
-      </div>
     </div>
     <div class="meta" id="meta"></div>
 
@@ -200,17 +196,17 @@ const FIGURES = [
     en:{h:"The knowledge inside is stuck at training time", c:"The memory can’t be revised or expanded."},
     art:(x)=>F(`
       <rect class="sv-box" x="16" y="28" width="150" height="98" rx="10"/>
-      <text class="sv-ink" x="91" y="68" text-anchor="middle" font-size="13" font-weight="500">MODEL</text>
+      <text class="sv-ink" x="91" y="68" text-anchor="middle" font-size="14" font-weight="500">MODEL</text>
       <rect class="sv-box" style="fill:var(--secondary)" x="36" y="82" width="110" height="22" rx="11"/>
-      <text class="sv-dim" x="91" y="97" text-anchor="middle" font-size="9.5">${x("학습한 지식","trained knowledge")}</text>
+      <text class="sv-dim" x="91" y="97" text-anchor="middle" font-size="10.5">${x("학습한 지식","trained knowledge")}</text>
 
       <path class="sv-ch-b" d="M196 62 L208 50 H306 Q316 50 316 60 V64 Q316 74 306 74 H208 Z"/>
       <circle style="fill:var(--card);stroke:var(--cherry-border);stroke-width:1.1" cx="218" cy="62" r="3"/>
-      <text class="sv-ch-t" x="266" y="65.5" text-anchor="middle" font-size="8.5" font-weight="700" letter-spacing="1">OUTDATED</text>
+      <text class="sv-ch-t" x="266" y="65.5" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing="1">OUTDATED</text>
 
       <path class="sv-ch-b" d="M196 92 L208 80 H306 Q316 80 316 90 V94 Q316 104 306 104 H208 Z"/>
       <circle style="fill:var(--card);stroke:var(--cherry-border);stroke-width:1.1" cx="218" cy="92" r="3"/>
-      <text class="sv-ch-t" x="266" y="95.5" text-anchor="middle" font-size="8.5" font-weight="700" letter-spacing="1">HALLUCINATION</text>`) },
+      <text class="sv-ch-t" x="266" y="95.5" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing="1">HALLUCINATION</text>`) },
 
   { tag:"IDEA",
     ko:{h:"지식을 모델밖에서 가져올 수 있을까?", c:"위키피디아를 100단어씩 잘라 2,100만 조각으로 만들었다."},
@@ -218,48 +214,48 @@ const FIGURES = [
     art:(x)=>F(`
       <rect class="sv-box" x="16" y="28" width="50" height="76" rx="5"/>
       <path class="sv-line" opacity=".8" d="M26 48h30M26 62h30M26 76h20"/>
-      <text class="sv-dim" x="41" y="126" text-anchor="middle" font-size="9.5">${x("문서","documents")}</text>
+      <text class="sv-dim" x="41" y="126" text-anchor="middle" font-size="10.5">${x("문서","documents")}</text>
       <path class="sv-line" d="M74 66h24"/><path class="sv-line" d="M92 61l7 5-7 5"/>
       <g class="sv-vi-f" opacity=".85"><rect x="110" y="34" width="40" height="16" rx="3"/>
         <rect x="110" y="58" width="40" height="16" rx="3"/><rect x="110" y="82" width="40" height="16" rx="3"/></g>
-      <text class="sv-dim" x="130" y="126" text-anchor="middle" font-size="9.5">${x("조각","chunks")}</text>
+      <text class="sv-dim" x="130" y="126" text-anchor="middle" font-size="10.5">${x("조각","chunks")}</text>
       <path class="sv-line" d="M158 66h24"/><path class="sv-line" d="M176 61l7 5-7 5"/>
       <rect class="sv-vi-b" x="192" y="28" width="130" height="76" rx="8"/>
-      <text class="sv-vi-t" x="257" y="60" text-anchor="middle" font-size="12" font-weight="500">${x("색인","Index")}</text>
-      <text class="sv-vi-t" x="257" y="82" text-anchor="middle" font-size="14" font-weight="700">${x("2,100만","21M")}</text>
-      <text class="sv-dim" x="257" y="126" text-anchor="middle" font-size="9.5">${x("모델 밖","outside the model")}</text>`) },
+      <text class="sv-vi-t" x="257" y="60" text-anchor="middle" font-size="13" font-weight="500">${x("색인","Index")}</text>
+      <text class="sv-vi-t" x="257" y="82" text-anchor="middle" font-size="15" font-weight="700">${x("2,100만","21M")}</text>
+      <text class="sv-dim" x="257" y="126" text-anchor="middle" font-size="10.5">${x("모델 밖","outside the model")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"질문마다 관련지식을 함께 꺼낸다.", c:"질문마다 5~10조각을 꺼내 질문 뒤에 붙인다."},
     en:{h:"Pull the related knowledge with every question.", c:"5–10 retrieved chunks are concatenated after each query."},
     art:(x)=>F(`
       <rect class="sv-box" x="12" y="51" width="68" height="30" rx="6"/>
-      <text class="sv-ink" x="46" y="71" text-anchor="middle" font-size="10.5" font-weight="500">${x("질문","query")}</text>
+      <text class="sv-ink" x="46" y="71" text-anchor="middle" font-size="11.5" font-weight="500">${x("질문","query")}</text>
       <path class="sv-line" d="M88 66h22"/><path class="sv-line" d="M104 61l7 5-7 5"/>
       <rect class="sv-vi-b" x="118" y="35" width="76" height="62" rx="8"/>
-      <text class="sv-vi-t" x="156" y="61" text-anchor="middle" font-size="11" font-weight="500">${x("색인에서 찾기","retrieve")}</text>
-      <text class="sv-vi-t" x="156" y="81" text-anchor="middle" font-size="13" font-weight="700">k = 5~10</text>
+      <text class="sv-vi-t" x="156" y="61" text-anchor="middle" font-size="12" font-weight="500">${x("색인에서 찾기","retrieve")}</text>
+      <text class="sv-vi-t" x="156" y="81" text-anchor="middle" font-size="14" font-weight="700">k = 5~10</text>
       <path class="sv-line" d="M202 66h22"/><path class="sv-line" d="M218 61l7 5-7 5"/>
       <rect class="sv-box" x="232" y="39" width="94" height="54" rx="9"/>
-      <text class="sv-ink" x="279" y="62" text-anchor="middle" font-size="12" font-weight="500">MODEL</text>
-      <text class="sv-dim" x="279" y="79" text-anchor="middle" font-size="9.5">${x("질문 + 조각","query + chunks")}</text>
-      <text class="sv-dim" x="156" y="126" text-anchor="middle" font-size="9.5">${x("질문마다 새로","fresh every time")}</text>`) },
+      <text class="sv-ink" x="279" y="62" text-anchor="middle" font-size="13" font-weight="500">MODEL</text>
+      <text class="sv-dim" x="279" y="79" text-anchor="middle" font-size="10.5">${x("질문 + 조각","query + chunks")}</text>
+      <text class="sv-dim" x="156" y="126" text-anchor="middle" font-size="10.5">${x("질문마다 새로","fresh every time")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"학습하지 않은 전문지식도 활용가능해진다.", c:"2018년을 물으면 2016년 색인은 4%, 2018년 색인은 68% 맞혔다."},
     en:{h:"Expertise it never trained on becomes usable.", c:"Asked about 2018: the 2016 index scored 4%, the 2018 index 68%."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="28" width="120" height="34" rx="6"/>
-      <text class="sv-dim" x="28" y="49" font-size="10">${x("2016 색인","2016 index")}</text>
-      <text class="sv-dim" x="120" y="49" text-anchor="end" font-size="12">4%</text>
+      <text class="sv-dim" x="28" y="49" font-size="11">${x("2016 색인","2016 index")}</text>
+      <text class="sv-dim" x="120" y="49" text-anchor="end" font-size="13">4%</text>
       <rect class="sv-gr-b" x="14" y="70" width="120" height="34" rx="6"/>
-      <text class="sv-gr-t" x="28" y="91" font-size="10">${x("2018 색인","2018 index")}</text>
-      <text class="sv-gr-t" x="120" y="91" text-anchor="end" font-size="13" font-weight="700">68%</text>
+      <text class="sv-gr-t" x="28" y="91" font-size="11">${x("2018 색인","2018 index")}</text>
+      <text class="sv-gr-t" x="120" y="91" text-anchor="end" font-size="14" font-weight="700">68%</text>
       <path class="sv-gr-l" d="M146 66h32"/><path class="sv-gr-l" d="M172 61l7 5-7 5"/>
       <rect class="sv-box" x="190" y="39" width="134" height="54" rx="9"/>
-      <text class="sv-ink" x="257" y="62" text-anchor="middle" font-size="12" font-weight="500">MODEL</text>
-      <text class="sv-dim" x="257" y="79" text-anchor="middle" font-size="9.5">${x("그대로 · 재학습 없음","unchanged · no retraining")}</text>
-      <text class="sv-dim" x="74" y="126" text-anchor="middle" font-size="9.5">${x("2018년을 물었을 때","when asked about 2018")}</text>`) },
+      <text class="sv-ink" x="257" y="62" text-anchor="middle" font-size="13" font-weight="500">MODEL</text>
+      <text class="sv-dim" x="257" y="79" text-anchor="middle" font-size="10.5">${x("그대로 · 재학습 없음","unchanged · no retraining")}</text>
+      <text class="sv-dim" x="74" y="126" text-anchor="middle" font-size="10.5">${x("2018년을 물었을 때","when asked about 2018")}</text>`) },
 ];
 
 const CHERRIES = [
@@ -436,7 +432,8 @@ function roadmap(){
   return `<svg viewBox="0 0 ${RM.W} ${Math.ceil(H)}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
 }
 
-let lang = "ko";
+/* 화면 언어는 앱 상단 바가 정한다(lib/lang.ts). 목업에서는 주소 뒤 ?lang=en 으로 본다. */
+let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "ko";
 function render(){
   const t = T[lang];
   document.getElementById("meta").innerHTML = t.meta
@@ -471,10 +468,6 @@ function render(){
     </div>`).join("");
 
   document.getElementById("roadmap").innerHTML = roadmap();
-  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
-  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
 }
-document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
-document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
 render();
 </script>

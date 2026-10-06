@@ -70,9 +70,9 @@ section{margin-bottom:40px}
 figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
   display:flex;flex-direction:column}
 .figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
-figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure h3{margin:2px 0 8px;font-size:14px;font-weight:600;color:var(--text-primary)}
 figure svg{display:block;width:100%;height:auto;margin-block:auto}
-figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+figcaption{margin-top:10px;font-size:12px;line-height:1.6;color:var(--text-muted);text-align:center}
 .sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
 .sv-card{fill:var(--card);stroke:var(--border);stroke-width:1.6}
 .sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
@@ -143,10 +143,6 @@ figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted
     <span class="badge" id="badge">BASICS</span>
     <div class="titlerow">
       <h1 id="title">Prompt Engineering</h1>
-      <div class="langs" role="group" aria-label="Language">
-        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
-        <button id="lang-en" type="button" aria-pressed="false">English</button>
-      </div>
     </div>
     <div class="meta" id="meta"></div>
 
@@ -204,51 +200,51 @@ const FIGURES = [
       <rect class="sv-card" x="20" y="34" width="52" height="60" rx="4"/>
       <rect class="sv-box" x="26" y="28" width="52" height="60" rx="4"/>
       <path class="sv-line" opacity=".6" d="M36 46h32M36 58h32M36 70h20"/>
-      <text class="sv-ch-t" x="46" y="126" text-anchor="middle" font-size="10.5" font-weight="700">${x("예시 수천~수만","1000s of examples")}</text>
+      <text class="sv-ch-t" x="46" y="126" text-anchor="middle" font-size="11.5" font-weight="700">${x("예시 수천~수만","1000s of examples")}</text>
       <path class="sv-line" d="M92 66h20"/><path class="sv-line" d="M106 61l7 5-7 5"/>
       <rect class="sv-box" x="122" y="44" width="80" height="44" rx="8"/>
-      <text class="sv-ink" x="162" y="71" text-anchor="middle" font-size="11" font-weight="500">${x("미세조정","fine-tune")}</text>
+      <text class="sv-ink" x="162" y="71" text-anchor="middle" font-size="12" font-weight="500">${x("미세조정","fine-tune")}</text>
       <path class="sv-line" d="M212 66h20"/><path class="sv-line" d="M226 61l7 5-7 5"/>
       <rect class="sv-box" x="242" y="40" width="84" height="52" rx="9"/>
-      <text class="sv-ink" x="284" y="62" text-anchor="middle" font-size="11" font-weight="500">MODEL</text>
-      <text class="sv-dim" x="284" y="78" text-anchor="middle" font-size="8.8">${x("이 과제 전용","for this task only")}</text>
-      <text class="sv-dim" x="212" y="126" text-anchor="middle" font-size="9.5">${x("과제가 늘면 처음부터 다시","a new task starts over")}</text>`) },
+      <text class="sv-ink" x="284" y="62" text-anchor="middle" font-size="12" font-weight="500">MODEL</text>
+      <text class="sv-dim" x="284" y="78" text-anchor="middle" font-size="9.8">${x("이 과제 전용","for this task only")}</text>
+      <text class="sv-dim" x="212" y="126" text-anchor="middle" font-size="10.5">${x("과제가 늘면 처음부터 다시","a new task starts over")}</text>`) },
 
   { tag:"IDEA",
     ko:{h:"모델은 그대로 두고 할 일을 글로 적어 넣는다", c:"가중치를 한 번도 갱신하지 않고, 지시와 예시를 글로만 전달한다."},
     en:{h:"Leave the model alone and write the task into the text", c:"No gradient updates — the task and its examples arrive purely as text."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="28" width="128" height="76" rx="8"/>
-      <text class="sv-dim" x="28" y="48" font-size="9">${x("프롬프트","prompt")}</text>
+      <text class="sv-dim" x="28" y="48" font-size="10">${x("프롬프트","prompt")}</text>
       <path class="sv-line" opacity=".55" d="M28 62h100M28 76h100M28 90h62"/>
-      <text class="sv-dim" x="78" y="126" text-anchor="middle" font-size="9.5">${x("지시 + 예시","instruction + examples")}</text>
+      <text class="sv-dim" x="78" y="126" text-anchor="middle" font-size="10.5">${x("지시 + 예시","instruction + examples")}</text>
       <path class="sv-line" d="M152 66h20"/><path class="sv-line" d="M166 61l7 5-7 5"/>
       <rect class="sv-box" x="182" y="40" width="88" height="52" rx="9"/>
-      <text class="sv-ink" x="226" y="64" text-anchor="middle" font-size="11.5" font-weight="500">MODEL</text>
-      <text class="sv-dim" x="226" y="80" text-anchor="middle" font-size="8.8">${x("가중치 그대로","weights untouched")}</text>
+      <text class="sv-ink" x="226" y="64" text-anchor="middle" font-size="12.5" font-weight="500">MODEL</text>
+      <text class="sv-dim" x="226" y="80" text-anchor="middle" font-size="9.8">${x("가중치 그대로","weights untouched")}</text>
       <rect class="sv-box" x="246" y="30" width="16" height="13" rx="2"/>
       <path class="sv-line" d="M249 30v-4a5 5 0 0 1 10 0v4"/>
       <path class="sv-line" d="M280 66h20"/><path class="sv-line" d="M294 61l7 5-7 5"/>
-      <text class="sv-ink" x="318" y="70" text-anchor="middle" font-size="11" font-weight="500">${x("답","answer")}</text>`) },
+      <text class="sv-ink" x="318" y="70" text-anchor="middle" font-size="12" font-weight="500">${x("답","answer")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"답을 내기 전에 중간 단계를 쓰게 한다", c:"생각의 사슬 — 예시 여덟 개면 큰 모형의 추론이 달라진다."},
     en:{h:"Make it write the steps before the answer", c:"Chain of thought — eight exemplars change how a large model reasons."},
     art:(x)=>F(`
       <rect class="sv-box" x="12" y="52" width="72" height="30" rx="6"/>
-      <text class="sv-ink" x="48" y="72" text-anchor="middle" font-size="10.5" font-weight="500">${x("질문","question")}</text>
+      <text class="sv-ink" x="48" y="72" text-anchor="middle" font-size="11.5" font-weight="500">${x("질문","question")}</text>
       <path class="sv-line" d="M92 66h18"/><path class="sv-line" d="M106 61l7 5-7 5"/>
       <rect class="sv-vi-b" x="120" y="28" width="118" height="76" rx="8"/>
-      <text class="sv-vi-t" x="134" y="48" font-size="9.5">1</text>
+      <text class="sv-vi-t" x="134" y="48" font-size="10.5">1</text>
       <path class="sv-line" opacity=".5" d="M146 44h78"/>
-      <text class="sv-vi-t" x="134" y="70" font-size="9.5">2</text>
+      <text class="sv-vi-t" x="134" y="70" font-size="10.5">2</text>
       <path class="sv-line" opacity=".5" d="M146 66h78"/>
-      <text class="sv-vi-t" x="134" y="92" font-size="9.5">3</text>
+      <text class="sv-vi-t" x="134" y="92" font-size="10.5">3</text>
       <path class="sv-line" opacity=".5" d="M146 88h52"/>
-      <text class="sv-vi-t" x="179" y="126" text-anchor="middle" font-size="10.5" font-weight="700">${x("중간 단계","the steps")}</text>
+      <text class="sv-vi-t" x="179" y="126" text-anchor="middle" font-size="11.5" font-weight="700">${x("중간 단계","the steps")}</text>
       <path class="sv-line" d="M248 66h18"/><path class="sv-line" d="M262 61l7 5-7 5"/>
       <rect class="sv-box" x="276" y="52" width="50" height="30" rx="6"/>
-      <text class="sv-ink" x="301" y="72" text-anchor="middle" font-size="10.5" font-weight="500">${x("답","answer")}</text>`) },
+      <text class="sv-ink" x="301" y="72" text-anchor="middle" font-size="11.5" font-weight="500">${x("답","answer")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"한 줄을 덧붙이자 정답률이 네 배가 됐다", c:"답 앞에 “차근차근 생각해 보자”를 붙였을 때의 GSM8K 정답률."},
@@ -256,11 +252,11 @@ const FIGURES = [
     art:(x)=>F(`
       <path class="sv-line" opacity=".5" d="M40 104h286"/>
       <rect class="sv-box" x="74" y="90" width="56" height="14" rx="3"/>
-      <text class="sv-dim" x="102" y="84" text-anchor="middle" font-size="11">10.4%</text>
-      <text class="sv-dim" x="102" y="126" text-anchor="middle" font-size="9.5">${x("그냥 물었을 때","asked plainly")}</text>
+      <text class="sv-dim" x="102" y="84" text-anchor="middle" font-size="12">10.4%</text>
+      <text class="sv-dim" x="102" y="126" text-anchor="middle" font-size="10.5">${x("그냥 물었을 때","asked plainly")}</text>
       <rect class="sv-gr-b" x="206" y="48" width="56" height="56" rx="3"/>
-      <text class="sv-gr-t" x="234" y="42" text-anchor="middle" font-size="13" font-weight="700">40.7%</text>
-      <text class="sv-gr-t" x="234" y="126" text-anchor="middle" font-size="9.5">${x("한 줄을 붙였을 때","with the one line")}</text>
+      <text class="sv-gr-t" x="234" y="42" text-anchor="middle" font-size="14" font-weight="700">40.7%</text>
+      <text class="sv-gr-t" x="234" y="126" text-anchor="middle" font-size="10.5">${x("한 줄을 붙였을 때","with the one line")}</text>
       <path class="sv-gr-l" d="M144 72h44"/><path class="sv-gr-l" d="M182 67l7 5-7 5"/>`) },
 ];
 
@@ -422,7 +418,8 @@ function roadmap(){
   return `<svg viewBox="0 0 ${RM.W} ${Math.ceil(H)}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
 }
 
-let lang = "ko";
+/* 화면 언어는 앱 상단 바가 정한다(lib/lang.ts). 목업에서는 주소 뒤 ?lang=en 으로 본다. */
+let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "ko";
 function render(){
   const t = T[lang];
   document.getElementById("meta").innerHTML = t.meta
@@ -457,10 +454,6 @@ function render(){
     </div>`).join("");
 
   document.getElementById("roadmap").innerHTML = roadmap();
-  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
-  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
 }
-document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
-document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
 render();
 </script>

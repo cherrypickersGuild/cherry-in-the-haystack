@@ -70,9 +70,9 @@ section{margin-bottom:40px}
 figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
   display:flex;flex-direction:column}
 .figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
-figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure h3{margin:2px 0 8px;font-size:14px;font-weight:600;color:var(--text-primary)}
 figure svg{display:block;width:100%;height:auto;margin-block:auto}
-figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+figcaption{margin-top:10px;font-size:12px;line-height:1.6;color:var(--text-muted);text-align:center}
 .sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
 .sv-card{fill:var(--card);stroke:var(--border);stroke-width:1.6}
 .sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
@@ -143,10 +143,6 @@ figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted
     <span class="badge" id="badge">BASICS</span>
     <div class="titlerow">
       <h1 id="title">Fine-tuning</h1>
-      <div class="langs" role="group" aria-label="Language">
-        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
-        <button id="lang-en" type="button" aria-pressed="false">English</button>
-      </div>
     </div>
     <div class="meta" id="meta"></div>
 
@@ -200,61 +196,61 @@ const FIGURES = [
     en:{h:"A new task meant training from scratch", c:"Each task needed its own architecture changes and its own training run."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="36" width="76" height="60" rx="8"/>
-      <text class="sv-dim" x="52" y="70" text-anchor="middle" font-size="10">${x("과제 A","task A")}</text>
-      <text class="sv-dim" x="52" y="126" text-anchor="middle" font-size="9.5">${x("전용 모델","its own model")}</text>
+      <text class="sv-dim" x="52" y="70" text-anchor="middle" font-size="11">${x("과제 A","task A")}</text>
+      <text class="sv-dim" x="52" y="126" text-anchor="middle" font-size="10.5">${x("전용 모델","its own model")}</text>
       <rect class="sv-box" x="104" y="36" width="76" height="60" rx="8"/>
-      <text class="sv-dim" x="142" y="70" text-anchor="middle" font-size="10">${x("과제 B","task B")}</text>
-      <text class="sv-dim" x="142" y="126" text-anchor="middle" font-size="9.5">${x("전용 모델","its own model")}</text>
+      <text class="sv-dim" x="142" y="70" text-anchor="middle" font-size="11">${x("과제 B","task B")}</text>
+      <text class="sv-dim" x="142" y="126" text-anchor="middle" font-size="10.5">${x("전용 모델","its own model")}</text>
       <rect class="sv-box" x="194" y="36" width="76" height="60" rx="8"/>
-      <text class="sv-dim" x="232" y="70" text-anchor="middle" font-size="10">${x("과제 C","task C")}</text>
-      <text class="sv-dim" x="232" y="126" text-anchor="middle" font-size="9.5">${x("전용 모델","its own model")}</text>
-      <text class="sv-ch-t" x="300" y="70" text-anchor="middle" font-size="12" font-weight="700">···</text>
-      <text class="sv-ch-t" x="300" y="88" text-anchor="middle" font-size="9.5">${x("계속","and on")}</text>`) },
+      <text class="sv-dim" x="232" y="70" text-anchor="middle" font-size="11">${x("과제 C","task C")}</text>
+      <text class="sv-dim" x="232" y="126" text-anchor="middle" font-size="10.5">${x("전용 모델","its own model")}</text>
+      <text class="sv-ch-t" x="300" y="70" text-anchor="middle" font-size="13" font-weight="700">···</text>
+      <text class="sv-ch-t" x="300" y="88" text-anchor="middle" font-size="10.5">${x("계속","and on")}</text>`) },
 
   { tag:"IDEA",
     ko:{h:"이미 배운 모델을 가져와 조금 더 가르친다", c:"예시 100개만으로도 100배 많은 자료로 처음부터 학습한 것과 맞먹었다."},
     en:{h:"Take a model that already learned, then teach it a little more", c:"With only 100 labeled examples it matched training from scratch on 100× more data."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="38" width="96" height="56" rx="9"/>
-      <text class="sv-ink" x="62" y="62" text-anchor="middle" font-size="11" font-weight="500">${x("사전학습","pre-trained")}</text>
-      <text class="sv-dim" x="62" y="78" text-anchor="middle" font-size="8.8">${x("이미 배운 모델","already trained")}</text>
+      <text class="sv-ink" x="62" y="62" text-anchor="middle" font-size="12" font-weight="500">${x("사전학습","pre-trained")}</text>
+      <text class="sv-dim" x="62" y="78" text-anchor="middle" font-size="9.8">${x("이미 배운 모델","already trained")}</text>
       <path class="sv-line" d="M120 66h20"/><path class="sv-line" d="M134 61l7 5-7 5"/>
       <rect class="sv-card" x="150" y="48" width="18" height="36" rx="3"/>
       <rect class="sv-card" x="172" y="48" width="18" height="36" rx="3"/>
-      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("내 예시 100개","100 examples")}</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="12" font-weight="700">${x("내 예시 100개","100 examples")}</text>
       <path class="sv-line" d="M200 66h20"/><path class="sv-line" d="M214 61l7 5-7 5"/>
       <rect class="sv-gr-b" x="230" y="38" width="96" height="56" rx="9"/>
-      <text class="sv-gr-t" x="278" y="62" text-anchor="middle" font-size="11" font-weight="500">${x("내 과제용","tuned for my task")}</text>
-      <text class="sv-dim" x="278" y="78" text-anchor="middle" font-size="8.8">${x("같은 모델, 조금 더","same model, a bit more")}</text>`) },
+      <text class="sv-gr-t" x="278" y="62" text-anchor="middle" font-size="12" font-weight="500">${x("내 과제용","tuned for my task")}</text>
+      <text class="sv-dim" x="278" y="78" text-anchor="middle" font-size="9.8">${x("같은 모델, 조금 더","same model, a bit more")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"전부 바꾸지 않고 작은 부품만 바꾼다", c:"학습해야 할 값이 1만분의 1로 줄고, 그래픽 메모리는 3분의 1이 된다."},
     en:{h:"Change a small part instead of the whole thing", c:"10,000× fewer trainable parameters and a third of the GPU memory."},
     art:(x)=>F(`
       <rect class="sv-box" x="26" y="28" width="150" height="76" rx="10"/>
-      <text class="sv-dim" x="101" y="50" text-anchor="middle" font-size="9.5">${x("원래 가중치","original weights")}</text>
-      <text class="sv-dim" x="101" y="70" text-anchor="middle" font-size="9">${x("그대로 얼려 둔다","kept frozen")}</text>
+      <text class="sv-dim" x="101" y="50" text-anchor="middle" font-size="10.5">${x("원래 가중치","original weights")}</text>
+      <text class="sv-dim" x="101" y="70" text-anchor="middle" font-size="10">${x("그대로 얼려 둔다","kept frozen")}</text>
       <rect class="sv-vi-b" x="62" y="78" width="78" height="20" rx="10"/>
-      <text class="sv-vi-t" x="101" y="92" text-anchor="middle" font-size="9.5" font-weight="600">${x("작은 어댑터","small adapter")}</text>
+      <text class="sv-vi-t" x="101" y="92" text-anchor="middle" font-size="10.5" font-weight="600">${x("작은 어댑터","small adapter")}</text>
       <path class="sv-line" d="M186 66h22"/><path class="sv-line" d="M202 61l7 5-7 5"/>
-      <text class="sv-vi-t" x="272" y="62" text-anchor="middle" font-size="15" font-weight="700">1 / 10,000</text>
-      <text class="sv-dim" x="272" y="80" text-anchor="middle" font-size="9.5">${x("학습하는 값의 수","trainable parameters")}</text>`) },
+      <text class="sv-vi-t" x="272" y="62" text-anchor="middle" font-size="16" font-weight="700">1 / 10,000</text>
+      <text class="sv-dim" x="272" y="80" text-anchor="middle" font-size="10.5">${x("학습하는 값의 수","trainable parameters")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"100배 작은 모델이 더 나은 답을 낸다", c:"사람 평가에서 13억 모델의 답이 1750억 모델의 답보다 선호됐다."},
     en:{h:"A 100× smaller model gives the better answer", c:"Human raters preferred the 1.3B model’s answers over those of the 175B model."},
     art:(x)=>F(`
       <rect class="sv-box" x="18" y="34" width="120" height="30" rx="6"/>
-      <text class="sv-dim" x="34" y="54" font-size="10">GPT-3</text>
-      <text class="sv-dim" x="126" y="54" text-anchor="end" font-size="11">175B</text>
+      <text class="sv-dim" x="34" y="54" font-size="11">GPT-3</text>
+      <text class="sv-dim" x="126" y="54" text-anchor="end" font-size="12">175B</text>
       <rect class="sv-gr-b" x="18" y="80" width="120" height="30" rx="6"/>
-      <text class="sv-gr-t" x="34" y="100" font-size="10">InstructGPT</text>
-      <text class="sv-gr-t" x="126" y="100" text-anchor="end" font-size="12" font-weight="700">1.3B</text>
+      <text class="sv-gr-t" x="34" y="100" font-size="11">InstructGPT</text>
+      <text class="sv-gr-t" x="126" y="100" text-anchor="end" font-size="13" font-weight="700">1.3B</text>
       <path class="sv-gr-l" d="M150 72h30"/><path class="sv-gr-l" d="M174 67l7 5-7 5"/>
       <rect class="sv-box" x="192" y="44" width="134" height="52" rx="9"/>
-      <text class="sv-ink" x="259" y="66" text-anchor="middle" font-size="11" font-weight="500">${x("사람이 고른 쪽","what people preferred")}</text>
-      <text class="sv-gr-t" x="259" y="83" text-anchor="middle" font-size="10" font-weight="600">InstructGPT</text>
-      <text class="sv-dim" x="78" y="126" text-anchor="middle" font-size="9.5">${x("같은 질문, 두 답","same prompts, two answers")}</text>`) },
+      <text class="sv-ink" x="259" y="66" text-anchor="middle" font-size="12" font-weight="500">${x("사람이 고른 쪽","what people preferred")}</text>
+      <text class="sv-gr-t" x="259" y="83" text-anchor="middle" font-size="11" font-weight="600">InstructGPT</text>
+      <text class="sv-dim" x="78" y="126" text-anchor="middle" font-size="10.5">${x("같은 질문, 두 답","same prompts, two answers")}</text>`) },
 ];
 
 const CHERRIES = [
@@ -419,7 +415,8 @@ function roadmap(){
   return `<svg viewBox="0 0 ${RM.W} ${Math.ceil(H)}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
 }
 
-let lang = "ko";
+/* 화면 언어는 앱 상단 바가 정한다(lib/lang.ts). 목업에서는 주소 뒤 ?lang=en 으로 본다. */
+let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "ko";
 function render(){
   const t = T[lang];
   document.getElementById("meta").innerHTML = t.meta
@@ -454,10 +451,6 @@ function render(){
     </div>`).join("");
 
   document.getElementById("roadmap").innerHTML = roadmap();
-  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
-  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
 }
-document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
-document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
 render();
 </script>

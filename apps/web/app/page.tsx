@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Sidebar, CherryIcon } from "@/components/cherry/sidebar"
 import { MobileSidebar } from "@/components/cherry/mobile-sidebar"
 import { PageHeader } from "@/components/cherry/page-header"
+import { useLang, setLang } from "@/lib/lang"
 import { PatchNotesPage } from "@/components/cherry/patch-notes-page"
 import { fetchLanding, fetchLandingArticles, LandingResponse, LandingTopArticle } from "@/lib/api"
 import { useAuthTick, getAccessToken, decodeToken, clearAccessToken } from "@/lib/auth"
@@ -399,6 +400,9 @@ export default function CherryApp() {
           className="hidden lg:flex items-center justify-end border-b border-[#E4E1EE] bg-white flex-shrink-0"
           style={{ gap: 8, paddingLeft: 40, paddingRight: 40, paddingTop: 16, paddingBottom: 16 }}
         >
+          {/* 화면 언어 — 개념 페이지 안이 아니라 여기서 고른다(lib/lang.ts).
+              자리는 Dashboard 버튼 왼쪽이다. */}
+          <LangToggle />
           {token && (
             <button
               onClick={() => setActiveNav("admin")}
@@ -464,6 +468,36 @@ export default function CherryApp() {
           }
         />
       )}
+    </div>
+  )
+}
+
+/* 한국어 · English — 상단 바 왼쪽. 고른 값은 브라우저에 남아 화면을 옮겨도 유지된다. */
+function LangToggle() {
+  const lang = useLang()
+  return (
+    <div
+      className="flex overflow-hidden border border-[#E4E1EE] bg-white"
+      style={{ borderRadius: 8 }}
+      role="group"
+      aria-label="Language"
+    >
+      {(["ko", "en"] as const).map((l) => (
+        <button
+          key={l}
+          type="button"
+          aria-pressed={lang === l}
+          onClick={() => setLang(l)}
+          className={
+            lang === l
+              ? "text-[12px] font-semibold bg-[#1A1626] text-white cursor-pointer"
+              : "text-[12px] font-medium text-[#7B7599] hover:text-[#C94B6E] transition-colors cursor-pointer"
+          }
+          style={{ paddingLeft: 12, paddingRight: 12, paddingTop: 6, paddingBottom: 6 }}
+        >
+          {l === "ko" ? "한국어" : "English"}
+        </button>
+      ))}
     </div>
   )
 }

@@ -70,9 +70,9 @@ section{margin-bottom:40px}
 figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
   display:flex;flex-direction:column}
 .figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
-figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure h3{margin:2px 0 8px;font-size:14px;font-weight:600;color:var(--text-primary)}
 figure svg{display:block;width:100%;height:auto;margin-block:auto}
-figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+figcaption{margin-top:10px;font-size:12px;line-height:1.6;color:var(--text-muted);text-align:center}
 .sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
 .sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
 .sv-ink{fill:var(--text-primary)} .sv-dim{fill:var(--text-muted)}
@@ -142,10 +142,6 @@ figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted
     <span class="badge" id="badge">BASICS</span>
     <div class="titlerow">
       <h1 id="title">Embedding</h1>
-      <div class="langs" role="group" aria-label="Language">
-        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
-        <button id="lang-en" type="button" aria-pressed="false">English</button>
-      </div>
     </div>
     <div class="meta" id="meta"></div>
 
@@ -200,20 +196,20 @@ const FIGURES = [
     en:{h:"Index numbers can’t tell you two words are alike", c:"The limit of treating words as indices in a vocabulary."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="28" width="152" height="98" rx="10"/>
-      <text class="sv-dim" x="30" y="52" font-size="10">${x("고양이","cat")}</text>
-      <text class="sv-dim" x="150" y="52" text-anchor="end" font-size="10">#1042</text>
+      <text class="sv-dim" x="30" y="52" font-size="11">${x("고양이","cat")}</text>
+      <text class="sv-dim" x="150" y="52" text-anchor="end" font-size="11">#1042</text>
       <path class="sv-line" opacity=".35" d="M30 62h120"/>
-      <text class="sv-dim" x="30" y="84" font-size="10">${x("고양잇과","feline")}</text>
-      <text class="sv-dim" x="150" y="84" text-anchor="end" font-size="10">#7781</text>
+      <text class="sv-dim" x="30" y="84" font-size="11">${x("고양잇과","feline")}</text>
+      <text class="sv-dim" x="150" y="84" text-anchor="end" font-size="11">#7781</text>
       <path class="sv-line" opacity=".35" d="M30 94h120"/>
-      <text class="sv-dim" x="30" y="116" font-size="10">${x("자동차","car")}</text>
-      <text class="sv-dim" x="150" y="116" text-anchor="end" font-size="10">#0032</text>
+      <text class="sv-dim" x="30" y="116" font-size="11">${x("자동차","car")}</text>
+      <text class="sv-dim" x="150" y="116" text-anchor="end" font-size="11">#0032</text>
 
       <path class="sv-line" d="M176 77h22"/><path class="sv-line" d="M192 72l7 5-7 5"/>
 
       <rect class="sv-ch-b" x="210" y="48" width="116" height="58" rx="10"/>
-      <text class="sv-ch-t" x="268" y="72" text-anchor="middle" font-size="9.5">${x("#1042 와 #7781","#1042 vs #7781")}</text>
-      <text class="sv-ch-t" x="268" y="94" text-anchor="middle" font-size="16" font-weight="700">?</text>`) },
+      <text class="sv-ch-t" x="268" y="72" text-anchor="middle" font-size="10.5">${x("#1042 와 #7781","#1042 vs #7781")}</text>
+      <text class="sv-ch-t" x="268" y="94" text-anchor="middle" font-size="17" font-weight="700">?</text>`) },
 
   { tag:"IDEA",
     ko:{h:"뜻이 비슷하면 가까운 자리에 놓는다", c:"낱말을 좌표로 바꾸면 닮음을 거리로 다룰 수 있다."},
@@ -222,13 +218,13 @@ const FIGURES = [
       <path class="sv-line" d="M34 120V34"/><path class="sv-line" d="M34 120h286"/>
       <path class="sv-line" d="M29 40l5-6 5 6"/><path class="sv-line" d="M314 115l6 5-6 5"/>
       <circle class="sv-vi-f" cx="116" cy="60" r="4.5"/>
-      <text class="sv-vi-t" x="126" y="58" font-size="9.5">${x("고양이","cat")}</text>
+      <text class="sv-vi-t" x="126" y="58" font-size="10.5">${x("고양이","cat")}</text>
       <circle class="sv-vi-f" cx="138" cy="76" r="4.5"/>
-      <text class="sv-vi-t" x="148" y="80" font-size="9.5">${x("고양잇과","feline")}</text>
+      <text class="sv-vi-t" x="148" y="80" font-size="10.5">${x("고양잇과","feline")}</text>
       <circle class="sv-vi-f" cx="104" cy="82" r="4.5"/>
-      <text class="sv-vi-t" x="60" y="86" font-size="9.5" text-anchor="end">${x("강아지","dog")}</text>
+      <text class="sv-vi-t" x="60" y="86" font-size="10.5" text-anchor="end">${x("강아지","dog")}</text>
       <circle class="sv-dot" style="fill:var(--text-muted)" cx="268" cy="104" r="4.5"/>
-      <text class="sv-dim" x="258" y="100" text-anchor="end" font-size="9.5">${x("자동차","car")}</text>
+      <text class="sv-dim" x="258" y="100" text-anchor="end" font-size="10.5">${x("자동차","car")}</text>
       <path class="sv-vi-b" style="fill:none;stroke-dasharray:4 4" d="M78 46h88v52H78z" opacity=".9"/>`) },
 
   { tag:"SOLUTION",
@@ -240,29 +236,29 @@ const FIGURES = [
       <path class="sv-line" d="M48 116L196 90"/>
       <path class="sv-line" style="stroke-linejoin:round" d="M187.1 88.4L196 90L188.2 94.5"/>
       <path style="fill:none;stroke:var(--violet-border);stroke-width:1.4" d="M83.2 86.4A46 46 0 0 1 93.3 108"/>
-      <text class="sv-vi-t" x="99" y="98" font-size="12" font-weight="500">θ</text>
+      <text class="sv-vi-t" x="99" y="98" font-size="13" font-weight="500">θ</text>
       <circle class="sv-ink" cx="48" cy="116" r="3"/>
-      <text class="sv-vi-t" x="148" y="38" font-size="9.5">${x("질문","query")}</text>
-      <text class="sv-dim" x="204" y="92" font-size="9.5">${x("문서 조각","a chunk")}</text>
-      <text class="sv-vi-t" x="286" y="46" text-anchor="middle" font-size="13" font-weight="700">${x("640차원","640-dim")}</text>
-      <text class="sv-dim" x="286" y="60" text-anchor="middle" font-size="9.5">${x("벡터 하나의 크기","one vector")}</text>`) },
+      <text class="sv-vi-t" x="148" y="38" font-size="10.5">${x("질문","query")}</text>
+      <text class="sv-dim" x="204" y="92" font-size="10.5">${x("문서 조각","a chunk")}</text>
+      <text class="sv-vi-t" x="286" y="46" text-anchor="middle" font-size="14" font-weight="700">${x("640차원","640-dim")}</text>
+      <text class="sv-dim" x="286" y="60" text-anchor="middle" font-size="10.5">${x("벡터 하나의 크기","one vector")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"뜻끼리 더하고 뺄 수 있다", c:"king − man + woman 의 결과는 queen 에 가장 가까웠다."},
     en:{h:"Meanings can be added and subtracted", c:"king − man + woman landed closest to queen."},
     art:(x)=>F(`
       <rect class="sv-box" x="10" y="60" width="58" height="34" rx="6"/>
-      <text class="sv-ink" x="39" y="82" text-anchor="middle" font-size="11" font-weight="500">king</text>
-      <text class="sv-dim" x="78" y="82" text-anchor="middle" font-size="14">−</text>
+      <text class="sv-ink" x="39" y="82" text-anchor="middle" font-size="12" font-weight="500">king</text>
+      <text class="sv-dim" x="78" y="82" text-anchor="middle" font-size="15">−</text>
       <rect class="sv-box" x="88" y="60" width="56" height="34" rx="6"/>
-      <text class="sv-ink" x="116" y="82" text-anchor="middle" font-size="11" font-weight="500">man</text>
-      <text class="sv-dim" x="154" y="82" text-anchor="middle" font-size="14">+</text>
+      <text class="sv-ink" x="116" y="82" text-anchor="middle" font-size="12" font-weight="500">man</text>
+      <text class="sv-dim" x="154" y="82" text-anchor="middle" font-size="15">+</text>
       <rect class="sv-box" x="164" y="60" width="68" height="34" rx="6"/>
-      <text class="sv-ink" x="198" y="82" text-anchor="middle" font-size="11" font-weight="500">woman</text>
+      <text class="sv-ink" x="198" y="82" text-anchor="middle" font-size="12" font-weight="500">woman</text>
       <path class="sv-gr-l" d="M240 77h16"/><path class="sv-gr-l" d="M252 72l6 5-6 5"/>
       <rect class="sv-gr-b" x="262" y="60" width="64" height="34" rx="6"/>
-      <text class="sv-gr-t" x="294" y="82" text-anchor="middle" font-size="12" font-weight="700">queen</text>
-      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="9.5">${x("벡터끼리의 셈","arithmetic on vectors")}</text>`) },
+      <text class="sv-gr-t" x="294" y="82" text-anchor="middle" font-size="13" font-weight="700">queen</text>
+      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="10.5">${x("벡터끼리의 셈","arithmetic on vectors")}</text>`) },
 ];
 
 const CHERRIES = [
@@ -424,7 +420,8 @@ function roadmap(){
   return `<svg viewBox="0 0 ${RM.W} ${Math.ceil(H)}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
 }
 
-let lang = "ko";
+/* 화면 언어는 앱 상단 바가 정한다(lib/lang.ts). 목업에서는 주소 뒤 ?lang=en 으로 본다. */
+let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "ko";
 function render(){
   const t = T[lang];
   document.getElementById("meta").innerHTML = t.meta
@@ -459,10 +456,6 @@ function render(){
     </div>`).join("");
 
   document.getElementById("roadmap").innerHTML = roadmap();
-  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
-  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
 }
-document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
-document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
 render();
 </script>

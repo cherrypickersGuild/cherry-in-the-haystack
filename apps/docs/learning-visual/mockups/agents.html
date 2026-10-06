@@ -70,9 +70,9 @@ section{margin-bottom:40px}
 figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
   display:flex;flex-direction:column}
 .figtag{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--cherry)}
-figure h3{margin:2px 0 8px;font-size:13px;font-weight:600;color:var(--text-primary)}
+figure h3{margin:2px 0 8px;font-size:14px;font-weight:600;color:var(--text-primary)}
 figure svg{display:block;width:100%;height:auto;margin-block:auto}
-figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted);text-align:center}
+figcaption{margin-top:10px;font-size:12px;line-height:1.6;color:var(--text-muted);text-align:center}
 .sv-box{fill:var(--card);stroke:var(--border);stroke-width:1.6}
 .sv-line{stroke:var(--text-muted);stroke-width:1.5;fill:none;stroke-linecap:round}
 .sv-ink{fill:var(--text-primary)} .sv-dim{fill:var(--text-muted)}
@@ -142,10 +142,6 @@ figcaption{margin-top:10px;font-size:11px;line-height:1.6;color:var(--text-muted
     <span class="badge" id="badge">BASICS</span>
     <div class="titlerow">
       <h1 id="title">Agents</h1>
-      <div class="langs" role="group" aria-label="Language">
-        <button id="lang-ko" type="button" aria-pressed="true">한국어</button>
-        <button id="lang-en" type="button" aria-pressed="false">English</button>
-      </div>
     </div>
     <div class="meta" id="meta"></div>
 
@@ -199,51 +195,51 @@ const FIGURES = [
     en:{h:"One question, one answer — nothing in between", c:"It must answer in a single pass, from what it already holds."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="52" width="68" height="30" rx="6"/>
-      <text class="sv-ink" x="48" y="72" text-anchor="middle" font-size="10.5" font-weight="500">${x("질문","question")}</text>
+      <text class="sv-ink" x="48" y="72" text-anchor="middle" font-size="11.5" font-weight="500">${x("질문","question")}</text>
       <path class="sv-line" d="M90 66h20"/><path class="sv-line" d="M104 61l7 5-7 5"/>
       <rect class="sv-box" x="120" y="44" width="92" height="46" rx="9"/>
-      <text class="sv-ink" x="166" y="72" text-anchor="middle" font-size="11.5" font-weight="500">MODEL</text>
+      <text class="sv-ink" x="166" y="72" text-anchor="middle" font-size="12.5" font-weight="500">MODEL</text>
       <path class="sv-line" d="M220 66h20"/><path class="sv-line" d="M234 61l7 5-7 5"/>
       <rect class="sv-box" x="250" y="52" width="60" height="30" rx="6"/>
-      <text class="sv-ink" x="280" y="72" text-anchor="middle" font-size="10.5" font-weight="500">${x("답","answer")}</text>
+      <text class="sv-ink" x="280" y="72" text-anchor="middle" font-size="11.5" font-weight="500">${x("답","answer")}</text>
       <rect class="sv-ch-b" x="120" y="100" width="92" height="22" rx="11"/>
-      <text class="sv-ch-t" x="166" y="115" text-anchor="middle" font-size="9.5">${x("바깥은 못 본다","can’t look outside")}</text>`) },
+      <text class="sv-ch-t" x="166" y="115" text-anchor="middle" font-size="10.5">${x("바깥은 못 본다","can’t look outside")}</text>`) },
 
   { tag:"IDEA",
     ko:{h:"생각과 행동을 번갈아 하게 한다", c:"생각이 계획을 세우고 고치면, 행동이 바깥에서 사실을 가져온다."},
     en:{h:"Let it alternate between thinking and acting", c:"Reasoning tracks the plan; acting reaches outside for facts."},
     art:(x)=>F(`
       <rect class="sv-vi-b" x="24" y="30" width="86" height="34" rx="8"/>
-      <text class="sv-vi-t" x="67" y="52" text-anchor="middle" font-size="10.5" font-weight="500">${x("생각","thought")}</text>
+      <text class="sv-vi-t" x="67" y="52" text-anchor="middle" font-size="11.5" font-weight="500">${x("생각","thought")}</text>
       <path class="sv-line" d="M116 47h40"/><path class="sv-line" d="M150 42l7 5-7 5"/>
       <rect class="sv-box" x="162" y="30" width="86" height="34" rx="8"/>
-      <text class="sv-ink" x="205" y="52" text-anchor="middle" font-size="10.5" font-weight="500">${x("행동","action")}</text>
+      <text class="sv-ink" x="205" y="52" text-anchor="middle" font-size="11.5" font-weight="500">${x("행동","action")}</text>
       <path class="sv-line" d="M254 47h26"/><path class="sv-line" d="M274 42l7 5-7 5"/>
       <rect class="sv-box" x="246" y="78" width="80" height="32" rx="8"/>
-      <text class="sv-dim" x="286" y="98" text-anchor="middle" font-size="10">${x("관찰","observation")}</text>
+      <text class="sv-dim" x="286" y="98" text-anchor="middle" font-size="11">${x("관찰","observation")}</text>
       <path class="sv-line" d="M286 64v10"/>
       <path class="sv-line" d="M240 94H112"/><path class="sv-line" d="M118 89l-7 5 7 5"/>
       <path class="sv-line" d="M67 70v24h40"/>
-      <text class="sv-dim" x="150" y="126" text-anchor="middle" font-size="9.5">${x("될 때까지 돌린다","round and round until done")}</text>`) },
+      <text class="sv-dim" x="150" y="126" text-anchor="middle" font-size="10.5">${x("될 때까지 돌린다","round and round until done")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"도구를 직접 골라 쓴다", c:"어떤 도구를 언제 부르고 무엇을 넘길지까지 모델이 정한다."},
     en:{h:"It picks up the tools itself", c:"Which tool to call, when, and with what arguments — the model decides."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="44" width="92" height="52" rx="9"/>
-      <text class="sv-ink" x="60" y="66" text-anchor="middle" font-size="11" font-weight="500">${x("에이전트","agent")}</text>
-      <text class="sv-dim" x="60" y="82" text-anchor="middle" font-size="8.8">${x("다음 수를 고른다","chooses the next move")}</text>
+      <text class="sv-ink" x="60" y="66" text-anchor="middle" font-size="12" font-weight="500">${x("에이전트","agent")}</text>
+      <text class="sv-dim" x="60" y="82" text-anchor="middle" font-size="9.8">${x("다음 수를 고른다","chooses the next move")}</text>
       <path class="sv-line" d="M114 50h40"/><path class="sv-line" d="M148 45l7 5-7 5"/>
       <path class="sv-line" d="M114 66h40"/><path class="sv-line" d="M148 61l7 5-7 5"/>
       <path class="sv-line" d="M114 82h40"/><path class="sv-line" d="M148 77l7 5-7 5"/>
       <rect class="sv-vi-b" x="164" y="36" width="104" height="28" rx="6"/>
-      <text class="sv-vi-t" x="216" y="54" text-anchor="middle" font-size="9.5">${x("검색","search")}</text>
+      <text class="sv-vi-t" x="216" y="54" text-anchor="middle" font-size="10.5">${x("검색","search")}</text>
       <rect class="sv-vi-b" x="164" y="68" width="104" height="28" rx="6"/>
-      <text class="sv-vi-t" x="216" y="86" text-anchor="middle" font-size="9.5">${x("계산","calculator")}</text>
+      <text class="sv-vi-t" x="216" y="86" text-anchor="middle" font-size="10.5">${x("계산","calculator")}</text>
       <rect class="sv-vi-b" x="164" y="100" width="104" height="24" rx="6"/>
-      <text class="sv-vi-t" x="216" y="116" text-anchor="middle" font-size="9.5">${x("코드 실행","run code")}</text>
+      <text class="sv-vi-t" x="216" y="116" text-anchor="middle" font-size="10.5">${x("코드 실행","run code")}</text>
       <path class="sv-line" d="M276 66h22"/><path class="sv-line" d="M292 61l7 5-7 5"/>
-      <text class="sv-dim" x="312" y="70" text-anchor="middle" font-size="9.5">${x("결과","result")}</text>`) },
+      <text class="sv-dim" x="312" y="70" text-anchor="middle" font-size="10.5">${x("결과","result")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"틀리면 스스로 돌아보고 다시 한다", c:"실패를 말로 적어 두고 다음 차례에 참고했을 때의 HumanEval 성적."},
@@ -251,11 +247,11 @@ const FIGURES = [
     art:(x)=>F(`
       <path class="sv-line" opacity=".5" d="M40 110h286"/>
       <rect class="sv-box" x="80" y="62" width="56" height="48" rx="3"/>
-      <text class="sv-dim" x="108" y="56" text-anchor="middle" font-size="11">80%</text>
-      <text class="sv-dim" x="108" y="126" text-anchor="middle" font-size="9.5">GPT-4</text>
+      <text class="sv-dim" x="108" y="56" text-anchor="middle" font-size="12">80%</text>
+      <text class="sv-dim" x="108" y="126" text-anchor="middle" font-size="10.5">GPT-4</text>
       <rect class="sv-gr-b" x="212" y="42" width="56" height="68" rx="3"/>
-      <text class="sv-gr-t" x="240" y="36" text-anchor="middle" font-size="13" font-weight="700">91%</text>
-      <text class="sv-gr-t" x="240" y="126" text-anchor="middle" font-size="9.5">Reflexion</text>
+      <text class="sv-gr-t" x="240" y="36" text-anchor="middle" font-size="14" font-weight="700">91%</text>
+      <text class="sv-gr-t" x="240" y="126" text-anchor="middle" font-size="10.5">Reflexion</text>
       <path class="sv-gr-l" d="M150 76h44"/><path class="sv-gr-l" d="M188 71l7 5-7 5"/>`) },
 ];
 
@@ -420,7 +416,8 @@ function roadmap(){
   return `<svg viewBox="0 0 ${RM.W} ${Math.ceil(H)}" role="img" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
 }
 
-let lang = "ko";
+/* 화면 언어는 앱 상단 바가 정한다(lib/lang.ts). 목업에서는 주소 뒤 ?lang=en 으로 본다. */
+let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "ko";
 function render(){
   const t = T[lang];
   document.getElementById("meta").innerHTML = t.meta
@@ -455,10 +452,6 @@ function render(){
     </div>`).join("");
 
   document.getElementById("roadmap").innerHTML = roadmap();
-  document.getElementById("lang-ko").setAttribute("aria-pressed", String(lang==="ko"));
-  document.getElementById("lang-en").setAttribute("aria-pressed", String(lang==="en"));
 }
-document.getElementById("lang-ko").addEventListener("click", ()=>{lang="ko";render();});
-document.getElementById("lang-en").addEventListener("click", ()=>{lang="en";render();});
 render();
 </script>

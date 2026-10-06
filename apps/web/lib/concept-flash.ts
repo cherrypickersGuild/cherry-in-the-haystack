@@ -50,51 +50,51 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
       <rect class="sv-card" x="20" y="34" width="52" height="60" rx="4"/>
       <rect class="sv-box" x="26" y="28" width="52" height="60" rx="4"/>
       <path class="sv-line" opacity=".6" d="M36 46h32M36 58h32M36 70h20"/>
-      <text class="sv-ch-t" x="46" y="126" text-anchor="middle" font-size="10.5" font-weight="700">${x("예시 수천~수만","1000s of examples")}</text>
+      <text class="sv-ch-t" x="46" y="126" text-anchor="middle" font-size="11.5" font-weight="700">${x("예시 수천~수만","1000s of examples")}</text>
       <path class="sv-line" d="M92 66h20"/><path class="sv-line" d="M106 61l7 5-7 5"/>
       <rect class="sv-box" x="122" y="44" width="80" height="44" rx="8"/>
-      <text class="sv-ink" x="162" y="71" text-anchor="middle" font-size="11" font-weight="500">${x("미세조정","fine-tune")}</text>
+      <text class="sv-ink" x="162" y="71" text-anchor="middle" font-size="12" font-weight="500">${x("미세조정","fine-tune")}</text>
       <path class="sv-line" d="M212 66h20"/><path class="sv-line" d="M226 61l7 5-7 5"/>
       <rect class="sv-box" x="242" y="40" width="84" height="52" rx="9"/>
-      <text class="sv-ink" x="284" y="62" text-anchor="middle" font-size="11" font-weight="500">MODEL</text>
-      <text class="sv-dim" x="284" y="78" text-anchor="middle" font-size="8.8">${x("이 과제 전용","for this task only")}</text>
-      <text class="sv-dim" x="212" y="126" text-anchor="middle" font-size="9.5">${x("과제가 늘면 처음부터 다시","a new task starts over")}</text>`) },
+      <text class="sv-ink" x="284" y="62" text-anchor="middle" font-size="12" font-weight="500">MODEL</text>
+      <text class="sv-dim" x="284" y="78" text-anchor="middle" font-size="9.8">${x("이 과제 전용","for this task only")}</text>
+      <text class="sv-dim" x="212" y="126" text-anchor="middle" font-size="10.5">${x("과제가 늘면 처음부터 다시","a new task starts over")}</text>`) },
 
   { tag:"IDEA",
     ko:{h:"모델은 그대로 두고 할 일을 글로 적어 넣는다", c:"가중치를 한 번도 갱신하지 않고, 지시와 예시를 글로만 전달한다."},
     en:{h:"Leave the model alone and write the task into the text", c:"No gradient updates — the task and its examples arrive purely as text."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="28" width="128" height="76" rx="8"/>
-      <text class="sv-dim" x="28" y="48" font-size="9">${x("프롬프트","prompt")}</text>
+      <text class="sv-dim" x="28" y="48" font-size="10">${x("프롬프트","prompt")}</text>
       <path class="sv-line" opacity=".55" d="M28 62h100M28 76h100M28 90h62"/>
-      <text class="sv-dim" x="78" y="126" text-anchor="middle" font-size="9.5">${x("지시 + 예시","instruction + examples")}</text>
+      <text class="sv-dim" x="78" y="126" text-anchor="middle" font-size="10.5">${x("지시 + 예시","instruction + examples")}</text>
       <path class="sv-line" d="M152 66h20"/><path class="sv-line" d="M166 61l7 5-7 5"/>
       <rect class="sv-box" x="182" y="40" width="88" height="52" rx="9"/>
-      <text class="sv-ink" x="226" y="64" text-anchor="middle" font-size="11.5" font-weight="500">MODEL</text>
-      <text class="sv-dim" x="226" y="80" text-anchor="middle" font-size="8.8">${x("가중치 그대로","weights untouched")}</text>
+      <text class="sv-ink" x="226" y="64" text-anchor="middle" font-size="12.5" font-weight="500">MODEL</text>
+      <text class="sv-dim" x="226" y="80" text-anchor="middle" font-size="9.8">${x("가중치 그대로","weights untouched")}</text>
       <rect class="sv-box" x="246" y="30" width="16" height="13" rx="2"/>
       <path class="sv-line" d="M249 30v-4a5 5 0 0 1 10 0v4"/>
       <path class="sv-line" d="M280 66h20"/><path class="sv-line" d="M294 61l7 5-7 5"/>
-      <text class="sv-ink" x="318" y="70" text-anchor="middle" font-size="11" font-weight="500">${x("답","answer")}</text>`) },
+      <text class="sv-ink" x="318" y="70" text-anchor="middle" font-size="12" font-weight="500">${x("답","answer")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"답을 내기 전에 중간 단계를 쓰게 한다", c:"생각의 사슬 — 예시 여덟 개면 큰 모형의 추론이 달라진다."},
     en:{h:"Make it write the steps before the answer", c:"Chain of thought — eight exemplars change how a large model reasons."},
     art:(x)=>F(`
       <rect class="sv-box" x="12" y="52" width="72" height="30" rx="6"/>
-      <text class="sv-ink" x="48" y="72" text-anchor="middle" font-size="10.5" font-weight="500">${x("질문","question")}</text>
+      <text class="sv-ink" x="48" y="72" text-anchor="middle" font-size="11.5" font-weight="500">${x("질문","question")}</text>
       <path class="sv-line" d="M92 66h18"/><path class="sv-line" d="M106 61l7 5-7 5"/>
       <rect class="sv-vi-b" x="120" y="28" width="118" height="76" rx="8"/>
-      <text class="sv-vi-t" x="134" y="48" font-size="9.5">1</text>
+      <text class="sv-vi-t" x="134" y="48" font-size="10.5">1</text>
       <path class="sv-line" opacity=".5" d="M146 44h78"/>
-      <text class="sv-vi-t" x="134" y="70" font-size="9.5">2</text>
+      <text class="sv-vi-t" x="134" y="70" font-size="10.5">2</text>
       <path class="sv-line" opacity=".5" d="M146 66h78"/>
-      <text class="sv-vi-t" x="134" y="92" font-size="9.5">3</text>
+      <text class="sv-vi-t" x="134" y="92" font-size="10.5">3</text>
       <path class="sv-line" opacity=".5" d="M146 88h52"/>
-      <text class="sv-vi-t" x="179" y="126" text-anchor="middle" font-size="10.5" font-weight="700">${x("중간 단계","the steps")}</text>
+      <text class="sv-vi-t" x="179" y="126" text-anchor="middle" font-size="11.5" font-weight="700">${x("중간 단계","the steps")}</text>
       <path class="sv-line" d="M248 66h18"/><path class="sv-line" d="M262 61l7 5-7 5"/>
       <rect class="sv-box" x="276" y="52" width="50" height="30" rx="6"/>
-      <text class="sv-ink" x="301" y="72" text-anchor="middle" font-size="10.5" font-weight="500">${x("답","answer")}</text>`) },
+      <text class="sv-ink" x="301" y="72" text-anchor="middle" font-size="11.5" font-weight="500">${x("답","answer")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"한 줄을 덧붙이자 정답률이 네 배가 됐다", c:"답 앞에 “차근차근 생각해 보자”를 붙였을 때의 GSM8K 정답률."},
@@ -102,11 +102,11 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     art:(x)=>F(`
       <path class="sv-line" opacity=".5" d="M40 104h286"/>
       <rect class="sv-box" x="74" y="90" width="56" height="14" rx="3"/>
-      <text class="sv-dim" x="102" y="84" text-anchor="middle" font-size="11">10.4%</text>
-      <text class="sv-dim" x="102" y="126" text-anchor="middle" font-size="9.5">${x("그냥 물었을 때","asked plainly")}</text>
+      <text class="sv-dim" x="102" y="84" text-anchor="middle" font-size="12">10.4%</text>
+      <text class="sv-dim" x="102" y="126" text-anchor="middle" font-size="10.5">${x("그냥 물었을 때","asked plainly")}</text>
       <rect class="sv-gr-b" x="206" y="48" width="56" height="56" rx="3"/>
-      <text class="sv-gr-t" x="234" y="42" text-anchor="middle" font-size="13" font-weight="700">40.7%</text>
-      <text class="sv-gr-t" x="234" y="126" text-anchor="middle" font-size="9.5">${x("한 줄을 붙였을 때","with the one line")}</text>
+      <text class="sv-gr-t" x="234" y="42" text-anchor="middle" font-size="14" font-weight="700">40.7%</text>
+      <text class="sv-gr-t" x="234" y="126" text-anchor="middle" font-size="10.5">${x("한 줄을 붙였을 때","with the one line")}</text>
       <path class="sv-gr-l" d="M144 72h44"/><path class="sv-gr-l" d="M182 67l7 5-7 5"/>`) },
 ],
     cherries: [
@@ -154,17 +154,17 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     en:{h:"The knowledge inside is stuck at training time", c:"The memory can’t be revised or expanded."},
     art:(x)=>F(`
       <rect class="sv-box" x="16" y="28" width="150" height="98" rx="10"/>
-      <text class="sv-ink" x="91" y="68" text-anchor="middle" font-size="13" font-weight="500">MODEL</text>
+      <text class="sv-ink" x="91" y="68" text-anchor="middle" font-size="14" font-weight="500">MODEL</text>
       <rect class="sv-box" style="fill:var(--secondary)" x="36" y="82" width="110" height="22" rx="11"/>
-      <text class="sv-dim" x="91" y="97" text-anchor="middle" font-size="9.5">${x("학습한 지식","trained knowledge")}</text>
+      <text class="sv-dim" x="91" y="97" text-anchor="middle" font-size="10.5">${x("학습한 지식","trained knowledge")}</text>
 
       <path class="sv-ch-b" d="M196 62 L208 50 H306 Q316 50 316 60 V64 Q316 74 306 74 H208 Z"/>
       <circle style="fill:var(--card);stroke:var(--cherry-border);stroke-width:1.1" cx="218" cy="62" r="3"/>
-      <text class="sv-ch-t" x="266" y="65.5" text-anchor="middle" font-size="8.5" font-weight="700" letter-spacing="1">OUTDATED</text>
+      <text class="sv-ch-t" x="266" y="65.5" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing="1">OUTDATED</text>
 
       <path class="sv-ch-b" d="M196 92 L208 80 H306 Q316 80 316 90 V94 Q316 104 306 104 H208 Z"/>
       <circle style="fill:var(--card);stroke:var(--cherry-border);stroke-width:1.1" cx="218" cy="92" r="3"/>
-      <text class="sv-ch-t" x="266" y="95.5" text-anchor="middle" font-size="8.5" font-weight="700" letter-spacing="1">HALLUCINATION</text>`) },
+      <text class="sv-ch-t" x="266" y="95.5" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing="1">HALLUCINATION</text>`) },
 
   { tag:"IDEA",
     ko:{h:"지식을 모델밖에서 가져올 수 있을까?", c:"위키피디아를 100단어씩 잘라 2,100만 조각으로 만들었다."},
@@ -172,48 +172,48 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     art:(x)=>F(`
       <rect class="sv-box" x="16" y="28" width="50" height="76" rx="5"/>
       <path class="sv-line" opacity=".8" d="M26 48h30M26 62h30M26 76h20"/>
-      <text class="sv-dim" x="41" y="126" text-anchor="middle" font-size="9.5">${x("문서","documents")}</text>
+      <text class="sv-dim" x="41" y="126" text-anchor="middle" font-size="10.5">${x("문서","documents")}</text>
       <path class="sv-line" d="M74 66h24"/><path class="sv-line" d="M92 61l7 5-7 5"/>
       <g class="sv-vi-f" opacity=".85"><rect x="110" y="34" width="40" height="16" rx="3"/>
         <rect x="110" y="58" width="40" height="16" rx="3"/><rect x="110" y="82" width="40" height="16" rx="3"/></g>
-      <text class="sv-dim" x="130" y="126" text-anchor="middle" font-size="9.5">${x("조각","chunks")}</text>
+      <text class="sv-dim" x="130" y="126" text-anchor="middle" font-size="10.5">${x("조각","chunks")}</text>
       <path class="sv-line" d="M158 66h24"/><path class="sv-line" d="M176 61l7 5-7 5"/>
       <rect class="sv-vi-b" x="192" y="28" width="130" height="76" rx="8"/>
-      <text class="sv-vi-t" x="257" y="60" text-anchor="middle" font-size="12" font-weight="500">${x("색인","Index")}</text>
-      <text class="sv-vi-t" x="257" y="82" text-anchor="middle" font-size="14" font-weight="700">${x("2,100만","21M")}</text>
-      <text class="sv-dim" x="257" y="126" text-anchor="middle" font-size="9.5">${x("모델 밖","outside the model")}</text>`) },
+      <text class="sv-vi-t" x="257" y="60" text-anchor="middle" font-size="13" font-weight="500">${x("색인","Index")}</text>
+      <text class="sv-vi-t" x="257" y="82" text-anchor="middle" font-size="15" font-weight="700">${x("2,100만","21M")}</text>
+      <text class="sv-dim" x="257" y="126" text-anchor="middle" font-size="10.5">${x("모델 밖","outside the model")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"질문마다 관련지식을 함께 꺼낸다.", c:"질문마다 5~10조각을 꺼내 질문 뒤에 붙인다."},
     en:{h:"Pull the related knowledge with every question.", c:"5–10 retrieved chunks are concatenated after each query."},
     art:(x)=>F(`
       <rect class="sv-box" x="12" y="51" width="68" height="30" rx="6"/>
-      <text class="sv-ink" x="46" y="71" text-anchor="middle" font-size="10.5" font-weight="500">${x("질문","query")}</text>
+      <text class="sv-ink" x="46" y="71" text-anchor="middle" font-size="11.5" font-weight="500">${x("질문","query")}</text>
       <path class="sv-line" d="M88 66h22"/><path class="sv-line" d="M104 61l7 5-7 5"/>
       <rect class="sv-vi-b" x="118" y="35" width="76" height="62" rx="8"/>
-      <text class="sv-vi-t" x="156" y="61" text-anchor="middle" font-size="11" font-weight="500">${x("색인에서 찾기","retrieve")}</text>
-      <text class="sv-vi-t" x="156" y="81" text-anchor="middle" font-size="13" font-weight="700">k = 5~10</text>
+      <text class="sv-vi-t" x="156" y="61" text-anchor="middle" font-size="12" font-weight="500">${x("색인에서 찾기","retrieve")}</text>
+      <text class="sv-vi-t" x="156" y="81" text-anchor="middle" font-size="14" font-weight="700">k = 5~10</text>
       <path class="sv-line" d="M202 66h22"/><path class="sv-line" d="M218 61l7 5-7 5"/>
       <rect class="sv-box" x="232" y="39" width="94" height="54" rx="9"/>
-      <text class="sv-ink" x="279" y="62" text-anchor="middle" font-size="12" font-weight="500">MODEL</text>
-      <text class="sv-dim" x="279" y="79" text-anchor="middle" font-size="9.5">${x("질문 + 조각","query + chunks")}</text>
-      <text class="sv-dim" x="156" y="126" text-anchor="middle" font-size="9.5">${x("질문마다 새로","fresh every time")}</text>`) },
+      <text class="sv-ink" x="279" y="62" text-anchor="middle" font-size="13" font-weight="500">MODEL</text>
+      <text class="sv-dim" x="279" y="79" text-anchor="middle" font-size="10.5">${x("질문 + 조각","query + chunks")}</text>
+      <text class="sv-dim" x="156" y="126" text-anchor="middle" font-size="10.5">${x("질문마다 새로","fresh every time")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"학습하지 않은 전문지식도 활용가능해진다.", c:"2018년을 물으면 2016년 색인은 4%, 2018년 색인은 68% 맞혔다."},
     en:{h:"Expertise it never trained on becomes usable.", c:"Asked about 2018: the 2016 index scored 4%, the 2018 index 68%."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="28" width="120" height="34" rx="6"/>
-      <text class="sv-dim" x="28" y="49" font-size="10">${x("2016 색인","2016 index")}</text>
-      <text class="sv-dim" x="120" y="49" text-anchor="end" font-size="12">4%</text>
+      <text class="sv-dim" x="28" y="49" font-size="11">${x("2016 색인","2016 index")}</text>
+      <text class="sv-dim" x="120" y="49" text-anchor="end" font-size="13">4%</text>
       <rect class="sv-gr-b" x="14" y="70" width="120" height="34" rx="6"/>
-      <text class="sv-gr-t" x="28" y="91" font-size="10">${x("2018 색인","2018 index")}</text>
-      <text class="sv-gr-t" x="120" y="91" text-anchor="end" font-size="13" font-weight="700">68%</text>
+      <text class="sv-gr-t" x="28" y="91" font-size="11">${x("2018 색인","2018 index")}</text>
+      <text class="sv-gr-t" x="120" y="91" text-anchor="end" font-size="14" font-weight="700">68%</text>
       <path class="sv-gr-l" d="M146 66h32"/><path class="sv-gr-l" d="M172 61l7 5-7 5"/>
       <rect class="sv-box" x="190" y="39" width="134" height="54" rx="9"/>
-      <text class="sv-ink" x="257" y="62" text-anchor="middle" font-size="12" font-weight="500">MODEL</text>
-      <text class="sv-dim" x="257" y="79" text-anchor="middle" font-size="9.5">${x("그대로 · 재학습 없음","unchanged · no retraining")}</text>
-      <text class="sv-dim" x="74" y="126" text-anchor="middle" font-size="9.5">${x("2018년을 물었을 때","when asked about 2018")}</text>`) },
+      <text class="sv-ink" x="257" y="62" text-anchor="middle" font-size="13" font-weight="500">MODEL</text>
+      <text class="sv-dim" x="257" y="79" text-anchor="middle" font-size="10.5">${x("그대로 · 재학습 없음","unchanged · no retraining")}</text>
+      <text class="sv-dim" x="74" y="126" text-anchor="middle" font-size="10.5">${x("2018년을 물었을 때","when asked about 2018")}</text>`) },
 ],
     cherries: [
   { who:"Vannevar Bush", role:{ko:"「As We May Think」 · 1945",en:"“As We May Think” · 1945"},
@@ -260,61 +260,61 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     en:{h:"A new task meant training from scratch", c:"Each task needed its own architecture changes and its own training run."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="36" width="76" height="60" rx="8"/>
-      <text class="sv-dim" x="52" y="70" text-anchor="middle" font-size="10">${x("과제 A","task A")}</text>
-      <text class="sv-dim" x="52" y="126" text-anchor="middle" font-size="9.5">${x("전용 모델","its own model")}</text>
+      <text class="sv-dim" x="52" y="70" text-anchor="middle" font-size="11">${x("과제 A","task A")}</text>
+      <text class="sv-dim" x="52" y="126" text-anchor="middle" font-size="10.5">${x("전용 모델","its own model")}</text>
       <rect class="sv-box" x="104" y="36" width="76" height="60" rx="8"/>
-      <text class="sv-dim" x="142" y="70" text-anchor="middle" font-size="10">${x("과제 B","task B")}</text>
-      <text class="sv-dim" x="142" y="126" text-anchor="middle" font-size="9.5">${x("전용 모델","its own model")}</text>
+      <text class="sv-dim" x="142" y="70" text-anchor="middle" font-size="11">${x("과제 B","task B")}</text>
+      <text class="sv-dim" x="142" y="126" text-anchor="middle" font-size="10.5">${x("전용 모델","its own model")}</text>
       <rect class="sv-box" x="194" y="36" width="76" height="60" rx="8"/>
-      <text class="sv-dim" x="232" y="70" text-anchor="middle" font-size="10">${x("과제 C","task C")}</text>
-      <text class="sv-dim" x="232" y="126" text-anchor="middle" font-size="9.5">${x("전용 모델","its own model")}</text>
-      <text class="sv-ch-t" x="300" y="70" text-anchor="middle" font-size="12" font-weight="700">···</text>
-      <text class="sv-ch-t" x="300" y="88" text-anchor="middle" font-size="9.5">${x("계속","and on")}</text>`) },
+      <text class="sv-dim" x="232" y="70" text-anchor="middle" font-size="11">${x("과제 C","task C")}</text>
+      <text class="sv-dim" x="232" y="126" text-anchor="middle" font-size="10.5">${x("전용 모델","its own model")}</text>
+      <text class="sv-ch-t" x="300" y="70" text-anchor="middle" font-size="13" font-weight="700">···</text>
+      <text class="sv-ch-t" x="300" y="88" text-anchor="middle" font-size="10.5">${x("계속","and on")}</text>`) },
 
   { tag:"IDEA",
     ko:{h:"이미 배운 모델을 가져와 조금 더 가르친다", c:"예시 100개만으로도 100배 많은 자료로 처음부터 학습한 것과 맞먹었다."},
     en:{h:"Take a model that already learned, then teach it a little more", c:"With only 100 labeled examples it matched training from scratch on 100× more data."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="38" width="96" height="56" rx="9"/>
-      <text class="sv-ink" x="62" y="62" text-anchor="middle" font-size="11" font-weight="500">${x("사전학습","pre-trained")}</text>
-      <text class="sv-dim" x="62" y="78" text-anchor="middle" font-size="8.8">${x("이미 배운 모델","already trained")}</text>
+      <text class="sv-ink" x="62" y="62" text-anchor="middle" font-size="12" font-weight="500">${x("사전학습","pre-trained")}</text>
+      <text class="sv-dim" x="62" y="78" text-anchor="middle" font-size="9.8">${x("이미 배운 모델","already trained")}</text>
       <path class="sv-line" d="M120 66h20"/><path class="sv-line" d="M134 61l7 5-7 5"/>
       <rect class="sv-card" x="150" y="48" width="18" height="36" rx="3"/>
       <rect class="sv-card" x="172" y="48" width="18" height="36" rx="3"/>
-      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("내 예시 100개","100 examples")}</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="12" font-weight="700">${x("내 예시 100개","100 examples")}</text>
       <path class="sv-line" d="M200 66h20"/><path class="sv-line" d="M214 61l7 5-7 5"/>
       <rect class="sv-gr-b" x="230" y="38" width="96" height="56" rx="9"/>
-      <text class="sv-gr-t" x="278" y="62" text-anchor="middle" font-size="11" font-weight="500">${x("내 과제용","tuned for my task")}</text>
-      <text class="sv-dim" x="278" y="78" text-anchor="middle" font-size="8.8">${x("같은 모델, 조금 더","same model, a bit more")}</text>`) },
+      <text class="sv-gr-t" x="278" y="62" text-anchor="middle" font-size="12" font-weight="500">${x("내 과제용","tuned for my task")}</text>
+      <text class="sv-dim" x="278" y="78" text-anchor="middle" font-size="9.8">${x("같은 모델, 조금 더","same model, a bit more")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"전부 바꾸지 않고 작은 부품만 바꾼다", c:"학습해야 할 값이 1만분의 1로 줄고, 그래픽 메모리는 3분의 1이 된다."},
     en:{h:"Change a small part instead of the whole thing", c:"10,000× fewer trainable parameters and a third of the GPU memory."},
     art:(x)=>F(`
       <rect class="sv-box" x="26" y="28" width="150" height="76" rx="10"/>
-      <text class="sv-dim" x="101" y="50" text-anchor="middle" font-size="9.5">${x("원래 가중치","original weights")}</text>
-      <text class="sv-dim" x="101" y="70" text-anchor="middle" font-size="9">${x("그대로 얼려 둔다","kept frozen")}</text>
+      <text class="sv-dim" x="101" y="50" text-anchor="middle" font-size="10.5">${x("원래 가중치","original weights")}</text>
+      <text class="sv-dim" x="101" y="70" text-anchor="middle" font-size="10">${x("그대로 얼려 둔다","kept frozen")}</text>
       <rect class="sv-vi-b" x="62" y="78" width="78" height="20" rx="10"/>
-      <text class="sv-vi-t" x="101" y="92" text-anchor="middle" font-size="9.5" font-weight="600">${x("작은 어댑터","small adapter")}</text>
+      <text class="sv-vi-t" x="101" y="92" text-anchor="middle" font-size="10.5" font-weight="600">${x("작은 어댑터","small adapter")}</text>
       <path class="sv-line" d="M186 66h22"/><path class="sv-line" d="M202 61l7 5-7 5"/>
-      <text class="sv-vi-t" x="272" y="62" text-anchor="middle" font-size="15" font-weight="700">1 / 10,000</text>
-      <text class="sv-dim" x="272" y="80" text-anchor="middle" font-size="9.5">${x("학습하는 값의 수","trainable parameters")}</text>`) },
+      <text class="sv-vi-t" x="272" y="62" text-anchor="middle" font-size="16" font-weight="700">1 / 10,000</text>
+      <text class="sv-dim" x="272" y="80" text-anchor="middle" font-size="10.5">${x("학습하는 값의 수","trainable parameters")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"100배 작은 모델이 더 나은 답을 낸다", c:"사람 평가에서 13억 모델의 답이 1750억 모델의 답보다 선호됐다."},
     en:{h:"A 100× smaller model gives the better answer", c:"Human raters preferred the 1.3B model’s answers over those of the 175B model."},
     art:(x)=>F(`
       <rect class="sv-box" x="18" y="34" width="120" height="30" rx="6"/>
-      <text class="sv-dim" x="34" y="54" font-size="10">GPT-3</text>
-      <text class="sv-dim" x="126" y="54" text-anchor="end" font-size="11">175B</text>
+      <text class="sv-dim" x="34" y="54" font-size="11">GPT-3</text>
+      <text class="sv-dim" x="126" y="54" text-anchor="end" font-size="12">175B</text>
       <rect class="sv-gr-b" x="18" y="80" width="120" height="30" rx="6"/>
-      <text class="sv-gr-t" x="34" y="100" font-size="10">InstructGPT</text>
-      <text class="sv-gr-t" x="126" y="100" text-anchor="end" font-size="12" font-weight="700">1.3B</text>
+      <text class="sv-gr-t" x="34" y="100" font-size="11">InstructGPT</text>
+      <text class="sv-gr-t" x="126" y="100" text-anchor="end" font-size="13" font-weight="700">1.3B</text>
       <path class="sv-gr-l" d="M150 72h30"/><path class="sv-gr-l" d="M174 67l7 5-7 5"/>
       <rect class="sv-box" x="192" y="44" width="134" height="52" rx="9"/>
-      <text class="sv-ink" x="259" y="66" text-anchor="middle" font-size="11" font-weight="500">${x("사람이 고른 쪽","what people preferred")}</text>
-      <text class="sv-gr-t" x="259" y="83" text-anchor="middle" font-size="10" font-weight="600">InstructGPT</text>
-      <text class="sv-dim" x="78" y="126" text-anchor="middle" font-size="9.5">${x("같은 질문, 두 답","same prompts, two answers")}</text>`) },
+      <text class="sv-ink" x="259" y="66" text-anchor="middle" font-size="12" font-weight="500">${x("사람이 고른 쪽","what people preferred")}</text>
+      <text class="sv-gr-t" x="259" y="83" text-anchor="middle" font-size="11" font-weight="600">InstructGPT</text>
+      <text class="sv-dim" x="78" y="126" text-anchor="middle" font-size="10.5">${x("같은 질문, 두 답","same prompts, two answers")}</text>`) },
 ],
     cherries: [
   { who:"Ilya Sutskever", role:{ko:"NeurIPS 2024 (전언)",en:"NeurIPS 2024 (as reported)"},
@@ -361,51 +361,51 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     en:{h:"One question, one answer — nothing in between", c:"It must answer in a single pass, from what it already holds."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="52" width="68" height="30" rx="6"/>
-      <text class="sv-ink" x="48" y="72" text-anchor="middle" font-size="10.5" font-weight="500">${x("질문","question")}</text>
+      <text class="sv-ink" x="48" y="72" text-anchor="middle" font-size="11.5" font-weight="500">${x("질문","question")}</text>
       <path class="sv-line" d="M90 66h20"/><path class="sv-line" d="M104 61l7 5-7 5"/>
       <rect class="sv-box" x="120" y="44" width="92" height="46" rx="9"/>
-      <text class="sv-ink" x="166" y="72" text-anchor="middle" font-size="11.5" font-weight="500">MODEL</text>
+      <text class="sv-ink" x="166" y="72" text-anchor="middle" font-size="12.5" font-weight="500">MODEL</text>
       <path class="sv-line" d="M220 66h20"/><path class="sv-line" d="M234 61l7 5-7 5"/>
       <rect class="sv-box" x="250" y="52" width="60" height="30" rx="6"/>
-      <text class="sv-ink" x="280" y="72" text-anchor="middle" font-size="10.5" font-weight="500">${x("답","answer")}</text>
+      <text class="sv-ink" x="280" y="72" text-anchor="middle" font-size="11.5" font-weight="500">${x("답","answer")}</text>
       <rect class="sv-ch-b" x="120" y="100" width="92" height="22" rx="11"/>
-      <text class="sv-ch-t" x="166" y="115" text-anchor="middle" font-size="9.5">${x("바깥은 못 본다","can’t look outside")}</text>`) },
+      <text class="sv-ch-t" x="166" y="115" text-anchor="middle" font-size="10.5">${x("바깥은 못 본다","can’t look outside")}</text>`) },
 
   { tag:"IDEA",
     ko:{h:"생각과 행동을 번갈아 하게 한다", c:"생각이 계획을 세우고 고치면, 행동이 바깥에서 사실을 가져온다."},
     en:{h:"Let it alternate between thinking and acting", c:"Reasoning tracks the plan; acting reaches outside for facts."},
     art:(x)=>F(`
       <rect class="sv-vi-b" x="24" y="30" width="86" height="34" rx="8"/>
-      <text class="sv-vi-t" x="67" y="52" text-anchor="middle" font-size="10.5" font-weight="500">${x("생각","thought")}</text>
+      <text class="sv-vi-t" x="67" y="52" text-anchor="middle" font-size="11.5" font-weight="500">${x("생각","thought")}</text>
       <path class="sv-line" d="M116 47h40"/><path class="sv-line" d="M150 42l7 5-7 5"/>
       <rect class="sv-box" x="162" y="30" width="86" height="34" rx="8"/>
-      <text class="sv-ink" x="205" y="52" text-anchor="middle" font-size="10.5" font-weight="500">${x("행동","action")}</text>
+      <text class="sv-ink" x="205" y="52" text-anchor="middle" font-size="11.5" font-weight="500">${x("행동","action")}</text>
       <path class="sv-line" d="M254 47h26"/><path class="sv-line" d="M274 42l7 5-7 5"/>
       <rect class="sv-box" x="246" y="78" width="80" height="32" rx="8"/>
-      <text class="sv-dim" x="286" y="98" text-anchor="middle" font-size="10">${x("관찰","observation")}</text>
+      <text class="sv-dim" x="286" y="98" text-anchor="middle" font-size="11">${x("관찰","observation")}</text>
       <path class="sv-line" d="M286 64v10"/>
       <path class="sv-line" d="M240 94H112"/><path class="sv-line" d="M118 89l-7 5 7 5"/>
       <path class="sv-line" d="M67 70v24h40"/>
-      <text class="sv-dim" x="150" y="126" text-anchor="middle" font-size="9.5">${x("될 때까지 돌린다","round and round until done")}</text>`) },
+      <text class="sv-dim" x="150" y="126" text-anchor="middle" font-size="10.5">${x("될 때까지 돌린다","round and round until done")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"도구를 직접 골라 쓴다", c:"어떤 도구를 언제 부르고 무엇을 넘길지까지 모델이 정한다."},
     en:{h:"It picks up the tools itself", c:"Which tool to call, when, and with what arguments — the model decides."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="44" width="92" height="52" rx="9"/>
-      <text class="sv-ink" x="60" y="66" text-anchor="middle" font-size="11" font-weight="500">${x("에이전트","agent")}</text>
-      <text class="sv-dim" x="60" y="82" text-anchor="middle" font-size="8.8">${x("다음 수를 고른다","chooses the next move")}</text>
+      <text class="sv-ink" x="60" y="66" text-anchor="middle" font-size="12" font-weight="500">${x("에이전트","agent")}</text>
+      <text class="sv-dim" x="60" y="82" text-anchor="middle" font-size="9.8">${x("다음 수를 고른다","chooses the next move")}</text>
       <path class="sv-line" d="M114 50h40"/><path class="sv-line" d="M148 45l7 5-7 5"/>
       <path class="sv-line" d="M114 66h40"/><path class="sv-line" d="M148 61l7 5-7 5"/>
       <path class="sv-line" d="M114 82h40"/><path class="sv-line" d="M148 77l7 5-7 5"/>
       <rect class="sv-vi-b" x="164" y="36" width="104" height="28" rx="6"/>
-      <text class="sv-vi-t" x="216" y="54" text-anchor="middle" font-size="9.5">${x("검색","search")}</text>
+      <text class="sv-vi-t" x="216" y="54" text-anchor="middle" font-size="10.5">${x("검색","search")}</text>
       <rect class="sv-vi-b" x="164" y="68" width="104" height="28" rx="6"/>
-      <text class="sv-vi-t" x="216" y="86" text-anchor="middle" font-size="9.5">${x("계산","calculator")}</text>
+      <text class="sv-vi-t" x="216" y="86" text-anchor="middle" font-size="10.5">${x("계산","calculator")}</text>
       <rect class="sv-vi-b" x="164" y="100" width="104" height="24" rx="6"/>
-      <text class="sv-vi-t" x="216" y="116" text-anchor="middle" font-size="9.5">${x("코드 실행","run code")}</text>
+      <text class="sv-vi-t" x="216" y="116" text-anchor="middle" font-size="10.5">${x("코드 실행","run code")}</text>
       <path class="sv-line" d="M276 66h22"/><path class="sv-line" d="M292 61l7 5-7 5"/>
-      <text class="sv-dim" x="312" y="70" text-anchor="middle" font-size="9.5">${x("결과","result")}</text>`) },
+      <text class="sv-dim" x="312" y="70" text-anchor="middle" font-size="10.5">${x("결과","result")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"틀리면 스스로 돌아보고 다시 한다", c:"실패를 말로 적어 두고 다음 차례에 참고했을 때의 HumanEval 성적."},
@@ -413,11 +413,11 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     art:(x)=>F(`
       <path class="sv-line" opacity=".5" d="M40 110h286"/>
       <rect class="sv-box" x="80" y="62" width="56" height="48" rx="3"/>
-      <text class="sv-dim" x="108" y="56" text-anchor="middle" font-size="11">80%</text>
-      <text class="sv-dim" x="108" y="126" text-anchor="middle" font-size="9.5">GPT-4</text>
+      <text class="sv-dim" x="108" y="56" text-anchor="middle" font-size="12">80%</text>
+      <text class="sv-dim" x="108" y="126" text-anchor="middle" font-size="10.5">GPT-4</text>
       <rect class="sv-gr-b" x="212" y="42" width="56" height="68" rx="3"/>
-      <text class="sv-gr-t" x="240" y="36" text-anchor="middle" font-size="13" font-weight="700">91%</text>
-      <text class="sv-gr-t" x="240" y="126" text-anchor="middle" font-size="9.5">Reflexion</text>
+      <text class="sv-gr-t" x="240" y="36" text-anchor="middle" font-size="14" font-weight="700">91%</text>
+      <text class="sv-gr-t" x="240" y="126" text-anchor="middle" font-size="10.5">Reflexion</text>
       <path class="sv-gr-l" d="M150 76h44"/><path class="sv-gr-l" d="M188 71l7 5-7 5"/>`) },
 ],
     cherries: [
@@ -466,20 +466,20 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     en:{h:"Index numbers can’t tell you two words are alike", c:"The limit of treating words as indices in a vocabulary."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="28" width="152" height="98" rx="10"/>
-      <text class="sv-dim" x="30" y="52" font-size="10">${x("고양이","cat")}</text>
-      <text class="sv-dim" x="150" y="52" text-anchor="end" font-size="10">#1042</text>
+      <text class="sv-dim" x="30" y="52" font-size="11">${x("고양이","cat")}</text>
+      <text class="sv-dim" x="150" y="52" text-anchor="end" font-size="11">#1042</text>
       <path class="sv-line" opacity=".35" d="M30 62h120"/>
-      <text class="sv-dim" x="30" y="84" font-size="10">${x("고양잇과","feline")}</text>
-      <text class="sv-dim" x="150" y="84" text-anchor="end" font-size="10">#7781</text>
+      <text class="sv-dim" x="30" y="84" font-size="11">${x("고양잇과","feline")}</text>
+      <text class="sv-dim" x="150" y="84" text-anchor="end" font-size="11">#7781</text>
       <path class="sv-line" opacity=".35" d="M30 94h120"/>
-      <text class="sv-dim" x="30" y="116" font-size="10">${x("자동차","car")}</text>
-      <text class="sv-dim" x="150" y="116" text-anchor="end" font-size="10">#0032</text>
+      <text class="sv-dim" x="30" y="116" font-size="11">${x("자동차","car")}</text>
+      <text class="sv-dim" x="150" y="116" text-anchor="end" font-size="11">#0032</text>
 
       <path class="sv-line" d="M176 77h22"/><path class="sv-line" d="M192 72l7 5-7 5"/>
 
       <rect class="sv-ch-b" x="210" y="48" width="116" height="58" rx="10"/>
-      <text class="sv-ch-t" x="268" y="72" text-anchor="middle" font-size="9.5">${x("#1042 와 #7781","#1042 vs #7781")}</text>
-      <text class="sv-ch-t" x="268" y="94" text-anchor="middle" font-size="16" font-weight="700">?</text>`) },
+      <text class="sv-ch-t" x="268" y="72" text-anchor="middle" font-size="10.5">${x("#1042 와 #7781","#1042 vs #7781")}</text>
+      <text class="sv-ch-t" x="268" y="94" text-anchor="middle" font-size="17" font-weight="700">?</text>`) },
 
   { tag:"IDEA",
     ko:{h:"뜻이 비슷하면 가까운 자리에 놓는다", c:"낱말을 좌표로 바꾸면 닮음을 거리로 다룰 수 있다."},
@@ -488,13 +488,13 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
       <path class="sv-line" d="M34 120V34"/><path class="sv-line" d="M34 120h286"/>
       <path class="sv-line" d="M29 40l5-6 5 6"/><path class="sv-line" d="M314 115l6 5-6 5"/>
       <circle class="sv-vi-f" cx="116" cy="60" r="4.5"/>
-      <text class="sv-vi-t" x="126" y="58" font-size="9.5">${x("고양이","cat")}</text>
+      <text class="sv-vi-t" x="126" y="58" font-size="10.5">${x("고양이","cat")}</text>
       <circle class="sv-vi-f" cx="138" cy="76" r="4.5"/>
-      <text class="sv-vi-t" x="148" y="80" font-size="9.5">${x("고양잇과","feline")}</text>
+      <text class="sv-vi-t" x="148" y="80" font-size="10.5">${x("고양잇과","feline")}</text>
       <circle class="sv-vi-f" cx="104" cy="82" r="4.5"/>
-      <text class="sv-vi-t" x="60" y="86" font-size="9.5" text-anchor="end">${x("강아지","dog")}</text>
+      <text class="sv-vi-t" x="60" y="86" font-size="10.5" text-anchor="end">${x("강아지","dog")}</text>
       <circle class="sv-dot" style="fill:var(--text-muted)" cx="268" cy="104" r="4.5"/>
-      <text class="sv-dim" x="258" y="100" text-anchor="end" font-size="9.5">${x("자동차","car")}</text>
+      <text class="sv-dim" x="258" y="100" text-anchor="end" font-size="10.5">${x("자동차","car")}</text>
       <path class="sv-vi-b" style="fill:none;stroke-dasharray:4 4" d="M78 46h88v52H78z" opacity=".9"/>`) },
 
   { tag:"SOLUTION",
@@ -506,29 +506,29 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
       <path class="sv-line" d="M48 116L196 90"/>
       <path class="sv-line" style="stroke-linejoin:round" d="M187.1 88.4L196 90L188.2 94.5"/>
       <path style="fill:none;stroke:var(--violet-border);stroke-width:1.4" d="M83.2 86.4A46 46 0 0 1 93.3 108"/>
-      <text class="sv-vi-t" x="99" y="98" font-size="12" font-weight="500">θ</text>
+      <text class="sv-vi-t" x="99" y="98" font-size="13" font-weight="500">θ</text>
       <circle class="sv-ink" cx="48" cy="116" r="3"/>
-      <text class="sv-vi-t" x="148" y="38" font-size="9.5">${x("질문","query")}</text>
-      <text class="sv-dim" x="204" y="92" font-size="9.5">${x("문서 조각","a chunk")}</text>
-      <text class="sv-vi-t" x="286" y="46" text-anchor="middle" font-size="13" font-weight="700">${x("640차원","640-dim")}</text>
-      <text class="sv-dim" x="286" y="60" text-anchor="middle" font-size="9.5">${x("벡터 하나의 크기","one vector")}</text>`) },
+      <text class="sv-vi-t" x="148" y="38" font-size="10.5">${x("질문","query")}</text>
+      <text class="sv-dim" x="204" y="92" font-size="10.5">${x("문서 조각","a chunk")}</text>
+      <text class="sv-vi-t" x="286" y="46" text-anchor="middle" font-size="14" font-weight="700">${x("640차원","640-dim")}</text>
+      <text class="sv-dim" x="286" y="60" text-anchor="middle" font-size="10.5">${x("벡터 하나의 크기","one vector")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"뜻끼리 더하고 뺄 수 있다", c:"king − man + woman 의 결과는 queen 에 가장 가까웠다."},
     en:{h:"Meanings can be added and subtracted", c:"king − man + woman landed closest to queen."},
     art:(x)=>F(`
       <rect class="sv-box" x="10" y="60" width="58" height="34" rx="6"/>
-      <text class="sv-ink" x="39" y="82" text-anchor="middle" font-size="11" font-weight="500">king</text>
-      <text class="sv-dim" x="78" y="82" text-anchor="middle" font-size="14">−</text>
+      <text class="sv-ink" x="39" y="82" text-anchor="middle" font-size="12" font-weight="500">king</text>
+      <text class="sv-dim" x="78" y="82" text-anchor="middle" font-size="15">−</text>
       <rect class="sv-box" x="88" y="60" width="56" height="34" rx="6"/>
-      <text class="sv-ink" x="116" y="82" text-anchor="middle" font-size="11" font-weight="500">man</text>
-      <text class="sv-dim" x="154" y="82" text-anchor="middle" font-size="14">+</text>
+      <text class="sv-ink" x="116" y="82" text-anchor="middle" font-size="12" font-weight="500">man</text>
+      <text class="sv-dim" x="154" y="82" text-anchor="middle" font-size="15">+</text>
       <rect class="sv-box" x="164" y="60" width="68" height="34" rx="6"/>
-      <text class="sv-ink" x="198" y="82" text-anchor="middle" font-size="11" font-weight="500">woman</text>
+      <text class="sv-ink" x="198" y="82" text-anchor="middle" font-size="12" font-weight="500">woman</text>
       <path class="sv-gr-l" d="M240 77h16"/><path class="sv-gr-l" d="M252 72l6 5-6 5"/>
       <rect class="sv-gr-b" x="262" y="60" width="64" height="34" rx="6"/>
-      <text class="sv-gr-t" x="294" y="82" text-anchor="middle" font-size="12" font-weight="700">queen</text>
-      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="9.5">${x("벡터끼리의 셈","arithmetic on vectors")}</text>`) },
+      <text class="sv-gr-t" x="294" y="82" text-anchor="middle" font-size="13" font-weight="700">queen</text>
+      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="10.5">${x("벡터끼리의 셈","arithmetic on vectors")}</text>`) },
 ],
     cherries: [
   { who:"Pandu Nayak", role:{ko:"Google 검색 부사장 · 2019 (전언)",en:"VP of Search, Google · 2019 (as reported)"},
@@ -576,67 +576,67 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     en:{h:"Scored by matching words against one reference answer", c:"Metrics borrowed from translation correlated very weakly with human judgement, and not at all in the technical domain."},
     art:(x)=>F(`
       <rect class="sv-box" x="12" y="36" width="92" height="26" rx="6"/>
-      <text class="sv-dim" x="58" y="53" text-anchor="middle" font-size="10">${x("모델 답","model answer")}</text>
+      <text class="sv-dim" x="58" y="53" text-anchor="middle" font-size="11">${x("모델 답","model answer")}</text>
       <rect class="sv-box" x="12" y="70" width="92" height="26" rx="6"/>
-      <text class="sv-dim" x="58" y="87" text-anchor="middle" font-size="10">${x("정답지 한 장","one reference")}</text>
+      <text class="sv-dim" x="58" y="87" text-anchor="middle" font-size="11">${x("정답지 한 장","one reference")}</text>
       <path class="sv-line" d="M112 66h20"/><path class="sv-line" d="M126 61l7 5-7 5"/>
       <rect class="sv-box" x="140" y="44" width="86" height="44" rx="8"/>
-      <text class="sv-ink" x="183" y="62" text-anchor="middle" font-size="10.5">${x("겹친 낱말을","count the words")}</text>
-      <text class="sv-dim" x="183" y="78" text-anchor="middle" font-size="9.5">${x("세어 채점","they share")}</text>
+      <text class="sv-ink" x="183" y="62" text-anchor="middle" font-size="11.5">${x("겹친 낱말을","count the words")}</text>
+      <text class="sv-dim" x="183" y="78" text-anchor="middle" font-size="10.5">${x("세어 채점","they share")}</text>
       <path class="sv-line" d="M234 66h20"/><path class="sv-line" d="M248 61l7 5-7 5"/>
       <rect class="sv-ch-b" x="262" y="44" width="66" height="44" rx="8"/>
-      <text class="sv-ch-t" x="295" y="62" text-anchor="middle" font-size="9.5">${x("사람 판단과","unrelated to")}</text>
-      <text class="sv-ch-t" x="295" y="77" text-anchor="middle" font-size="9.5">${x("거의 무관","human judgement")}</text>`) },
+      <text class="sv-ch-t" x="295" y="62" text-anchor="middle" font-size="10.5">${x("사람 판단과","unrelated to")}</text>
+      <text class="sv-ch-t" x="295" y="77" text-anchor="middle" font-size="10.5">${x("거의 무관","human judgement")}</text>`) },
 
   { tag:"IDEA",
     ko:{h:"두 답을 나란히 놓고 더 나은 쪽을 고른다", c:"공개 플랫폼에서 모은 표로 순위를 만들었고, 그 표는 전문 평가자의 판단과도 잘 맞았다."},
     en:{h:"Put two answers side by side and pick the better one", c:"Votes gathered on an open platform became the ranking, and they agreed well with expert raters."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="36" width="86" height="26" rx="6"/>
-      <text class="sv-dim" x="57" y="53" text-anchor="middle" font-size="10">${x("답 A","answer A")}</text>
+      <text class="sv-dim" x="57" y="53" text-anchor="middle" font-size="11">${x("답 A","answer A")}</text>
       <rect class="sv-box" x="14" y="70" width="86" height="26" rx="6"/>
-      <text class="sv-dim" x="57" y="87" text-anchor="middle" font-size="10">${x("답 B","answer B")}</text>
+      <text class="sv-dim" x="57" y="87" text-anchor="middle" font-size="11">${x("답 B","answer B")}</text>
       <path class="sv-line" d="M108 66h20"/><path class="sv-line" d="M122 61l7 5-7 5"/>
       <rect class="sv-vi-b" x="136" y="44" width="76" height="44" rx="8"/>
-      <text class="sv-vi-t" x="174" y="61" text-anchor="middle" font-size="9.5">${x("더 나은 쪽에","one vote for")}</text>
-      <text class="sv-vi-t" x="174" y="78" text-anchor="middle" font-size="11" font-weight="600">${x("한 표","the better")}</text>
-      <text class="sv-gr-t" x="174" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("모은 표 24만","240K votes")}</text>
+      <text class="sv-vi-t" x="174" y="61" text-anchor="middle" font-size="10.5">${x("더 나은 쪽에","one vote for")}</text>
+      <text class="sv-vi-t" x="174" y="78" text-anchor="middle" font-size="12" font-weight="600">${x("한 표","the better")}</text>
+      <text class="sv-gr-t" x="174" y="126" text-anchor="middle" font-size="12" font-weight="700">${x("모은 표 24만","240K votes")}</text>
       <path class="sv-line" d="M220 66h20"/><path class="sv-line" d="M234 61l7 5-7 5"/>
       <rect class="sv-box" x="248" y="34" width="78" height="64" rx="8"/>
       <rect class="sv-ch-b" x="258" y="43" width="58" height="13" rx="3"/>
       <rect class="sv-box" x="258" y="60" width="58" height="13" rx="3"/>
       <rect class="sv-box" x="258" y="77" width="58" height="13" rx="3"/>
-      <text class="sv-dim" x="287" y="126" text-anchor="middle" font-size="9.5">${x("순위","ranking")}</text>`) },
+      <text class="sv-dim" x="287" y="126" text-anchor="middle" font-size="10.5">${x("순위","ranking")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"사람 대신 강한 모델이 심판을 본다", c:"어느 답을 왜 골랐는지까지 쓰게 하면, 비싸서 많이 할 수 없던 사람 평가를 대신할 수 있다."},
     en:{h:"A strong model sits as the judge instead of people", c:"Made to state which answer it picked and why, it stands in for human rating that was too expensive to scale."},
     art:(x)=>F(`
       <rect class="sv-box" x="12" y="36" width="76" height="26" rx="6"/>
-      <text class="sv-dim" x="50" y="53" text-anchor="middle" font-size="10">${x("답 A","answer A")}</text>
+      <text class="sv-dim" x="50" y="53" text-anchor="middle" font-size="11">${x("답 A","answer A")}</text>
       <rect class="sv-box" x="12" y="70" width="76" height="26" rx="6"/>
-      <text class="sv-dim" x="50" y="87" text-anchor="middle" font-size="10">${x("답 B","answer B")}</text>
+      <text class="sv-dim" x="50" y="87" text-anchor="middle" font-size="11">${x("답 B","answer B")}</text>
       <path class="sv-line" d="M96 66h20"/><path class="sv-line" d="M110 61l7 5-7 5"/>
       <rect class="sv-vi-b" x="124" y="38" width="88" height="56" rx="9"/>
-      <text class="sv-vi-t" x="168" y="62" text-anchor="middle" font-size="11" font-weight="600">${x("심판 모델","the judge")}</text>
-      <text class="sv-vi-t" x="168" y="78" text-anchor="middle" font-size="9" font-weight="400">GPT-4</text>
+      <text class="sv-vi-t" x="168" y="62" text-anchor="middle" font-size="12" font-weight="600">${x("심판 모델","the judge")}</text>
+      <text class="sv-vi-t" x="168" y="78" text-anchor="middle" font-size="10" font-weight="400">GPT-4</text>
       <path class="sv-line" d="M220 66h20"/><path class="sv-line" d="M234 61l7 5-7 5"/>
       <rect class="sv-box" x="248" y="38" width="78" height="56" rx="9"/>
-      <text class="sv-ink" x="287" y="60" text-anchor="middle" font-size="10.5">${x("고른 답","the pick")}</text>
-      <text class="sv-dim" x="287" y="77" text-anchor="middle" font-size="9.5">${x("고른 이유","and the reason")}</text>`) },
+      <text class="sv-ink" x="287" y="60" text-anchor="middle" font-size="11.5">${x("고른 답","the pick")}</text>
+      <text class="sv-dim" x="287" y="77" text-anchor="middle" font-size="10.5">${x("고른 이유","and the reason")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"채점을 사람 수준으로 자동화할 수 있다", c:"심판 모델과 사람의 판단이 80% 넘게 일치했다. 사람끼리 일치하는 정도와 같은 수준이다."},
     en:{h:"Scoring can be automated at human level", c:"The judge agreed with human preference over 80% of the time — the same level at which humans agree with each other."},
     art:(x)=>F(`
       <rect class="sv-gr-b" x="14" y="40" width="130" height="52" rx="9"/>
-      <text class="sv-gr-t" x="79" y="60" text-anchor="middle" font-size="9.5">${x("심판 모델 ↔ 사람","judge ↔ human")}</text>
-      <text class="sv-gr-t" x="79" y="81" text-anchor="middle" font-size="17" font-weight="700">80% +</text>
+      <text class="sv-gr-t" x="79" y="60" text-anchor="middle" font-size="10.5">${x("심판 모델 ↔ 사람","judge ↔ human")}</text>
+      <text class="sv-gr-t" x="79" y="81" text-anchor="middle" font-size="18" font-weight="700">80% +</text>
       <path class="sv-gr-l" d="M154 66h26"/><path class="sv-gr-l" d="M174 61l7 5-7 5"/>
       <rect class="sv-box" x="192" y="40" width="134" height="52" rx="9"/>
-      <text class="sv-ink" x="259" y="60" text-anchor="middle" font-size="10.5">${x("사람 ↔ 사람","human ↔ human")}</text>
-      <text class="sv-dim" x="259" y="79" text-anchor="middle" font-size="10">${x("일치하는 정도와 같다","agree at the same rate")}</text>
-      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="9.5">${x("같은 질문, 같은 두 답","same question, same two answers")}</text>`) },
+      <text class="sv-ink" x="259" y="60" text-anchor="middle" font-size="11.5">${x("사람 ↔ 사람","human ↔ human")}</text>
+      <text class="sv-dim" x="259" y="79" text-anchor="middle" font-size="11">${x("일치하는 정도와 같다","agree at the same rate")}</text>
+      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="10.5">${x("같은 질문, 같은 두 답","same question, same two answers")}</text>`) },
 ],
     cherries: [
   { who:"Alan Turing", role:{ko:"Mind · 1950",en:"Mind · 1950"},
@@ -684,75 +684,75 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     en:{h:"Chain of Thought — make it write the steps, not the answer", c:"Eight exemplars took GSM8K to state of the art; one added sentence moved it from 10.4% to 40.7%."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="52" width="58" height="28" rx="6"/>
-      <text class="sv-dim" x="43" y="70" text-anchor="middle" font-size="9.5">${x("생각 1","step 1")}</text>
+      <text class="sv-dim" x="43" y="70" text-anchor="middle" font-size="10.5">${x("생각 1","step 1")}</text>
       <path class="sv-line" d="M76 66h12"/><path class="sv-line" d="M84 61l6 5-6 5"/>
       <rect class="sv-box" x="102" y="52" width="58" height="28" rx="6"/>
-      <text class="sv-dim" x="131" y="70" text-anchor="middle" font-size="9.5">${x("생각 2","step 2")}</text>
+      <text class="sv-dim" x="131" y="70" text-anchor="middle" font-size="10.5">${x("생각 2","step 2")}</text>
       <path class="sv-line" d="M164 66h12"/><path class="sv-line" d="M172 61l6 5-6 5"/>
       <rect class="sv-box" x="190" y="52" width="58" height="28" rx="6"/>
-      <text class="sv-dim" x="219" y="70" text-anchor="middle" font-size="9.5">${x("생각 3","step 3")}</text>
+      <text class="sv-dim" x="219" y="70" text-anchor="middle" font-size="10.5">${x("생각 3","step 3")}</text>
       <path class="sv-line" d="M252 66h12"/><path class="sv-line" d="M260 61l6 5-6 5"/>
       <rect class="sv-gr-b" x="278" y="52" width="48" height="28" rx="6"/>
-      <text class="sv-gr-t" x="302" y="70" text-anchor="middle" font-size="9.5">${x("답","answer")}</text>
-      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="10.5" font-weight="700">${x("\u201C단계별로 생각해 봅시다\u201D","\u201CLet\u2019s think step by step\u201D")}</text>`) },
+      <text class="sv-gr-t" x="302" y="70" text-anchor="middle" font-size="10.5">${x("답","answer")}</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11.5" font-weight="700">${x("\u201C단계별로 생각해 봅시다\u201D","\u201CLet\u2019s think step by step\u201D")}</text>`) },
 
   { tag:"IDEA 2",
     ko:{h:"자기일관성 — 여러 길로 풀고 많이 나온 답을 고른다", c:"복잡한 문제는 여러 갈래로 풀어도 같은 정답에 이른다. GSM8K가 17.9%포인트 올랐다."},
     en:{h:"Self-Consistency — solve it several ways, take what recurs", c:"A complex problem admits several ways of thinking that reach its one correct answer. GSM8K rose 17.9 points."},
     art:(x)=>F(`
       <rect class="sv-box" x="10" y="52" width="54" height="28" rx="6"/>
-      <text class="sv-dim" x="37" y="70" text-anchor="middle" font-size="9.5">${x("질문","question")}</text>
+      <text class="sv-dim" x="37" y="70" text-anchor="middle" font-size="10.5">${x("질문","question")}</text>
       <path class="sv-line" d="M64 66L92 41"/><path class="sv-line" d="M64 66h28"/><path class="sv-line" d="M64 66L92 93"/>
       <rect class="sv-box" x="92" y="30" width="64" height="22" rx="5"/>
-      <text class="sv-dim" x="124" y="45" text-anchor="middle" font-size="9">${x("길 A","path A")}</text>
+      <text class="sv-dim" x="124" y="45" text-anchor="middle" font-size="10">${x("길 A","path A")}</text>
       <rect class="sv-box" x="92" y="56" width="64" height="22" rx="5"/>
-      <text class="sv-dim" x="124" y="71" text-anchor="middle" font-size="9">${x("길 B","path B")}</text>
+      <text class="sv-dim" x="124" y="71" text-anchor="middle" font-size="10">${x("길 B","path B")}</text>
       <rect class="sv-box" x="92" y="82" width="64" height="22" rx="5"/>
-      <text class="sv-dim" x="124" y="97" text-anchor="middle" font-size="9">${x("길 C","path C")}</text>
+      <text class="sv-dim" x="124" y="97" text-anchor="middle" font-size="10">${x("길 C","path C")}</text>
       <path class="sv-line" d="M156 41L236 66"/><path class="sv-line" d="M156 67h80"/><path class="sv-line" d="M156 93L236 66"/>
       <rect class="sv-gr-b" x="244" y="48" width="84" height="36" rx="8"/>
-      <text class="sv-gr-t" x="286" y="71" text-anchor="middle" font-size="10.5">${x("가장 많이 나온 답","the answer that recurs")}</text>
-      <text class="sv-gr-t" x="124" y="126" text-anchor="middle" font-size="11" font-weight="700">GSM8K +17.9%</text>`) },
+      <text class="sv-gr-t" x="286" y="71" text-anchor="middle" font-size="11.5">${x("가장 많이 나온 답","the answer that recurs")}</text>
+      <text class="sv-gr-t" x="124" y="126" text-anchor="middle" font-size="12" font-weight="700">GSM8K +17.9%</text>`) },
 
   { tag:"IDEA 3",
     ko:{h:"생각의 나무 — 펼쳐 보고 막히면 되돌아간다", c:"여러 갈래를 스스로 평가해 앞을 내다본다. 24 게임 성공률이 4%에서 74%로 올랐다."},
     en:{h:"Tree of Thoughts — branch out, back up at a dead end", c:"It self-evaluates the branches and looks ahead. On Game of 24 the success rate went from 4% to 74%."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="52" width="48" height="28" rx="6"/>
-      <text class="sv-dim" x="38" y="70" text-anchor="middle" font-size="9.5">${x("생각","thought")}</text>
+      <text class="sv-dim" x="38" y="70" text-anchor="middle" font-size="10.5">${x("생각","thought")}</text>
       <path class="sv-line" d="M62 66L84 41"/><path class="sv-line" d="M62 66L84 93"/>
       <rect class="sv-box" x="84" y="30" width="56" height="22" rx="5"/>
-      <text class="sv-dim" x="112" y="45" text-anchor="middle" font-size="9">${x("가지 1","branch 1")}</text>
+      <text class="sv-dim" x="112" y="45" text-anchor="middle" font-size="10">${x("가지 1","branch 1")}</text>
       <rect class="sv-box" x="84" y="82" width="56" height="22" rx="5"/>
-      <text class="sv-dim" x="112" y="97" text-anchor="middle" font-size="9">${x("가지 2","branch 2")}</text>
+      <text class="sv-dim" x="112" y="97" text-anchor="middle" font-size="10">${x("가지 2","branch 2")}</text>
       <path class="sv-line" d="M140 41h18"/><path class="sv-line" d="M140 93h18"/>
       <rect class="sv-ch-b" x="158" y="30" width="56" height="22" rx="5"/>
-      <text class="sv-ch-t" x="186" y="45" text-anchor="middle" font-size="9">${x("막힘","dead end")}</text>
+      <text class="sv-ch-t" x="186" y="45" text-anchor="middle" font-size="10">${x("막힘","dead end")}</text>
       <rect class="sv-gr-b" x="158" y="82" width="56" height="22" rx="5"/>
-      <text class="sv-gr-t" x="186" y="97" text-anchor="middle" font-size="9">${x("계속","keep going")}</text>
+      <text class="sv-gr-t" x="186" y="97" text-anchor="middle" font-size="10">${x("계속","keep going")}</text>
       <path class="sv-line" d="M214 41h20v52h-12" stroke-dasharray="4 3"/>
       <path class="sv-line" d="M228 88l-6 5 6 5"/>
-      <text class="sv-dim" x="276" y="52" text-anchor="middle" font-size="9">${x("되돌아간다","backtrack")}</text>
-      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("24 게임 성공률 74%","Game of 24: 74%")}</text>`) },
+      <text class="sv-dim" x="276" y="52" text-anchor="middle" font-size="10">${x("되돌아간다","backtrack")}</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="12" font-weight="700">${x("24 게임 성공률 74%","Game of 24: 74%")}</text>`) },
 
   { tag:"IDEA 4",
     ko:{h:"리액트 — 생각과 행동을 번갈아 한다", c:"밖의 자료로 환각과 오류 전파를 끊는다. ALFWorld 성공률이 34%포인트 올랐다."},
     en:{h:"ReAct — alternate thinking and acting", c:"Outside sources break hallucination and error propagation. ALFWorld success rose 34 points."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="36" width="76" height="26" rx="6"/>
-      <text class="sv-dim" x="52" y="53" text-anchor="middle" font-size="10">${x("생각","reason")}</text>
+      <text class="sv-dim" x="52" y="53" text-anchor="middle" font-size="11">${x("생각","reason")}</text>
       <rect class="sv-box" x="14" y="74" width="76" height="26" rx="6"/>
-      <text class="sv-dim" x="52" y="91" text-anchor="middle" font-size="10">${x("행동","act")}</text>
+      <text class="sv-dim" x="52" y="91" text-anchor="middle" font-size="11">${x("행동","act")}</text>
       <path class="sv-line" d="M40 62v8"/><path class="sv-line" d="M36 66l4 5 4-5"/>
       <path class="sv-line" d="M64 74v-8"/><path class="sv-line" d="M60 70l4-5 4 5"/>
       <path class="sv-line" d="M94 66h14"/><path class="sv-line" d="M102 61l6 5-6 5"/>
       <rect class="sv-vi-b" x="116" y="44" width="86" height="44" rx="9"/>
-      <text class="sv-vi-t" x="159" y="62" text-anchor="middle" font-size="10.5">${x("밖의 자료","outside source")}</text>
-      <text class="sv-vi-t" x="159" y="78" text-anchor="middle" font-size="9">${x("검색해 확인","look it up")}</text>
+      <text class="sv-vi-t" x="159" y="62" text-anchor="middle" font-size="11.5">${x("밖의 자료","outside source")}</text>
+      <text class="sv-vi-t" x="159" y="78" text-anchor="middle" font-size="10">${x("검색해 확인","look it up")}</text>
       <path class="sv-gr-l" d="M210 66h16"/><path class="sv-gr-l" d="M220 61l6 5-6 5"/>
       <rect class="sv-gr-b" x="234" y="44" width="92" height="44" rx="9"/>
-      <text class="sv-gr-t" x="280" y="68" text-anchor="middle" font-size="17" font-weight="700">+34%</text>
-      <text class="sv-dim" x="280" y="126" text-anchor="middle" font-size="9.5">${x("ALFWorld 성공률","ALFWorld success")}</text>`) },
+      <text class="sv-gr-t" x="280" y="68" text-anchor="middle" font-size="18" font-weight="700">+34%</text>
+      <text class="sv-dim" x="280" y="126" text-anchor="middle" font-size="10.5">${x("ALFWorld 성공률","ALFWorld success")}</text>`) },
 ],
     cherries: [
   { who:"Shunyu Yao", role:{ko:"ReAct·ToT 저자 · 2025",en:"author of ReAct & ToT · 2025"},
@@ -800,64 +800,64 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     en:{h:"It answers each piece and still fails to compose them", c:"In the GPT-3 family single-hop accuracy improved faster than multi-hop, so the compositionality gap did not shrink."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="34" width="104" height="26" rx="6"/>
-      <text class="sv-dim" x="66" y="51" text-anchor="middle" font-size="9.5">${x("하위 질문 1 — 맞음","sub-question 1 — right")}</text>
+      <text class="sv-dim" x="66" y="51" text-anchor="middle" font-size="10.5">${x("하위 질문 1 — 맞음","sub-question 1 — right")}</text>
       <rect class="sv-box" x="14" y="72" width="104" height="26" rx="6"/>
-      <text class="sv-dim" x="66" y="89" text-anchor="middle" font-size="9.5">${x("하위 질문 2 — 맞음","sub-question 2 — right")}</text>
+      <text class="sv-dim" x="66" y="89" text-anchor="middle" font-size="10.5">${x("하위 질문 2 — 맞음","sub-question 2 — right")}</text>
       <path class="sv-line" d="M126 48h14v36h-14" /><path class="sv-line" d="M148 66h16"/><path class="sv-line" d="M158 61l6 5-6 5"/>
       <rect class="sv-ch-b" x="172" y="44" width="154" height="44" rx="9"/>
-      <text class="sv-ch-t" x="249" y="62" text-anchor="middle" font-size="11" font-weight="600">${x("합친 답은 틀린다","the composed answer is wrong")}</text>
-      <text class="sv-ch-t" x="249" y="78" text-anchor="middle" font-size="9">${x("둘을 잇는 사실을 함께 본 적이 없다","never seen the two facts together")}</text>`) },
+      <text class="sv-ch-t" x="249" y="62" text-anchor="middle" font-size="12" font-weight="600">${x("합친 답은 틀린다","the composed answer is wrong")}</text>
+      <text class="sv-ch-t" x="249" y="78" text-anchor="middle" font-size="10">${x("둘을 잇는 사실을 함께 본 적이 없다","never seen the two facts together")}</text>`) },
 
   { tag:"IDEA",
     ko:{h:"한 번의 검색으로 답할 크기까지 질문을 쪼갠다", c:"모델이 스스로 후속 질문을 묻고 답한 뒤 처음 질문에 답한다. 쪼갠 질문은 검색엔진에 그대로 넣을 수 있다."},
     en:{h:"Split the question down to what one search can answer", c:"The model asks itself follow-up questions and answers them first — and each one can be handed straight to a search engine."},
     art:(x)=>F(`
       <rect class="sv-box" x="10" y="52" width="66" height="28" rx="6"/>
-      <text class="sv-dim" x="43" y="70" text-anchor="middle" font-size="9.5">${x("복합 질문","one question")}</text>
+      <text class="sv-dim" x="43" y="70" text-anchor="middle" font-size="10.5">${x("복합 질문","one question")}</text>
       <path class="sv-line" d="M76 66L104 41"/><path class="sv-line" d="M76 66h28"/><path class="sv-line" d="M76 66L104 93"/>
       <rect class="sv-vi-b" x="104" y="30" width="86" height="22" rx="5"/>
-      <text class="sv-vi-t" x="147" y="45" text-anchor="middle" font-size="9">${x("후속 질문 1","follow-up 1")}</text>
+      <text class="sv-vi-t" x="147" y="45" text-anchor="middle" font-size="10">${x("후속 질문 1","follow-up 1")}</text>
       <rect class="sv-vi-b" x="104" y="56" width="86" height="22" rx="5"/>
-      <text class="sv-vi-t" x="147" y="71" text-anchor="middle" font-size="9">${x("후속 질문 2","follow-up 2")}</text>
+      <text class="sv-vi-t" x="147" y="71" text-anchor="middle" font-size="10">${x("후속 질문 2","follow-up 2")}</text>
       <rect class="sv-vi-b" x="104" y="82" width="86" height="22" rx="5"/>
-      <text class="sv-vi-t" x="147" y="97" text-anchor="middle" font-size="9">${x("후속 질문 3","follow-up 3")}</text>
+      <text class="sv-vi-t" x="147" y="97" text-anchor="middle" font-size="10">${x("후속 질문 3","follow-up 3")}</text>
       <path class="sv-line" d="M194 41h16"/><path class="sv-line" d="M204 36l6 5-6 5"/>
       <path class="sv-line" d="M194 67h16"/><path class="sv-line" d="M204 62l6 5-6 5"/>
       <path class="sv-line" d="M194 93h16"/><path class="sv-line" d="M204 88l6 5-6 5"/>
       <rect class="sv-box" x="218" y="30" width="108" height="74" rx="8"/>
-      <text class="sv-ink" x="272" y="62" text-anchor="middle" font-size="11">${x("검색 한 번으로","one search")}</text>
-      <text class="sv-dim" x="272" y="78" text-anchor="middle" font-size="9.5">${x("답이 나오는 크기","answers each")}</text>`) },
+      <text class="sv-ink" x="272" y="62" text-anchor="middle" font-size="12">${x("검색 한 번으로","one search")}</text>
+      <text class="sv-dim" x="272" y="78" text-anchor="middle" font-size="10.5">${x("답이 나오는 크기","answers each")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"생각과 검색을 번갈아 돌린다", c:"생각이 다음 검색을 이끌고, 찾아온 것이 다음 생각을 고친다. 검색 성적이 최대 21점 올랐다."},
     en:{h:"Interleave the thinking with the retrieving", c:"The reasoning guides the next retrieval and what comes back improves the next reasoning step — retrieval rose by up to 21 points."},
     art:(x)=>F(`
       <rect class="sv-box" x="12" y="52" width="56" height="28" rx="6"/>
-      <text class="sv-dim" x="40" y="70" text-anchor="middle" font-size="9.5">${x("생각","reason")}</text>
+      <text class="sv-dim" x="40" y="70" text-anchor="middle" font-size="10.5">${x("생각","reason")}</text>
       <path class="sv-line" d="M72 66h12"/><path class="sv-line" d="M80 61l6 5-6 5"/>
       <rect class="sv-vi-b" x="88" y="52" width="56" height="28" rx="6"/>
-      <text class="sv-vi-t" x="116" y="70" text-anchor="middle" font-size="9.5">${x("검색","retrieve")}</text>
+      <text class="sv-vi-t" x="116" y="70" text-anchor="middle" font-size="10.5">${x("검색","retrieve")}</text>
       <path class="sv-line" d="M148 66h12"/><path class="sv-line" d="M156 61l6 5-6 5"/>
       <rect class="sv-box" x="164" y="52" width="56" height="28" rx="6"/>
-      <text class="sv-dim" x="192" y="70" text-anchor="middle" font-size="9.5">${x("생각","reason")}</text>
+      <text class="sv-dim" x="192" y="70" text-anchor="middle" font-size="10.5">${x("생각","reason")}</text>
       <path class="sv-line" d="M224 66h12"/><path class="sv-line" d="M232 61l6 5-6 5"/>
       <rect class="sv-vi-b" x="240" y="52" width="56" height="28" rx="6"/>
-      <text class="sv-vi-t" x="268" y="70" text-anchor="middle" font-size="9.5">${x("검색","retrieve")}</text>
-      <text class="sv-dim" x="314" y="70" text-anchor="middle" font-size="12" font-weight="700">···</text>
-      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("검색 성적 +21점","retrieval +21 points")}</text>`) },
+      <text class="sv-vi-t" x="268" y="70" text-anchor="middle" font-size="10.5">${x("검색","retrieve")}</text>
+      <text class="sv-dim" x="314" y="70" text-anchor="middle" font-size="13" font-weight="700">···</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="12" font-weight="700">${x("검색 성적 +21점","retrieval +21 points")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"흩어진 근거를 모아 답이 맞아 간다", c:"추가 학습 없이, 더 작은 모델로도 네 개 데이터셋에서 답 정확도가 최대 15점 올랐다."},
     en:{h:"Scattered evidence comes together and the answer lands", c:"Across four datasets, answer accuracy rose by up to 15 points — with smaller models and no additional training."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="36" width="118" height="26" rx="6"/>
-      <text class="sv-dim" x="30" y="53" font-size="10">${x("한 번만 검색","one retrieval")}</text>
+      <text class="sv-dim" x="30" y="53" font-size="11">${x("한 번만 검색","one retrieval")}</text>
       <rect class="sv-gr-b" x="14" y="74" width="118" height="26" rx="6"/>
-      <text class="sv-gr-t" x="30" y="91" font-size="10">${x("번갈아 반복","interleaved")}</text>
+      <text class="sv-gr-t" x="30" y="91" font-size="11">${x("번갈아 반복","interleaved")}</text>
       <path class="sv-gr-l" d="M144 66h26"/><path class="sv-gr-l" d="M164 61l6 5-6 5"/>
       <rect class="sv-gr-b" x="182" y="40" width="144" height="52" rx="9"/>
-      <text class="sv-gr-t" x="254" y="68" text-anchor="middle" font-size="17" font-weight="700">+15</text>
-      <text class="sv-dim" x="254" y="126" text-anchor="middle" font-size="9.5">${x("네 개 데이터셋, 답 정확도(점)","answer accuracy, four datasets")}</text>`) },
+      <text class="sv-gr-t" x="254" y="68" text-anchor="middle" font-size="18" font-weight="700">+15</text>
+      <text class="sv-dim" x="254" y="126" text-anchor="middle" font-size="10.5">${x("네 개 데이터셋, 답 정확도(점)","answer accuracy, four datasets")}</text>`) },
 ],
     cherries: [
   { who:"Press et al.", role:{ko:"Self-Ask · 2022",en:"Self-Ask · 2022"},
@@ -905,15 +905,15 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     en:{h:"Adapters — insert a small module into each layer", c:"On GLUE it came within 0.4% of full fine-tuning while adding only 3.6% parameters per task."},
     art:(x)=>F(`
       <rect class="sv-box" x="22" y="28" width="150" height="76" rx="10"/>
-      <text class="sv-dim" x="97" y="48" text-anchor="middle" font-size="9.5">${x("얼린 모델","frozen model")}</text>
+      <text class="sv-dim" x="97" y="48" text-anchor="middle" font-size="10.5">${x("얼린 모델","frozen model")}</text>
       <path class="sv-line" opacity=".5" d="M38 62h118M38 86h118"/>
       <rect class="sv-vi-b" x="62" y="54" width="70" height="16" rx="8"/>
       <rect class="sv-vi-b" x="62" y="78" width="70" height="16" rx="8"/>
-      <text class="sv-vi-t" x="97" y="66" text-anchor="middle" font-size="8.5">${x("어댑터","adapter")}</text>
-      <text class="sv-vi-t" x="97" y="90" text-anchor="middle" font-size="8.5">${x("어댑터","adapter")}</text>
+      <text class="sv-vi-t" x="97" y="66" text-anchor="middle" font-size="9.5">${x("어댑터","adapter")}</text>
+      <text class="sv-vi-t" x="97" y="90" text-anchor="middle" font-size="9.5">${x("어댑터","adapter")}</text>
       <path class="sv-line" d="M182 66h20"/><path class="sv-line" d="M196 61l7 5-7 5"/>
-      <text class="sv-gr-t" x="268" y="62" text-anchor="middle" font-size="16" font-weight="700">+3.6%</text>
-      <text class="sv-dim" x="268" y="80" text-anchor="middle" font-size="9.5">${x("과제마다 더하는 양","added per task")}</text>`) },
+      <text class="sv-gr-t" x="268" y="62" text-anchor="middle" font-size="17" font-weight="700">+3.6%</text>
+      <text class="sv-dim" x="268" y="80" text-anchor="middle" font-size="10.5">${x("과제마다 더하는 양","added per task")}</text>`) },
 
   { tag:"IDEA 2",
     ko:{h:"프리픽스 튜닝 — 앞에 벡터 몇 개를 붙인다", c:"파라미터의 0.1%만 학습해도 전체 데이터에서 맞먹었고, 자료가 적을 때는 전체 미세조정을 앞섰다."},
@@ -922,44 +922,44 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
       <rect class="sv-vi-b" x="14" y="52" width="16" height="28" rx="4"/>
       <rect class="sv-vi-b" x="34" y="52" width="16" height="28" rx="4"/>
       <rect class="sv-vi-b" x="54" y="52" width="16" height="28" rx="4"/>
-      <text class="sv-vi-t" x="42" y="126" text-anchor="middle" font-size="9.5">${x("학습하는 벡터","trainable prefix")}</text>
+      <text class="sv-vi-t" x="42" y="126" text-anchor="middle" font-size="10.5">${x("학습하는 벡터","trainable prefix")}</text>
       <rect class="sv-box" x="80" y="38" width="124" height="56" rx="9"/>
-      <text class="sv-dim" x="142" y="62" text-anchor="middle" font-size="10">${x("얼린 모델","frozen model")}</text>
-      <text class="sv-dim" x="142" y="78" text-anchor="middle" font-size="9">${x("그대로 둔다","untouched")}</text>
+      <text class="sv-dim" x="142" y="62" text-anchor="middle" font-size="11">${x("얼린 모델","frozen model")}</text>
+      <text class="sv-dim" x="142" y="78" text-anchor="middle" font-size="10">${x("그대로 둔다","untouched")}</text>
       <path class="sv-line" d="M212 66h20"/><path class="sv-line" d="M226 61l7 5-7 5"/>
-      <text class="sv-gr-t" x="284" y="62" text-anchor="middle" font-size="16" font-weight="700">0.1%</text>
-      <text class="sv-dim" x="284" y="80" text-anchor="middle" font-size="9.5">${x("학습하는 양","what is trained")}</text>`) },
+      <text class="sv-gr-t" x="284" y="62" text-anchor="middle" font-size="17" font-weight="700">0.1%</text>
+      <text class="sv-dim" x="284" y="80" text-anchor="middle" font-size="10.5">${x("학습하는 양","what is trained")}</text>`) },
 
   { tag:"IDEA 3",
     ko:{h:"LoRA — 가중치 옆에 저랭크 행렬을 더한다", c:"학습해야 할 값이 1만분의 1로 줄고, 그래픽 메모리는 3분의 1이 된다."},
     en:{h:"LoRA — add a low-rank matrix beside the weights", c:"10,000× fewer trainable parameters and a third of the GPU memory."},
     art:(x)=>F(`
       <rect class="sv-box" x="22" y="34" width="86" height="64" rx="9"/>
-      <text class="sv-dim" x="65" y="60" text-anchor="middle" font-size="9.5">${x("원래 가중치","original W")}</text>
-      <text class="sv-dim" x="65" y="76" text-anchor="middle" font-size="9">${x("얼려 둔다","frozen")}</text>
-      <text class="sv-ink" x="122" y="71" text-anchor="middle" font-size="14">+</text>
+      <text class="sv-dim" x="65" y="60" text-anchor="middle" font-size="10.5">${x("원래 가중치","original W")}</text>
+      <text class="sv-dim" x="65" y="76" text-anchor="middle" font-size="10">${x("얼려 둔다","frozen")}</text>
+      <text class="sv-ink" x="122" y="71" text-anchor="middle" font-size="15">+</text>
       <rect class="sv-vi-b" x="136" y="44" width="30" height="44" rx="5"/>
       <rect class="sv-vi-b" x="172" y="58" width="44" height="16" rx="5"/>
-      <text class="sv-vi-t" x="176" y="126" text-anchor="middle" font-size="9.5">${x("저랭크 두 장","two low-rank matrices")}</text>
+      <text class="sv-vi-t" x="176" y="126" text-anchor="middle" font-size="10.5">${x("저랭크 두 장","two low-rank matrices")}</text>
       <path class="sv-line" d="M226 66h20"/><path class="sv-line" d="M240 61l7 5-7 5"/>
-      <text class="sv-gr-t" x="290" y="62" text-anchor="middle" font-size="15" font-weight="700">1 / 10,000</text>
-      <text class="sv-dim" x="290" y="80" text-anchor="middle" font-size="9.5">${x("학습하는 값의 수","trainable parameters")}</text>`) },
+      <text class="sv-gr-t" x="290" y="62" text-anchor="middle" font-size="16" font-weight="700">1 / 10,000</text>
+      <text class="sv-dim" x="290" y="80" text-anchor="middle" font-size="10.5">${x("학습하는 값의 수","trainable parameters")}</text>`) },
 
   { tag:"IDEA 4",
     ko:{h:"QLoRA — 4비트로 눌러 담고 그 위에 LoRA", c:"650억 모델을 48GB 그래픽카드 한 장에서, 16비트 미세조정과 같은 성능으로 학습했다."},
     en:{h:"QLoRA — quantize to 4-bit, then put LoRA on top", c:"A 65B model fine-tuned on a single 48GB GPU, matching full 16-bit fine-tuning performance."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="34" width="76" height="64" rx="9"/>
-      <text class="sv-dim" x="52" y="60" text-anchor="middle" font-size="10">16-bit</text>
-      <text class="sv-dim" x="52" y="78" text-anchor="middle" font-size="9">${x("650억","65B")}</text>
+      <text class="sv-dim" x="52" y="60" text-anchor="middle" font-size="11">16-bit</text>
+      <text class="sv-dim" x="52" y="78" text-anchor="middle" font-size="10">${x("650억","65B")}</text>
       <path class="sv-line" d="M96 66h18"/><path class="sv-line" d="M108 61l6 5-6 5"/>
       <rect class="sv-vi-b" x="122" y="44" width="62" height="44" rx="8"/>
-      <text class="sv-vi-t" x="153" y="62" text-anchor="middle" font-size="11" font-weight="600">4-bit</text>
-      <text class="sv-vi-t" x="153" y="78" text-anchor="middle" font-size="8.5">${x("+ LoRA","+ LoRA")}</text>
+      <text class="sv-vi-t" x="153" y="62" text-anchor="middle" font-size="12" font-weight="600">4-bit</text>
+      <text class="sv-vi-t" x="153" y="78" text-anchor="middle" font-size="9.5">${x("+ LoRA","+ LoRA")}</text>
       <path class="sv-gr-l" d="M190 66h18"/><path class="sv-gr-l" d="M202 61l6 5-6 5"/>
       <rect class="sv-gr-b" x="216" y="40" width="110" height="52" rx="9"/>
-      <text class="sv-gr-t" x="271" y="64" text-anchor="middle" font-size="15" font-weight="700">48GB ×1</text>
-      <text class="sv-dim" x="271" y="81" text-anchor="middle" font-size="9.5">${x("그래픽카드 한 장","a single GPU")}</text>`) },
+      <text class="sv-gr-t" x="271" y="64" text-anchor="middle" font-size="16" font-weight="700">48GB ×1</text>
+      <text class="sv-dim" x="271" y="81" text-anchor="middle" font-size="10.5">${x("그래픽카드 한 장","a single GPU")}</text>`) },
 ],
     cherries: [
   { who:"Hu et al.", role:{ko:"LoRA · 2021",en:"LoRA · 2021"},
@@ -1006,65 +1006,65 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     en:{h:"Chain them naively and one wrong step spreads", c:"Naively chaining LLMs produces cascading hallucinations and logic inconsistencies."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="52" width="60" height="28" rx="6"/>
-      <text class="sv-dim" x="44" y="70" text-anchor="middle" font-size="9.5">${x("에이전트 1","agent 1")}</text>
+      <text class="sv-dim" x="44" y="70" text-anchor="middle" font-size="10.5">${x("에이전트 1","agent 1")}</text>
       <path class="sv-line" d="M78 66h14"/><path class="sv-line" d="M86 61l6 5-6 5"/>
       <rect class="sv-box" x="100" y="52" width="60" height="28" rx="6"/>
-      <text class="sv-dim" x="130" y="70" text-anchor="middle" font-size="9.5">${x("에이전트 2","agent 2")}</text>
+      <text class="sv-dim" x="130" y="70" text-anchor="middle" font-size="10.5">${x("에이전트 2","agent 2")}</text>
       <path class="sv-line" d="M164 66h14"/><path class="sv-line" d="M172 61l6 5-6 5"/>
       <rect class="sv-ch-b" x="186" y="52" width="60" height="28" rx="6"/>
-      <text class="sv-ch-t" x="216" y="70" text-anchor="middle" font-size="9.5">${x("에이전트 3","agent 3")}</text>
+      <text class="sv-ch-t" x="216" y="70" text-anchor="middle" font-size="10.5">${x("에이전트 3","agent 3")}</text>
       <path class="sv-line" d="M250 66h14"/><path class="sv-line" d="M258 61l6 5-6 5"/>
       <rect class="sv-ch-b" x="272" y="52" width="54" height="28" rx="6"/>
-      <text class="sv-ch-t" x="299" y="70" text-anchor="middle" font-size="9.5">${x("결과","result")}</text>
-      <text class="sv-ch-t" x="170" y="126" text-anchor="middle" font-size="10">${x("한 번 어긋나면 뒤로 번진다","one slip propagates downstream")}</text>`) },
+      <text class="sv-ch-t" x="299" y="70" text-anchor="middle" font-size="10.5">${x("결과","result")}</text>
+      <text class="sv-ch-t" x="170" y="126" text-anchor="middle" font-size="11">${x("한 번 어긋나면 뒤로 번진다","one slip propagates downstream")}</text>`) },
 
   { tag:"IDEA",
     ko:{h:"역할을 나누고 일하는 절차를 넣는다", c:"사람의 표준 작업 절차를 프롬프트 순서로 심어, 각 역할이 중간 결과를 검증하게 한다."},
     en:{h:"Give them roles, and give the work a procedure", c:"Standardized operating procedures are encoded into prompt sequences so each role verifies the intermediate result."},
     art:(x)=>F(`
       <rect class="sv-vi-b" x="14" y="30" width="92" height="22" rx="5"/>
-      <text class="sv-vi-t" x="60" y="45" text-anchor="middle" font-size="9">${x("기획","product")}</text>
+      <text class="sv-vi-t" x="60" y="45" text-anchor="middle" font-size="10">${x("기획","product")}</text>
       <rect class="sv-vi-b" x="14" y="56" width="92" height="22" rx="5"/>
-      <text class="sv-vi-t" x="60" y="71" text-anchor="middle" font-size="9">${x("설계","architect")}</text>
+      <text class="sv-vi-t" x="60" y="71" text-anchor="middle" font-size="10">${x("설계","architect")}</text>
       <rect class="sv-vi-b" x="14" y="82" width="92" height="22" rx="5"/>
-      <text class="sv-vi-t" x="60" y="97" text-anchor="middle" font-size="9">${x("구현","engineer")}</text>
+      <text class="sv-vi-t" x="60" y="97" text-anchor="middle" font-size="10">${x("구현","engineer")}</text>
       <path class="sv-line" d="M112 66h16"/><path class="sv-line" d="M122 61l6 5-6 5"/>
       <rect class="sv-box" x="136" y="38" width="94" height="56" rx="9"/>
-      <text class="sv-ink" x="183" y="60" text-anchor="middle" font-size="10.5">${x("표준 절차","standard procedure")}</text>
-      <text class="sv-dim" x="183" y="76" text-anchor="middle" font-size="9">${x("단계마다 검증","checked at each step")}</text>
+      <text class="sv-ink" x="183" y="60" text-anchor="middle" font-size="11.5">${x("표준 절차","standard procedure")}</text>
+      <text class="sv-dim" x="183" y="76" text-anchor="middle" font-size="10">${x("단계마다 검증","checked at each step")}</text>
       <path class="sv-line" d="M238 66h16"/><path class="sv-line" d="M248 61l6 5-6 5"/>
       <rect class="sv-gr-b" x="262" y="44" width="64" height="44" rx="8"/>
-      <text class="sv-gr-t" x="294" y="70" text-anchor="middle" font-size="10">${x("넘겨준다","hand off")}</text>`) },
+      <text class="sv-gr-t" x="294" y="70" text-anchor="middle" font-size="11">${x("넘겨준다","hand off")}</text>`) },
 
   { tag:"SOLUTION",
     ko:{h:"계획·실행·조정을 따로 세운다", c:"계획을 짜는 쪽, 도구를 불러 실행하는 쪽, 순서와 상태를 맞추는 쪽이 각각 맡는다."},
     en:{h:"Separate the planning, the doing and the coordinating", c:"One part plans, one calls the tools and handles retries, one keeps order and state consistent."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="40" width="80" height="52" rx="9"/>
-      <text class="sv-ink" x="54" y="62" text-anchor="middle" font-size="10.5">${x("계획","planner")}</text>
-      <text class="sv-dim" x="54" y="78" text-anchor="middle" font-size="8.5">${x("순서를 짠다","sets the order")}</text>
+      <text class="sv-ink" x="54" y="62" text-anchor="middle" font-size="11.5">${x("계획","planner")}</text>
+      <text class="sv-dim" x="54" y="78" text-anchor="middle" font-size="9.5">${x("순서를 짠다","sets the order")}</text>
       <path class="sv-line" d="M98 66h14"/><path class="sv-line" d="M106 61l6 5-6 5"/>
       <rect class="sv-box" x="120" y="40" width="80" height="52" rx="9"/>
-      <text class="sv-ink" x="160" y="62" text-anchor="middle" font-size="10.5">${x("실행","executor")}</text>
-      <text class="sv-dim" x="160" y="78" text-anchor="middle" font-size="8.5">${x("도구를 부른다","calls the tools")}</text>
+      <text class="sv-ink" x="160" y="62" text-anchor="middle" font-size="11.5">${x("실행","executor")}</text>
+      <text class="sv-dim" x="160" y="78" text-anchor="middle" font-size="9.5">${x("도구를 부른다","calls the tools")}</text>
       <path class="sv-line" d="M204 66h14"/><path class="sv-line" d="M212 61l6 5-6 5"/>
       <rect class="sv-vi-b" x="226" y="40" width="96" height="52" rx="9"/>
-      <text class="sv-vi-t" x="274" y="62" text-anchor="middle" font-size="10.5">${x("조정","coordinator")}</text>
-      <text class="sv-vi-t" x="274" y="78" text-anchor="middle" font-size="8.5">${x("상태를 맞춘다","keeps state in step")}</text>
-      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="9.5">${x("제어 계층","the control layer")}</text>`) },
+      <text class="sv-vi-t" x="274" y="62" text-anchor="middle" font-size="11.5">${x("조정","coordinator")}</text>
+      <text class="sv-vi-t" x="274" y="78" text-anchor="middle" font-size="9.5">${x("상태를 맞춘다","keeps state in step")}</text>
+      <text class="sv-dim" x="170" y="126" text-anchor="middle" font-size="10.5">${x("제어 계층","the control layer")}</text>`) },
 
   { tag:"BENEFIT",
     ko:{h:"혼자 할 때보다 멀리 간다 — 대신 토큰을 쓴다", c:"연구 과제에서 여럿이 나눠 맡은 쪽이 혼자 한 쪽보다 90.2% 나았다. 토큰은 대화의 약 15배를 썼다."},
     en:{h:"It goes further than one agent — and spends for it", c:"On research tasks a lead-and-subagents setup beat a single agent by 90.2%, using about 15× the tokens of a chat."},
     art:(x)=>F(`
       <rect class="sv-box" x="14" y="36" width="120" height="26" rx="6"/>
-      <text class="sv-dim" x="30" y="53" font-size="10">${x("혼자","single agent")}</text>
+      <text class="sv-dim" x="30" y="53" font-size="11">${x("혼자","single agent")}</text>
       <rect class="sv-gr-b" x="14" y="74" width="120" height="26" rx="6"/>
-      <text class="sv-gr-t" x="30" y="91" font-size="10">${x("나눠 맡기","lead + subagents")}</text>
+      <text class="sv-gr-t" x="30" y="91" font-size="11">${x("나눠 맡기","lead + subagents")}</text>
       <path class="sv-gr-l" d="M146 66h24"/><path class="sv-gr-l" d="M164 61l6 5-6 5"/>
       <rect class="sv-gr-b" x="182" y="40" width="144" height="52" rx="9"/>
-      <text class="sv-gr-t" x="254" y="68" text-anchor="middle" font-size="17" font-weight="700">+90.2%</text>
-      <text class="sv-dim" x="254" y="126" text-anchor="middle" font-size="9.5">${x("연구 과제 성적","on research tasks")}</text>`) },
+      <text class="sv-gr-t" x="254" y="68" text-anchor="middle" font-size="18" font-weight="700">+90.2%</text>
+      <text class="sv-dim" x="254" y="126" text-anchor="middle" font-size="10.5">${x("연구 과제 성적","on research tasks")}</text>`) },
 ],
     cherries: [
   { who:"Melanie Mitchell", role:{ko:"『Artificial Intelligence』 · 2019 (요지)",en:"“Artificial Intelligence” · 2019 (paraphrase)"},
@@ -1100,6 +1100,115 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
   { stage:{ko:"반론",en:"The counterargument"}, t:"Don't Build Multi-Agents",
     d:{ko:"나누지 말라는 쪽의 주장. 맥락이 갈라지면 결정이 어긋난다.",en:"The case against splitting: once context splits, decisions diverge."},
     url:"https://cognition.ai/blog/dont-build-multi-agents" },
+],
+  },
+  CustomEmbedding: {
+    title: "Custom Embeddings",
+    overview: { ko:"맞춤 임베딩은 범용 모델이 뭉개 버리는 한 분야 안의 의미 구분을, 그 분야 자료로 다시 가르치는 일이다.<br>무엇을 정답으로 묶느냐보다 무엇을 오답으로 가르치느냐가 결과를 가른다.", en:"Custom embeddings re-teach, on a domain's own data, the distinctions a general model blurs together.<br>What decides the result is less which pairs you call correct than which ones you teach as wrong." },
+    figures: [
+  { tag:"PROBLEM",
+    ko:{h:"범용 모델은 분야 안의 구분을 놓친다", c:"18개 데이터셋으로 재 보니, 밀집 검색 모델들은 처음 보는 분야에서 BM25에도 밀리는 일이 잦았다."},
+    en:{h:"A general model misses the distinctions inside a domain", c:"Across 18 datasets BM25 proved a robust baseline, with dense models often underperforming out of distribution."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="38" width="96" height="56" rx="9"/>
+      <text class="sv-ink" x="62" y="60" text-anchor="middle" font-size="11.5">${x("범용 임베딩","general model")}</text>
+      <text class="sv-dim" x="62" y="76" text-anchor="middle" font-size="9.8">${x("일상 언어는 잘 본다","everyday language is fine")}</text>
+      <path class="sv-line" d="M118 66h16"/><path class="sv-line" d="M128 61l6 5-6 5"/>
+      <rect class="sv-box" x="142" y="30" width="86" height="22" rx="5"/>
+      <text class="sv-dim" x="185" y="45" text-anchor="middle" font-size="10">${x("법률 문서","legal")}</text>
+      <rect class="sv-box" x="142" y="56" width="86" height="22" rx="5"/>
+      <text class="sv-dim" x="185" y="71" text-anchor="middle" font-size="10">${x("의료 기록","medical")}</text>
+      <rect class="sv-box" x="142" y="82" width="86" height="22" rx="5"/>
+      <text class="sv-dim" x="185" y="97" text-anchor="middle" font-size="10">${x("사내 문서","in-house docs")}</text>
+      <path class="sv-line" d="M236 66h16"/><path class="sv-line" d="M246 61l6 5-6 5"/>
+      <rect class="sv-ch-b" x="260" y="44" width="66" height="44" rx="8"/>
+      <text class="sv-ch-t" x="293" y="62" text-anchor="middle" font-size="10.5">${x("가까운 것끼리","near things")}</text>
+      <text class="sv-ch-t" x="293" y="77" text-anchor="middle" font-size="10.5">${x("뭉개진다","blur together")}</text>`) },
+
+  { tag:"IDEA",
+    ko:{h:"맞는 쌍은 당기고 어긋난 쌍은 민다", c:"대조 학습은 가까워야 할 것을 끌어당기고 아닌 것을 밀어내 벡터 공간을 그 분야에 맞게 다시 편다."},
+    en:{h:"Pull the matching pairs together, push the rest apart", c:"Contrastive learning pulls semantically close neighbors together and pushes apart non-neighbors, reshaping the space for the domain."},
+    art:(x)=>F(`
+      <circle class="sv-vi-b" cx="70" cy="46" r="13"/>
+      <circle class="sv-vi-b" cx="104" cy="56" r="13"/>
+      <path class="sv-vi-f" d="M84 50h8" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="sv-vi-t" x="88" y="126" text-anchor="middle" font-size="10.5">${x("맞는 쌍 — 당긴다","matching pair — pull")}</text>
+      <circle class="sv-ch-b" cx="60" cy="90" r="11"/>
+      <circle class="sv-ch-b" cx="124" cy="94" r="11"/>
+      <path class="sv-ch" d="M76 90h10M98 94h10"/>
+      <path class="sv-line" d="M150 66h18"/><path class="sv-line" d="M162 61l6 5-6 5"/>
+      <rect class="sv-box" x="176" y="38" width="150" height="56" rx="9"/>
+      <text class="sv-ink" x="251" y="60" text-anchor="middle" font-size="11.5">${x("그 분야에 맞게","reshaped for")}</text>
+      <text class="sv-dim" x="251" y="76" text-anchor="middle" font-size="10.5">${x("공간을 다시 편다","that one domain")}</text>`) },
+
+  { tag:"SOLUTION",
+    ko:{h:"어떤 오답으로 가르칠지가 거의 전부다", c:"MS-MARCO에서 정답으로 표시되지 않은 상위 글을 직접 들여다보니 70%가 사실은 정답이었다."},
+    en:{h:"Which wrong answers you teach with decides almost everything", c:"Hand-checking MS MARCO's top-retrieved passages that were not labeled positive, 70% of them turned out to be positives."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="52" width="72" height="28" rx="6"/>
+      <text class="sv-dim" x="50" y="70" text-anchor="middle" font-size="10.5">${x("질문","query")}</text>
+      <path class="sv-line" d="M90 66h14"/><path class="sv-line" d="M98 61l6 5-6 5"/>
+      <rect class="sv-box" x="112" y="30" width="96" height="22" rx="5"/>
+      <text class="sv-dim" x="160" y="45" text-anchor="middle" font-size="10">${x("닮은 글 1","near passage 1")}</text>
+      <rect class="sv-box" x="112" y="56" width="96" height="22" rx="5"/>
+      <text class="sv-dim" x="160" y="71" text-anchor="middle" font-size="10">${x("닮은 글 2","near passage 2")}</text>
+      <rect class="sv-box" x="112" y="82" width="96" height="22" rx="5"/>
+      <text class="sv-dim" x="160" y="97" text-anchor="middle" font-size="10">${x("닮은 글 3","near passage 3")}</text>
+      <path class="sv-line" d="M216 66h16"/><path class="sv-line" d="M226 61l6 5-6 5"/>
+      <rect class="sv-ch-b" x="240" y="40" width="86" height="52" rx="9"/>
+      <text class="sv-ch-t" x="283" y="64" text-anchor="middle" font-size="18" font-weight="700">70%</text>
+      <text class="sv-ch-t" x="283" y="81" text-anchor="middle" font-size="10">${x("실은 정답이었다","were positives")}</text>`) },
+
+  { tag:"BENEFIT",
+    ko:{h:"한 모델이 여러 예산을 맡는다", c:"앞부분만 잘라 써도 되게 학습하면, 같은 정확도에서 임베딩을 최대 14배 작게 쓸 수 있다."},
+    en:{h:"One model covers many budgets", c:"Train so a prefix of the vector stands alone, and the embedding can be up to 14× smaller at the same accuracy."},
+    art:(x)=>F(`
+      <rect class="sv-vi-b" x="14" y="52" width="150" height="28" rx="6"/>
+      <path class="sv-line" opacity=".6" d="M62 52v28M110 52v28"/>
+      <text class="sv-vi-t" x="38" y="70" text-anchor="middle" font-size="10">256</text>
+      <text class="sv-dim" x="86" y="70" text-anchor="middle" font-size="10">512</text>
+      <text class="sv-dim" x="137" y="70" text-anchor="middle" font-size="10">1024</text>
+      <text class="sv-dim" x="89" y="126" text-anchor="middle" font-size="10.5">${x("앞부분만 잘라 써도 된다","a prefix stands on its own")}</text>
+      <path class="sv-gr-l" d="M174 66h22"/><path class="sv-gr-l" d="M190 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="206" y="40" width="120" height="52" rx="9"/>
+      <text class="sv-gr-t" x="266" y="68" text-anchor="middle" font-size="18" font-weight="700">14×</text>
+      <text class="sv-dim" x="266" y="126" text-anchor="middle" font-size="10.5">${x("같은 정확도, 더 작게","smaller at the same accuracy")}</text>`) },
+],
+    cherries: [
+  { who:"Qu et al.", role:{ko:"RocketQA · 2021",en:"RocketQA · 2021"},
+    q:{ko:"정답으로 표시되지 않은 상위 글들을 손으로 들여다보니, 그중 70%가 사실은 정답이었다.",
+       en:"we manually examine the top-retrieved passages that were not labeled as positives in the original MSMARCO dataset, and we find that 70% of them are actually positives"},
+    cite:"Qu et al., “RocketQA: An Optimized Training Approach to Dense Passage Retrieval”, §4 (arXiv:2010.08191)", url:"https://arxiv.org/abs/2010.08191" },
+  { who:"Thakur et al.", role:{ko:"BEIR · 2021",en:"BEIR · 2021"},
+    q:{ko:"BM25는 든든한 기준선이고, 밀집 검색 모델들은 처음 보는 분야에서 종종 그에 못 미친다.",
+       en:"BM25 is a robust baseline … dense and sparse-retrieval models … often underperform other approaches, highlighting the considerable room for improvement in their generalization capabilities"},
+    cite:"Thakur et al., “BEIR: A Heterogenous Benchmark for Zero-shot Evaluation of Information Retrieval Models”, Abstract (arXiv:2104.08663)", url:"https://arxiv.org/abs/2104.08663" },
+  { who:"Kusupati et al.", role:{ko:"마트료시카 · 2022",en:"Matryoshka · 2022"},
+    q:{ko:"내려갈 과제마다 어떤 계산 자원이 주어질지 모르는 채로 표현을 학습한다 — 그래서 고정된 크기는 과하거나 모자란다.",
+       en:"it is often the case that computational and statistical constraints for each downstream task are unknown … rigid, fixed capacity representations can be either over or under-accommodating to the task at hand"},
+    cite:"Kusupati et al., “Matryoshka Representation Learning”, Abstract (arXiv:2205.13147)", url:"https://arxiv.org/abs/2205.13147" },
+  { who:"Gao, Yao & Chen", role:{ko:"SimCSE · 2021",en:"SimCSE · 2021"},
+    q:{ko:"드롭아웃만 잡음으로 써서 자기 자신을 맞히게 하는 것만으로도 놀랄 만큼 잘된다.",
+       en:"takes an input sentence and predicts itself in a contrastive objective, with only standard dropout used as noise. This simple method works surprisingly well"},
+    cite:"Gao, Yao & Chen, “SimCSE: Simple Contrastive Learning of Sentence Embeddings”, Abstract (arXiv:2104.08821)", url:"https://arxiv.org/abs/2104.08821" },
+  { who:"Kusupati et al.", role:{ko:"마트료시카 · 2022",en:"Matryoshka · 2022"},
+    q:{ko:"거친 데서 고운 데로 이어지는 표현을 배운다. 잘라 쓴 앞부분이, 그 크기로 따로 학습한 것만큼은 정확하다.",
+       en:"MRL learns coarse-to-fine representations that are at least as accurate and rich as independently trained low-dimensional representations"},
+    cite:"Kusupati et al., “Matryoshka Representation Learning”, Abstract (arXiv:2205.13147)", url:"https://arxiv.org/abs/2205.13147" },
+],
+    refs: [
+  { stage:{ko:"문제",en:"The gap"}, t:"BEIR: A Heterogenous Benchmark for Zero-shot Evaluation of Information Retrieval Models",
+    d:{ko:"처음 보는 분야에서 밀집 검색이 어떻게 무너지는지 18개 데이터셋으로 보인다.",en:"18 datasets showing how dense retrieval falls over out of domain."},
+    url:"https://arxiv.org/abs/2104.08663" },
+  { stage:{ko:"방법",en:"The method"}, t:"SimCSE: Simple Contrastive Learning of Sentence Embeddings",
+    d:{ko:"대조 학습으로 문장 임베딩을 만드는 가장 단순한 틀.",en:"The simplest contrastive recipe for sentence embeddings."},
+    url:"https://arxiv.org/abs/2104.08821" },
+  { stage:{ko:"함정",en:"The trap"}, t:"RocketQA: An Optimized Training Approach to Dense Passage Retrieval",
+    d:{ko:"오답인 줄 알고 가르친 것의 70%가 정답이었다. 하드 네거티브를 거르는 법이 여기 있다.",en:"70% of the supposed negatives were positives — and how to denoise them."},
+    url:"https://arxiv.org/abs/2010.08191" },
+  { stage:{ko:"예산",en:"The budget"}, t:"Matryoshka Representation Learning",
+    d:{ko:"한 벡터를 여러 크기로 잘라 쓴다. 14배가 여기서 나온다.",en:"One vector, many sizes — where the 14× comes from."},
+    url:"https://arxiv.org/abs/2205.13147" },
 ],
   },
 }

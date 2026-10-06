@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { ShoppingCart } from "lucide-react"
 import { fetchLearningConcept, type ConceptPage, type ConceptRelationType } from "@/lib/api"
 import { CONCEPT_FLASH } from "@/lib/concept-flash"
+import { useLang } from "@/lib/lang"
 
 /* 데이터 정본 = DB (API: GET /api/learning/concepts/:key)
    기획: apps/docs/ontology-migration/2-implementation-guide.md §5
@@ -53,8 +54,8 @@ export function ConceptReaderPage({
 }) {
   const [doc, setDoc] = useState<ConceptPage | null>(null)
   const [error, setError] = useState<string | null>(null)
-  /* 승인본(목업)이 한/영 두 벌이다. Flash 가 있는 개념만 토글을 띄운다. */
-  const [lang, setLang] = useState<"ko" | "en">("ko")
+  /* 화면 언어는 상단 바에서 고른다(lib/lang.ts). 페이지가 따로 갖지 않는다. */
+  const lang = useLang()
 
   useEffect(() => {
     let alive = true
@@ -111,24 +112,6 @@ export function ConceptReaderPage({
               {flash?.title ?? doc.title}
             </h1>
             <div className="flex-shrink-0 flex items-center gap-2">
-            {flash && (
-              <div className="flex border border-border rounded-lg overflow-hidden bg-card" role="group" aria-label="Language">
-                {(["ko", "en"] as const).map((l) => (
-                  <button
-                    key={l}
-                    type="button"
-                    aria-pressed={lang === l}
-                    onClick={() => setLang(l)}
-                    className={cn(
-                      "px-3 py-1.5 text-[12px] font-semibold cursor-pointer",
-                      lang === l ? "bg-text-primary text-card" : "text-text-muted",
-                    )}
-                  >
-                    {l === "ko" ? "한국어" : "English"}
-                  </button>
-                ))}
-              </div>
-            )}
             {onBuyOnMarket && (
               <button
                 onClick={() => onBuyOnMarket(doc.slug)}
@@ -201,9 +184,9 @@ export function ConceptReaderPage({
                     className="concept-figure m-0 bg-card border border-border rounded-[8px] p-3 flex flex-col"
                   >
                     <div className="text-[10px] font-bold tracking-[0.8px] text-cherry">{fig.tag}</div>
-                    <h3 className="mt-0.5 mb-2 text-[13px] font-semibold text-text-primary">{fig[lang].h}</h3>
+                    <h3 className="mt-0.5 mb-2 text-[14px] font-semibold text-text-primary">{fig[lang].h}</h3>
                     <div dangerouslySetInnerHTML={{ __html: fig.art(x) }} />
-                    <figcaption className="mt-2.5 text-[11px] leading-[1.6] text-text-muted text-center">
+                    <figcaption className="mt-2.5 text-[12px] leading-[1.6] text-text-muted text-center">
                       {fig[lang].c}
                     </figcaption>
                   </figure>
