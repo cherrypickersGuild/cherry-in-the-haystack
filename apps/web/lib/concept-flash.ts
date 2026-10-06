@@ -791,4 +791,109 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
     url:"https://arxiv.org/abs/2210.03629" },
 ],
   },
+  MultiHopRAG: {
+    title: "Multi-hop RAG",
+    overview: { ko:"멀티홉 RAG는 한 번의 검색으로 답할 수 없는 질문을 하위 질문으로 쪼개, 앞 검색의 결과를 다음 질의로 삼아 반복하는 방식이다.<br>흩어진 근거를 이어 붙여 답하지만, 언제 멈출지가 비용과 정확도를 함께 가른다.", en:"Multi-hop RAG splits a question that one search cannot answer, then uses what each search returns as the next query.<br>It assembles an answer from scattered evidence, and where it stops decides both the cost and the accuracy." },
+    figures: [
+  { tag:"PROBLEM",
+    ko:{h:"조각은 맞게 답하면서 합치지는 못한다", c:"GPT-3 계열에서 모델이 커질수록 단일 홉 성적이 더 빨리 올라, 합치는 능력의 격차는 줄지 않았다."},
+    en:{h:"It answers each piece and still fails to compose them", c:"In the GPT-3 family single-hop accuracy improved faster than multi-hop, so the compositionality gap did not shrink."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="34" width="104" height="26" rx="6"/>
+      <text class="sv-dim" x="66" y="51" text-anchor="middle" font-size="9.5">${x("하위 질문 1 — 맞음","sub-question 1 — right")}</text>
+      <rect class="sv-box" x="14" y="72" width="104" height="26" rx="6"/>
+      <text class="sv-dim" x="66" y="89" text-anchor="middle" font-size="9.5">${x("하위 질문 2 — 맞음","sub-question 2 — right")}</text>
+      <path class="sv-line" d="M126 48h14v36h-14" /><path class="sv-line" d="M148 66h16"/><path class="sv-line" d="M158 61l6 5-6 5"/>
+      <rect class="sv-ch-b" x="172" y="44" width="154" height="44" rx="9"/>
+      <text class="sv-ch-t" x="249" y="62" text-anchor="middle" font-size="11" font-weight="600">${x("합친 답은 틀린다","the composed answer is wrong")}</text>
+      <text class="sv-ch-t" x="249" y="78" text-anchor="middle" font-size="9">${x("둘을 잇는 사실을 함께 본 적이 없다","never seen the two facts together")}</text>`) },
+
+  { tag:"IDEA",
+    ko:{h:"한 번의 검색으로 답할 크기까지 질문을 쪼갠다", c:"모델이 스스로 후속 질문을 묻고 답한 뒤 처음 질문에 답한다. 쪼갠 질문은 검색엔진에 그대로 넣을 수 있다."},
+    en:{h:"Split the question down to what one search can answer", c:"The model asks itself follow-up questions and answers them first — and each one can be handed straight to a search engine."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="10" y="52" width="66" height="28" rx="6"/>
+      <text class="sv-dim" x="43" y="70" text-anchor="middle" font-size="9.5">${x("복합 질문","one question")}</text>
+      <path class="sv-line" d="M76 66L104 41"/><path class="sv-line" d="M76 66h28"/><path class="sv-line" d="M76 66L104 93"/>
+      <rect class="sv-vi-b" x="104" y="30" width="86" height="22" rx="5"/>
+      <text class="sv-vi-t" x="147" y="45" text-anchor="middle" font-size="9">${x("후속 질문 1","follow-up 1")}</text>
+      <rect class="sv-vi-b" x="104" y="56" width="86" height="22" rx="5"/>
+      <text class="sv-vi-t" x="147" y="71" text-anchor="middle" font-size="9">${x("후속 질문 2","follow-up 2")}</text>
+      <rect class="sv-vi-b" x="104" y="82" width="86" height="22" rx="5"/>
+      <text class="sv-vi-t" x="147" y="97" text-anchor="middle" font-size="9">${x("후속 질문 3","follow-up 3")}</text>
+      <path class="sv-line" d="M194 41h16"/><path class="sv-line" d="M204 36l6 5-6 5"/>
+      <path class="sv-line" d="M194 67h16"/><path class="sv-line" d="M204 62l6 5-6 5"/>
+      <path class="sv-line" d="M194 93h16"/><path class="sv-line" d="M204 88l6 5-6 5"/>
+      <rect class="sv-box" x="218" y="30" width="108" height="74" rx="8"/>
+      <text class="sv-ink" x="272" y="62" text-anchor="middle" font-size="11">${x("검색 한 번으로","one search")}</text>
+      <text class="sv-dim" x="272" y="78" text-anchor="middle" font-size="9.5">${x("답이 나오는 크기","answers each")}</text>`) },
+
+  { tag:"SOLUTION",
+    ko:{h:"생각과 검색을 번갈아 돌린다", c:"생각이 다음 검색을 이끌고, 찾아온 것이 다음 생각을 고친다. 검색 성적이 최대 21점 올랐다."},
+    en:{h:"Interleave the thinking with the retrieving", c:"The reasoning guides the next retrieval and what comes back improves the next reasoning step — retrieval rose by up to 21 points."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="12" y="52" width="56" height="28" rx="6"/>
+      <text class="sv-dim" x="40" y="70" text-anchor="middle" font-size="9.5">${x("생각","reason")}</text>
+      <path class="sv-line" d="M72 66h12"/><path class="sv-line" d="M80 61l6 5-6 5"/>
+      <rect class="sv-vi-b" x="88" y="52" width="56" height="28" rx="6"/>
+      <text class="sv-vi-t" x="116" y="70" text-anchor="middle" font-size="9.5">${x("검색","retrieve")}</text>
+      <path class="sv-line" d="M148 66h12"/><path class="sv-line" d="M156 61l6 5-6 5"/>
+      <rect class="sv-box" x="164" y="52" width="56" height="28" rx="6"/>
+      <text class="sv-dim" x="192" y="70" text-anchor="middle" font-size="9.5">${x("생각","reason")}</text>
+      <path class="sv-line" d="M224 66h12"/><path class="sv-line" d="M232 61l6 5-6 5"/>
+      <rect class="sv-vi-b" x="240" y="52" width="56" height="28" rx="6"/>
+      <text class="sv-vi-t" x="268" y="70" text-anchor="middle" font-size="9.5">${x("검색","retrieve")}</text>
+      <text class="sv-dim" x="314" y="70" text-anchor="middle" font-size="12" font-weight="700">···</text>
+      <text class="sv-gr-t" x="170" y="126" text-anchor="middle" font-size="11" font-weight="700">${x("검색 성적 +21점","retrieval +21 points")}</text>`) },
+
+  { tag:"BENEFIT",
+    ko:{h:"흩어진 근거를 모아 답이 맞아 간다", c:"추가 학습 없이, 더 작은 모델로도 네 개 데이터셋에서 답 정확도가 최대 15점 올랐다."},
+    en:{h:"Scattered evidence comes together and the answer lands", c:"Across four datasets, answer accuracy rose by up to 15 points — with smaller models and no additional training."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="36" width="118" height="26" rx="6"/>
+      <text class="sv-dim" x="30" y="53" font-size="10">${x("한 번만 검색","one retrieval")}</text>
+      <rect class="sv-gr-b" x="14" y="74" width="118" height="26" rx="6"/>
+      <text class="sv-gr-t" x="30" y="91" font-size="10">${x("번갈아 반복","interleaved")}</text>
+      <path class="sv-gr-l" d="M144 66h26"/><path class="sv-gr-l" d="M164 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="182" y="40" width="144" height="52" rx="9"/>
+      <text class="sv-gr-t" x="254" y="68" text-anchor="middle" font-size="17" font-weight="700">+15</text>
+      <text class="sv-dim" x="254" y="126" text-anchor="middle" font-size="9.5">${x("네 개 데이터셋, 답 정확도(점)","answer accuracy, four datasets")}</text>`) },
+],
+    cherries: [
+  { who:"Press et al.", role:{ko:"Self-Ask · 2022",en:"Self-Ask · 2022"},
+    q:{ko:"모델이 커질수록 더 많은 사실을 외우고 떠올리지만, 그것들을 엮어 내는 능력은 그만큼 늘지 않는다.",
+       en:"while more powerful models memorize and recall more factual knowledge, they show no corresponding improvement in their ability to perform this kind of compositional reasoning"},
+    cite:"Press et al., “Measuring and Narrowing the Compositionality Gap in Language Models”, Abstract (arXiv:2210.03350)", url:"https://arxiv.org/abs/2210.03350" },
+  { who:"Press et al.", role:{ko:"Self-Ask · 2022",en:"Self-Ask · 2022"},
+    q:{ko:"모델이 처음 질문에 답하기 전에, 스스로 후속 질문을 묻고 답한다.",
+       en:"the model explicitly asks itself (and answers) follow-up questions before answering the initial question"},
+    cite:"Press et al., “Measuring and Narrowing the Compositionality Gap in Language Models”, Abstract (arXiv:2210.03350)", url:"https://arxiv.org/abs/2210.03350" },
+  { who:"Trivedi et al.", role:{ko:"IRCoT · 2022",en:"IRCoT · 2022"},
+    q:{ko:"생각이 검색을 이끌고, 찾아온 것이 다시 생각을 고친다.",
+       en:"guiding the retrieval with CoT and in turn using retrieved results to improve CoT"},
+    cite:"Trivedi et al., “Interleaving Retrieval with Chain-of-Thought Reasoning for Knowledge-Intensive Multi-Step Questions”, Abstract (arXiv:2212.10509)", url:"https://arxiv.org/abs/2212.10509" },
+  { who:"Yang et al.", role:{ko:"HotpotQA · 2018",en:"HotpotQA · 2018"},
+    q:{ko:"답하려면 여러 문서를 찾아 그 위에서 추론해야 하는 질문들이다.",
+       en:"the questions require finding and reasoning over multiple supporting documents to answer"},
+    cite:"Yang et al., “HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering”, Abstract (arXiv:1809.09600)", url:"https://arxiv.org/abs/1809.09600" },
+  { who:"Press et al.", role:{ko:"Self-Ask · 2022",en:"Self-Ask · 2022"},
+    q:{ko:"하위 문제를 전부 맞히고도 전체 답을 못 내는 비율 — 이것을 합성 격차라 부른다.",
+       en:"how often models can correctly answer all sub-problems but not generate the overall solution, a ratio we call the compositionality gap"},
+    cite:"Press et al., “Measuring and Narrowing the Compositionality Gap in Language Models”, Abstract (arXiv:2210.03350)", url:"https://arxiv.org/abs/2210.03350" },
+],
+    refs: [
+  { stage:{ko:"과제",en:"The task"}, t:"HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering",
+    d:{ko:"여러 문서를 엮어야 풀리는 질문 11만 3천 개. 멀티홉이라는 과제가 여기서 섰다.",en:"113k questions that need several documents — where the task was defined."},
+    url:"https://arxiv.org/abs/1809.09600" },
+  { stage:{ko:"문제",en:"The gap"}, t:"Measuring and Narrowing the Compositionality Gap in Language Models",
+    d:{ko:"조각은 맞히고 전체는 틀리는 비율을 재고, self-ask 로 좁힌다.",en:"Measures the gap between sub-answers and the whole, then narrows it with self-ask."},
+    url:"https://arxiv.org/abs/2210.03350" },
+  { stage:{ko:"방법",en:"The method"}, t:"Interleaving Retrieval with Chain-of-Thought Reasoning for Knowledge-Intensive Multi-Step Questions",
+    d:{ko:"생각과 검색을 번갈아 돌린다. 수치가 초록에 있다.",en:"Interleave the two — the numbers are in the abstract."},
+    url:"https://arxiv.org/abs/2212.10509" },
+  { stage:{ko:"멈춤",en:"When to stop"}, t:"Active Retrieval Augmented Generation",
+    d:{ko:"언제 더 찾을지를 모델이 스스로 정하게 하는 쪽의 이야기.",en:"Letting the model decide when to retrieve again."},
+    url:"https://arxiv.org/abs/2305.06983" },
+],
+  },
 }
