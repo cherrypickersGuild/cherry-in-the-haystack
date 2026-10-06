@@ -14,6 +14,8 @@ export type Pick = (ko: string, en: string) => string
 export type FigureTag =
   | "PROBLEM" | "IDEA" | "SOLUTION" | "BENEFIT"
   | "IDEA 1" | "IDEA 2" | "IDEA 3" | "IDEA 4"
+  /** 평가처럼 "좋아졌다"로 끝내면 거짓이 되는 개념은 넷째 칸이 한계다 */
+  | "LIMIT"
 
 export type ConceptFigure = {
   tag: FigureTag
@@ -1209,6 +1211,119 @@ export const CONCEPT_FLASH: Record<string, ConceptFlash> = {
   { stage:{ko:"예산",en:"The budget"}, t:"Matryoshka Representation Learning",
     d:{ko:"한 벡터를 여러 크기로 잘라 쓴다. 14배가 여기서 나온다.",en:"One vector, many sizes — where the 14× comes from."},
     url:"https://arxiv.org/abs/2205.13147" },
+],
+  },
+  AdversarialEvaluation: {
+    title: "Adversarial Evaluation",
+    overview: { ko:"적대적 평가는 깨뜨리려고 만든 입력 앞에서 모델이 얼마나 버티는지를, 모두가 같은 자로 재도록 표준화한 묶음에 대고 점수 매기는 일이다.<br>숫자가 서로 견줄 수 있게 되지만, 시험지에 없는 공격은 끝내 점수에 잡히지 않는다.", en:"Adversarial evaluation scores how a model holds up under inputs built to break it, against a standardized suite so that everyone measures with the same ruler.<br>The numbers become comparable — but an attack the suite does not hold never shows up in them." },
+    figures: [
+  { tag:"PROBLEM",
+    ko:{h:"각자 만든 자로 재니 숫자가 맞붙지 않는다", c:"탈옥 연구마다 자기 기준을 만들어 쓰고, 성공률과 비용을 서로 견줄 수 없는 방식으로 셌다."},
+    en:{h:"Everyone brings their own ruler, so the numbers don't meet", c:"Jailbreak papers build their own benchmarks and compute costs and success rates in incomparable ways."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="30" width="90" height="22" rx="5"/>
+      <text class="sv-dim" x="59" y="45" text-anchor="middle" font-size="10">${x("논문 A — 98%","paper A — 98%")}</text>
+      <rect class="sv-box" x="14" y="56" width="90" height="22" rx="5"/>
+      <text class="sv-dim" x="59" y="71" text-anchor="middle" font-size="10">${x("논문 B — 95%","paper B — 95%")}</text>
+      <rect class="sv-box" x="14" y="82" width="90" height="22" rx="5"/>
+      <text class="sv-dim" x="59" y="97" text-anchor="middle" font-size="10">${x("논문 C — 99%","paper C — 99%")}</text>
+      <path class="sv-line" d="M108 41h8v50h-8"/>
+      <path class="sv-line" d="M116 66h14"/><path class="sv-line" d="M124 61l6 5-6 5"/>
+      <rect class="sv-box" x="136" y="40" width="94" height="52" rx="9"/>
+      <text class="sv-dim" x="183" y="62" text-anchor="middle" font-size="11">${x("저마다 다른 자","each its own ruler")}</text>
+      <text class="sv-dim" x="183" y="79" text-anchor="middle" font-size="10">${x("기준도 판정도","data and judge")}</text>
+      <path class="sv-line" d="M238 66h16"/><path class="sv-line" d="M248 61l6 5-6 5"/>
+      <rect class="sv-ch-b" x="252" y="44" width="74" height="44" rx="8"/>
+      <text class="sv-ch-t" x="289" y="62" text-anchor="middle" font-size="10.5">${x("견줄 수","cannot be")}</text>
+      <text class="sv-ch-t" x="289" y="78" text-anchor="middle" font-size="10.5">${x("없다","compared")}</text>`) },
+
+  { tag:"IDEA",
+    ko:{h:"다 같이 쓰는 한 벌의 시험지를 만든다", c:"공격 프롬프트·행동 목록·위협 모형·판정 함수를 묶어 공개하고, 순위표에 공격과 방어를 함께 올린다."},
+    en:{h:"Make one shared exam everybody writes", c:"Prompts, behaviours, a stated threat model and scoring functions are released together, with a leaderboard for attacks and defenses."},
+    art:(x)=>F(`
+      <rect class="sv-vi-b" x="14" y="30" width="84" height="20" rx="5"/>
+      <text class="sv-vi-t" x="56" y="44" text-anchor="middle" font-size="9.5">${x("공격 프롬프트","prompts")}</text>
+      <rect class="sv-vi-b" x="14" y="55" width="84" height="20" rx="5"/>
+      <text class="sv-vi-t" x="56" y="69" text-anchor="middle" font-size="9.5">${x("행동 목록","behaviours")}</text>
+      <rect class="sv-vi-b" x="14" y="80" width="84" height="20" rx="5"/>
+      <text class="sv-vi-t" x="56" y="94" text-anchor="middle" font-size="9.5">${x("판정 함수","scoring")}</text>
+      <path class="sv-line" d="M106 66h16"/><path class="sv-line" d="M116 61l6 5-6 5"/>
+      <rect class="sv-box" x="130" y="34" width="100" height="64" rx="9"/>
+      <text class="sv-ink" x="180" y="58" text-anchor="middle" font-size="11.5">${x("한 벌의 시험지","one shared suite")}</text>
+      <text class="sv-dim" x="180" y="76" text-anchor="middle" font-size="10">${x("위협 모형까지 적는다","threat model stated")}</text>
+      <path class="sv-line" d="M238 66h16"/><path class="sv-line" d="M248 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="252" y="44" width="74" height="44" rx="8"/>
+      <text class="sv-gr-t" x="289" y="62" text-anchor="middle" font-size="10.5">${x("같은 뜻의","numbers that")}</text>
+      <text class="sv-gr-t" x="289" y="78" text-anchor="middle" font-size="10.5">${x("숫자","mean the same")}</text>`) },
+
+  { tag:"SOLUTION",
+    ko:{h:"공격 18가지 × 모델 33개를 한 판에 올린다", c:"표준 틀 위에서 공격 방법 18개와 대상 모델·방어 33개를 한꺼번에 견줬다."},
+    en:{h:"Put 18 attacks against 33 models on one board", c:"On the standardized framework, 18 red teaming methods were compared across 33 target LLMs and defenses."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="40" width="94" height="52" rx="9"/>
+      <text class="sv-ink" x="61" y="62" text-anchor="middle" font-size="18" font-weight="700">18</text>
+      <text class="sv-dim" x="61" y="80" text-anchor="middle" font-size="10">${x("공격 방법","attack methods")}</text>
+      <text class="sv-ink" x="124" y="72" text-anchor="middle" font-size="14">×</text>
+      <rect class="sv-box" x="140" y="40" width="94" height="52" rx="9"/>
+      <text class="sv-ink" x="187" y="62" text-anchor="middle" font-size="18" font-weight="700">33</text>
+      <text class="sv-dim" x="187" y="80" text-anchor="middle" font-size="10">${x("모델과 방어","models & defenses")}</text>
+      <path class="sv-gr-l" d="M242 66h18"/><path class="sv-gr-l" d="M254 61l6 5-6 5"/>
+      <rect class="sv-gr-b" x="266" y="44" width="60" height="44" rx="8"/>
+      <text class="sv-gr-t" x="296" y="70" text-anchor="middle" font-size="10.5">${x("한 판에","one board")}</text>`) },
+
+  { tag:"LIMIT",
+    ko:{h:"이미 들어 있는 공격만 잴 수 있다", c:"기존 판정 방식은 사람의 판단보다 탈옥 성공률을 크게 부풀렸다. 재는 자가 틀리면 숫자도 틀린다."},
+    en:{h:"A benchmark can only measure the attacks it already holds", c:"Existing evaluators significantly overstate jailbreak effectiveness compared to human judgments — a wrong ruler gives wrong numbers."},
+    art:(x)=>F(`
+      <rect class="sv-box" x="14" y="28" width="146" height="46" rx="9"/>
+      <text class="sv-dim" x="87" y="44" text-anchor="middle" font-size="10">${x("시험지 안의 공격","attacks inside the suite")}</text>
+      <rect class="sv-vi-b" x="28" y="50" width="56" height="18" rx="9"/>
+      <text class="sv-vi-t" x="56" y="63" text-anchor="middle" font-size="9.5">${x("공격 A","attack A")}</text>
+      <rect class="sv-vi-b" x="92" y="50" width="56" height="18" rx="9"/>
+      <text class="sv-vi-t" x="120" y="63" text-anchor="middle" font-size="9.5">${x("공격 B","attack B")}</text>
+      <path class="sv-gr-l" d="M164 51h20"/><path class="sv-gr-l" d="M178 46l6 5-6 5"/>
+      <rect class="sv-gr-b" x="190" y="28" width="136" height="46" rx="9"/>
+      <text class="sv-gr-t" x="258" y="56" text-anchor="middle" font-size="11">${x("점수에 잡힌다","lands in the score")}</text>
+      <rect class="sv-ch-b" x="14" y="84" width="146" height="20" rx="10" stroke-dasharray="4 3"/>
+      <text class="sv-ch-t" x="87" y="98" text-anchor="middle" font-size="10">${x("아직 모르는 공격","the attack nobody wrote down")}</text>
+      <path class="sv-ch" d="M164 94h18" stroke-dasharray="3 3"/>
+      <text class="sv-ch-t" x="258" y="98" text-anchor="middle" font-size="11">${x("끝내 잡히지 않는다","never arrives")}</text>`) },
+],
+    cherries: [
+  { who:"Souly et al.", role:{ko:"StrongREJECT · 2024",en:"StrongREJECT · 2024"},
+    q:{ko:"성과를 부풀리지 않은 탈옥 논문을 찾기가 오히려 더 어렵다.",
+       en:"it is perhaps more common than not for jailbreak developers to substantially exaggerate the effectiveness of their jailbreaks"},
+    cite:"Souly et al., “A StrongREJECT for Empty Jailbreaks”, Abstract (arXiv:2402.10260)", url:"https://arxiv.org/abs/2402.10260" },
+  { who:"Mazeika et al.", role:{ko:"HarmBench · 2024",en:"HarmBench · 2024"},
+    q:{ko:"공격과 방어가 같은 틀 위에서 함께 자라게 한다.",
+       en:"demonstrating how HarmBench enables codevelopment of attacks and defenses"},
+    cite:"Mazeika et al., “HarmBench: A Standardized Evaluation Framework for Automated Red Teaming and Robust Refusal”, Abstract (arXiv:2402.04249)", url:"https://arxiv.org/abs/2402.04249" },
+  { who:"Souly et al.", role:{ko:"StrongREJECT · 2024",en:"StrongREJECT · 2024"},
+    q:{ko:"안전장치를 뚫고 들어간 탈옥은 그 모델의 능력까지 함께 떨어뜨린다.",
+       en:"jailbreaks bypassing a victim model’s safety fine-tuning tend to reduce its capabilities"},
+    cite:"Souly et al., “A StrongREJECT for Empty Jailbreaks”, Abstract (arXiv:2402.10260)", url:"https://arxiv.org/abs/2402.10260" },
+  { who:"Souly et al.", role:{ko:"StrongREJECT · 2024",en:"StrongREJECT · 2024"},
+    q:{ko:"지금 쓰는 평가 방식은 사람이 보고 판단한 것보다 탈옥의 효과를 훨씬 크게 매긴다.",
+       en:"we find that existing evaluation methods significantly overstate jailbreak effectiveness compared to human judgments"},
+    cite:"Souly et al., “A StrongREJECT for Empty Jailbreaks”, Abstract (arXiv:2402.10260)", url:"https://arxiv.org/abs/2402.10260" },
+  { who:"Chao et al.", role:{ko:"JailbreakBench · 2024",en:"JailbreakBench · 2024"},
+    q:{ko:"남이 따라 해 볼 수 없는 연구가 많다. 공격 프롬프트를 감춰 두거나, 코드를 닫아 두거나, 계속 바뀌는 상용 API에 기대 놓았기 때문이다.",
+       en:"numerous works are not reproducible, as they withhold adversarial prompts, involve closed-source code, or rely on evolving proprietary APIs"},
+    cite:"Chao et al., “JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models”, Abstract (arXiv:2404.01318)", url:"https://arxiv.org/abs/2404.01318" },
+],
+    refs: [
+  { stage:{ko:"문제",en:"The problem"}, t:"A StrongREJECT for Empty Jailbreaks",
+    d:{ko:"성공률이 왜 부풀려지는지, 그리고 뚫린 모델이 왜 멍청해지는지.",en:"Why success rates inflate — and why a jailbroken model gets worse at thinking."},
+    url:"https://arxiv.org/abs/2402.10260" },
+  { stage:{ko:"표준",en:"The standard"}, t:"HarmBench: A Standardized Evaluation Framework for Automated Red Teaming and Robust Refusal",
+    d:{ko:"공격 18개 × 모델·방어 33개를 한 틀에서 견준다.",en:"18 attacks against 33 models and defenses on one framework."},
+    url:"https://arxiv.org/abs/2402.04249" },
+  { stage:{ko:"재현",en:"Reproducibility"}, t:"JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models",
+    d:{ko:"프롬프트·위협 모형·채점 함수·순위표를 모두 열어 둔다.",en:"Prompts, threat model, scoring and leaderboard, all in the open."},
+    url:"https://arxiv.org/abs/2404.01318" },
+  { stage:{ko:"짝",en:"The other half"}, t:"Red Teaming Language Models to Reduce Harms",
+    d:{ko:"정해진 묶음이 아니라 새 실패를 찾아다니는 쪽의 이야기.",en:"The half that goes looking for failures no suite contains."},
+    url:"https://arxiv.org/abs/2209.07858" },
 ],
   },
 }
