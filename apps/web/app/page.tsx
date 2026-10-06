@@ -401,8 +401,10 @@ export default function CherryApp() {
           style={{ gap: 8, paddingLeft: 40, paddingRight: 40, paddingTop: 16, paddingBottom: 16 }}
         >
           {/* 화면 언어 — 개념 페이지 안이 아니라 여기서 고른다(lib/lang.ts).
-              자리는 Dashboard 버튼 왼쪽이다. */}
+              자리는 Dashboard 버튼 왼쪽. 성격이 다른 조작(화면 설정 ↔ 계정)이라
+              사이에 여백과 세로 선을 둬서 갈라 놓는다. */}
           <LangToggle />
+          <span aria-hidden className="bg-[#E4E1EE]" style={{ width: 1, height: 18, marginLeft: 12, marginRight: 12 }} />
           {token && (
             <button
               onClick={() => setActiveNav("admin")}
